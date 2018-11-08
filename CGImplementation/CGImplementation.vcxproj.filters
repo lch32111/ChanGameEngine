@@ -1,0 +1,290 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="3rd Party">
+      <UniqueIdentifier>{8ba87398-1f14-4f6d-b9e7-17887287efd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rd Party\glad">
+      <UniqueIdentifier>{74abd574-ae85-4e27-968e-1474eeb0cc57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Demo">
+      <UniqueIdentifier>{932caf78-0400-4ead-9ace-ee0ea7ab4ec1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Demo\Physics Demo">
+      <UniqueIdentifier>{56240cbe-bcd7-4ebb-8bc2-f77406117448}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics Source">
+      <UniqueIdentifier>{ab6a414f-de95-4c4d-9c9b-9b8bf43994fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GPED Header">
+      <UniqueIdentifier>{1c7d5853-c8eb-4c27-97f4-7f1f338dd74b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics Header">
+      <UniqueIdentifier>{5fe1d7ed-0b48-4972-b506-84cb575f7cc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GPED Source">
+      <UniqueIdentifier>{7b7443e3-369a-41c8-8567-0edcf5b79437}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Imgui">
+      <UniqueIdentifier>{3a79f40f-3151-4c37-927e-4649ade208df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Demo\Graphics Demo">
+      <UniqueIdentifier>{5b76e730-5a83-40fe-81af-627a96b81da0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Demo\Physics Demo\TryFirst Demo">
+      <UniqueIdentifier>{45685984-d53e-499b-b247-4d9c5d5654ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Demo\Graphics Demo\DeferredRenderer Demo">
+      <UniqueIdentifier>{a1b560e5-a03f-49dc-b1eb-d99217394ffa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rd Party\stb_image">
+      <UniqueIdentifier>{d1824c40-cb87-48e8-8af3-8101460ad56b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ShaderFolder">
+      <UniqueIdentifier>{5f596ca9-5fef-43cc-95ec-36d952bf3ca9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CG_Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glad.c">
+      <Filter>3rd Party\glad</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\GPED_body.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\GPED_collide_coarse.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\GPED_collide_fine.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\GPED_contacts.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\GPED_fgen.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\GPED_Fireworks.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\GPED_joints.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\GPED_Particle.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\GPED_Pcontacts.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\GPED_Pfgen.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\GPED_plinks.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\GPED_Precision.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\GPED_Projectiles.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\GPED_pworld.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\GPED_random.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\GPED_world.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\PS_AmmoRound.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\PS_Box.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_demo.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_draw.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_widgets.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_impl_opengl3.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_impl_glfw.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Demo\DeferredRenderer.cpp">
+      <Filter>Demo\Graphics Demo\DeferredRenderer Demo</Filter>
+    </ClCompile>
+    <ClCompile Include="Demo\TryFirst.cpp">
+      <Filter>Demo\Physics Demo\TryFirst Demo</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\chanQuatCamera.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Shader.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\chanEulerCamera.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\GLTextureUtility.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CG_Application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\GPED_body.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\GPED_collide_coarse.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\GPED_collide_fine.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\GPED_contacts.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\GPED_fgen.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\GPED_Fireworks.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\GPED_joints.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\GPED_Particle.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\GPED_Pcontacts.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\GPED_Pfgen.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\GPED_plinks.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\GPED_Precision.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\GPED_Projectiles.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\GPED_pworld.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\GPED_random.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\GPED_world.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\PS_AmmoRound.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\PS_Box.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imconfig.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imgui.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imgui_internal.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imstb_rectpack.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imstb_textedit.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imstb_truetype.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imgui_impl_glfw.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\imgui_impl_opengl3.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Demo\DeferredRenderer.h">
+      <Filter>Demo\Graphics Demo\DeferredRenderer Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="Demo\TryFirst.h">
+      <Filter>Demo\Physics Demo\TryFirst Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Shader.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\chanEulerCamera.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\chanQuatCamera.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>3rd Party\stb_image</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GLTextureUtility.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ShaderFolder\DeferredFirst.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\DeferredFirst.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\DeferredPost.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\DeferredPost.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\DeferredSecond.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\DeferredSecond.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\simpleRender.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\simpleRender.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+  </ItemGroup>
+</Project>

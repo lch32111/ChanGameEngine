@@ -149,6 +149,7 @@ void CGProj::DeferredRenderer::updateImgui()
 
 void CGProj::DeferredRenderer::updateSimulation(float deltaTime, float lastFrame)
 {
+
 }
 
 void CGProj::DeferredRenderer::display(int width, int height)
@@ -255,6 +256,61 @@ void CGProj::DeferredRenderer::mouse(double xpos, double ypos)
 void CGProj::DeferredRenderer::scroll(double yoffset)
 {
 	camera.ProcessMouseScroll(yoffset);
+}
+
+void CGProj::DeferredRenderer::resize(int width, int height)
+{
+	// First Pass Setup For Deferred Rendering
+	glBindFramebuffer(GL_FRAMEBUFFER, gFBO);
+
+	// Position Buffer
+	glBindTexture(GL_TEXTURE_2D, gPosition);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
+
+	// Normal Buffer
+	glBindTexture(GL_TEXTURE_2D, gNormal);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
+
+	// Albedo + specular Buffer
+	glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoSpec, 0);
+
+	// Emissive Buffer
+	glBindTexture(GL_TEXTURE_2D, gEmissive);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, gEmissive, 0);
+
+	// Boolean Buffer
+	glBindTexture(GL_TEXTURE_2D, gBool);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, gBool, 0);
+
+	// Tell OpenGL which color attachments we'll use (of this framebuffeer) for rendering
+	unsigned attachments[5] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2,
+		GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
+	glDrawBuffers(5, attachments);
+
+	// attach the depth component with renderbuffer
+	glBindRenderbuffer(GL_RENDERBUFFER, gRBO);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, gRBO);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		assert(0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 

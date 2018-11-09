@@ -71,6 +71,7 @@ namespace CGProj
 
 		virtual void mouse(double xpos, double ypos);
 		virtual void scroll(double yoffset);
+		virtual void resize(int width, int height);
 	private:
 		DeferredRenderer test2;
 	};

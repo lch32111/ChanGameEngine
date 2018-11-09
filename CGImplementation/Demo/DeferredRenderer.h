@@ -24,6 +24,7 @@ namespace CGProj
 		void key(GLFWwindow* app_window, float deltaTime);
 		void mouse(double xpos, double ypos);
 		void scroll(double yoffset);
+		void resize(int width, int height);
 	private:
 		chanQuatCamera camera;
 		float lastX = 400, lastY = 300;

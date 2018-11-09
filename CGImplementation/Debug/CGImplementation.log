@@ -1,9 +1,0 @@
-﻿  CG_Application.cpp
-d:\visual studio project\cgimplementation\cgimplementation\demo\tryfirst.h(39): warning C4305: 'initializing': truncation from 'double' to 'GPED::real'
-d:\visual studio project\cgimplementation\cgimplementation\demo\tryfirst.h(40): warning C4305: 'initializing': truncation from 'double' to 'GPED::real'
-d:\visual studio project\cgimplementation\cgimplementation\demo\tryfirst.h(41): warning C4305: 'initializing': truncation from 'double' to 'GPED::real'
-d:\visual studio project\cgimplementation\cgimplementation\demo\deferredrenderer.h(50): warning C4305: 'initializing': truncation from 'double' to 'float'
-d:\visual studio project\cgimplementation\cgimplementation\demo\deferredrenderer.h(51): warning C4305: 'initializing': truncation from 'double' to 'float'
-d:\visual studio project\cgimplementation\cgimplementation\cg_application.cpp(64): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-d:\visual studio project\cgimplementation\cgimplementation\cg_application.cpp(89): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
-  CGImplementation.vcxproj -> D:\Visual Studio Project\CGImplementation\Debug\CGImplementation.exe

@@ -253,11 +253,18 @@ void CGProj::GraphicsDemo::scroll(double yoffset)
 	test2.scroll(yoffset);
 }
 
+void CGProj::GraphicsDemo::resize(int width, int height)
+{
+	Application::resize(width, height);
+
+	test2.resize(width, height);
+}
+
 /* ### Graphics Demo ### */
 /****************************************************************************************/
 
 
 CGProj::Application* getApplication()
 {
-	return new CGProj::PhysicsDemo();
+	return new CGProj::GraphicsDemo();
 }

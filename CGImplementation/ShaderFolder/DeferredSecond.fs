@@ -23,7 +23,7 @@ struct Light
     float Radius;
 };
 
-const int NR_LIGHTS = 32;
+const int NR_LIGHTS = 100;
 uniform Light lights[NR_LIGHTS];
 
 void main()
@@ -106,14 +106,14 @@ void main()
         }
     }
 
-	/*
-    // post=processing for HDR with tone mapping and gamma corection
+    // post-processing for HDR with tone mapping and gamma corection
     const float gamma = 2.2;
     const float exposure = 1.0;
+
     vec3 hdrColor = lighting;
     vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);
     mapped = pow(mapped, vec3(1.0 / gamma));
     FragColor = vec4(mapped, 1.0);
-	*/
-	FragColor = vec4(lighting, 1.0);
+	
+	// FragColor = vec4(lighting, 1.0);
 }

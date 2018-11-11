@@ -423,6 +423,7 @@ void GPED::RigidBody::clearAccumulators()
 void GPED::RigidBody::addForce(const glm::vec3& force)
 {
 	forceAccum += force;
+	isAwake = true;
 }
 
 void GPED::RigidBody::addForceAtPoint(const glm::vec3& force, const glm::vec3& point)
@@ -433,6 +434,8 @@ void GPED::RigidBody::addForceAtPoint(const glm::vec3& force, const glm::vec3& p
 
 	forceAccum += force;
 	torqueAccum += glm::cross(pt, force);
+
+	isAwake = true;
 }
 
 void GPED::RigidBody::addForceAtBodyPoint(const glm::vec3& force, const glm::vec3& point)
@@ -445,6 +448,7 @@ void GPED::RigidBody::addForceAtBodyPoint(const glm::vec3& force, const glm::vec
 void GPED::RigidBody::addTorque(const glm::vec3& torque)
 {
 	torqueAccum += torque;
+	isAwake = true;
 }
 
 void GPED::RigidBody::setAcceleration(const glm::vec3 & acceleration)

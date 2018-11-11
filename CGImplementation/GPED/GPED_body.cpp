@@ -141,7 +141,7 @@ void GPED::RigidBody::integrate(real duration)
 
 void GPED::RigidBody::setMass(const real mass)
 {
-	assert(mass != 0);
+	assert(mass > real_epsilon);
 	RigidBody::inverseMass = (real(1.0)) / mass;
 }
 
@@ -165,7 +165,7 @@ real GPED::RigidBody::getInverseMass() const
 
 bool GPED::RigidBody::hasFiniteMass() const
 {
-	return inverseMass >= 0.0f;
+	return inverseMass > real_epsilon;
 }
 
 void GPED::RigidBody::setInertiaTensor(const glm::mat3& inertiaTensor)

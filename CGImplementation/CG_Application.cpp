@@ -133,8 +133,8 @@ void CGProj::PhysicsDemo::initGraphics()
 {
 	Application::initGraphics();
 	
-	// glfwSwapInterval(0); // Turn off Vsync and measure the FPS
-	glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSwapInterval(0); // Turn off Vsync and measure the FPS
+	// glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 

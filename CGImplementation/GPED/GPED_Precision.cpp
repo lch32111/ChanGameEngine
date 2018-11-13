@@ -85,3 +85,23 @@ glm::mat3 GPED::getBlockInertiaTensor(const glm::vec3& halfSizes, real mass)
 		0.3f * mass * (square.x + square.y)
 	);
 }
+
+real GPED::rMin(real a, real b)
+{
+	return a < b ? a : b;
+}
+
+real GPED::rMax(real a, real b)
+{
+	return a > b ? a : b;
+}
+
+glm::vec3 GPED::rMin(const glm::vec3 & a, const glm::vec3 & b)
+{
+	return glm::vec3(rMin(a.x, b.x), rMin(a.y, b.y), rMin(a.z, b.z));
+}
+
+glm::vec3 GPED::rMax(const glm::vec3 & a, const glm::vec3 & b)
+{
+	return glm::vec3(rMax(a.x, b.x), rMax(a.y, b.y), rMax(a.z, b.z));
+}

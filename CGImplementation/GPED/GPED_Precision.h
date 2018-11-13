@@ -112,6 +112,11 @@ namespace GPED
 		real ixy = 0, real ixz = 0, real iyz = 0);
 
 	glm::mat3 getBlockInertiaTensor(const glm::vec3& halfSizes, real mass);
+
+	real rMin(real a, real b);
+	real rMax(real a, real b);
+	glm::vec3 rMin(const glm::vec3& a, const glm::vec3& b);
+	glm::vec3 rMax(const glm::vec3& a, const glm::vec3& b);
 }
 
 

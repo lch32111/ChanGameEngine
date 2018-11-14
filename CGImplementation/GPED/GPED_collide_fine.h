@@ -59,6 +59,12 @@ namespace GPED
 			return transform;
 		}
 
+		/** 18-11-14 Chanhaneg Lee
+		 * this method is for the broadPhase.
+		 * this virtual interface will make the code simple in the broadPhase class.
+		 */
+		virtual c3AABB makeAABB() const = 0;
+
 	protected:
 		/**
 		 * The resultant transform of the primitive. This is
@@ -79,6 +85,19 @@ namespace GPED
 		 * The radius of the sphere.
 		 */
 		real radius;
+
+		virtual c3AABB makeAABB() const
+		{
+			c3AABB aabb;
+			
+			// Ignore the orientation of sphere primitive
+			glm::vec3 pos = getAxis(3);
+
+			aabb.min = pos - glm::vec3(radius);
+			aabb.max = pos + glm::vec3(radius);
+
+			return aabb;
+		}
 	};
 
 	/**
@@ -111,6 +130,40 @@ namespace GPED
 		 * Holds the half-sizes of the box along each of its local axes.
 		 */
 		glm::vec3 halfSize;
+
+
+		// RTCD p86 ~ p87.
+		virtual c3AABB makeAABB() const
+		{
+			c3AABB aabb;
+			// For all three axes
+			for (int i = 0; i < 3; ++i)
+			{
+				// Start by adding in translation
+				aabb.min[i] = aabb.max[i] = transform[3][i];
+				
+				// Form extent by summing smaller and larger terms respectively
+				for (int j = 0; j < 3; ++j)
+				{
+					
+					real e = transform[j][i] * halfSize[j] * -1;
+					real f = transform[j][i] * halfSize[j];
+
+					if (e < f)
+					{
+						aabb.min[i] += e;
+						aabb.max[i] += f;
+					}
+					else
+					{
+						aabb.min[i] += f;
+						aabb.max[i] += e;
+					}
+				}
+			}
+
+			return aabb;
+		}
 	};
 
 	/**

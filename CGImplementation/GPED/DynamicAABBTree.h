@@ -9,54 +9,6 @@
 
 namespace CGProj
 {
-	/* 18-11-13 Chanhaneg Lee
-		I referred to http://www.randygaul.net/2013/08/06/dynamic-aabb-tree/ .
-		However, this article is almost based on the Box2D Code.
-		So, I also referred to the Box2D Code.
-		I made the code work with our project code
-	*/
-#define aabbExtension 0.1
-#define aabbMultiplier 2.0
-	struct c3AABB // CG Project 3-dimenstional AABB
-	{
-		glm::vec3 min;
-		glm::vec3 max;
-
-		GPED::real GetPerimeter() const
-		{
-			GPED::real wx = max.x - min.x;
-			GPED::real wy = max.y - min.y;
-			GPED::real wz = max.z - min.z;
-
-			return GPED::real(4) * (wx + wy + wz);
-		}
-
-		void Combine(const c3AABB& aabb)
-		{
-			min = GPED::rMin(min, aabb.min);
-			max = GPED::rMax(max, aabb.max);
-		}
-
-		void Combine(const c3AABB& aabb1, const c3AABB& aabb2)
-		{
-			min = GPED::rMin(aabb1.min, aabb2.min);
-			max = GPED::rMax(aabb1.max, aabb2.max);
-		}
-
-		// Does this aabb contain the provided AABB;
-		bool Contains(const c3AABB& aabb) const
-		{
-			bool result = true;
-			result = result && min.x <= aabb.min.x;
-			result = result && min.y <= aabb.min.y;
-			result = result && min.z <= aabb.min.z;
-			result = result && aabb.max.x <= max.x;
-			result = result && aabb.max.y <= max.y;
-			result = result && aabb.max.z <= max.z;
-			return result;
-		}
-	};
-
 #define Node_Null -1
 	struct TreeNode
 	{
@@ -67,7 +19,7 @@ namespace CGProj
 		}
 
 		// Fat AABB for leafs, bounding AABB for branches
-		c3AABB aabb;
+		GPED::c3AABB aabb;
 
 		union
 		{
@@ -102,19 +54,19 @@ namespace CGProj
 
 		~DynamicAABBTree();
 
-		int CreateProxy(const c3AABB& aabb, void* userData);
+		int CreateProxy(const GPED::c3AABB& aabb, void* userData);
 		void DestroyProxy(int proxyId);
 
 		// this method is the same as MoveProxy in the box2D.
 		// I changed the name for the more intuition
-		bool UpdateProxy(int proxyId, const c3AABB& aabb, const glm::vec3 displacement);
+		bool UpdateProxy(int proxyId, const GPED::c3AABB& aabb, const glm::vec3 displacement);
 		
 		void* GetUserData(int proxyId) const;
 
-		const c3AABB& GetFatAABB(int proxyId) const;
+		const GPED::c3AABB& GetFatAABB(int proxyId) const;
 
 		template<typename T>
-		void Query(T* callback, const c3AABB& aabb) const;
+		void Query(T* callback, const GPED::c3AABB& aabb) const;
 
 		int GetHiehgt() const;
 
@@ -126,8 +78,6 @@ namespace CGProj
 		void RemoveLeaf(int leaf);
 
 		int Balance(int index);
-
-		bool aabbOverlap(const c3AABB& a, const c3AABB& b);
 
 		int m_root;
 		
@@ -143,7 +93,7 @@ namespace CGProj
 	};
 
 	template<typename T>
-	inline void DynamicAABBTree::Query(T * callback, const c3AABB & aabb) const
+	inline void DynamicAABBTree::Query(T * callback, const GPED::c3AABB & aabb) const
 	{
 		const int stackCapacity = 256;
 		int stack[stackCapacity];

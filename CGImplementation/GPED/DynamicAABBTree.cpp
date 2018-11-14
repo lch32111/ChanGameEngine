@@ -55,7 +55,7 @@ CGProj::DynamicAABBTree::~DynamicAABBTree()
 // Create a proxy in the tree as a leaf node. We return the index
 // of the node instead of a pointer so that we can grow
 // the node pool
-int CGProj::DynamicAABBTree::CreateProxy(const c3AABB & aabb, void * userData)
+int CGProj::DynamicAABBTree::CreateProxy(const GPED::c3AABB & aabb, void * userData)
 {
 	int proxyId = AllocateNode();
 
@@ -80,7 +80,7 @@ void CGProj::DynamicAABBTree::DestroyProxy(int proxyId)
 	FreeNode(proxyId);
 }
 
-bool CGProj::DynamicAABBTree::UpdateProxy(int proxyId, const c3AABB & aabb, const glm::vec3 displacement)
+bool CGProj::DynamicAABBTree::UpdateProxy(int proxyId, const GPED::c3AABB & aabb, const glm::vec3 displacement)
 {
 	assert(0 <= proxyId && proxyId < m_nodeCapacity);
 	assert(m_nodes[proxyId].isLeaf());
@@ -91,7 +91,7 @@ bool CGProj::DynamicAABBTree::UpdateProxy(int proxyId, const c3AABB & aabb, cons
 	RemoveLeaf(proxyId);
 
 	// Extend AABB
-	c3AABB b = aabb;
+	GPED::c3AABB b = aabb;
 	glm::vec3 r(aabbExtension);
 	b.min = b.min - r;
 	b.max = b.max + r;
@@ -120,7 +120,7 @@ void * CGProj::DynamicAABBTree::GetUserData(int proxyId) const
 	return m_nodes[proxyId].userdata;
 }
 
-const CGProj::c3AABB& CGProj::DynamicAABBTree::GetFatAABB(int proxyId) const
+const GPED::c3AABB& CGProj::DynamicAABBTree::GetFatAABB(int proxyId) const
 {
 	assert(0 <= proxyId && proxyId < m_nodeCapacity);
 	return m_nodes[proxyId].aabb;
@@ -195,7 +195,7 @@ void CGProj::DynamicAABBTree::InsertLeaf(int leaf)
 	}
 
 	// Find the best sibling for this node with Surface Area Heuristic
-	c3AABB leafAABB = m_nodes[leaf].aabb;
+	GPED::c3AABB leafAABB = m_nodes[leaf].aabb;
 	int index = m_root;
 	while(m_nodes[index].isLeaf() == false)
 	{
@@ -204,7 +204,7 @@ void CGProj::DynamicAABBTree::InsertLeaf(int leaf)
 
 		// Cost Heuristic Traversal on tree
 		GPED::real area = m_nodes[index].aabb.GetPerimeter();
-		c3AABB combinedAABB;
+		GPED::c3AABB combinedAABB;
 		combinedAABB.Combine(m_nodes[index].aabb, leafAABB);
 		GPED::real combinedArea = combinedAABB.GetPerimeter();
 
@@ -218,13 +218,13 @@ void CGProj::DynamicAABBTree::InsertLeaf(int leaf)
 		GPED::real cost1;
 		if (m_nodes[left].isLeaf())
 		{
-			c3AABB aabb;
+			GPED::c3AABB aabb;
 			aabb.Combine(leafAABB, m_nodes[left].aabb);
 			cost1 = aabb.GetPerimeter() + inheritanceCost;
 		}
 		else
 		{
-			c3AABB aabb;
+			GPED::c3AABB aabb;
 			aabb.Combine(leafAABB, m_nodes[left].aabb);
 			GPED::real oldArea = m_nodes[left].aabb.GetPerimeter();
 			GPED::real newArea = aabb.GetPerimeter();
@@ -235,13 +235,13 @@ void CGProj::DynamicAABBTree::InsertLeaf(int leaf)
 		GPED::real cost2;
 		if (m_nodes[right].isLeaf())
 		{
-			c3AABB aabb;
+			GPED::c3AABB aabb;
 			aabb.Combine(leafAABB, m_nodes[right].aabb);
 			cost2 = aabb.GetPerimeter() + inheritanceCost;
 		}
 		else
 		{
-			c3AABB aabb;
+			GPED::c3AABB aabb;
 			aabb.Combine(leafAABB, m_nodes[right].aabb);
 			GPED::real oldArea = m_nodes[right].aabb.GetPerimeter();
 			GPED::real newArea = aabb.GetPerimeter();
@@ -369,15 +369,4 @@ void CGProj::DynamicAABBTree::RemoveLeaf(int leaf)
 int CGProj::DynamicAABBTree::Balance(int index)
 {
 	return 0;
-}
-
-bool CGProj::DynamicAABBTree::aabbOverlap(const c3AABB & a, const c3AABB & b)
-{
-	// Exit with no intersection if separated along an axis
-	if (a.max[0] < b.min[0] || a.min[0] > b.max[0]) return false;
-	if (a.max[1] < b.min[1] || a.min[1] > b.max[1]) return false;
-	if (a.max[2] < b.min[2] || a.min[2] > b.max[2]) return false;
-	
-	// Overlapping on all axes means AABBs are intersecting
-	return true;
 }

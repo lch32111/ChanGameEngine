@@ -117,6 +117,65 @@ namespace GPED
 	real rMax(real a, real b);
 	glm::vec3 rMin(const glm::vec3& a, const glm::vec3& b);
 	glm::vec3 rMax(const glm::vec3& a, const glm::vec3& b);
+	
+	/* 18-11-13 Chanhaneg Lee
+		I referred to http://www.randygaul.net/2013/08/06/dynamic-aabb-tree/ .
+		However, this article is almost based on the Box2D Code.
+		So, I also referred to the Box2D Code.
+		I made the code work with our project code
+	*/
+#define aabbExtension 0.1
+#define aabbMultiplier 2.0
+	struct c3AABB // CG Project 3-dimenstional AABB
+	{
+		glm::vec3 min;
+		glm::vec3 max;
+
+		GPED::real GetPerimeter() const
+		{
+			GPED::real wx = max.x - min.x;
+			GPED::real wy = max.y - min.y;
+			GPED::real wz = max.z - min.z;
+
+			return GPED::real(4) * (wx + wy + wz);
+		}
+
+		void Combine(const c3AABB& aabb)
+		{
+			min = GPED::rMin(min, aabb.min);
+			max = GPED::rMax(max, aabb.max);
+		}
+
+		void Combine(const c3AABB& aabb1, const c3AABB& aabb2)
+		{
+			min = GPED::rMin(aabb1.min, aabb2.min);
+			max = GPED::rMax(aabb1.max, aabb2.max);
+		}
+
+		// Does this aabb contain the provided AABB;
+		bool Contains(const c3AABB& aabb) const
+		{
+			bool result = true;
+			result = result && min.x <= aabb.min.x;
+			result = result && min.y <= aabb.min.y;
+			result = result && min.z <= aabb.min.z;
+			result = result && aabb.max.x <= max.x;
+			result = result && aabb.max.y <= max.y;
+			result = result && aabb.max.z <= max.z;
+			return result;
+		}
+	};
+
+	bool aabbOverlap(const GPED::c3AABB & a, const c3AABB & b)
+	{
+		// Exit with no intersection if separated along an axis
+		if (a.max[0] < b.min[0] || a.min[0] > b.max[0]) return false;
+		if (a.max[1] < b.min[1] || a.min[1] > b.max[1]) return false;
+		if (a.max[2] < b.min[2] || a.min[2] > b.max[2]) return false;
+
+		// Overlapping on all axes means AABBs are intersecting
+		return true;
+	}
 }
 
 

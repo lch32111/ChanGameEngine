@@ -36,6 +36,8 @@ void CGProj::TryFirst::initGraphics()
 		box->proxyId = FirstBroadPhase.CreateProxy(GPED::convertFromCollisionPrimitive(*box), box);
 	}
 	currentShotType = ShotType::SHOT_PISTOL;
+
+	bRender.tree = FirstBroadPhase.getTree();
 }
 
 void CGProj::TryFirst::initImgui()
@@ -147,7 +149,7 @@ void CGProj::TryFirst::display(int width, int height)
 	glBindTexture(GL_TEXTURE_2D, containerTexture);
 	for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; ++shot)
 	{
-		if (shot->type != ShotType::SHOT_UNUSED)
+		if (shot->m_shotType != ShotType::SHOT_UNUSED)
 		{
 			model = glm::mat4(1.0);
 			model = shot->body->getTransform();
@@ -167,8 +169,6 @@ void CGProj::TryFirst::display(int width, int height)
 	}
 
 	// Broad Phase Debug Rendering
-	DynamicAABBTree* tree = FirstBroadPhase.getTree();
-	bRender.tree = tree;
 	bRender.draw(&wireShader, &projection, &view);
 }
 
@@ -263,7 +263,7 @@ void CGProj::TryFirst::updateObjects(float duration, float lastFrame)
 {
 	for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; ++shot)
 	{
-		if (shot->type != ShotType::SHOT_UNUSED)
+		if (shot->m_shotType != ShotType::SHOT_UNUSED)
 		{
 			glm::vec3 pos = shot->body->getPosition();
 
@@ -271,12 +271,21 @@ void CGProj::TryFirst::updateObjects(float duration, float lastFrame)
 			{
 				// We simply set the shot type to be unused, so the
 				// memory it occupies can be reused by another shot.
-				shot->type = ShotType::SHOT_UNUSED;
-
-				FirstBroadPhase.DestroyProxy(shot->proxyId);
+				shot->m_shotType = ShotType::SHOT_UNUSED;
+				
+				if (shot->connectBroad)
+				{
+					FirstBroadPhase.DestroyProxy(shot->proxyId);
+				}
 			}
 			else
 			{
+				if (shot->connectBroad == false)
+				{
+					shot->proxyId = FirstBroadPhase.CreateProxy(GPED::convertFromCollisionPrimitive(*shot), shot);
+					shot->connectBroad = true;
+				}
+
 				// Run the physics
 				shot->body->integrate(duration);
 				shot->calculateInternals();
@@ -298,17 +307,18 @@ void CGProj::TryFirst::updateObjects(float duration, float lastFrame)
 void CGProj::TryFirst::SyncAndUpdate()
 {
 	for (int i = 0; i < boxes; ++i)
-		if (boxData[i].body->getAwake())
+		if(boxData[i].body->getAwake())
 			FirstBroadPhase.UpdateProxy(boxData[i].proxyId, GPED::convertFromCollisionPrimitive(boxData[i]));
 
-	for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; ++shot)
-		if (shot->type != ShotType::SHOT_UNUSED)
-			FirstBroadPhase.UpdateProxy(ammo->proxyId, GPED::convertFromCollisionPrimitive(*shot));
+	for (int i = 0; i < ammoRounds; ++i)
+		if (ammo[i].m_shotType != ShotType::SHOT_UNUSED)
+			FirstBroadPhase.UpdateProxy(ammo[i].proxyId, GPED::convertFromCollisionPrimitive(ammo[i]));
 }
 
 // Update Broad Phase Pairs
 void CGProj::TryFirst::broadPhase()
 {
+	firstResult.vPairs.clear();
 	// Perform Tree Queries for all moving proxies
 	// on this step, we gather the pairs and then 
 	// pass the pairs to the generateContacts process for narrow phase
@@ -334,8 +344,9 @@ void CGProj::TryFirst::generateContacts(GPED::CollisionData & cData)
 
 	// we will generate contacts from the pairs detected by broadphase
 	// In addition, we will generate contacts manually with planes
-	std::vector<std::pair<GPED::CollisionPrimitive*, GPED::CollisionPrimitive*>>& t_pair
+	const std::vector<std::pair<GPED::CollisionPrimitive*, GPED::CollisionPrimitive*>>& t_pair
 		= firstResult.vPairs;
+	std::cout << t_pair.size() << '\n';
 	for (int i = 0; i < t_pair.size(); ++i)
 	{
 		GPED::CollisionDetector::collision(t_pair[i].first, t_pair[i].second, &cData);
@@ -343,6 +354,7 @@ void CGProj::TryFirst::generateContacts(GPED::CollisionData & cData)
 
 	for (int i = 0; i < boxes; ++i)
 	{
+		if (!boxData[i].body->getAwake()) continue;
 		GPED::CollisionDetector::boxAndHalfSpace(boxData[i], planeGround, &cData);
 		GPED::CollisionDetector::boxAndHalfSpace(boxData[i], planeZWall, &cData);
 	}
@@ -353,7 +365,7 @@ void CGProj::TryFirst::fire()
 	AmmoRound* shot;
 	for (shot = ammo; shot < ammo + ammoRounds; ++shot)
 	{
-		if (shot->type == ShotType::SHOT_UNUSED)
+		if (shot->m_shotType == ShotType::SHOT_UNUSED)
 			break;
 	}
 
@@ -362,7 +374,6 @@ void CGProj::TryFirst::fire()
 
 	// Set the shot
 	shot->setState(currentShotType, camera);
-	shot->proxyId = FirstBroadPhase.CreateProxy(GPED::convertFromCollisionPrimitive(*shot), shot);;
 }
 
 void CGProj::TryFirst::totalFire()
@@ -370,7 +381,7 @@ void CGProj::TryFirst::totalFire()
 	int index = 0;
 	for (int i = 0; i < ammoRounds; ++i)
 	{
-		if (ammo[i].type == ShotType::SHOT_UNUSED)
+		if (ammo[i].m_shotType == ShotType::SHOT_UNUSED)
 		{
 			index = i;
 			break;
@@ -389,10 +400,9 @@ void CGProj::TryFirst::totalFire()
 	{
 		x = ranGen.randomBinomial(50);
 		y = ranGen.randomReal(0, 5);
-		if (ammo[i].type == ShotType::SHOT_UNUSED)
+		if (ammo[i].m_shotType == ShotType::SHOT_UNUSED)
 		{
 			ammo[i].setState(ShotType::SHOT_ARTILLERY, glm::vec3(x, y, z), glm::vec3(0, 3, 40));
-			ammo[i].proxyId = FirstBroadPhase.CreateProxy(GPED::convertFromCollisionPrimitive(ammo[i]), &ammo[i]);
 			++j;
 			x += 0.6;
 		}
@@ -413,10 +423,10 @@ void CGProj::TryFirst::reset()
 	AmmoRound* shot;
 	for (shot = ammo; shot < ammo + ammoRounds; ++shot)
 	{
-		if (shot->type != ShotType::SHOT_UNUSED)
+		if (shot->m_shotType != ShotType::SHOT_UNUSED)
 			FirstBroadPhase.DestroyProxy(shot->proxyId);
 
-		shot->type = ShotType::SHOT_UNUSED;
+		shot->m_shotType = ShotType::SHOT_UNUSED;
 	}
 
 }

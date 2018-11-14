@@ -22,7 +22,7 @@ namespace CGProj
 {
 	struct BroadRenderer
 	{
-		DynamicAABBTree* tree;
+		const DynamicAABBTree* tree;
 		Shader* m_shader;
 		glm::mat4* m_projection;
 		glm::mat4* m_view;
@@ -36,8 +36,7 @@ namespace CGProj
 			shader->use();
 			shader->setMat4("projection", *m_projection);
 			shader->setMat4("view", *view);
-
-			if(tree->GetHiehgt() >= 0)
+			if(tree->GetHeight() >= 0)
 				recursiveDraw(tree->m_root);
 		}
 
@@ -123,7 +122,7 @@ namespace CGProj
 		Shader wireShader;
 		BroadRenderer bRender;
 		
-		static const int maxContacts = 256;
+		static const int maxContacts = 1000;
 		GPED::Contact contacts[maxContacts];
 		GPED::CollisionData cData;
 		GPED::ContactResolver resolver;
@@ -131,7 +130,7 @@ namespace CGProj
 		const static unsigned ammoRounds = 100;
 		AmmoRound ammo[ammoRounds];
 
-		const static unsigned boxes = 30;
+		const static unsigned boxes = 70;
 		Box boxData[boxes];
 
 		void updateObjects(float duration, float lastFrame);

@@ -22,7 +22,7 @@ namespace GPED
 			primitive_sphere,
 			primitive_box
 		};
-		primitiveType type;
+		primitiveType m_primitiveType;
 
 		/**
 		 * This class exists to help the collision detector
@@ -91,7 +91,7 @@ namespace GPED
 	public:
 		CollisionSphere()
 		{
-			CollisionPrimitive::type = primitive_sphere;
+			CollisionPrimitive::m_primitiveType = primitive_sphere;
 		}
 
 		/**
@@ -141,7 +141,7 @@ namespace GPED
 	public:
 		CollisionBox()
 		{
-			CollisionPrimitive::type = primitive_box;
+			CollisionPrimitive::m_primitiveType = primitive_box;
 		}
 
 		/**
@@ -316,7 +316,7 @@ namespace GPED
 		)
 		{
 			int aKey = 0;
-			switch (a->type)
+			switch (a->m_primitiveType)
 			{
 			case GPED::CollisionPrimitive::primitiveType::primitive_sphere:
 				aKey = 0;
@@ -329,7 +329,7 @@ namespace GPED
 			}
 
 			int bKey = 0;
-			switch (b->type)
+			switch (b->m_primitiveType)
 			{
 			case GPED::CollisionPrimitive::primitiveType::primitive_sphere:
 				bKey = 0;

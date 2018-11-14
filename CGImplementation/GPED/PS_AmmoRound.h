@@ -17,8 +17,9 @@ class AmmoRound : public GPED::CollisionSphere
 {
 public:
 	int proxyId;
+	bool connectBroad;
 
-	ShotType type;
+	ShotType m_shotType;
 	unsigned startTime;
 
 	AmmoRound()

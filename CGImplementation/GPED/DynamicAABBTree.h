@@ -64,7 +64,7 @@ namespace CGProj
 		template<typename T>
 		void Query(T* callback, const GPED::c3AABB& aabb) const;
 
-		int GetHiehgt() const;
+		int GetHeight() const;
 
 	protected:
 		int AllocateNode();
@@ -86,6 +86,13 @@ namespace CGProj
 		int m_path;
 
 		int m_insertionCount;
+
+		void Validate();
+		void ValidateStructure(int index) const;
+		void ValidateMetrics(int index) const;
+		
+		GPED::real ComputeHeight(int nodeId) const;
+		int ComputeHeight() const;
 	};
 
 	template<typename T>

@@ -4,10 +4,10 @@
 
 void AmmoRound::setState(ShotType shotType)
 {
-	type = shotType;
+	m_shotType = shotType;
 
 	// Set the properties of the particle
-	switch (type)
+	switch (m_shotType)
 	{
 	case SHOT_PISTOL:
 		body->setMass(1.5f);
@@ -59,14 +59,16 @@ void AmmoRound::setState(ShotType shotType)
 	// Clear the force accumulators
 	body->calculateDerivedData();
 	calculateInternals();
+
+	connectBroad = false;
 }
 
 void AmmoRound::setState(ShotType shotType, glm::vec3 Position, glm::vec3 Velocity)
 {
-	type = shotType;
+	m_shotType = shotType;
 
 	// Set the properties of the particle
-	switch (type)
+	switch (m_shotType)
 	{
 	case SHOT_PISTOL:
 		body->setMass(1.5f);
@@ -122,14 +124,16 @@ void AmmoRound::setState(ShotType shotType, glm::vec3 Position, glm::vec3 Veloci
 	// Clear the force accumulators
 	body->calculateDerivedData();
 	calculateInternals();
+
+	connectBroad = false;
 }
 
 void AmmoRound::setState(ShotType shotType, const chanQuatCamera& camera)
 {
-	type = shotType;
+	m_shotType = shotType;
 
 	// Set the properties of the particle
-	switch (type)
+	switch (m_shotType)
 	{
 	case SHOT_PISTOL:
 		body->setMass(1.5f);
@@ -187,5 +191,8 @@ void AmmoRound::setState(ShotType shotType, const chanQuatCamera& camera)
 	// Clear the force accumulators
 	body->calculateDerivedData();
 	calculateInternals();
+
+	// prepare the connection with the broad Phase tree
+	connectBroad = false;
 }
 

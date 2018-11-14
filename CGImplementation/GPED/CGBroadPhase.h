@@ -41,7 +41,7 @@ namespace CGProj
 		template<typename T>
 		void Query(T* callback, const GPED::c3AABB& aabb) const;
 
-		DynamicAABBTree* getTree()
+		const DynamicAABBTree* getTree() const
 		{
 			return &m_tree;
 		}

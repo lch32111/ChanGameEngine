@@ -126,7 +126,7 @@ bool CGProj::DynamicAABBTree::UpdateProxy(int proxyId, const GPED::c3AABB & aabb
 
 	// Extend AABB
 	GPED::c3AABB b = aabb;
-	glm::vec3 r(aabbExtension);
+	glm::vec3 r(aabbExtension * aabbMultiplier);
 	b.min = b.min - r;
 	b.max = b.max + r;
 	m_nodes[proxyId].aabb = b;
@@ -147,7 +147,7 @@ const GPED::c3AABB& CGProj::DynamicAABBTree::GetFatAABB(int proxyId) const
 	return m_nodes[proxyId].aabb;
 }
 
-int CGProj::DynamicAABBTree::GetHiehgt() const
+int CGProj::DynamicAABBTree::GetHeight() const
 {
 	if(m_root == Node_Null)
 		return 0;
@@ -316,7 +316,7 @@ void CGProj::DynamicAABBTree::InsertLeaf(int leaf)
 		m_nodes[leaf].parent = newParent;
 		m_root = newParent;
 	}
-
+	
 	// Walk back up the tree fixing heights and AABBs
 	index = m_nodes[leaf].parent;
 	while (index != Node_Null)
@@ -334,6 +334,8 @@ void CGProj::DynamicAABBTree::InsertLeaf(int leaf)
 
 		index = m_nodes[index].parent;
 	}
+
+	// Validate();
 }
 
 void CGProj::DynamicAABBTree::RemoveLeaf(int leaf)
@@ -343,9 +345,9 @@ void CGProj::DynamicAABBTree::RemoveLeaf(int leaf)
 		m_root = Node_Null;
 		return;
 	}
-	int parent = 0;
-	parent = m_nodes[parent].parent;
+	int parent = m_nodes[leaf].parent;
 	int grandParent = m_nodes[parent].parent;
+	
 	int sibling;
 	if (m_nodes[parent].left == leaf)
 		sibling = m_nodes[parent].right;
@@ -386,10 +388,125 @@ void CGProj::DynamicAABBTree::RemoveLeaf(int leaf)
 		m_nodes[sibling].parent = Node_Null;
 		FreeNode(parent);
 	}
-		 
+	
+	// Validate();
 }
 
 int CGProj::DynamicAABBTree::Balance(int index)
 {
 	return 0;
+}
+
+void CGProj::DynamicAABBTree::Validate()
+{
+	ValidateStructure(m_root);
+	ValidateMetrics(m_root);
+
+	int freeCount = 0;
+	int freeIndex = m_freeList;
+	while (freeIndex != Node_Null)
+	{
+		assert(0 <= freeIndex && freeIndex < m_nodeCapacity);
+		freeIndex = m_nodes[freeIndex].next;
+		++freeCount;
+	}
+
+	assert(GetHeight() == ComputeHeight());
+
+	assert(m_nodeCount + freeCount == m_nodeCapacity);
+}
+
+void CGProj::DynamicAABBTree::ValidateStructure(int index) const
+{
+	if (index == Node_Null)
+	{
+		return;
+	}
+
+	if (index == m_root)
+	{
+		assert(m_nodes[index].parent == Node_Null);
+	}
+
+	const TreeNode* node = m_nodes + index;
+
+	int left = node->left;
+	int right = node->right;
+
+	if (node->isLeaf())
+	{
+		assert(left == Node_Null);
+		assert(right == Node_Null);
+		assert(node->height == 0);
+		return;
+	}
+
+	assert(0 <= left && left < m_nodeCapacity);
+	assert(0 <= right && right < m_nodeCapacity);
+
+	assert(m_nodes[left].parent == index);
+	assert(m_nodes[right].parent == index);
+
+	ValidateStructure(left);
+	ValidateStructure(right);
+}
+
+void CGProj::DynamicAABBTree::ValidateMetrics(int index) const
+{
+	if (index == Node_Null)
+	{
+		return;
+	}
+
+	const TreeNode* node = m_nodes + index;
+
+	int left = node->left;
+	int right = node->right;
+
+	if (node->isLeaf())
+	{
+		assert(left == Node_Null);
+		assert(right == Node_Null);
+		assert(node->height == 0);
+		return;
+	}
+
+	assert(0 <= left && left < m_nodeCapacity);
+	assert(0 <= right && right < m_nodeCapacity);
+
+	int height1 = m_nodes[left].height;
+	int height2 = m_nodes[right].height;
+	int height;
+	height = 1 + GPED::rMax(height1, height2);
+	assert(node->height == height);
+
+	GPED::c3AABB aabb;
+	aabb.Combine(m_nodes[left].aabb, m_nodes[right].aabb);
+
+	assert(aabb.min == node->aabb.min);
+	assert(aabb.max == node->aabb.max);
+
+	ValidateMetrics(left);
+	ValidateMetrics(right);
+}
+
+GPED::real CGProj::DynamicAABBTree::ComputeHeight(int nodeId) const
+{
+	assert(0 <= nodeId && nodeId < m_nodeCapacity);
+	TreeNode* node = m_nodes + nodeId;
+
+	if (node->isLeaf())
+	{
+		return 0;
+	}
+
+	int height1 = ComputeHeight(node->left);
+	int height2 = ComputeHeight(node->right);
+	return 1 + GPED::rMax(height1, height2);
+}
+
+int CGProj::DynamicAABBTree::ComputeHeight() const
+{
+	int height = ComputeHeight(m_root);
+	return height;
 }

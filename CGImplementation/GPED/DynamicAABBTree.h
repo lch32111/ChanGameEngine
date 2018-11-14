@@ -15,6 +15,8 @@ namespace CGProj
 		So, I also referred to the Box2D Code.
 		I made the code work with our project code
 	*/
+#define aabbExtension 0.1
+#define aabbMultiplier 2.0
 	struct c3AABB // CG Project 3-dimenstional AABB
 	{
 		glm::vec3 min;
@@ -39,6 +41,19 @@ namespace CGProj
 		{
 			min = GPED::rMin(aabb1.min, aabb2.min);
 			max = GPED::rMax(aabb1.max, aabb2.max);
+		}
+
+		// Does this aabb contain the provided AABB;
+		bool Contains(const c3AABB& aabb) const
+		{
+			bool result = true;
+			result = result && min.x <= aabb.min.x;
+			result = result && min.y <= aabb.min.y;
+			result = result && min.z <= aabb.min.z;
+			result = result && aabb.max.x <= max.x;
+			result = result && aabb.max.y <= max.y;
+			result = result && aabb.max.z <= max.z;
+			return result;
 		}
 	};
 
@@ -79,13 +94,6 @@ namespace CGProj
 		int height;
 	};
 
-
-	/* 18-11-13 Chanhaeng Lee
-		This Dynamic AABB Tree is implemented with statif linked list
-		It means this tree will not allocate memory at runtime.
-		If you want, then you can implement your own growable array similar to std::vector.
-		But you should note that you avoid allocating memory frequenrly at runtime.
-	*/
 	class DynamicAABBTree
 	{
 	public:
@@ -96,6 +104,10 @@ namespace CGProj
 
 		int CreateProxy(const c3AABB& aabb, void* userData);
 		void DestroyProxy(int proxyId);
+
+		// this method is the same as MoveProxy in the box2D.
+		// I changed the name for the more intuition
+		bool UpdateProxy(int proxyId, const c3AABB& aabb, const glm::vec3 displacement);
 		
 		void* GetUserData(int proxyId) const;
 
@@ -108,12 +120,14 @@ namespace CGProj
 
 	private:
 		int AllocateNode();
-		void FreeNode(int node);
+		void FreeNode(int nodeId);
 
 		void InsertLeaf(int leaf);
-		void RemoveLeaf(int node);
+		void RemoveLeaf(int leaf);
 
 		int Balance(int index);
+
+		bool aabbOverlap(const c3AABB& a, const c3AABB& b);
 
 		int m_root;
 		
@@ -131,9 +145,39 @@ namespace CGProj
 	template<typename T>
 	inline void DynamicAABBTree::Query(T * callback, const c3AABB & aabb) const
 	{
+		const int stackCapacity = 256;
+		int stack[stackCapacity];
+		int count = 0;
+
+		stack[count] = m_root;
+
+		while (count < stackCapacity && count >= 0)
+		{
+			// Pop from the stack
+			int nodeId = stack[count--]; 
+
+			if (nodeId == Node_Null)
+				continue;
+
+			const TreeNode* node = m_nodes + nodeId;
+
+			if (aabbOverlap(node->aabb, aabb)
+			{
+				if (node->isLeaf())
+				{
+					bool proceed = callback->QueryCallback(nodeId);
+					if(proceed == false) 
+						return;
+				}
+				else
+				{
+					stack[count++] = node->left;
+					stack[count] = node->right;
+				}
+			}
+		}
+
 	}
 }
-
-
 
 #endif

@@ -156,6 +156,9 @@
     <ClCompile Include="Graphics\GLTextureUtility.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
+    <ClCompile Include="GPED\DynamicAABBTree.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -259,6 +262,9 @@
     </ClInclude>
     <ClInclude Include="Graphics\GLTextureUtility.h">
       <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\DynamicAABBTree.h">
+      <Filter>GPED Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

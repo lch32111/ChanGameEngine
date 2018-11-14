@@ -4,6 +4,7 @@
 
 #include <GPED/DynamicAABBTree.h>
 #include <GPED/GPED_collide_fine.h>
+#include <algorithm>
 
 namespace CGProj
 {
@@ -27,6 +28,7 @@ namespace CGProj
 		int CreateProxy(const GPED::c3AABB& aabb, void* userData);
 		void DestroyProxy(int proxyId);
 		void UpdateProxy(int proxyId, const GPED::c3AABB& aabb, const glm::vec3& displacement);
+		void UpdateProxy(int proxyId, const GPED::c3AABB& aabb);
 		
 		void* GetUserData(int proxyId) const;
 		bool TestOverlap(int proxyIdA, int proxyIdB);
@@ -39,9 +41,10 @@ namespace CGProj
 		template<typename T>
 		void Query(T* callback, const GPED::c3AABB& aabb) const;
 
-		/// The method to enable GPED Object to interact with CGBroadPhase 
-		/// which uses dynamicAABB tree
-		GPED::c3AABB convertFromCollisionPrimitive(const GPED::CollisionPrimitive& primitive);
+		DynamicAABBTree* getTree()
+		{
+			return &m_tree;
+		}
 	private:
 		friend class DynamicAABBTree;
 
@@ -71,7 +74,7 @@ namespace CGProj
 			return true;
 
 		if (pair1.proxyIdA == pair2.proxyIdA)
-			return pair1.proxyIdA < pair2.proxyIdB;
+			return pair1.proxyIdB < pair2.proxyIdB;
 
 		return false;
 	}
@@ -100,7 +103,7 @@ namespace CGProj
 		m_moveCount = 0;
 		
 		// Sort the pair buffer to expose duplicates.
-		std::qsort(m_pairBuffer, m_pairBuffer + m_pairCount, cgPairLessThan);
+		std::sort(m_pairBuffer, m_pairBuffer + m_pairCount, cgPairLessThan);
 
 		// Send the pairs back to the client
 		int i = 0;

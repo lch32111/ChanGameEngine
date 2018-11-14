@@ -1,10 +1,4 @@
 #include "CGBroadPhase.h"
-
-GPED::c3AABB CGProj::CGBroadPhase::convertFromCollisionPrimitive(const GPED::CollisionPrimitive& primitive)
-{
-	return primitive.makeAABB();
-}
-
 CGProj::CGBroadPhase::CGBroadPhase()
 {
 	m_proxyCount = 0;
@@ -44,6 +38,13 @@ void CGProj::CGBroadPhase::DestroyProxy(int proxyId)
 void CGProj::CGBroadPhase::UpdateProxy(int proxyId, const GPED::c3AABB & aabb, const glm::vec3 & displacement)
 {
 	bool buffer = m_tree.UpdateProxy(proxyId, aabb, displacement);
+	if (buffer)
+		BufferMove(proxyId);
+}
+
+void CGProj::CGBroadPhase::UpdateProxy(int proxyId, const GPED::c3AABB & aabb)
+{
+	bool buffer = m_tree.UpdateProxy(proxyId, aabb);
 	if (buffer)
 		BufferMove(proxyId);
 }

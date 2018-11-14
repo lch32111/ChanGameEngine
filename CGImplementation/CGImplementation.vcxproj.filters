@@ -159,6 +159,9 @@
     <ClCompile Include="GPED\DynamicAABBTree.cpp">
       <Filter>GPED Source</Filter>
     </ClCompile>
+    <ClCompile Include="GPED\CGBroadPhase.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -266,6 +269,12 @@
     <ClInclude Include="GPED\DynamicAABBTree.h">
       <Filter>GPED Header</Filter>
     </ClInclude>
+    <ClInclude Include="GPED\CGBroadPhase.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GLPrimitiveUtil.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderFolder\DeferredFirst.fs">
@@ -290,6 +299,12 @@
       <Filter>ShaderFolder</Filter>
     </None>
     <None Include="ShaderFolder\simpleRender.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\wireRender.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\wireRender.fs">
       <Filter>ShaderFolder</Filter>
     </None>
   </ItemGroup>

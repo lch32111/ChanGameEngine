@@ -114,6 +114,27 @@ bool CGProj::DynamicAABBTree::UpdateProxy(int proxyId, const GPED::c3AABB & aabb
 	return true;
 }
 
+bool CGProj::DynamicAABBTree::UpdateProxy(int proxyId, const GPED::c3AABB & aabb)
+{
+	assert(0 <= proxyId && proxyId < m_nodeCapacity);
+	assert(m_nodes[proxyId].isLeaf());
+
+	if (m_nodes[proxyId].aabb.Contains(aabb))
+		return false;
+
+	RemoveLeaf(proxyId);
+
+	// Extend AABB
+	GPED::c3AABB b = aabb;
+	glm::vec3 r(aabbExtension);
+	b.min = b.min - r;
+	b.max = b.max + r;
+	m_nodes[proxyId].aabb = b;
+
+	InsertLeaf(proxyId);
+	return true;
+}
+
 void * CGProj::DynamicAABBTree::GetUserData(int proxyId) const
 {
 	assert(0 <= proxyId && proxyId < m_nodeCapacity);
@@ -322,8 +343,8 @@ void CGProj::DynamicAABBTree::RemoveLeaf(int leaf)
 		m_root = Node_Null;
 		return;
 	}
-
-	int parent = m_nodes[parent].parent;
+	int parent = 0;
+	parent = m_nodes[parent].parent;
 	int grandParent = m_nodes[parent].parent;
 	int sibling;
 	if (m_nodes[parent].left == leaf)

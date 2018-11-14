@@ -14,6 +14,9 @@ void CGProj::TryFirst::initGraphics()
 	simpleShader.use();
 	simpleShader.setInt("texture1", 0);
 
+	wireShader = Shader("ShaderFolder/wireRender.vs", "ShaderFolder/wireRender.fs");
+	wireShader.loadShader();
+
 	woodTexture = TextureFromFile("ImageFolder/redMarble.jpg", false);
 	containerTexture = TextureFromFile("ImageFolder/container2.png", false);
 
@@ -30,6 +33,7 @@ void CGProj::TryFirst::initGraphics()
 		float yRan = ranGen.randomReal(3, 20);
 		float zRan = ranGen.randomReal(0, 50);
 		box->setState(xRan, yRan, zRan);
+		box->proxyId = FirstBroadPhase.CreateProxy(GPED::convertFromCollisionPrimitive(*box), box);
 	}
 	currentShotType = ShotType::SHOT_PISTOL;
 }
@@ -161,6 +165,11 @@ void CGProj::TryFirst::display(int width, int height)
 		simpleShader.setMat4("model", model);
 		renderCube();
 	}
+
+	// Broad Phase Debug Rendering
+	DynamicAABBTree* tree = FirstBroadPhase.getTree();
+	bRender.tree = tree;
+	bRender.draw(&wireShader, &projection, &view);
 }
 
 void CGProj::TryFirst::key(GLFWwindow* app_window, float deltaTime)
@@ -263,6 +272,8 @@ void CGProj::TryFirst::updateObjects(float duration, float lastFrame)
 				// We simply set the shot type to be unused, so the
 				// memory it occupies can be reused by another shot.
 				shot->type = ShotType::SHOT_UNUSED;
+
+				FirstBroadPhase.DestroyProxy(shot->proxyId);
 			}
 			else
 			{
@@ -286,7 +297,13 @@ void CGProj::TryFirst::updateObjects(float duration, float lastFrame)
 // Sync the body AABBs in broad phase
 void CGProj::TryFirst::SyncAndUpdate()
 {
-	
+	for (int i = 0; i < boxes; ++i)
+		if (boxData[i].body->getAwake())
+			FirstBroadPhase.UpdateProxy(boxData[i].proxyId, GPED::convertFromCollisionPrimitive(boxData[i]));
+
+	for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; ++shot)
+		if (shot->type != ShotType::SHOT_UNUSED)
+			FirstBroadPhase.UpdateProxy(ammo->proxyId, GPED::convertFromCollisionPrimitive(*shot));
 }
 
 // Update Broad Phase Pairs
@@ -295,8 +312,7 @@ void CGProj::TryFirst::broadPhase()
 	// Perform Tree Queries for all moving proxies
 	// on this step, we gather the pairs and then 
 	// pass the pairs to the generateContacts process for narrow phase
-
-	
+	FirstBroadPhase.UpdatePairs(&firstResult);
 }
 
 // narrow phase
@@ -318,7 +334,18 @@ void CGProj::TryFirst::generateContacts(GPED::CollisionData & cData)
 
 	// we will generate contacts from the pairs detected by broadphase
 	// In addition, we will generate contacts manually with planes
-	
+	std::vector<std::pair<GPED::CollisionPrimitive*, GPED::CollisionPrimitive*>>& t_pair
+		= firstResult.vPairs;
+	for (int i = 0; i < t_pair.size(); ++i)
+	{
+		GPED::CollisionDetector::collision(t_pair[i].first, t_pair[i].second, &cData);
+	}
+
+	for (int i = 0; i < boxes; ++i)
+	{
+		GPED::CollisionDetector::boxAndHalfSpace(boxData[i], planeGround, &cData);
+		GPED::CollisionDetector::boxAndHalfSpace(boxData[i], planeZWall, &cData);
+	}
 }
 
 void CGProj::TryFirst::fire()
@@ -335,6 +362,7 @@ void CGProj::TryFirst::fire()
 
 	// Set the shot
 	shot->setState(currentShotType, camera);
+	shot->proxyId = FirstBroadPhase.CreateProxy(GPED::convertFromCollisionPrimitive(*shot), shot);;
 }
 
 void CGProj::TryFirst::totalFire()
@@ -364,6 +392,7 @@ void CGProj::TryFirst::totalFire()
 		if (ammo[i].type == ShotType::SHOT_UNUSED)
 		{
 			ammo[i].setState(ShotType::SHOT_ARTILLERY, glm::vec3(x, y, z), glm::vec3(0, 3, 40));
+			ammo[i].proxyId = FirstBroadPhase.CreateProxy(GPED::convertFromCollisionPrimitive(ammo[i]), &ammo[i]);
 			++j;
 			x += 0.6;
 		}
@@ -383,200 +412,11 @@ void CGProj::TryFirst::reset()
 
 	AmmoRound* shot;
 	for (shot = ammo; shot < ammo + ammoRounds; ++shot)
+	{
+		if (shot->type != ShotType::SHOT_UNUSED)
+			FirstBroadPhase.DestroyProxy(shot->proxyId);
+
 		shot->type = ShotType::SHOT_UNUSED;
-}
-
-void CGProj::TryFirst::renderCube()
-{
-	// initialize (if necessary)
-	if (cubeVAO == 0)
-	{
-		float vertices[] = {
-			// back face
-			-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-			 1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
-			 1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, // bottom-right         
-			 1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
-			-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-			-1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, // top-left
-			// front face
-			-1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-			 1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
-			 1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
-			 1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
-			-1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, // top-left
-			-1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-			// left face
-			-1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
-			-1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-left
-			-1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
-			-1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
-			-1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-right
-			-1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
-			// right face
-			 1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
-			 1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-			 1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-right         
-			 1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-			 1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
-			 1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-left     
-			// bottom face
-			-1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
-			 1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // top-left
-			 1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
-			 1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
-			-1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // bottom-right
-			-1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
-			// top face
-			-1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
-			 1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
-			 1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // top-right     
-			 1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
-			-1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
-			-1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left        
-		};
-		glGenVertexArrays(1, &cubeVAO);
-		glGenBuffers(1, &cubeVBO);
-		// fill buffer
-		glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-		// link vertex attributes
-		glBindVertexArray(cubeVAO);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-	}
-	// render Cube
-	glBindVertexArray(cubeVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glBindVertexArray(0);
-}
-
-void CGProj::TryFirst::renderQuad()
-{
-	if (quadVAO == 0)
-	{
-		float quadVertices[] = {
-			// positions        // texture Coords
-			-1.0f,  0.0f, 1.0f, 0.0f, 1.0f,
-			1.0f,  0.0f, 1.0f, 1.0f, 1.0f,
-			-1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-			 1.0f, 0.0f, -1.0f, 1.0f, 0.0f,
-		};
-
-		// setup plane VAO
-		glGenVertexArrays(1, &quadVAO);
-		glGenBuffers(1, &quadVBO);
-		
-		glBindVertexArray(quadVAO);
-		
-		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	}
-	glBindVertexArray(quadVAO);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-}
-
-void CGProj::TryFirst::renderSphere()
-{
-	if (sphereVAO == 0)
-	{
-		glGenVertexArrays(1, &sphereVAO);
-
-		unsigned int vbo, ebo;
-		glGenBuffers(1, &vbo);
-		glGenBuffers(1, &ebo);
-
-		std::vector<glm::vec3> positions;
-		std::vector<glm::vec2> uv;
-		std::vector<glm::vec3> normals;
-		std::vector<unsigned int> indices;
-
-		const unsigned int X_SEGMENTS = 64;
-		const unsigned int Y_SEGMENTS = 64;
-		const float PI = 3.14159265359;
-		for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
-		{
-			for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
-			{
-				float xSegment = (float)x / (float)X_SEGMENTS;
-				float ySegment = (float)y / (float)Y_SEGMENTS;
-				float xPos = std::cos(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
-				float yPos = std::cos(ySegment * PI);
-				float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
-
-				positions.push_back(glm::vec3(xPos, yPos, zPos));
-				uv.push_back(glm::vec2(xSegment, ySegment));
-				normals.push_back(glm::vec3(xPos, yPos, zPos));
-			}
-		}
-
-		bool oddRow = false;
-		for (int y = 0; y < Y_SEGMENTS; ++y)
-		{
-			if (!oddRow) // even rows: y == 0, y == 2; and so on
-			{
-				for (int x = 0; x <= X_SEGMENTS; ++x)
-				{
-					indices.push_back(y       * (X_SEGMENTS + 1) + x);
-					indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
-				}
-			}
-			else
-			{
-				for (int x = X_SEGMENTS; x >= 0; --x)
-				{
-					indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
-					indices.push_back(y       * (X_SEGMENTS + 1) + x);
-				}
-			}
-			oddRow = !oddRow;
-		}
-		indexCount = indices.size();
-
-		std::vector<float> data;
-		for (int i = 0; i < positions.size(); ++i)
-		{
-			data.push_back(positions[i].x);
-			data.push_back(positions[i].y);
-			data.push_back(positions[i].z);
-			if (uv.size() > 0)
-			{
-				data.push_back(uv[i].x);
-				data.push_back(uv[i].y);
-			}
-			if (normals.size() > 0)
-			{
-				data.push_back(normals[i].x);
-				data.push_back(normals[i].y);
-				data.push_back(normals[i].z);
-			}
-		}
-		glBindVertexArray(sphereVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-		float stride = (3 + 2 + 3) * sizeof(float);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
 	}
 
-	glBindVertexArray(sphereVAO);
-	glDrawElements(GL_TRIANGLE_STRIP, indexCount, GL_UNSIGNED_INT, 0);
 }

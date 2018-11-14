@@ -129,6 +129,7 @@
     <ClCompile Include="Demo\DeferredRenderer.cpp" />
     <ClCompile Include="Demo\TryFirst.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="GPED\CGBroadPhase.cpp" />
     <ClCompile Include="GPED\DynamicAABBTree.cpp" />
     <ClCompile Include="GPED\GPED_body.cpp" />
     <ClCompile Include="GPED\GPED_collide_coarse.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="CG_Application.h" />
     <ClInclude Include="Demo\DeferredRenderer.h" />
     <ClInclude Include="Demo\TryFirst.h" />
+    <ClInclude Include="GPED\CGBroadPhase.h" />
     <ClInclude Include="GPED\DynamicAABBTree.h" />
     <ClInclude Include="GPED\GPED_body.h" />
     <ClInclude Include="GPED\GPED_collide_coarse.h" />
@@ -185,6 +187,7 @@
     <ClInclude Include="GPED\PS_Box.h" />
     <ClInclude Include="Graphics\chanEulerCamera.h" />
     <ClInclude Include="Graphics\chanQuatCamera.h" />
+    <ClInclude Include="Graphics\GLPrimitiveUtil.h" />
     <ClInclude Include="Graphics\GLTextureUtility.h" />
     <ClInclude Include="Graphics\Shader.h" />
     <ClInclude Include="Imgui\imconfig.h" />
@@ -206,6 +209,8 @@
     <None Include="ShaderFolder\DeferredSecond.vs" />
     <None Include="ShaderFolder\simpleRender.fs" />
     <None Include="ShaderFolder\simpleRender.vs" />
+    <None Include="ShaderFolder\wireRender.fs" />
+    <None Include="ShaderFolder\wireRender.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

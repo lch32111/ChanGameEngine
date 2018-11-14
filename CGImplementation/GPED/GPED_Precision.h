@@ -166,16 +166,13 @@ namespace GPED
 		}
 	};
 
-	bool aabbOverlap(const GPED::c3AABB & a, const c3AABB & b)
-	{
-		// Exit with no intersection if separated along an axis
-		if (a.max[0] < b.min[0] || a.min[0] > b.max[0]) return false;
-		if (a.max[1] < b.min[1] || a.min[1] > b.max[1]) return false;
-		if (a.max[2] < b.min[2] || a.min[2] > b.max[2]) return false;
+	bool aabbOverlap(const GPED::c3AABB & a, const c3AABB & b);
 
-		// Overlapping on all axes means AABBs are intersecting
-		return true;
-	}
+	class CollisionPrimitive; // Forward Declaration
+	
+	/// The method to enable GPED Object to interact with CGBroadPhase 
+	/// which uses dynamicAABB tree
+	GPED::c3AABB convertFromCollisionPrimitive(const CollisionPrimitive& primitive);
 }
 
 

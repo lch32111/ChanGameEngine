@@ -15,7 +15,7 @@ namespace CGProj
 		bool isLeaf(void) const
 		{
 			// The right leaf does not use the same memory as the userdata
-			return right == Node_Null;
+			return left == Node_Null;
 		}
 
 		// Fat AABB for leafs, bounding AABB for branches
@@ -27,27 +27,20 @@ namespace CGProj
 			int next; // free list
 		};
 
-		union
-		{
-			// Child indices
-			struct
-			{
-				int left;
-				int right;
-			};
+		// Child indices
+		int left;
+		int right;
 
-			// Since only leaf nodes hold userdata, we can use the
-			// same memory used for left/right indices to store
-			// the userdata void pointer
-			void* userdata;
-		};
+		void* userdata;
 
 		// leaf = 0, free nodes = -1
 		int height;
 	};
 
+	class BroadRenderer;
 	class DynamicAABBTree
 	{
+		friend class BroadRenderer;
 	public:
 		DynamicAABBTree();
 		DynamicAABBTree(int nodeCapacity);
@@ -60,6 +53,9 @@ namespace CGProj
 		// this method is the same as MoveProxy in the box2D.
 		// I changed the name for the more intuition
 		bool UpdateProxy(int proxyId, const GPED::c3AABB& aabb, const glm::vec3 displacement);
+
+		// Version with no displacement prediction
+		bool UpdateProxy(int proxyId, const GPED::c3AABB& aabb);
 		
 		void* GetUserData(int proxyId) const;
 
@@ -70,7 +66,7 @@ namespace CGProj
 
 		int GetHiehgt() const;
 
-	private:
+	protected:
 		int AllocateNode();
 		void FreeNode(int nodeId);
 
@@ -97,21 +93,21 @@ namespace CGProj
 	{
 		const int stackCapacity = 256;
 		int stack[stackCapacity];
-		int count = 0;
-
-		stack[count] = m_root;
-
-		while (count < stackCapacity && count >= 0)
+		stack[0] = m_root;
+		
+		int count = 1;
+		while (count)
 		{
+			assert(count < stackCapacity);
 			// Pop from the stack
-			int nodeId = stack[count--]; 
+			int nodeId = stack[--count]; 
 
 			if (nodeId == Node_Null)
 				continue;
 
 			const TreeNode* node = m_nodes + nodeId;
 
-			if (aabbOverlap(node->aabb, aabb)
+			if (GPED::aabbOverlap(node->aabb, aabb))
 			{
 				if (node->isLeaf())
 				{
@@ -122,7 +118,7 @@ namespace CGProj
 				else
 				{
 					stack[count++] = node->left;
-					stack[count] = node->right;
+					stack[count++] = node->right;
 				}
 			}
 		}

@@ -16,6 +16,14 @@ namespace GPED
 	class CollisionPrimitive
 	{
 	public:
+		enum primitiveType
+		{
+			UNDECLARED = 0,
+			primitive_sphere,
+			primitive_box
+		};
+		primitiveType type;
+
 		/**
 		 * This class exists to help the collision detector
 		 * and intersection routines,so they should have
@@ -81,6 +89,11 @@ namespace GPED
 	class CollisionSphere : public CollisionPrimitive
 	{
 	public:
+		CollisionSphere()
+		{
+			CollisionPrimitive::type = primitive_sphere;
+		}
+
 		/**
 		 * The radius of the sphere.
 		 */
@@ -90,7 +103,7 @@ namespace GPED
 		{
 			c3AABB aabb;
 			
-			// Ignore the orientation of sphere primitive
+			// Just ignore the orientation since it's sphere.
 			glm::vec3 pos = getAxis(3);
 
 			aabb.min = pos - glm::vec3(radius);
@@ -126,6 +139,11 @@ namespace GPED
 	class CollisionBox : public CollisionPrimitive
 	{
 	public:
+		CollisionBox()
+		{
+			CollisionPrimitive::type = primitive_box;
+		}
+
 		/**
 		 * Holds the half-sizes of the box along each of its local axes.
 		 */
@@ -290,6 +308,44 @@ namespace GPED
 	class CollisionDetector
 	{
 	public:
+		static unsigned collision
+		(
+			const CollisionPrimitive* a, 
+			const CollisionPrimitive* b, 
+			CollisionData* data
+		)
+		{
+			int aKey = 0;
+			switch (a->type)
+			{
+			case GPED::CollisionPrimitive::primitiveType::primitive_sphere:
+				aKey = 0;
+				break;
+			case GPED::CollisionPrimitive::primitiveType::primitive_box:
+				aKey = 1;
+				break;
+			default:
+				assert(0);
+			}
+
+			int bKey = 0;
+			switch (b->type)
+			{
+			case GPED::CollisionPrimitive::primitiveType::primitive_sphere:
+				bKey = 0;
+				break;
+			case GPED::CollisionPrimitive::primitiveType::primitive_box:
+				bKey = 1;
+				break;
+			}
+
+			if (aKey & bKey) return boxAndBox(*(CollisionBox*)a, *(CollisionBox*)b, data);
+			if (!aKey & !bKey) return sphereAndSphere(*(CollisionSphere*)a, *(CollisionSphere*)b, data);
+			if (aKey) return boxAndSphere(*(CollisionBox*)a, *(CollisionSphere*)b, data);
+			else return boxAndSphere(*(CollisionBox*)b, *(CollisionSphere*)a, data);
+		};
+
+
 		static unsigned sphereAndHalfSpace
 		(
 			const CollisionSphere& sphere,

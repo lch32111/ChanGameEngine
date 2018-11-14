@@ -6,7 +6,7 @@ CGProj::DynamicAABBTree::DynamicAABBTree()
 
 	m_nodeCapacity = 16;
 	m_nodeCount = 0;
-	m_nodes = new TreeNode[m_nodeCapacity * sizeof(TreeNode)];
+	m_nodes = new TreeNode[m_nodeCapacity];
 
 	// Build a linked list for the free list
 	for (int i = 0; i < m_nodeCapacity - 1; ++i)
@@ -29,7 +29,7 @@ CGProj::DynamicAABBTree::DynamicAABBTree(int nodeCapacity)
 
 	m_nodeCapacity = nodeCapacity;
 	m_nodeCount = 0;
-	m_nodes = new TreeNode[m_nodeCapacity * sizeof(TreeNode)];
+	m_nodes = new TreeNode[m_nodeCapacity];
 
 	// Build a linked list for the free list
 	for (int i = 0; i < m_nodeCapacity - 1; ++i)
@@ -147,6 +147,8 @@ int CGProj::DynamicAABBTree::AllocateNode()
 		m_nodeCapacity *= 2;
 		m_nodes = new TreeNode[m_nodeCapacity];
 		memcpy(m_nodes, oldNodes, m_nodeCount * sizeof(TreeNode));
+		delete[] oldNodes;
+		oldNodes = nullptr;
 
 		// Build a linked list for the free list. The parent
 		// pointer becomes the "next" pointer.

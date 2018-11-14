@@ -63,7 +63,11 @@ namespace CGProj
 		Box boxData[boxes];
 		
 		void updateObjects(float duration, float lastFrame);
+		void SyncAndUpdate();
+		void broadPhase();
 		void generateContacts(GPED::CollisionData& cData);
+		
+
 		void fire();
 		void totalFire();
 		void reset();

@@ -92,8 +92,19 @@ void CGProj::TryFirst::updateSimulation(float deltaTime, float lastFrame)
 {
 	if (start)
 	{
+		/*
+			Simulation Process
+			1. Integration of the rigid bodies
+			2. Sync with Broad Phase
+			3. Broad Phase of Collision Detection
+			4. Narrow Phase of Collision Detection
+			5. Solve the contacts from Narrow Phase
+		*/
+
 		updateObjects(deltaTime, lastFrame);
-		generateContacts(cData);
+		SyncAndUpdate(); // sync between client object and rigid body in broadPhase
+		broadPhase(); // literally broadphase.
+		generateContacts(cData); // narrow phase from broadphase
 		resolver.resolveContacts(cData.contactArray, cData.contactCount, deltaTime);
 	}
 }
@@ -271,6 +282,24 @@ void CGProj::TryFirst::updateObjects(float duration, float lastFrame)
 	}
 }
 
+// After integration of rigid bodies,
+// Sync the body AABBs in broad phase
+void CGProj::TryFirst::SyncAndUpdate()
+{
+	
+}
+
+// Update Broad Phase Pairs
+void CGProj::TryFirst::broadPhase()
+{
+	// Perform Tree Queries for all moving proxies
+	// on this step, we gather the pairs and then 
+	// pass the pairs to the generateContacts process for narrow phase
+
+	
+}
+
+// narrow phase
 void CGProj::TryFirst::generateContacts(GPED::CollisionData & cData)
 {
 	GPED::CollisionPlane planeGround;
@@ -286,36 +315,10 @@ void CGProj::TryFirst::generateContacts(GPED::CollisionData & cData)
 	cData.friction = contactFriction;
 	cData.restitution = contactRestitution;
 	cData.tolerance = contactRestitution;
+
+	// we will generate contacts from the pairs detected by broadphase
+	// In addition, we will generate contacts manually with planes
 	
-
-	// Check ground plane collisions
-	for (Box* box = boxData; box < boxData + boxes; ++box)
-	{
-		if (!cData.hasMoreContacts()) return;
-		GPED::CollisionDetector::boxAndHalfSpace(*box, planeGround, &cData);
-		GPED::CollisionDetector::boxAndHalfSpace(*box, planeZWall, &cData);
-
-		// Check for collisions with each shot
-		for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; ++shot)
-		{
-			if (shot->type != ShotType::SHOT_UNUSED)
-			{
-				if (!cData.hasMoreContacts()) return;
-				// GPED::CollisionDetector::sphereAndHalfSpace(*shot, planeGround, &cData);
-				// GPED::CollisionDetector::sphereAndHalfSpace(*shot, planeZWall, &cData);
-				GPED::CollisionDetector::boxAndSphere(*box, *shot, &cData);
-			}
-		}
-	}
-
-	for (Box* box = boxData; box < boxData + boxes; ++box)
-	{
-		for (Box* other = box + 1; other < boxData + boxes ; ++other)
-		{
-			if (!cData.hasMoreContacts()) return;
-			GPED::CollisionDetector::boxAndBox(*box, *other, &cData);
-		}
-	}
 }
 
 void CGProj::TryFirst::fire()

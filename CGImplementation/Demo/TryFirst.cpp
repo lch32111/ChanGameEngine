@@ -17,7 +17,7 @@ void CGProj::TryFirst::initGraphics()
 	wireShader = Shader("ShaderFolder/wireRender.vs", "ShaderFolder/wireRender.fs");
 	wireShader.loadShader();
 
-	woodTexture = TextureFromFile("ImageFolder/redMarble.jpg", false);
+	woodTexture = TextureFromFile("ImageFolder/fieldGrass.jpg", false);
 	containerTexture = TextureFromFile("ImageFolder/container2.png", false);
 
 	// BigBallistic Demo
@@ -37,7 +37,9 @@ void CGProj::TryFirst::initGraphics()
 	}
 	currentShotType = ShotType::SHOT_PISTOL;
 
-	bRender.tree = FirstBroadPhase.getTree();
+	bRender.connectTree(FirstBroadPhase.getTree());
+	bRender.setColor(glm::vec3(1, 0, 0), glm::vec3(1, 1, 0));
+	bRender.setLineWidth(1.5f, 1.f);
 }
 
 void CGProj::TryFirst::initImgui()
@@ -273,19 +275,10 @@ void CGProj::TryFirst::updateObjects(float duration, float lastFrame)
 				// memory it occupies can be reused by another shot.
 				shot->m_shotType = ShotType::SHOT_UNUSED;
 				
-				if (shot->connectBroad)
-				{
-					FirstBroadPhase.DestroyProxy(shot->proxyId);
-				}
+				FirstBroadPhase.DestroyProxy(shot->proxyId);
 			}
 			else
 			{
-				if (shot->connectBroad == false)
-				{
-					shot->proxyId = FirstBroadPhase.CreateProxy(GPED::convertFromCollisionPrimitive(*shot), shot);
-					shot->connectBroad = true;
-				}
-
 				// Run the physics
 				shot->body->integrate(duration);
 				shot->calculateInternals();
@@ -346,7 +339,7 @@ void CGProj::TryFirst::generateContacts(GPED::CollisionData & cData)
 	// In addition, we will generate contacts manually with planes
 	const std::vector<std::pair<GPED::CollisionPrimitive*, GPED::CollisionPrimitive*>>& t_pair
 		= firstResult.vPairs;
-	std::cout << t_pair.size() << '\n';
+	// std::cout << t_pair.size() << '\n';
 	for (int i = 0; i < t_pair.size(); ++i)
 	{
 		GPED::CollisionDetector::collision(t_pair[i].first, t_pair[i].second, &cData);
@@ -362,18 +355,21 @@ void CGProj::TryFirst::generateContacts(GPED::CollisionData & cData)
 
 void CGProj::TryFirst::fire()
 {
-	AmmoRound* shot;
-	for (shot = ammo; shot < ammo + ammoRounds; ++shot)
-	{
-		if (shot->m_shotType == ShotType::SHOT_UNUSED)
+	int shotIndex = 0;
+	for (int i = 0; i < ammoRounds; ++i)
+		if (ammo[i].m_shotType == ShotType::SHOT_UNUSED)
+		{
+			shotIndex = i;
 			break;
-	}
+		}
 
 	// If we didn't find a round, then exit- we can't fire.
-	if (shot >= ammo + ammoRounds) return;
+	if (shotIndex >= ammoRounds) return;
 
 	// Set the shot
-	shot->setState(currentShotType, camera);
+	ammo[shotIndex].setState(currentShotType, camera);
+	ammo[shotIndex].proxyId = 
+		FirstBroadPhase.CreateProxy(GPED::convertFromCollisionPrimitive(ammo[shotIndex]), &ammo[shotIndex]);
 }
 
 void CGProj::TryFirst::totalFire()
@@ -403,6 +399,7 @@ void CGProj::TryFirst::totalFire()
 		if (ammo[i].m_shotType == ShotType::SHOT_UNUSED)
 		{
 			ammo[i].setState(ShotType::SHOT_ARTILLERY, glm::vec3(x, y, z), glm::vec3(0, 3, 40));
+			ammo[i].proxyId = FirstBroadPhase.CreateProxy(GPED::convertFromCollisionPrimitive(ammo[i]), &ammo[i]);
 			++j;
 			x += 0.6;
 		}

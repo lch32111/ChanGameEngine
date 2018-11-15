@@ -126,7 +126,7 @@ bool CGProj::DynamicAABBTree::UpdateProxy(int proxyId, const GPED::c3AABB & aabb
 
 	// Extend AABB
 	GPED::c3AABB b = aabb;
-	glm::vec3 r(aabbExtension * aabbMultiplier);
+	glm::vec3 r(aabbExtension);
 	b.min = b.min - r;
 	b.max = b.max + r;
 	m_nodes[proxyId].aabb = b;

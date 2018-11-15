@@ -116,3 +116,45 @@ int CGProj::CGBroadPhase::GetProxyCount() const
 {
 	return m_proxyCount;
 }
+
+void CGProj::BroadRendererWrapper::draw(Shader* shader, glm::mat4* proj, glm::mat4* view)
+{
+	m_shader = shader;
+	m_projection = proj;
+	m_view = view;
+
+	shader->use();
+	shader->setMat4("projection", *m_projection);
+	shader->setMat4("view", *view);
+	if (m_tree->GetHeight() >= 0)
+		recursiveDraw(m_tree->m_root);
+}
+
+void CGProj::BroadRendererWrapper::recursiveDraw(int index)
+{
+	if (m_tree->m_nodes[index].isLeaf() == false)
+		render(m_tree->m_nodes[index].aabb, branchColor, branchWidth);
+	else
+		render(m_tree->m_nodes[index].aabb, leafColor, leafWidth);
+
+	int left = m_tree->m_nodes[index].left;
+	int right = m_tree->m_nodes[index].right;
+
+	if (left != Node_Null)
+		recursiveDraw(left);
+
+	if (right != Node_Null)
+		recursiveDraw(right);
+}
+
+void CGProj::BroadRendererWrapper::render(const GPED::c3AABB& aabb, const glm::vec3& Color, float lineWidth)
+{
+	glm::mat4 model = glm::mat4(1.0);
+	glm::vec3 halfextents = (aabb.max - aabb.min) / 2.f;
+	glm::vec3 pos = aabb.min + halfextents;
+	model = glm::translate(model, pos);
+	model = glm::scale(model, halfextents);
+	m_shader->setMat4("model", model);
+	m_shader->setVec3("Color", Color);
+	wireRenderCube(lineWidth);
+}

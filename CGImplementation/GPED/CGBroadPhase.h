@@ -2,9 +2,19 @@
 #ifndef __CG_BROAD_PHASE_H__
 #define __CG_BROAD_PHASE_H__
 
+#include <vector>
+#include <algorithm>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <GPED/DynamicAABBTree.h>
 #include <GPED/GPED_collide_fine.h>
-#include <algorithm>
+#include <Graphics/GLPrimitiveUtil.h>
+#include <Graphics/Shader.h>
+
+
 
 namespace CGProj
 {
@@ -134,6 +144,85 @@ namespace CGProj
 	{
 		m_tree.Query(callback, aabb);
 	}
+
+	/* 181116 Chanhaneg Lee
+	   Wrapper Class to get pairs of potential collisions from the BroadPhase
+	   You should pass this class to the parameter of the UpdatePairs method of BroadPhase
+	   ex) BroadPhaseInstance.UpdatePairs(&BroadResultWrapper_Instance)
+
+	   The vPairs member is using STL vector. So, It will be better to change the data structure
+	   to manage memory alloc/free by our own intention. This work will be achieved later.
+	*/
+	template<class T>
+	struct BroadResultWrapper
+	{
+		// You can pass the type you want for your purpose, and then
+		// get the pairs matched with the type you passed.
+		// For example, In physics engine, we will use the CollisionPrimitive Class.
+		// In Graphics Engine, we will other class.
+		typedef typename T* TypePointer;
+	public:
+		std::vector<std::pair<TypePointer, TypePointer>> vPairs;
+		
+		// Callback function of BroadPhase Result
+		void AddPair(void* proxyUserDataA, void* proxyUserDataB)
+		{
+			vPairs.push_back
+			(
+				std::make_pair
+				(
+					(TypePointer)proxyUserDataA,
+					(TypePointer)proxyUserDataB
+				)
+			);
+		}
+
+		BroadResultWrapper() 
+		{ 
+			#define BROAD_RESULT_WRAPPER_INIT_SIZE 200
+
+			// Manual Setting of Memory Space of STL vector
+			// The memory will be allocated dynamically if the number of elements will be
+			// more than the macro.
+			vPairs.reserve(BROAD_RESULT_WRAPPER_INIT_SIZE); 
+
+			#undef BROAD_RESULT_WRAPPER_INIT_SIZE
+		}
+		~BroadResultWrapper() { vPairs.clear(); }
+	}; // Struct BroadResultWrapper
+
+
+	// BroadPhase AABB Renderer for Debug
+	class BroadRendererWrapper
+	{
+	public:
+		void draw(Shader* shader, glm::mat4* proj, glm::mat4* view);
+
+		void connectTree(const DynamicAABBTree* tree) { m_tree = tree; }
+		void setColor(const glm::vec3& leaf, const glm::vec3& branch)
+		{
+			leafColor = leaf;
+			branchColor = branch;
+		}
+		void setLineWidth(float leaf, float branch)
+		{
+			leafWidth = leaf;
+			branchWidth = branch;
+		}
+	private:
+		const DynamicAABBTree* m_tree;
+		Shader* m_shader;
+		glm::mat4* m_projection;
+		glm::mat4* m_view;
+
+		glm::vec3 leafColor;
+		glm::vec3 branchColor;
+		float leafWidth = 1.f;
+		float branchWidth = 1.f;
+
+		void recursiveDraw(int index);
+		void render(const GPED::c3AABB& aabb, const glm::vec3& Color, float lineWidth);
+	};
 }
 
 #endif

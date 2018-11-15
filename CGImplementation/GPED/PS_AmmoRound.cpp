@@ -59,8 +59,6 @@ void AmmoRound::setState(ShotType shotType)
 	// Clear the force accumulators
 	body->calculateDerivedData();
 	calculateInternals();
-
-	connectBroad = false;
 }
 
 void AmmoRound::setState(ShotType shotType, glm::vec3 Position, glm::vec3 Velocity)
@@ -124,8 +122,6 @@ void AmmoRound::setState(ShotType shotType, glm::vec3 Position, glm::vec3 Veloci
 	// Clear the force accumulators
 	body->calculateDerivedData();
 	calculateInternals();
-
-	connectBroad = false;
 }
 
 void AmmoRound::setState(ShotType shotType, const chanQuatCamera& camera)
@@ -191,8 +187,5 @@ void AmmoRound::setState(ShotType shotType, const chanQuatCamera& camera)
 	// Clear the force accumulators
 	body->calculateDerivedData();
 	calculateInternals();
-
-	// prepare the connection with the broad Phase tree
-	connectBroad = false;
 }
 

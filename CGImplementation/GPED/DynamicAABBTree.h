@@ -2,10 +2,7 @@
 #ifndef __DYNAMIC_AABB_TREE_H__
 #define __DYNAMIC_AABB_TREE_H__
 
-
-
 #include <GPED/GPED_Precision.h>
-
 
 namespace CGProj
 {
@@ -37,10 +34,8 @@ namespace CGProj
 		int height;
 	};
 
-	class BroadRenderer;
 	class DynamicAABBTree
 	{
-		friend class BroadRenderer;
 	public:
 		DynamicAABBTree();
 		DynamicAABBTree(int nodeCapacity);
@@ -66,7 +61,9 @@ namespace CGProj
 
 		int GetHeight() const;
 
-	protected:
+	private:
+		friend class BroadRendererWrapper;
+
 		int AllocateNode();
 		void FreeNode(int nodeId);
 

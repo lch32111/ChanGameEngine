@@ -149,35 +149,30 @@ namespace GPED
 		 */
 		glm::vec3 halfSize;
 
-
-		// RTCD p86 ~ p87.
 		virtual c3AABB makeAABB() const
 		{
 			c3AABB aabb;
-			// For all three axes
-			for (int i = 0; i < 3; ++i)
-			{
-				// Start by adding in translation
-				aabb.min[i] = aabb.max[i] = transform[3][i];
-				
-				// Form extent by summing smaller and larger terms respectively
-				for (int j = 0; j < 3; ++j)
-				{
-					
-					real e = transform[j][i] * halfSize[j] * -1;
-					real f = transform[j][i] * halfSize[j];
+			aabb.min = glm::vec3(REAL_MAX);
+			aabb.max = glm::vec3(-REAL_MAX);
 
-					if (e < f)
-					{
-						aabb.min[i] += e;
-						aabb.max[i] += f;
-					}
-					else
-					{
-						aabb.min[i] += f;
-						aabb.max[i] += e;
-					}
-				}
+			glm::vec3 v[8] =
+			{
+				glm::vec3(-halfSize.x,-halfSize.y, -halfSize.z),
+				glm::vec3(-halfSize.x,-halfSize.y, halfSize.z),
+				glm::vec3(halfSize.x, -halfSize.y, halfSize.z),
+				glm::vec3(halfSize.x,-halfSize.y, -halfSize.z),
+				glm::vec3(-halfSize.x, halfSize.y, -halfSize.z),
+				glm::vec3(-halfSize.x, halfSize.y, halfSize.z),
+				glm::vec3(halfSize.x, halfSize.y, halfSize.z),
+				glm::vec3(halfSize.x, halfSize.y, -halfSize.z)
+			};
+
+			for (int i = 0; i < 8; ++i)
+			{
+				v[i] = transform * glm::vec4(v[i], 1.0);
+
+				aabb.min = GPED::rMin(aabb.min, v[i]);
+				aabb.max = GPED::rMax(aabb.max, v[i]);
 			}
 
 			return aabb;

@@ -172,7 +172,10 @@ void AmmoRound::setState(ShotType shotType, const chanQuatCamera& camera)
 	body->setInertiaTensor(tensor);
 
 	// Set the data common to all particle types
-	body->setPosition(camera.Position);
+	glm::vec3 MinusZaxis(0, 0, -1);
+	glm::quat mzQ = camera.Orientation *  glm::quat(0, MinusZaxis)  * glm::conjugate(camera.Orientation);
+	glm::vec3 forwardSetting(mzQ.x, mzQ.y, mzQ.z);
+	body->setPosition(camera.Position + forwardSetting * 5.f);
 	startTime = glfwGetTime();
 	body->setOrientation(camera.Orientation);
 

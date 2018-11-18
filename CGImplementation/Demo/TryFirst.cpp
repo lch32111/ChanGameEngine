@@ -92,6 +92,7 @@ void CGProj::TryFirst::updateImgui()
 	ImGui::SliderFloat("Restitution", &contactRestitution, 0.f, 1.f);
 	ImGui::SliderFloat("Tolerance", &contactTolerance, 0.f, 1.f);
 
+	ImGui::Checkbox("Broad Debug Render", &BroadDebug);
 	
 	ImGui::End();
 }
@@ -171,7 +172,8 @@ void CGProj::TryFirst::display(int width, int height)
 	}
 
 	// Broad Phase Debug Rendering
-	bRender.draw(&wireShader, &projection, &view);
+	if(BroadDebug)
+		bRender.draw(&wireShader, &projection, &view);
 }
 
 void CGProj::TryFirst::key(GLFWwindow* app_window, float deltaTime)
@@ -300,8 +302,10 @@ void CGProj::TryFirst::updateObjects(float duration, float lastFrame)
 void CGProj::TryFirst::SyncAndUpdate()
 {
 	for (int i = 0; i < boxes; ++i)
-		if(boxData[i].body->getAwake())
-			FirstBroadPhase.UpdateProxy(boxData[i].proxyId, GPED::convertFromCollisionPrimitive(boxData[i]));
+	{
+
+		FirstBroadPhase.UpdateProxy(boxData[i].proxyId, GPED::convertFromCollisionPrimitive(boxData[i]));
+	}
 
 	for (int i = 0; i < ammoRounds; ++i)
 		if (ammo[i].m_shotType != ShotType::SHOT_UNUSED)

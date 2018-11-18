@@ -124,7 +124,7 @@ namespace GPED
 		So, I also referred to the Box2D Code.
 		I made the code work with our project code
 	*/
-#define aabbExtension 0.1
+#define aabbExtension 0.01
 #define aabbMultiplier 2.0
 	struct c3AABB // CG Project 3-dimenstional AABB
 	{
@@ -163,6 +163,13 @@ namespace GPED
 			result = result && aabb.max.y <= max.y;
 			result = result && aabb.max.z <= max.z;
 			return result;
+		}
+
+		void fatten()
+		{
+			glm::vec3 extension(aabbExtension);
+			min -= extension;
+			max += extension;
 		}
 	};
 

@@ -121,7 +121,7 @@ bool CGProj::DynamicAABBTree::UpdateProxy(int proxyId, const GPED::c3AABB & aabb
 
 	if (m_nodes[proxyId].aabb.Contains(aabb))
 		return false;
-
+	
 	RemoveLeaf(proxyId);
 
 	// Extend AABB

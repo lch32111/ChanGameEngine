@@ -235,7 +235,7 @@ namespace GPED
 		 * can be incremented each time a contact is detected, while
 		 * this pointer points to the first contact found.
 		 */
-		Contact* contactArray;
+		Contact* contactHead;
 
 		/** Holds the contact array to write into */
 		Contact* contacts;
@@ -274,7 +274,7 @@ namespace GPED
 		{
 			contactsLeft = maxContacts;
 			contactCount = 0;
-			contacts = contactArray;
+			contacts = contactHead;
 		}
 
 		/**
@@ -289,6 +289,11 @@ namespace GPED
 
 			// Move the array forward
 			contacts += count;
+		}
+
+		void connectContactArray(Contact* c)
+		{
+			contactHead = c;
 		}
 	};
 	

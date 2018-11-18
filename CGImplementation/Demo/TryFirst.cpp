@@ -21,7 +21,7 @@ void CGProj::TryFirst::initGraphics()
 	containerTexture = TextureFromFile("ImageFolder/container2.png", false);
 
 	// BigBallistic Demo
-	cData.contacts = cData.contactArray = contacts;
+	cData.contacts = cData.contactHead = contacts;
 	resolver = GPED::ContactResolver(maxContacts * 8);
 
 	// Initialise the box
@@ -114,7 +114,7 @@ void CGProj::TryFirst::updateSimulation(float deltaTime, float lastFrame)
 		SyncAndUpdate(); // sync between client object and rigid body in broadPhase
 		broadPhase(); // literally broadphase.
 		generateContacts(cData); // narrow phase from broadphase
-		resolver.resolveContacts(cData.contactArray, cData.contactCount, deltaTime);
+		resolver.resolveContacts(cData.contactHead, cData.contactCount, deltaTime);
 	}
 }
 

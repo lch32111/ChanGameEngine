@@ -656,6 +656,14 @@ void GPED::ContactResolver::adjustPositions(Contact * c, unsigned numContacts, r
 	real max;
 	glm::vec3 deltaPosition;
 
+	// sorting contacts
+	sortByPosition(c, 0, numContacts - 1);
+
+	// For Debug
+	std::cout << "##Debug##\n";
+	for (int i = 0; i < numContacts; ++i)
+		std::cout << c[i].penetration << '\n';
+
 	// iteratively resolve interpenetrations in order of severity.
 	positionIterationsUsed = 0;
 	while (positionIterationsUsed < positionIterations)
@@ -711,4 +719,3 @@ void GPED::ContactResolver::adjustPositions(Contact * c, unsigned numContacts, r
 		++positionIterationsUsed;
 	}
 }
-

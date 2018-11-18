@@ -164,13 +164,6 @@ namespace GPED
 			result = result && aabb.max.z <= max.z;
 			return result;
 		}
-
-		void fatten()
-		{
-			glm::vec3 extension(aabbExtension);
-			min -= extension;
-			max += extension;
-		}
 	};
 
 	bool aabbOverlap(const GPED::c3AABB & a, const c3AABB & b);

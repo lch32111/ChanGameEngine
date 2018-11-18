@@ -38,6 +38,7 @@ namespace GPED
 		 * set and effect the contact.
 		 */
 		friend class ContactResolver;
+		friend class ContactManager;
 
 	public:
 		/**
@@ -187,6 +188,11 @@ namespace GPED
 		 * function has access to these anyway.
 		 */
 		glm::vec3 calculateFrictionImpulse(glm::mat3* inverseInertiaTensor);
+
+	protected:
+		// Holds the doubly linked list pointers for the ordered list.
+		int prev;
+		int next;
 	};
 
 

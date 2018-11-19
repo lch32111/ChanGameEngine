@@ -3,7 +3,7 @@
 #define __CG_CONTACT_MANAGER_H__
 
 #include <GPED/GPED_contacts.h>
-
+#include <iostream>
 namespace GPED
 {
 	/* 181119 Chanhaeng Lee
@@ -71,14 +71,16 @@ constexpr int NODE_NULL = -1;
 
 		int m_freeList;
 	};
+	
 
 	inline void GPED::ContactManager::updatePenetration(int move,
 		const int contactId, const int bodyIndex,
 		const glm::vec3 & linearChange, const glm::vec3 & angularChange)
 	{
+		unsigned index = 0;
 		while (move != NODE_NULL)
 		{
-			unsigned index = 0;
+			index = 0;
 			if (m_nodes[move].body[1] == m_nodes[contactId].body[bodyIndex]) index = 1;
 			m_nodes[move].updatePenetration(linearChange, angularChange, index);
 
@@ -91,11 +93,10 @@ constexpr int NODE_NULL = -1;
 		const glm::vec3 & velocityChange, const glm::vec3 & rotationChange,
 		real duration)
 	{
-		int numb = 0;
+		unsigned index = 0;
 		while (move != NODE_NULL)
 		{
-			++numb;
-			unsigned index = 0;
+			index = 0;
 			if (m_nodes[move].body[1] == m_nodes[contactId].body[bodyIndex]) index = 1;
 			m_nodes[move].updateDesiredVelocity(velocityChange, rotationChange, index, duration);
 			move = m_nodes[move].nextObjects[index];

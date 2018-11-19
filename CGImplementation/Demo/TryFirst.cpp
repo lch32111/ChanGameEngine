@@ -20,7 +20,8 @@ void CGProj::TryFirst::initGraphics()
 	woodTexture = TextureFromFile("ImageFolder/fieldGrass.jpg", false);
 	containerTexture = TextureFromFile("ImageFolder/container2.png", false);
 
-	resolver = GPED::ContactResolver(100 * 8);
+	resolver = GPED::ContactResolver(256 * 8);
+	// cManager = GPED::ContactManager(200);
 
 	// Initialise the box
 	GPED::real z = 20.0f;

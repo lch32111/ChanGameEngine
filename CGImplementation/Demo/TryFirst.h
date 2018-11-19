@@ -73,7 +73,7 @@ namespace CGProj
 		// Simulation Object
 		const static unsigned ammoRounds = 100;
 		AmmoRound ammo[ammoRounds];
-		const static unsigned boxes = 20;
+		const static unsigned boxes = 200;
 		Box boxData[boxes];
 		// Simulation Object
 

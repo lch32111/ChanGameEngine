@@ -53,7 +53,6 @@ void GPED::ContactResolver::prepareContacts(ContactManager * CM, real duration)
 	CM->AllcalculateInternals(duration);
 }
 
-#include <iostream>
 void GPED::ContactResolver::adjustPositions(ContactManager * CM, real duration)
 {
 	glm::vec3 linearChange[2], angularChange[2];

@@ -35,8 +35,8 @@ constexpr int NODE_NULL = -1;
 		int GetEmptyContactNode();
 		void setBodyData(int nodeId, RigidBody* one, RigidBody* two);
 
-		void sortByPenetration();
-		void sortByVelocity();
+		Contact* GetMaxPenetration();
+		Contact* GetMaxVelocity();
 
 		void updatePenetration(int move, 
 			const int contactId, const int bodyIndex,
@@ -62,11 +62,6 @@ constexpr int NODE_NULL = -1;
 		void InsertNode(int nodeId);
 		void DeleteNode(int nodeId);
 		
-		void QuickSortPenetration(int left, int right);
-		int partitionPenetrtaion(int left, int right);
-		void QuickSortVelocity(int left, int right);
-		int partitionVelocity(int left, int right);
-		void swap(int nodeIdA, int nodeIdB);
 
 		int m_root;
 
@@ -76,6 +71,36 @@ constexpr int NODE_NULL = -1;
 
 		int m_freeList;
 	};
+
+	inline void GPED::ContactManager::updatePenetration(int move,
+		const int contactId, const int bodyIndex,
+		const glm::vec3 & linearChange, const glm::vec3 & angularChange)
+	{
+		while (move != NODE_NULL)
+		{
+			unsigned index = 0;
+			if (m_nodes[move].body[1] == m_nodes[contactId].body[bodyIndex]) index = 1;
+			m_nodes[move].updatePenetration(linearChange, angularChange, index);
+
+			move = m_nodes[move].nextObjects[index];
+		}
+	}
+
+	inline void GPED::ContactManager::updateDesiredVelocity(int move,
+		const int contactId, const int bodyIndex,
+		const glm::vec3 & velocityChange, const glm::vec3 & rotationChange,
+		real duration)
+	{
+		int numb = 0;
+		while (move != NODE_NULL)
+		{
+			++numb;
+			unsigned index = 0;
+			if (m_nodes[move].body[1] == m_nodes[contactId].body[bodyIndex]) index = 1;
+			m_nodes[move].updateDesiredVelocity(velocityChange, rotationChange, index, duration);
+			move = m_nodes[move].nextObjects[index];
+		}
+	}
 }
 
 

@@ -53,19 +53,17 @@ void GPED::ContactResolver::prepareContacts(ContactManager * CM, real duration)
 	CM->AllcalculateInternals(duration);
 }
 
+#include <iostream>
 void GPED::ContactResolver::adjustPositions(ContactManager * CM, real duration)
 {
 	glm::vec3 linearChange[2], angularChange[2];
 
-	// sorting contacts
-	CM->sortByPenetration();
-
 	for (unsigned i = 0; i < positionIterations; ++i)
 	{
-		Contact* MaxPenetrationOne = CM->GetFirstContact();
+		Contact* MaxPenetrationOne = CM->GetMaxPenetration();
 
-		if (MaxPenetrationOne->penetration < 0) break;
-
+		if (MaxPenetrationOne->penetration < positionEpsilon) break;
+		
 		MaxPenetrationOne->matchAwakeState();
 		MaxPenetrationOne->applyPositionChange(linearChange, angularChange);
 
@@ -81,26 +79,18 @@ void GPED::ContactResolver::adjustPositions(ContactManager * CM, real duration)
 			CM->updatePenetration(bodyContact, MaxPenetrationOne->myId, 1, // 1 == means Second Body
 				linearChange[1], angularChange[1]);
 		}
-
-		CM->sortByPenetration();
 	}
 }
 
 void GPED::ContactResolver::adjustVelocities(ContactManager * CM, real duration)
 {
 	glm::vec3 velocityChange[2], rotationChange[2];
-	glm::vec3 deltaVel, tempVec;
-	real max;
-	int sign;
 	
-	// sorting contacts
-	CM->sortByVelocity();
-
 	for (unsigned i = 0; i < velocityIterations; ++i)
 	{
-		Contact* MaxVelocityOne = CM->GetFirstContact();
-		if (MaxVelocityOne->desiredDeltaVelocity <= 0) break;
-
+		Contact* MaxVelocityOne = CM->GetMaxVelocity();
+		if (MaxVelocityOne->desiredDeltaVelocity < velocityEpsilon) break;
+		
 		MaxVelocityOne->matchAwakeState();
 		MaxVelocityOne->applyVelocityChange(velocityChange, rotationChange);
 
@@ -116,7 +106,5 @@ void GPED::ContactResolver::adjustVelocities(ContactManager * CM, real duration)
 			CM->updateDesiredVelocity(bodyContact, MaxVelocityOne->myId, 1, // 1 == means Second Body
 				velocityChange[1], rotationChange[1], duration);
 		}
-
-		CM->sortByVelocity();
 	}
 }

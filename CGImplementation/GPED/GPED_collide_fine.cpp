@@ -447,6 +447,7 @@ unsigned GPED::CollisionDetector::boxAndBox(
 	CHECK_OVERLAP(glm::cross(one.getAxis(2), two.getAxis(2)), 14);
 
 	// Make sure we've got a result
+	if (best == 0xffffff) __debugbreak();
 	assert(best != 0xffffff);
 
 	// We now know there's a collision, and we know which 

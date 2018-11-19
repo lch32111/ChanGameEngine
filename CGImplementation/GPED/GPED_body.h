@@ -867,6 +867,14 @@ namespace GPED
 		 * The linear acceleration is given in world space
 		 */
 		glm::vec3 getLastFrameAcceleration() const;
+
+	protected:
+		friend class Contact;
+		friend class ContactResolver;
+		friend class ContactManager;
+		// Hold the list of contacts that involve this body
+		// use contacts->nextObject[index];
+		int contacts = -1; // -1 == Node_NUll
 	};
 }
 

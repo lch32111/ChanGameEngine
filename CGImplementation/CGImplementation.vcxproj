@@ -135,6 +135,7 @@
     <ClCompile Include="GPED\GPED_body.cpp" />
     <ClCompile Include="GPED\GPED_collide_coarse.cpp" />
     <ClCompile Include="GPED\GPED_collide_fine.cpp" />
+    <ClCompile Include="GPED\GPED_ContactResolver.cpp" />
     <ClCompile Include="GPED\GPED_contacts.cpp" />
     <ClCompile Include="GPED\GPED_fgen.cpp" />
     <ClCompile Include="GPED\GPED_Fireworks.cpp" />
@@ -172,6 +173,7 @@
     <ClInclude Include="GPED\GPED_body.h" />
     <ClInclude Include="GPED\GPED_collide_coarse.h" />
     <ClInclude Include="GPED\GPED_collide_fine.h" />
+    <ClInclude Include="GPED\GPED_ContactResolver.h" />
     <ClInclude Include="GPED\GPED_contacts.h" />
     <ClInclude Include="GPED\GPED_fgen.h" />
     <ClInclude Include="GPED\GPED_Fireworks.h" />

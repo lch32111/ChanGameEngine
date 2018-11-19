@@ -11,6 +11,7 @@ GPED::Contact::Contact()
 	relativeContactPosition[0] = relativeContactPosition[1] = glm::vec3(0);
 }
 
+/*
 void GPED::Contact::setBodyData(RigidBody * one, RigidBody * two, 
 	real friction, real restitution)
 {
@@ -18,7 +19,51 @@ void GPED::Contact::setBodyData(RigidBody * one, RigidBody * two,
 	Contact::body[1] = two;
 	Contact::friction = friction;
 	Contact::restitution = restitution;
+
+	int index = 0;
+	if (one)
+	{
+		Contact* move = one->contacts;
+
+		if (move)
+		{
+			index = (move->body[0] == one) ? 0 : 1;
+			while (move->nextObjects[index] != nullptr)
+			{
+				move = move->nextObjects[index];
+				index = (move->body[0] == one) ? 0 : 1;
+			}
+
+			move->nextObjects[index] = this;
+		}
+		else
+		{
+			one->contacts = this;
+		}
+	}
+	
+	if (two)
+	{
+		Contact* move = two->contacts;
+
+		if(move)
+		{
+			index = (move->body[0] == two) ? 0 : 1;
+			while (move)
+			{
+				move = move->nextObjects[index];
+				index = (move->body[0] == two) ? 0 : 1;
+			}
+
+			move->nextObjects[index] = this;
+		}
+		else
+		{
+			two->contacts = this;
+		}
+	}
 }
+*/
 
 /**
  * Swaps the bodies in the current contact. so body 0 is at body 1 and
@@ -525,4 +570,32 @@ glm::vec3 GPED::Contact::calculateFrictionImpulse(glm::mat3 * inverseInertiaTens
 	return impulseContact;
 }
 
+void GPED::Contact::updatePenetration(
+	const glm::vec3& linearChange, 
+	const glm::vec3& angularChange, 
+	unsigned index)
+{
+	real sign = (index ? 1 : -1);
+	glm::vec3 deltaPosition = linearChange + 
+		glm::cross(angularChange, relativeContactPosition[index]);
+	penetration += glm::dot(deltaPosition, contactNormal) * sign;
+}
 
+void GPED::Contact::updateDesiredVelocity(
+	const glm::vec3 & velocityChange, 
+	const glm::vec3 & rotationChange, 
+	unsigned index,
+	real duration
+)
+{
+	real sign = (index ? -1 : 1);
+	glm::vec3 deltaVel = velocityChange + 
+		glm::cross(rotationChange, relativeContactPosition[index]);
+	
+	glm::vec3 tempVec;
+	for (unsigned col = 0; col < 3; ++col)
+		tempVec[col] = glm::dot(contactToWorld[col], deltaVel) * sign;
+
+	contactVelocity += tempVec;
+	calculateDesiredDeltaVelocity(duration);
+}

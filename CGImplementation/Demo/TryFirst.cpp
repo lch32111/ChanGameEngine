@@ -20,9 +20,7 @@ void CGProj::TryFirst::initGraphics()
 	woodTexture = TextureFromFile("ImageFolder/fieldGrass.jpg", false);
 	containerTexture = TextureFromFile("ImageFolder/container2.png", false);
 
-	// BigBallistic Demo
-	cData.contacts = cData.contactHead = contacts;
-	resolver = GPED::ContactResolver(maxContacts * 8);
+	resolver = GPED::ContactResolver(100 * 8);
 
 	// Initialise the box
 	GPED::real z = 20.0f;
@@ -113,8 +111,8 @@ void CGProj::TryFirst::updateSimulation(float deltaTime, float lastFrame)
 		updateObjects(deltaTime, lastFrame);
 		SyncAndUpdate(); // sync between client object and rigid body in broadPhase
 		broadPhase(); // literally broadphase.
-		generateContacts(cData); // narrow phase from broadphase
-		resolver.resolveContacts(cData.contactHead, cData.contactCount, deltaTime);
+		generateContacts(cManager); // narrow phase from broadphase
+		resolver.resolveContacts(&cManager, deltaTime);
 	}
 }
 
@@ -323,7 +321,7 @@ void CGProj::TryFirst::broadPhase()
 }
 
 // narrow phase
-void CGProj::TryFirst::generateContacts(GPED::CollisionData & cData)
+void CGProj::TryFirst::generateContacts(GPED::ContactManager& cData)
 {
 	GPED::CollisionPlane planeGround;
 	planeGround.direction = glm::vec3(0, 1, 0);
@@ -334,7 +332,7 @@ void CGProj::TryFirst::generateContacts(GPED::CollisionData & cData)
 	planeZWall.offset = -50;
 
 	// Set up the collision data structure
-	cData.reset(maxContacts);
+	cData.reset();
 	cData.friction = contactFriction;
 	cData.restitution = contactRestitution;
 	cData.tolerance = contactRestitution;

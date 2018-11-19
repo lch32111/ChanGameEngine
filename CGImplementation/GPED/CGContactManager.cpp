@@ -51,11 +51,62 @@ GPED::ContactManager::~ContactManager()
 	m_nodes = nullptr;
 }
 
-GPED::Contact* GPED::ContactManager::GetEmptyContactNode()
+int GPED::ContactManager::GetEmptyContactNode()
 {
 	int nodeId = AllocateNode();
 	InsertNode(nodeId);
-	return &(m_nodes[nodeId]);
+	return nodeId;
+}
+
+void GPED::ContactManager::setBodyData(int nodeId, RigidBody * one, RigidBody * two)
+{
+	Contact* theContact = &m_nodes[nodeId];
+
+	theContact->body[0] = one;
+	theContact->body[1] = two;
+	theContact->friction = friction;
+	theContact->restitution = restitution;
+
+	int index = 0;
+	if (one)
+	{
+		int move = one->contacts;
+		if (move != NODE_NULL)
+		{
+			index = (m_nodes[move].body[0] == one) ? 0 : 1;
+			while (m_nodes[move].nextObjects[index] != NODE_NULL)
+			{
+				move = m_nodes[move].nextObjects[index];
+				index = (m_nodes[move].body[0] == one) ? 0 : 1;
+			}
+
+			m_nodes[move].nextObjects[index] = nodeId;
+		}
+		else
+		{
+			one->contacts = nodeId;
+		}
+	}
+
+	if (two)
+	{
+		int move = two->contacts;
+		if (move != NODE_NULL)
+		{
+			index = (m_nodes[move].body[0] == two) ? 0 : 1;
+			while (m_nodes[move].nextObjects[index] != NODE_NULL)
+			{
+				move = m_nodes[move].nextObjects[index];
+				index = (m_nodes[move].body[0] == two) ? 0 : 1;
+			}
+
+			m_nodes[move].nextObjects[index] = nodeId;
+		}
+		else
+		{
+			two->contacts = nodeId;
+		}
+	}
 }
 
 void GPED::ContactManager::sortByPenetration()
@@ -70,6 +121,7 @@ void GPED::ContactManager::sortByPenetration()
 	QuickSortPenetration(m_root, lastId);
 }
 
+#include <iostream>
 void GPED::ContactManager::sortByVelocity()
 {
 	int lastId = m_root;
@@ -78,6 +130,33 @@ void GPED::ContactManager::sortByVelocity()
 
 	// Decreasing Order
 	QuickSortVelocity(m_root, lastId);
+}
+
+void GPED::ContactManager::updatePenetration(int move, 
+	const int contactId, const int bodyIndex, 
+	const glm::vec3 & linearChange, const glm::vec3 & angularChange)
+{
+	while (move != NODE_NULL)
+	{
+		unsigned index = 0;
+		if (m_nodes[move].body[1] == m_nodes[contactId].body[bodyIndex]) index = 1;
+		m_nodes[move].updatePenetration(linearChange, angularChange, index);
+		move = m_nodes[move].nextObjects[index];
+	}
+}
+
+void GPED::ContactManager::updateDesiredVelocity(int move,
+	const int contactId, const int bodyIndex,
+	const glm::vec3 & velocityChange, const glm::vec3 & rotationChange, 
+	real duration)
+{
+	while (move != NODE_NULL)
+	{
+		unsigned index = 0;
+		if (m_nodes[move].body[1] == m_nodes[contactId].body[bodyIndex]) index = 1;
+		m_nodes[move].updateDesiredVelocity(velocityChange, rotationChange, index, duration);
+		move = m_nodes[move].nextObjects[index];
+	}
 }
 
 void GPED::ContactManager::AllcalculateInternals(GPED::real duration)
@@ -98,6 +177,17 @@ GPED::Contact * GPED::ContactManager::GetFirstContact()
 int GPED::ContactManager::GetNodeCount()
 {
 	return m_nodeCount;
+}
+
+void GPED::ContactManager::reset()
+{
+	int move = m_root;
+	while (move != NODE_NULL)
+	{
+		int freeId = move;
+		move = m_nodes[move].next;
+		DeleteNode(freeId);
+	}
 }
 
 int GPED::ContactManager::AllocateNode()
@@ -132,6 +222,9 @@ int GPED::ContactManager::AllocateNode()
 	m_freeList = m_nodes[nodeId].next;
 	m_nodes[nodeId].body[0] = nullptr;
 	m_nodes[nodeId].body[1] = nullptr;
+	m_nodes[nodeId].nextObjects[0] = NODE_NULL;
+	m_nodes[nodeId].nextObjects[1] = NODE_NULL;
+	m_nodes[nodeId].myId = nodeId;
 	++m_nodeCount;
 	return nodeId;
 }
@@ -141,6 +234,14 @@ void GPED::ContactManager::FreeNode(int nodeId)
 	assert(0 <= nodeId && nodeId < m_nodeCapacity);
 	assert(0 < m_nodeCount);
 	m_nodes[nodeId].next = m_freeList;
+	m_nodes[nodeId].body[0]->contacts = NODE_NULL;
+	if(m_nodes[nodeId].body[1])
+		m_nodes[nodeId].body[1]->contacts = NODE_NULL;
+	m_nodes[nodeId].body[0] = nullptr;
+	m_nodes[nodeId].body[1] = nullptr;
+	m_nodes[nodeId].nextObjects[0] = NODE_NULL;
+	m_nodes[nodeId].nextObjects[1] = NODE_NULL;
+
 	m_freeList = nodeId;
 	--m_nodeCount;
 }
@@ -182,7 +283,7 @@ void GPED::ContactManager::DeleteNode(int nodeId)
 
 void GPED::ContactManager::QuickSortPenetration(int left, int right)
 {
-	if (right != NODE_NULL && left != NODE_NULL && left != m_nodes[right].next)
+	if (right != NODE_NULL && left != right && left != m_nodes[right].next)
 	{
 		int node = partitionPenetrtaion(left, right);
 		QuickSortPenetration(left, m_nodes[node].prev);
@@ -212,7 +313,7 @@ int GPED::ContactManager::partitionPenetrtaion(int left, int right)
 
 void GPED::ContactManager::QuickSortVelocity(int left, int right)
 {
-	if (right != NODE_NULL && left != NODE_NULL && left != m_nodes[right].next)
+	if (right != NODE_NULL && left != right && left != m_nodes[right].next)
 	{
 		int node = partitionVelocity(left, right);
 		QuickSortVelocity(left, m_nodes[node].prev);

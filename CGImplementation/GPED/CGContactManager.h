@@ -32,10 +32,19 @@ constexpr int NODE_NULL = -1;
 		ContactManager(int nodeCapacity);
 		~ContactManager();
 
-		Contact* GetEmptyContactNode();
+		int GetEmptyContactNode();
+		void setBodyData(int nodeId, RigidBody* one, RigidBody* two);
 
 		void sortByPenetration();
 		void sortByVelocity();
+
+		void updatePenetration(int move, 
+			const int contactId, const int bodyIndex,
+			const glm::vec3& linearChange, const glm::vec3& angularChange);
+		void updateDesiredVelocity(int move,
+			const int contactId, const int bodyIndex,
+			const glm::vec3& velocityChange, const glm::vec3& rotationChange,
+			real duration);
 
 		real friction;
 		real restitution;
@@ -45,6 +54,7 @@ constexpr int NODE_NULL = -1;
 		Contact* GetFirstContact();
 
 		int GetNodeCount();
+		void reset();
 	private:
 		int AllocateNode();
 		void FreeNode(int nodeId);

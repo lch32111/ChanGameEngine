@@ -77,9 +77,13 @@ namespace GPED
 		/**
 		 * Sets the data that doesn't normally depend on the position
 		 * of the contact (i.e. the bodies,and their material properties).
+		 * 
+		 * Chanhaeng Lee 181120
+		 * This method is substituted by ContactManager::SetBodyData
+		 * The reson is that Contact Manager should manage all of contacts info
 		 */
-		void setBodyData(RigidBody* one, RigidBody* two, 
-			real friction, real restitution);
+		// void setBodyData(RigidBody* one, RigidBody* two, 
+		//	real friction, real restitution);
 
 		Contact();
 	protected:
@@ -189,10 +193,27 @@ namespace GPED
 		 */
 		glm::vec3 calculateFrictionImpulse(glm::mat3* inverseInertiaTensor);
 
+		void updatePenetration(
+			const glm::vec3& linearChange, 
+			const glm::vec3& angularChange, 
+			unsigned index);
+
+		void updateDesiredVelocity(
+			const glm::vec3& velocityChange,
+			const glm::vec3& rotationChange,
+			unsigned index,
+			real duration
+		);
 	protected:
+		// Holds its own Id
+		int myId;
+
 		// Holds the doubly linked list pointers for the ordered list.
 		int prev;
 		int next;
+
+		// Holds pointers to the next contact that involves each rigid body
+		int nextObjects[2];
 	};
 
 

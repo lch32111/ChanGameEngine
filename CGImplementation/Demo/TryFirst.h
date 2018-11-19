@@ -8,11 +8,13 @@
 #include <Graphics/chanQuatCamera.h>
 
 #include <GPED/GPED_contacts.h>
-#include <GPED/GPED_contacts.h>
+#include <GPED/CGContactManager.h>
+#include <GPED/GPED_ContactResolver.h>
 #include <GPED/GPED_collide_fine.h>
 #include <GPED/PS_AmmoRound.h>
 #include <GPED/PS_Box.h>
 #include <GPED/CGBroadPhase.h>
+
 
 #include <string>
 #include <vector>
@@ -64,10 +66,8 @@ namespace CGProj
 		// Broad Phase
 		
 		// Narrow Phase
-		static const int maxContacts = 1000;
-		GPED::Contact contacts[maxContacts];
-		GPED::CollisionData cData;
 		GPED::ContactResolver resolver;
+		GPED::ContactManager cManager;
 		// Narrow Phase
 
 		// Simulation Object
@@ -81,7 +81,7 @@ namespace CGProj
 		void updateObjects(float duration, float lastFrame);
 		void SyncAndUpdate();
 		void broadPhase();
-		void generateContacts(GPED::CollisionData& cData);
+		void generateContacts(GPED::ContactManager& cData);
 		// Simulation Logic
 
 		// Miscellaneous

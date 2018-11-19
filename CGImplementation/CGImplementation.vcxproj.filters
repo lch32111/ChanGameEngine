@@ -162,6 +162,9 @@
     <ClCompile Include="GPED\CGBroadPhase.cpp">
       <Filter>GPED Source</Filter>
     </ClCompile>
+    <ClCompile Include="GPED\CGContactManager.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -274,6 +277,9 @@
     </ClInclude>
     <ClInclude Include="Graphics\GLPrimitiveUtil.h">
       <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGContactManager.h">
+      <Filter>GPED Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

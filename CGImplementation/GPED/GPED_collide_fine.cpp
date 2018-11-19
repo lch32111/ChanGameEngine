@@ -117,11 +117,8 @@ bool GPED::IntersectionTests::boxAndHalfSpace(const CollisionBox & box, const Co
 unsigned GPED::CollisionDetector::sphereAndHalfSpace(
 	const CollisionSphere & sphere, 
 	const CollisionPlane & plane, 
-	CollisionData * data)
+	ContactManager * data)
 {
-	// Make sure we have contacts
-	if (data->contactsLeft <= 0) return 0;
-
 	// Cache the sphere position
 	glm::vec3 position = sphere.getAxis(3);
 
@@ -131,23 +128,19 @@ unsigned GPED::CollisionDetector::sphereAndHalfSpace(
 	if (ballDistance >= 0) return 0;
 
 	// Create the contact - it has a normal in the plane direction.
-	Contact* contact = data->contacts;
+	Contact* contact = data->GetEmptyContactNode();
 	contact->contactNormal = plane.direction;
 	contact->penetration = -ballDistance;
 	contact->contactPoint = position - plane.direction * (ballDistance + sphere.radius);
 	contact->setBodyData(sphere.body, NULL, data->friction, data->restitution);
-	data->addContacts(1);
 	return 1;
 }
 
 unsigned GPED::CollisionDetector::sphereAndTruePlane(
 	const CollisionSphere & sphere, 
 	const CollisionPlane & plane, 
-	CollisionData * data)
+	ContactManager * data)
 {
-	// Make sure we have contacts
-	if (data->contactsLeft <= 0) return 0;
-
 	// Cache the sphere position
 	glm::vec3 position = sphere.getAxis(3);
 
@@ -171,24 +164,20 @@ unsigned GPED::CollisionDetector::sphereAndTruePlane(
 	penetration += sphere.radius;
 
 	// Create the contact - it has a normal in the plane direction
-	Contact* contact = data->contacts;
+	Contact* contact = data->GetEmptyContactNode();
 	contact->contactNormal = normal;
 	contact->penetration = penetration;
 	contact->contactPoint = position - plane.direction * centreDistance;
 	contact->setBodyData(sphere.body, NULL, data->friction, data->restitution);
 
-	data->addContacts(1);
 	return 1;
 }
 
 unsigned GPED::CollisionDetector::sphereAndSphere(
 	const CollisionSphere & one, 
 	const CollisionSphere & two, 
-	CollisionData * data)
+	ContactManager * data)
 {
-	// Make sure we have contacts
-	if (data->contactsLeft <= 0) return 0;
-
 	// Cache the sphere positions
 	glm::vec3 positionOne = one.getAxis(3);
 	glm::vec3 positionTwo = two.getAxis(3);
@@ -207,25 +196,21 @@ unsigned GPED::CollisionDetector::sphereAndSphere(
 	// size to hand.
 	glm::vec3 normal = midline * ((real)(1.0) / size);
 
-	Contact* contact = data->contacts;
+	Contact* contact = data->GetEmptyContactNode();
 	contact->contactNormal = normal;
 	contact->contactPoint = positionOne + midline * (real) 0.5;
 	contact->penetration = (one.radius + two.radius - size);
 	contact->setBodyData(one.body, two.body,
 		data->friction, data->restitution);
 	
-	data->addContacts(1);
 	return 1;
 }
 
 unsigned GPED::CollisionDetector::boxAndHalfSpace(
 	const CollisionBox & box, 
 	const CollisionPlane & plane, 
-	CollisionData * data)
+	ContactManager * data)
 {
-	// Make sure we have contacts
-	if (data->contactsLeft <= 0) return 0;
-
 	// Check for intersection
 	if (!IntersectionTests::boxAndHalfSpace(box, plane)) return 0;
 
@@ -237,7 +222,7 @@ unsigned GPED::CollisionDetector::boxAndHalfSpace(
 	static real mults[8][3] = { { 1,1,1 },{ -1,1,1 },{ 1,-1,1 },{ -1,-1,1 },
 								{ 1,1,-1 },{ -1,1,-1 },{ 1,-1,-1 },{ -1,-1,-1 } };
 
-	Contact* contact = data->contacts;
+	Contact* contact = data->GetEmptyContactNode();
 	unsigned contactUsed = 0;
 	for (unsigned i = 0; i < 8; ++i)
 	{
@@ -266,17 +251,12 @@ unsigned GPED::CollisionDetector::boxAndHalfSpace(
 			contact->setBodyData(box.body, NULL, data->friction, data->restitution);
 			
 			// Move onto the next contact
-			contact++;
+			contact = data->GetEmptyContactNode();
+
 			contactUsed++;
-			if (contactUsed == (unsigned)data->contactsLeft)
-			{
-				data->addContacts(contactUsed);
-				return contactUsed;
-			}
 		}
 	}
 	
-	data->addContacts(contactUsed);
 	return contactUsed;
 }
 
@@ -337,7 +317,7 @@ void fillPointFaceBoxBox(
 	const GPED::CollisionBox& one,
 	const GPED::CollisionBox& two,
 	const glm::vec3& toCentre,
-	GPED::CollisionData* data,
+	GPED::ContactManager* data,
 	unsigned best,
 	GPED::real pen
 )
@@ -345,7 +325,7 @@ void fillPointFaceBoxBox(
 	// This method is called when we know that a vertex from
 	// box two is in contact with box one
 
-	GPED::Contact* contact = data->contacts;
+	GPED::Contact* contact = data->GetEmptyContactNode();
 
 	// We know which axis the collision is on (i.e best),
 	// but we need to work out which of the two faces on
@@ -429,7 +409,7 @@ static inline glm::vec3 contactPoint(
 unsigned GPED::CollisionDetector::boxAndBox(
 	const CollisionBox & one, 
 	const CollisionBox & two, 
-	CollisionData * data)
+	ContactManager * data)
 {
 	// if(!IntersectionTest::boxAndBox(one, two)) return 0;
 
@@ -477,7 +457,6 @@ unsigned GPED::CollisionDetector::boxAndBox(
 	{
 		// We've got a vertex of box two on a face of box one.
 		fillPointFaceBoxBox(one, two, toCentre, data, best, pen);
-		data->addContacts(1);
 		return 1;
 	}
 	else if (best < 6)
@@ -487,7 +466,6 @@ unsigned GPED::CollisionDetector::boxAndBox(
 		// one and two (and therefore also the vector between their
 		// centres).
 		fillPointFaceBoxBox(two, one, toCentre * real(-1.0), data, best - 3, pen);
-		data->addContacts(1);
 		return 1;
 	}
 	else
@@ -534,13 +512,11 @@ unsigned GPED::CollisionDetector::boxAndBox(
 		);
 
 		// We can fill the contact
-		Contact* contact = data->contacts;
+		Contact* contact = data->GetEmptyContactNode();
 		contact->penetration = pen;
 		contact->contactNormal = axis;
 		contact->contactPoint = vertex;
 		contact->setBodyData(one.body, two.body, data->friction, data->restitution);
-		
-		data->addContacts(1);
 		return 1;
 		
 	}
@@ -552,7 +528,7 @@ unsigned GPED::CollisionDetector::boxAndBox(
 unsigned GPED::CollisionDetector::boxAndPoint(
 	const CollisionBox & box, 
 	const glm::vec3 & point, 
-	CollisionData * data)
+	ContactManager * data)
 {
 	// Transform the point into box coordinates
 	glm::vec3 relPt = glm::transpose(glm::mat3(box.transform)) * 
@@ -583,7 +559,7 @@ unsigned GPED::CollisionDetector::boxAndPoint(
 	}
 
 	// Compile the contact
-	Contact* contact = data->contacts;
+	Contact* contact = data->GetEmptyContactNode();
 	contact->contactNormal = normal;
 	contact->contactPoint = point;
 	contact->penetration = min_depth;
@@ -593,7 +569,6 @@ unsigned GPED::CollisionDetector::boxAndPoint(
 	// this value can be left or filled in.
 	contact->setBodyData(box.body, NULL, data->friction, data->restitution);
 
-	data->addContacts(1);
 	return 1;
 }
 
@@ -601,7 +576,7 @@ unsigned GPED::CollisionDetector::boxAndPoint(
 unsigned GPED::CollisionDetector::boxAndSphere(
 	const CollisionBox & box, 
 	const CollisionSphere & sphere, 
-	CollisionData * data)
+	ContactManager * data)
 {
 	// Transform the centre of the sphere into box coordinates
 	glm::vec3 sphereCentre = sphere.getAxis(3);
@@ -679,7 +654,7 @@ unsigned GPED::CollisionDetector::boxAndSphere(
 	}
 	
 	// Compile the contact
-	Contact* contact = data->contacts;
+	Contact* contact = data->GetEmptyContactNode();
 	
 	glm::vec3 closestPtWorld = glm::vec3(box.transform * glm::vec4(closestPt, 1.0));
 	glm::vec3 sphereToClosestPt = closestPtWorld - sphereCentre;
@@ -698,7 +673,6 @@ unsigned GPED::CollisionDetector::boxAndSphere(
 	contact->penetration = real_abs(sphere.radius - dist);
 	contact->setBodyData(box.body, sphere.body, data->friction, data->restitution);
 
-	data->addContacts(1);
 	return 1;
 }
 

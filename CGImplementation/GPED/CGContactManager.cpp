@@ -53,15 +53,51 @@ GPED::ContactManager::~ContactManager()
 
 GPED::Contact* GPED::ContactManager::GetEmptyContactNode()
 {
-	return nullptr;
+	int nodeId = AllocateNode();
+	InsertNode(nodeId);
+	return &(m_nodes[nodeId]);
 }
 
 void GPED::ContactManager::sortByPenetration()
 {
+	int lastId = m_root;
+	while (lastId && m_nodes[lastId].next)
+		lastId = m_nodes[lastId].next;
+
+	// Decreasing Order
+	// refer to https://www.geeksforgeeks.org/quicksort-for-linked-list/
+	// abou the implemenetation
+	QuickSortPenetration(m_root, lastId);
 }
 
 void GPED::ContactManager::sortByVelocity()
 {
+	int lastId = m_root;
+	while (lastId && m_nodes[lastId].next)
+		lastId = m_nodes[lastId].next;
+
+	// Decreasing Order
+	QuickSortVelocity(m_root, lastId);
+}
+
+void GPED::ContactManager::AllcalculateInternals(GPED::real duration)
+{
+	int move = m_root;
+	while (move != NODE_NULL)
+	{
+		m_nodes[move].calculateInternals(duration);
+		move = m_nodes[move].next;
+	}
+}
+
+GPED::Contact * GPED::ContactManager::GetFirstContact()
+{
+	return &m_nodes[m_root];
+}
+
+int GPED::ContactManager::GetNodeCount()
+{
+	return m_nodeCount;
 }
 
 int GPED::ContactManager::AllocateNode()
@@ -109,15 +145,114 @@ void GPED::ContactManager::FreeNode(int nodeId)
 	--m_nodeCount;
 }
 
-void GPED::ContactManager::InsertNode(Contact * node)
+void GPED::ContactManager::InsertNode(int nodeId)
 {
-	if (m_root = NODE_NULL)
+	if (m_root == NODE_NULL)
 	{
-		m_root = 0;
-		m_nodes[]
+		m_root = nodeId;
+		m_nodes[m_root].prev = NODE_NULL;
+		m_nodes[m_root].next = NODE_NULL;
+		return;
+	}
+
+	// Insert the node into the first place of doubly linked list
+	m_nodes[nodeId].prev = NODE_NULL;
+	m_nodes[nodeId].next = m_root;
+
+	m_nodes[m_root].prev = nodeId;
+
+	m_root = nodeId;
+}
+
+void GPED::ContactManager::DeleteNode(int nodeId)
+{
+	int prevId = m_nodes[nodeId].prev;
+	int nextId = m_nodes[nodeId].next;
+
+	if (prevId != NODE_NULL)
+		m_nodes[prevId].next = nextId;
+	else
+		m_root = nextId;
+
+	if(nextId != NODE_NULL)
+		m_nodes[nextId].prev = prevId;
+
+	FreeNode(nodeId);
+}
+
+void GPED::ContactManager::QuickSortPenetration(int left, int right)
+{
+	if (right != NODE_NULL && left != NODE_NULL && left != m_nodes[right].next)
+	{
+		int node = partitionPenetrtaion(left, right);
+		QuickSortPenetration(left, m_nodes[node].prev);
+		QuickSortPenetration(m_nodes[node].next, right);
 	}
 }
 
-void GPED::ContactManager::DeleteNode(Contact * node)
+int GPED::ContactManager::partitionPenetrtaion(int left, int right)
 {
+	GPED::real pivot = m_nodes[right].penetration;
+
+	int i = m_nodes[left].prev;
+
+	for (int j = left; j != right; j = m_nodes[j].next)
+	{
+		if (m_nodes[j].penetration > pivot)
+		{
+			i = (i == NODE_NULL) ? left : m_nodes[i].next;
+			ContactManager::swap(i, j);
+		}
+	}
+
+	i = (i == NODE_NULL) ? left : m_nodes[i].next;
+	ContactManager::swap(i, right);
+	return i;
+}
+
+void GPED::ContactManager::QuickSortVelocity(int left, int right)
+{
+	if (right != NODE_NULL && left != NODE_NULL && left != m_nodes[right].next)
+	{
+		int node = partitionVelocity(left, right);
+		QuickSortVelocity(left, m_nodes[node].prev);
+		QuickSortVelocity(m_nodes[node].next, right);
+	}
+}
+
+int GPED::ContactManager::partitionVelocity(int left, int right)
+{
+	GPED::real pivot = m_nodes[right].desiredDeltaVelocity;
+
+	int i = m_nodes[left].prev;
+
+	for (int j = left; j != right; j = m_nodes[j].next)
+	{
+		if (m_nodes[j].desiredDeltaVelocity > pivot)
+		{
+			i = (i == NODE_NULL) ? left : m_nodes[i].next;
+			ContactManager::swap(i, j);
+		}
+	}
+
+	i = (i == NODE_NULL) ? left : m_nodes[i].next;
+	ContactManager::swap(i, right);
+	return i;
+}
+
+void GPED::ContactManager::swap(int nodeIdA, int nodeIdB)
+{
+	int Aprev = m_nodes[nodeIdA].prev;
+	int Anext = m_nodes[nodeIdA].next;
+	int Bprev = m_nodes[nodeIdB].prev;
+	int Bnext = m_nodes[nodeIdB].next;
+
+	Contact temp = m_nodes[nodeIdA];
+	m_nodes[nodeIdA] = m_nodes[nodeIdB];
+	m_nodes[nodeIdA].prev = Aprev;
+	m_nodes[nodeIdA].next = Anext;
+
+	m_nodes[nodeIdB] = temp;
+	m_nodes[nodeIdB].prev = Bprev;
+	m_nodes[nodeIdB].next = Bnext;
 }

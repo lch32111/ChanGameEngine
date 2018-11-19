@@ -3,6 +3,7 @@
 
 #include <GPED/GPED_body.h>
 #include <GPED/GPED_contacts.h>
+#include <GPED/CGContactManager.h>
 
 namespace GPED
 {
@@ -312,7 +313,7 @@ namespace GPED
 		(
 			const CollisionPrimitive* a, 
 			const CollisionPrimitive* b, 
-			CollisionData* data
+			ContactManager* data
 		)
 		{
 			int aKey = 0;
@@ -350,21 +351,21 @@ namespace GPED
 		(
 			const CollisionSphere& sphere,
 			const CollisionPlane& plane,
-			CollisionData* data
+			ContactManager* data
 		);
 
 		static unsigned sphereAndTruePlane
 		(
 			const CollisionSphere& sphere,
 			const CollisionPlane& plane,
-			CollisionData* data
+			ContactManager* data
 		);
 
 		static unsigned sphereAndSphere
 		(
 			const CollisionSphere& one,
 			const CollisionSphere& two,
-			CollisionData* data
+			ContactManager* data
 		);
 
 		/**
@@ -376,28 +377,28 @@ namespace GPED
 		(
 			const CollisionBox& box,
 			const CollisionPlane& plane,
-			CollisionData* data
+			ContactManager* data
 		);
 
 		static unsigned boxAndBox
 		(
 			const CollisionBox& one,
 			const CollisionBox& two,
-			CollisionData* data
+			ContactManager* data
 		);
 
 		static unsigned boxAndPoint
 		(
 			const CollisionBox& box,
 			const glm::vec3& point,
-			CollisionData* data
+			ContactManager* data
 		);
 
 
 		static unsigned boxAndSphere(
 			const CollisionBox& box,
 			const CollisionSphere& sphere,
-			CollisionData* data
+			ContactManager* data
 		);
 	};
 

@@ -425,7 +425,6 @@ static inline glm::vec3 contactPoint(
 // in the boxAndBox contact generation method
 #define CHECK_OVERLAP(axis, index) \
 	if(!tryAxis(one, two, (axis), toCentre, (index), pen, best)) return 0;
-
 unsigned GPED::CollisionDetector::boxAndBox(
 	const CollisionBox & one, 
 	const CollisionBox & two, 
@@ -597,7 +596,6 @@ unsigned GPED::CollisionDetector::boxAndPoint(
 	return 1;
 }
 
-#define DIST_EPSILON 0.0001
 unsigned GPED::CollisionDetector::boxAndSphere(
 	const CollisionBox & box, 
 	const CollisionSphere & sphere, 
@@ -649,7 +647,7 @@ unsigned GPED::CollisionDetector::boxAndSphere(
 	The solution is giving the closest point of box hull to the closestPt Point.
 	It means the closest point will be one of the vertices of the box.
 	*/
-	if (dist <= DIST_EPSILON)
+	if (dist <= real_epsilon)
 	{
 		real distX, distY, distZ;
 		distX = box.halfSize.x - real_abs(closestPt.x);
@@ -685,7 +683,7 @@ unsigned GPED::CollisionDetector::boxAndSphere(
 	glm::vec3 sphereToClosestPt = closestPtWorld - sphereCentre;
 	
 	contact->contactNormal = sphereToClosestPt;
-	if (dist <= DIST_EPSILON)
+	if (dist <= real_epsilon)
 	{
 		// 18.11.03 : Because sphere -> box point normal should be reversed.
 		// and the dist between sphere and closest pt was changed.
@@ -701,5 +699,3 @@ unsigned GPED::CollisionDetector::boxAndSphere(
 	data->addContacts(1);
 	return 1;
 }
-
-

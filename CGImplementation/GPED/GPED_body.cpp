@@ -141,7 +141,7 @@ void GPED::RigidBody::integrate(real duration)
 
 void GPED::RigidBody::setMass(const real mass)
 {
-	assert(mass != 0);
+	assert(mass > real_epsilon);
 	RigidBody::inverseMass = (real(1.0)) / mass;
 }
 
@@ -165,7 +165,7 @@ real GPED::RigidBody::getInverseMass() const
 
 bool GPED::RigidBody::hasFiniteMass() const
 {
-	return inverseMass >= 0.0f;
+	return inverseMass > real_epsilon;
 }
 
 void GPED::RigidBody::setInertiaTensor(const glm::mat3& inertiaTensor)
@@ -423,6 +423,7 @@ void GPED::RigidBody::clearAccumulators()
 void GPED::RigidBody::addForce(const glm::vec3& force)
 {
 	forceAccum += force;
+	isAwake = true;
 }
 
 void GPED::RigidBody::addForceAtPoint(const glm::vec3& force, const glm::vec3& point)
@@ -433,6 +434,8 @@ void GPED::RigidBody::addForceAtPoint(const glm::vec3& force, const glm::vec3& p
 
 	forceAccum += force;
 	torqueAccum += glm::cross(pt, force);
+
+	isAwake = true;
 }
 
 void GPED::RigidBody::addForceAtBodyPoint(const glm::vec3& force, const glm::vec3& point)
@@ -445,6 +448,7 @@ void GPED::RigidBody::addForceAtBodyPoint(const glm::vec3& force, const glm::vec
 void GPED::RigidBody::addTorque(const glm::vec3& torque)
 {
 	torqueAccum += torque;
+	isAwake = true;
 }
 
 void GPED::RigidBody::setAcceleration(const glm::vec3 & acceleration)

@@ -3,6 +3,7 @@
 
 #include <GPED/GPED_body.h>
 #include <GPED/GPED_contacts.h>
+#include <GPED/GPED_ContactResolver.h>
 
 namespace GPED
 {

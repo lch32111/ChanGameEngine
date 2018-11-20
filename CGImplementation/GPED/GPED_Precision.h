@@ -112,6 +112,67 @@ namespace GPED
 		real ixy = 0, real ixz = 0, real iyz = 0);
 
 	glm::mat3 getBlockInertiaTensor(const glm::vec3& halfSizes, real mass);
+
+	real rMin(real a, real b);
+	real rMax(real a, real b);
+	glm::vec3 rMin(const glm::vec3& a, const glm::vec3& b);
+	glm::vec3 rMax(const glm::vec3& a, const glm::vec3& b);
+	
+	/* 18-11-13 Chanhaneg Lee
+		I referred to http://www.randygaul.net/2013/08/06/dynamic-aabb-tree/ .
+		However, this article is almost based on the Box2D Code.
+		So, I also referred to the Box2D Code.
+		I made the code work with our project code
+	*/
+#define aabbExtension 0.01
+#define aabbMultiplier 2.0
+	struct c3AABB // CG Project 3-dimenstional AABB
+	{
+		glm::vec3 min;
+		glm::vec3 max;
+
+		GPED::real GetPerimeter() const
+		{
+			GPED::real wx = max.x - min.x;
+			GPED::real wy = max.y - min.y;
+			GPED::real wz = max.z - min.z;
+
+			return GPED::real(4) * (wx + wy + wz);
+		}
+
+		void Combine(const c3AABB& aabb)
+		{
+			min = GPED::rMin(min, aabb.min);
+			max = GPED::rMax(max, aabb.max);
+		}
+
+		void Combine(const c3AABB& aabb1, const c3AABB& aabb2)
+		{
+			min = GPED::rMin(aabb1.min, aabb2.min);
+			max = GPED::rMax(aabb1.max, aabb2.max);
+		}
+
+		// Does this aabb contain the provided AABB;
+		bool Contains(const c3AABB& aabb) const
+		{
+			bool result = true;
+			result = result && min.x <= aabb.min.x;
+			result = result && min.y <= aabb.min.y;
+			result = result && min.z <= aabb.min.z;
+			result = result && aabb.max.x <= max.x;
+			result = result && aabb.max.y <= max.y;
+			result = result && aabb.max.z <= max.z;
+			return result;
+		}
+	};
+
+	bool aabbOverlap(const GPED::c3AABB & a, const c3AABB & b);
+
+	class CollisionPrimitive; // Forward Declaration
+	
+	/// The method to enable GPED Object to interact with CGBroadPhase 
+	/// which uses dynamicAABB tree
+	GPED::c3AABB convertFromCollisionPrimitive(const CollisionPrimitive& primitive);
 }
 
 

@@ -58,7 +58,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	// Emissive Buffer
 	glGenTextures(1, &gEmissive);
 	glBindTexture(GL_TEXTURE_2D, gEmissive);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, gEmissive, 0);
@@ -88,9 +88,10 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	// First Pass Setup For Deferred Rendering
 
 	// Object Manual Setting + Light Manual Setting
-	boxTexture = TextureFromFile("ImageFolder/container2.png", false);
-	boxSpecular = TextureFromFile("ImageFolder/container2_specular.png", false);
-	woodTexture = TextureFromFile("ImageFolder/woodpanel.png", false);
+	boxTexture = TextureFromFile("ImageFolder/container2.png", true);
+	boxSpecular = TextureFromFile("ImageFolder/container2_specular.png", true);
+	woodTexture = TextureFromFile("ImageFolder/woodpanel.png", true);
+	emissiveTexture = TextureFromFile("ImageFolder/matrix.jpg", true);
 
 
 	objectPositions.push_back(glm::vec3(-3.0, -3.0, -3.0));
@@ -169,11 +170,13 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	Deferred_First_Shader.setBool("material.CMorLM", true);
 	Deferred_First_Shader.setBool("material.isLMdiffuse", true);
 	Deferred_First_Shader.setBool("material.isLMspecular", true);
-	Deferred_First_Shader.setBool("material.isLMemissive", false);
+	Deferred_First_Shader.setBool("material.isLMemissive", true);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, boxTexture);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, boxSpecular);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, emissiveTexture);
 	for (unsigned i = 0; i < objectPositions.size(); ++i)
 	{
 		model = glm::mat4(1.0);
@@ -188,6 +191,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	model = glm::translate(model, glm::vec3(0, -5, 0));
 	model = glm::rotate(model, glm::radians(-90.f), glm::vec3(1, 0, 0));
 	model = glm::scale(model, glm::vec3(10));
+	Deferred_First_Shader.setBool("material.isLMemissive", false);
 	Deferred_First_Shader.setMat4("viewModel", view * model);
 	Deferred_First_Shader.setMat3("MVNormalMatrix", glm::mat3(glm::transpose(glm::inverse(view * model))));
 	glActiveTexture(GL_TEXTURE0);
@@ -195,7 +199,6 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	renderQuad();
 
 
-	// Second Pass
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -286,7 +289,7 @@ void CGProj::DeferredRenderer::resize(int width, int height)
 
 	// Emissive Buffer
 	glBindTexture(GL_TEXTURE_2D, gEmissive);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, gEmissive, 0);

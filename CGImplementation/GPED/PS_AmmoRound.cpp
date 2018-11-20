@@ -4,10 +4,10 @@
 
 void AmmoRound::setState(ShotType shotType)
 {
-	type = shotType;
+	m_shotType = shotType;
 
 	// Set the properties of the particle
-	switch (type)
+	switch (m_shotType)
 	{
 	case SHOT_PISTOL:
 		body->setMass(1.5f);
@@ -63,10 +63,10 @@ void AmmoRound::setState(ShotType shotType)
 
 void AmmoRound::setState(ShotType shotType, glm::vec3 Position, glm::vec3 Velocity)
 {
-	type = shotType;
+	m_shotType = shotType;
 
 	// Set the properties of the particle
-	switch (type)
+	switch (m_shotType)
 	{
 	case SHOT_PISTOL:
 		body->setMass(1.5f);
@@ -126,10 +126,10 @@ void AmmoRound::setState(ShotType shotType, glm::vec3 Position, glm::vec3 Veloci
 
 void AmmoRound::setState(ShotType shotType, const chanQuatCamera& camera)
 {
-	type = shotType;
+	m_shotType = shotType;
 
 	// Set the properties of the particle
-	switch (type)
+	switch (m_shotType)
 	{
 	case SHOT_PISTOL:
 		body->setMass(1.5f);
@@ -172,7 +172,10 @@ void AmmoRound::setState(ShotType shotType, const chanQuatCamera& camera)
 	body->setInertiaTensor(tensor);
 
 	// Set the data common to all particle types
-	body->setPosition(camera.Position);
+	glm::vec3 MinusZaxis(0, 0, -1);
+	glm::quat mzQ = camera.Orientation *  glm::quat(0, MinusZaxis)  * glm::conjugate(camera.Orientation);
+	glm::vec3 forwardSetting(mzQ.x, mzQ.y, mzQ.z);
+	body->setPosition(camera.Position + forwardSetting * 5.f);
 	startTime = glfwGetTime();
 	body->setOrientation(camera.Orientation);
 

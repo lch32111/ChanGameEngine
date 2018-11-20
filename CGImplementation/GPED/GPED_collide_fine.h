@@ -3,6 +3,7 @@
 
 #include <GPED/GPED_body.h>
 #include <GPED/GPED_contacts.h>
+#include <GPED/CGContactManager.h>
 
 namespace GPED
 {
@@ -16,6 +17,14 @@ namespace GPED
 	class CollisionPrimitive
 	{
 	public:
+		enum primitiveType
+		{
+			UNDECLARED = 0,
+			primitive_sphere,
+			primitive_box
+		};
+		primitiveType m_primitiveType;
+
 		/**
 		 * This class exists to help the collision detector
 		 * and intersection routines,so they should have
@@ -59,6 +68,12 @@ namespace GPED
 			return transform;
 		}
 
+		/** 18-11-14 Chanhaneg Lee
+		 * this method is for the broadPhase.
+		 * this virtual interface will make the code simple in the broadPhase class.
+		 */
+		virtual c3AABB makeAABB() const = 0;
+
 	protected:
 		/**
 		 * The resultant transform of the primitive. This is
@@ -75,10 +90,28 @@ namespace GPED
 	class CollisionSphere : public CollisionPrimitive
 	{
 	public:
+		CollisionSphere()
+		{
+			CollisionPrimitive::m_primitiveType = primitive_sphere;
+		}
+
 		/**
 		 * The radius of the sphere.
 		 */
 		real radius;
+
+		virtual c3AABB makeAABB() const
+		{
+			c3AABB aabb;
+			
+			// Just ignore the orientation since it's sphere.
+			glm::vec3 pos = getAxis(3);
+
+			aabb.min = pos - glm::vec3(radius);
+			aabb.max = pos + glm::vec3(radius);
+
+			return aabb;
+		}
 	};
 
 	/**
@@ -107,10 +140,44 @@ namespace GPED
 	class CollisionBox : public CollisionPrimitive
 	{
 	public:
+		CollisionBox()
+		{
+			CollisionPrimitive::m_primitiveType = primitive_box;
+		}
+
 		/**
 		 * Holds the half-sizes of the box along each of its local axes.
 		 */
 		glm::vec3 halfSize;
+
+		virtual c3AABB makeAABB() const
+		{
+			c3AABB aabb;
+			aabb.min = glm::vec3(REAL_MAX);
+			aabb.max = glm::vec3(-REAL_MAX);
+
+			glm::vec3 v[8] =
+			{
+				glm::vec3(-halfSize.x,-halfSize.y, -halfSize.z),
+				glm::vec3(-halfSize.x,-halfSize.y, halfSize.z),
+				glm::vec3(halfSize.x, -halfSize.y, halfSize.z),
+				glm::vec3(halfSize.x,-halfSize.y, -halfSize.z),
+				glm::vec3(-halfSize.x, halfSize.y, -halfSize.z),
+				glm::vec3(-halfSize.x, halfSize.y, halfSize.z),
+				glm::vec3(halfSize.x, halfSize.y, halfSize.z),
+				glm::vec3(halfSize.x, halfSize.y, -halfSize.z)
+			};
+
+			for (int i = 0; i < 8; ++i)
+			{
+				v[i] = transform * glm::vec4(v[i], 1.0);
+
+				aabb.min = GPED::rMin(aabb.min, v[i]);
+				aabb.max = GPED::rMax(aabb.max, v[i]);
+			}
+
+			return aabb;
+		}
 	};
 
 	/**
@@ -169,7 +236,7 @@ namespace GPED
 		 * can be incremented each time a contact is detected, while
 		 * this pointer points to the first contact found.
 		 */
-		Contact* contactArray;
+		Contact* contactHead;
 
 		/** Holds the contact array to write into */
 		Contact* contacts;
@@ -208,7 +275,7 @@ namespace GPED
 		{
 			contactsLeft = maxContacts;
 			contactCount = 0;
-			contacts = contactArray;
+			contacts = contactHead;
 		}
 
 		/**
@@ -224,6 +291,11 @@ namespace GPED
 			// Move the array forward
 			contacts += count;
 		}
+
+		void connectContactArray(Contact* c)
+		{
+			contactHead = c;
+		}
 	};
 	
 	/**
@@ -237,25 +309,63 @@ namespace GPED
 	class CollisionDetector
 	{
 	public:
+		static unsigned collision
+		(
+			const CollisionPrimitive* a, 
+			const CollisionPrimitive* b, 
+			ContactManager* data
+		)
+		{
+			int aKey = 0;
+			switch (a->m_primitiveType)
+			{
+			case GPED::CollisionPrimitive::primitiveType::primitive_sphere:
+				aKey = 0;
+				break;
+			case GPED::CollisionPrimitive::primitiveType::primitive_box:
+				aKey = 1;
+				break;
+			default:
+				assert(0);
+			}
+
+			int bKey = 0;
+			switch (b->m_primitiveType)
+			{
+			case GPED::CollisionPrimitive::primitiveType::primitive_sphere:
+				bKey = 0;
+				break;
+			case GPED::CollisionPrimitive::primitiveType::primitive_box:
+				bKey = 1;
+				break;
+			}
+
+			if (aKey & bKey) return boxAndBox(*(CollisionBox*)a, *(CollisionBox*)b, data);
+			if (!aKey & !bKey) return sphereAndSphere(*(CollisionSphere*)a, *(CollisionSphere*)b, data);
+			if (aKey) return boxAndSphere(*(CollisionBox*)a, *(CollisionSphere*)b, data);
+			else return boxAndSphere(*(CollisionBox*)b, *(CollisionSphere*)a, data);
+		};
+
+
 		static unsigned sphereAndHalfSpace
 		(
 			const CollisionSphere& sphere,
 			const CollisionPlane& plane,
-			CollisionData* data
+			ContactManager* data
 		);
 
 		static unsigned sphereAndTruePlane
 		(
 			const CollisionSphere& sphere,
 			const CollisionPlane& plane,
-			CollisionData* data
+			ContactManager* data
 		);
 
 		static unsigned sphereAndSphere
 		(
 			const CollisionSphere& one,
 			const CollisionSphere& two,
-			CollisionData* data
+			ContactManager* data
 		);
 
 		/**
@@ -267,28 +377,28 @@ namespace GPED
 		(
 			const CollisionBox& box,
 			const CollisionPlane& plane,
-			CollisionData* data
+			ContactManager* data
 		);
 
 		static unsigned boxAndBox
 		(
 			const CollisionBox& one,
 			const CollisionBox& two,
-			CollisionData* data
+			ContactManager* data
 		);
 
 		static unsigned boxAndPoint
 		(
 			const CollisionBox& box,
 			const glm::vec3& point,
-			CollisionData* data
+			ContactManager* data
 		);
 
 
 		static unsigned boxAndSphere(
 			const CollisionBox& box,
 			const CollisionSphere& sphere,
-			CollisionData* data
+			ContactManager* data
 		);
 	};
 

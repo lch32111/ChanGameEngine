@@ -6,6 +6,9 @@
 class Box : public GPED::CollisionBox
 {
 public:
+	int proxyId;
+	
+
 	Box()
 	{
 		body = new GPED::RigidBody;

@@ -263,7 +263,6 @@ void CGProj::GraphicsDemo::resize(int width, int height)
 /* ### Graphics Demo ### */
 /****************************************************************************************/
 
-
 CGProj::Application* getApplication()
 {
 	return new CGProj::PhysicsDemo();

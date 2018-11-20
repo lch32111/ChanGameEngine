@@ -60,7 +60,7 @@ void GPED::World::runPhysics(real duration)
 
 	// And process them
 	if (calculateIterations) resolver.setIterations(usedContacts * 4, usedContacts * 4);
-	resolver.resolveContacts(contacts, usedContacts, duration);
+	// resolver.resolveContacts(contacts, usedContacts, duration);
 }
 
 void GPED::World::startFrame()

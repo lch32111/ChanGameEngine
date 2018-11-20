@@ -16,7 +16,9 @@ enum ShotType
 class AmmoRound : public GPED::CollisionSphere
 {
 public:
-	ShotType type;
+	int proxyId;
+
+	ShotType m_shotType;
 	unsigned startTime;
 
 	AmmoRound()

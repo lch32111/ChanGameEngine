@@ -1,4 +1,5 @@
 #include "GPED_Precision.h"
+#include "GPED_collide_fine.h"
 using namespace GPED;
 
 real GPED::sleepEpsilon = ((real)0.05);
@@ -84,4 +85,40 @@ glm::mat3 GPED::getBlockInertiaTensor(const glm::vec3& halfSizes, real mass)
 		0.3f * mass * (square.x + square.z),
 		0.3f * mass * (square.x + square.y)
 	);
+}
+
+real GPED::rMin(real a, real b)
+{
+	return a < b ? a : b;
+}
+
+real GPED::rMax(real a, real b)
+{
+	return a > b ? a : b;
+}
+
+glm::vec3 GPED::rMin(const glm::vec3 & a, const glm::vec3 & b)
+{
+	return glm::vec3(rMin(a.x, b.x), rMin(a.y, b.y), rMin(a.z, b.z));
+}
+
+glm::vec3 GPED::rMax(const glm::vec3 & a, const glm::vec3 & b)
+{
+	return glm::vec3(rMax(a.x, b.x), rMax(a.y, b.y), rMax(a.z, b.z));
+}
+
+bool GPED::aabbOverlap(const GPED::c3AABB & a, const c3AABB & b)
+{
+	// Exit with no intersection if separated along an axis
+	if (a.max[0] < b.min[0] || a.min[0] > b.max[0]) return false;
+	if (a.max[1] < b.min[1] || a.min[1] > b.max[1]) return false;
+	if (a.max[2] < b.min[2] || a.min[2] > b.max[2]) return false;
+
+	// Overlapping on all axes means AABBs are intersecting
+	return true;
+}
+
+GPED::c3AABB GPED::convertFromCollisionPrimitive(const CollisionPrimitive & primitive)
+{
+	return primitive.makeAABB();
 }

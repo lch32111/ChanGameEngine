@@ -8,5 +8,5 @@ Debug/
 # Don't Include Image Folder. We will share the design resources with Google Drive
 ImageFolder/
 
-# Don't Include imgui save files. it's useless. 181109 added by Chanhaeng Lee
-*.ini
+# Don't Include Imgui Setting Save File.
+imgui.ini

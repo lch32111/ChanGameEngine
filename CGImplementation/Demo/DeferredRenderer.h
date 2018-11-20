@@ -45,8 +45,9 @@ namespace CGProj
 		std::vector<glm::vec3> objectPositions;
 		unsigned int boxTexture, boxSpecular;
 		unsigned int woodTexture;
+		unsigned int emissiveTexture;
+		unsigned int NR_LIGHTS = 200;
 
-		unsigned int NR_LIGHTS = 100;
 		float constant = 1.0;
 		float linear = 0.7;
 		float quadratic = 1.8;

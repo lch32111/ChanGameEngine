@@ -8,12 +8,17 @@
 #include <Graphics/chanQuatCamera.h>
 
 #include <GPED/GPED_contacts.h>
-#include <GPED/GPED_contacts.h>
+#include <GPED/CGContactManager.h>
+#include <GPED/GPED_ContactResolver.h>
 #include <GPED/GPED_collide_fine.h>
 #include <GPED/PS_AmmoRound.h>
 #include <GPED/PS_Box.h>
+#include <GPED/CGBroadPhase.h>
+
 
 #include <string>
+#include <vector>
+#include <Graphics/GLPrimitiveUtil.h>
 
 namespace CGProj
 {
@@ -31,17 +36,13 @@ namespace CGProj
 		void key(GLFWwindow* app_window, float deltaTime);
 		void mouse(double xpos, double ypos);
 		void scroll(double yoffset);
-
-
 	private:
-		/* Imgui Control Parameters*/
+		// User Input Interaction
 		ShotType currentShotType;
 		GPED::real contactFriction = 0.9;
 		GPED::real contactRestitution = 0.1;
 		GPED::real contactTolerance = 0.1;
 
-		Shader simpleShader;
-		chanQuatCamera camera;
 		float lastX = 400, lastY = 300;
 		bool firstMouse = true;
 		bool start = false;
@@ -50,39 +51,45 @@ namespace CGProj
 
 		bool UIControl = false;
 		bool GameControl = true;
+		bool BroadDebug = false;
 		
-		static const int maxContacts = 256;
-		GPED::Contact contacts[maxContacts];
-		GPED::CollisionData cData;
-		GPED::ContactResolver resolver;
-
-		const static unsigned ammoRounds = 100;
-		AmmoRound ammo[ammoRounds];
-
-		const static unsigned boxes = 30;
-		Box boxData[boxes];
-		
-		void updateObjects(float duration, float lastFrame);
-		void generateContacts(GPED::CollisionData& cData);
 		void fire();
 		void totalFire();
 		void reset();
+		// User Input Interaction
 
+		// Broad Phase
+		CGBroadPhase FirstBroadPhase;
+		BroadResultWrapper<GPED::CollisionPrimitive> firstResult;
+		BroadRendererWrapper bRender;
+		Shader wireShader;
+		// Broad Phase
+		
+		// Narrow Phase
+		GPED::ContactResolver resolver;
+		GPED::ContactManager cManager;
+		// Narrow Phase
 
+		// Simulation Object
+		const static unsigned ammoRounds = 100;
+		AmmoRound ammo[ammoRounds];
+		const static unsigned boxes = 200;
+		Box boxData[boxes];
+		// Simulation Object
+
+		// Simulation Logic
+		void updateObjects(float duration, float lastFrame);
+		void SyncAndUpdate();
+		void broadPhase();
+		void generateContacts(GPED::ContactManager& cData);
+		// Simulation Logic
+
+		// Miscellaneous
 		unsigned int woodTexture;
 		unsigned int containerTexture;
-
-		unsigned int cubeVAO = 0;
-		unsigned int cubeVBO = 0;
-		void renderCube();
-
-		unsigned int quadVAO = 0;
-		unsigned int quadVBO;
-		void renderQuad();
-
-		unsigned int sphereVAO = 0;
-		unsigned int indexCount;
-		void renderSphere();
+		Shader simpleShader;
+		chanQuatCamera camera;
+		// Miscellaneous
 	};
 }
 

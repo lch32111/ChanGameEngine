@@ -45,7 +45,7 @@ namespace GPED
 
 	/** Defines the number e on which 1+e == 1 **/
 #define real_epsilon FLT_EPSILON
-
+#define REAL_EPSILON 0.0001
 #define R_PI 3.14159f
 
 #else
@@ -166,13 +166,41 @@ namespace GPED
 		}
 	};
 
-	bool aabbOverlap(const GPED::c3AABB & a, const c3AABB & b);
-
 	class CollisionPrimitive; // Forward Declaration
 	
 	/// The method to enable GPED Object to interact with CGBroadPhase 
 	/// which uses dynamicAABB tree
 	GPED::c3AABB convertFromCollisionPrimitive(const CollisionPrimitive& primitive);
+
+	struct c3RayInput
+	{
+		c3RayInput()
+			: startPoint(glm::vec3(0)), direction(glm::vec3(0))
+		{	}
+
+		c3RayInput(const glm::vec3& rayFrom, const glm::vec3& rayTo)
+			: startPoint(rayFrom)
+		{
+			direction = glm::normalize(rayFrom - rayTo);
+		}
+
+		glm::vec3 startPoint;
+		glm::vec3 direction;
+	};
+
+	bool aabbOverlap(const GPED::c3AABB & a, const c3AABB & b);
+	bool rayaabbOverlap(const GPED::c3AABB& a, const GPED::c3RayInput& ray);
+
+	template<class T>
+	void Swap(T& a, T& b) { T t = a; a = b; b = t; }
+	
+	struct c3RayOutput
+	{
+		glm::vec3 hitPoint; // literally, hitPoint between ray and object
+		GPED::real t; // startPoint + t * direction from rayInput
+		glm::vec3 startPoint; // From RayInput
+	};
+
 }
 
 

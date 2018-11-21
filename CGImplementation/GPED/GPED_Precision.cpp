@@ -118,6 +118,39 @@ bool GPED::aabbOverlap(const GPED::c3AABB & a, const c3AABB & b)
 	return true;
 }
 
+// RTCD p180 ~ 181.
+bool GPED::rayaabbOverlap(const GPED::c3AABB & a, const GPED::c3RayInput & ray)
+{
+	GPED::real tmin = GPED::real(0.0);
+	GPED::real tmax = REAL_MAX;
+	// For all three slabs
+	for (int i = 0; i < 3; ++i)
+	{
+		if (real_abs(ray.direction[i]) < REAL_EPSILON)
+		{
+			// Ray is parallel to slab. No hit if origin not within slab
+			if (ray.startPoint[i] < a.min[i] || ray.startPoint[i] > a.max[i]) return false;
+		}
+		else
+		{
+			// Compute intersection t value of ray with near and far plane of slabe
+			GPED::real ood = GPED::real(1.0) / ray.direction[i];
+			GPED::real t1 = (a.min[i] - ray.startPoint[i]) * ood;
+			GPED::real t2 = (a.max[i] - ray.startPoint[i]) * ood;
+			// Make t1 be intersection with near plane, t2 with far plane
+			if (t1 > t2) GPED::Swap(t1, t2);
+			// Compute the intersection of slab intersection intervals
+			if (t1 > tmin) tmin = t1;
+			if (t2 > tmax) tmax = t2;
+			// Exit with no collision as soon as slab intersection becomes empty
+			if (tmin > tmax) return false;
+		}
+	}
+	// Ray intersects all 3slabs. Return point (q) and intersection t value (tmin)
+	// return ray.startPoint + ray.direction * tmin;
+	return true;
+}
+
 GPED::c3AABB GPED::convertFromCollisionPrimitive(const CollisionPrimitive & primitive)
 {
 	return primitive.makeAABB();

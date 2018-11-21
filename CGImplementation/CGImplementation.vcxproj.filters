@@ -168,6 +168,9 @@
     <ClCompile Include="GPED\GPED_ContactResolver.cpp">
       <Filter>GPED Source</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\chanRenderLine.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -287,6 +290,12 @@
     <ClInclude Include="GPED\GPED_ContactResolver.h">
       <Filter>GPED Header</Filter>
     </ClInclude>
+    <ClInclude Include="GPED\CGPhysicsUtil.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\chanRenderLine.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderFolder\DeferredFirst.fs">
@@ -317,6 +326,15 @@
       <Filter>ShaderFolder</Filter>
     </None>
     <None Include="ShaderFolder\wireRender.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\lineShader.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\lineShader.gs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\lineShader.vs">
       <Filter>ShaderFolder</Filter>
     </None>
   </ItemGroup>

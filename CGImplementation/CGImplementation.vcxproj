@@ -169,6 +169,7 @@
     <ClInclude Include="Demo\TryFirst.h" />
     <ClInclude Include="GPED\CGBroadPhase.h" />
     <ClInclude Include="GPED\CGContactManager.h" />
+    <ClInclude Include="GPED\CGPhysicsUtil.h" />
     <ClInclude Include="GPED\DynamicAABBTree.h" />
     <ClInclude Include="GPED\GPED_body.h" />
     <ClInclude Include="GPED\GPED_collide_coarse.h" />

@@ -35,7 +35,8 @@ namespace CGProj
 
 		void key(GLFWwindow* app_window, float deltaTime);
 		void mouse(double xpos, double ypos);
-		void mouseButton(int button, int action, int mods);
+		void mouseButton(GLFWwindow* app_window, int button, int action, int mods
+		, int screen_width, int screen_height);
 		void scroll(double yoffset);
 	private:
 		// User Input Interaction
@@ -49,6 +50,7 @@ namespace CGProj
 		bool start = false;
 		bool Fkey = false;
 		bool tabKey = false;
+		bool mouseClick = false;
 
 		bool UIControl = false;
 		bool GameControl = true;
@@ -63,6 +65,7 @@ namespace CGProj
 		CGBroadPhase FirstBroadPhase;
 		BroadResultWrapper<GPED::CollisionPrimitive> firstResult;
 		BroadRendererWrapper bRender;
+		BroadRayCastWrapper bRayWrapper;
 		Shader wireShader;
 		// Broad Phase
 		

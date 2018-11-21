@@ -189,7 +189,7 @@ void CGProj::PhysicsDemo::mouseButton(int button, int action, int mods)
 {
 	// Application::mouseButton(button, action, mods)
 
-	test1.mouseButton(button, action, mods);
+	test1.mouseButton(app_window, button, action, mods, width, height);
 }
 
 

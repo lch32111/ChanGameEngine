@@ -1,9 +1,12 @@
 #include "CG_Application.h"
+#include <Imgui/imgui_impl_glfw.h>
 extern CGProj::Application* getApplication();
 CGProj::Application* app = getApplication();
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
+	
+
 	app->resize(width, height);
 }
 
@@ -14,6 +17,8 @@ void cursorPos_callback(GLFWwindow* window, double xpos, double ypos)
 
 void mouseButton_callback(GLFWwindow* window, int button, int action, int mods)
 {
+	ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+
 	// you can use the mods value.
 	// it indicates whether the shift/control/alt/super(windows key) is pressed 
 	app->mouseButton(button, action, mods);
@@ -21,6 +26,8 @@ void mouseButton_callback(GLFWwindow* window, int button, int action, int mods)
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
+	ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+
 	app->scroll(yoffset);
 }
 

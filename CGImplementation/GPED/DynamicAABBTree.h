@@ -59,6 +59,9 @@ namespace CGProj
 		template<typename T>
 		void Query(T* callback, const GPED::c3AABB& aabb) const;
 
+		template<typename T>
+		void RayCast(T* callback, const GPED::c3RayInput& input) const;
+
 		int GetHeight() const;
 
 	private:
@@ -127,6 +130,41 @@ namespace CGProj
 			}
 		}
 
+	}
+	template<typename T>
+	inline void DynamicAABBTree::RayCast(T * callback, const GPED::c3RayInput & input) const
+	{
+		const int stackCapacity = 256;
+		int stack[stackCapacity];
+		stack[0] = m_root;
+
+		int count = 1;
+		while (count)
+		{
+			assert(count < stackCapacity);
+			// Pop from the stack
+			int nodeId = stack[--count];
+
+			if (nodeId == Node_Null)
+				continue;
+
+			const TreeNode* node = m_nodes + nodeId;
+
+			if (GPED::rayaabbOverlap(node->aabb, input))
+			{
+				if (node->isLeaf())
+				{
+					bool proceed = callback->RayCastCallback(input, nodeId);
+					if (proceed == false)
+						return;
+				}
+				else
+				{
+					stack[count++] = node->left;
+					stack[count++] = node->right;
+				}
+			}
+		}
 	}
 }
 

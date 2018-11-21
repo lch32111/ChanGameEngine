@@ -51,6 +51,9 @@ namespace CGProj
 		template<typename T>
 		void Query(T* callback, const GPED::c3AABB& aabb) const;
 
+		template<typename T>
+		void RayCast(T* callback, const GPED::c3RayInput& input) const;
+
 		const DynamicAABBTree* getTree() const
 		{
 			return &m_tree;
@@ -145,6 +148,12 @@ namespace CGProj
 		m_tree.Query(callback, aabb);
 	}
 
+	template<typename T>
+	inline void CGBroadPhase::RayCast(T * callback, const GPED::c3RayInput & input) const
+	{
+		m_tree.RayCast(callback, input);
+	}
+
 	/* 181116 Chanhaneg Lee
 	   Wrapper Class to get pairs of potential collisions from the BroadPhase
 	   You should pass this class to the parameter of the UpdatePairs method of BroadPhase
@@ -222,6 +231,38 @@ namespace CGProj
 
 		void recursiveDraw(int index);
 		void render(const GPED::c3AABB& aabb, const glm::vec3& Color, float lineWidth);
+	};
+
+	struct CGRayCastCallback
+	{
+		virtual bool process
+		(
+			const GPED::c3RayOutput& output, 
+			const GPED::c3RayInput& input, 
+			void* userData
+		) = 0; // interface
+	};
+
+	struct BroadRayCastWrapper
+	{
+	public:
+		bool rayCastCallback(const GPED::c3RayInput& input, int nodeId)
+		{
+			void* userData = broadPhase->GetUserData(nodeId);
+
+			GPED::c3RayOutput output;
+			bool hit = GPED::CollisionRayDetector(&output, input, userData);
+
+			if (hit)
+			{
+				return callback->process(output, input, userData);
+			}
+
+			return false;
+		}
+
+		const CGBroadPhase* broadPhase;
+		CGRayCastCallback* callback;
 	};
 }
 

@@ -5,6 +5,7 @@
 #include <Imgui/imgui.h>
 #include <GPED/GPED_random.h>
 #include <Graphics/GLTextureUtility.h>
+#include <GPED/CGPhysicsUtil.h>
 
 
 void CGProj::TryFirst::initGraphics()
@@ -39,6 +40,8 @@ void CGProj::TryFirst::initGraphics()
 	bRender.connectTree(FirstBroadPhase.getTree());
 	bRender.setColor(glm::vec3(1, 0, 0), glm::vec3(1, 1, 0));
 	bRender.setLineWidth(1.5f, 1.f);
+
+	bRayWrapper.broadPhase = &FirstBroadPhase;
 }
 
 void CGProj::TryFirst::initImgui()
@@ -254,11 +257,53 @@ void CGProj::TryFirst::mouse(double xpos, double ypos)
 	
 }
 
-void CGProj::TryFirst::mouseButton(int button, int action, int mods)
+void CGProj::TryFirst::mouseButton(GLFWwindow* app_window, 
+	int button, int action, int mods,
+	int screen_width, int screen_height)
 {
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	if (!mouseClick)
 	{
+		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+		{
+			mouseClick = true;
+			double x, y;
+			glfwGetCursorPos(app_window, &x, &y);
+			
+			glm::vec3 rayFrom = camera.Position;
+			glm::vec3 rayTo = GetRayTo((int)x, (int)y, &camera, screen_width, screen_height);
+			GPED::c3RayInput rayInput(rayFrom, rayTo);
 
+			struct CGTestClickCastCallback : CGRayCastCallback
+			{
+				virtual bool process
+				(
+					const GPED::c3RayOutput& output,
+					const GPED::c3RayInput& input ,
+					void* userData
+				)
+				{
+					if (userData)
+					{
+						GPED::CollisionPrimitive* cP = (GPED::CollisionPrimitive*)userData;
+						glm::vec3 Position = cP->body->getPosition();
+						std::cout << Position.x << ' ' << Position.y << ' ' << Position.z << '\n';
+						
+						return true;
+					}
+
+					return false;
+				}
+			};
+
+			CGTestClickCastCallback tempCallback;
+			bRayWrapper.callback = &tempCallback;
+			FirstBroadPhase.RayCast(&bRayWrapper, rayInput);
+		}
+	}
+	
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+	{
+		mouseClick = false;
 	}
 }
 

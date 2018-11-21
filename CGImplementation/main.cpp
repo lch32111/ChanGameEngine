@@ -1,5 +1,6 @@
 #include "CG_Application.h"
 #include <Imgui/imgui_impl_glfw.h>
+
 extern CGProj::Application* getApplication();
 CGProj::Application* app = getApplication();
 

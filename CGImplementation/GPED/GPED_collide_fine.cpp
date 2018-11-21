@@ -679,4 +679,20 @@ unsigned GPED::CollisionDetector::boxAndSphere(
 	return 1;
 }
 
+	unsigned GPED::CollisionDetector::rayAndBox(
+		GPED::c3RayOutput & output, 
+		const GPED::c3RayInput & input, 
+		const CollisionBox & box)
+	{
+		return 0;
+	}
+
+	unsigned GPED::CollisionDetector::rayAndSphere(
+		GPED::c3RayOutput & output, 
+		const GPED::c3RayInput & input, 
+		const CollisionSphere & sphere)
+	{
+		return 0;
+	}
+
 

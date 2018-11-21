@@ -6,6 +6,7 @@
 
 #include <Graphics/Shader.h>
 #include <Graphics/chanQuatCamera.h>
+#include <Graphics/chanRenderLine.h>
 
 #include <GPED/GPED_contacts.h>
 #include <GPED/CGContactManager.h>
@@ -66,6 +67,8 @@ namespace CGProj
 		BroadResultWrapper<GPED::CollisionPrimitive> firstResult;
 		BroadRendererWrapper bRender;
 		BroadRayCastWrapper bRayWrapper;
+		lineRenderer lineRen;
+		std::vector<std::pair<glm::vec3, glm::vec3>> rayCollector;
 		Shader wireShader;
 		// Broad Phase
 		

@@ -42,7 +42,7 @@ void chanQuatCamera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
 	glm::quat qF = Orientation * glm::quat(0, 0, 0, -1) * glm::conjugate(Orientation);
 	glm::vec3 Front = { qF.x, qF.y, qF.z };
 	glm::vec3 Right = glm::cross(Front, glm::vec3(0, 1, 0));
-
+	
 	if (direction == Camera_Movement::FORWARD)
 		Position += Front * velocity;
 

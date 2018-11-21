@@ -153,6 +153,7 @@
     <ClCompile Include="GPED\PS_Box.cpp" />
     <ClCompile Include="Graphics\chanEulerCamera.cpp" />
     <ClCompile Include="Graphics\chanQuatCamera.cpp" />
+    <ClCompile Include="Graphics\chanRenderLine.cpp" />
     <ClCompile Include="Graphics\GLTextureUtility.cpp" />
     <ClCompile Include="Graphics\Shader.cpp" />
     <ClCompile Include="Imgui\imgui.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="GPED\PS_Box.h" />
     <ClInclude Include="Graphics\chanEulerCamera.h" />
     <ClInclude Include="Graphics\chanQuatCamera.h" />
+    <ClInclude Include="Graphics\chanRenderLine.h" />
     <ClInclude Include="Graphics\GLPrimitiveUtil.h" />
     <ClInclude Include="Graphics\GLTextureUtility.h" />
     <ClInclude Include="Graphics\Shader.h" />
@@ -212,6 +214,9 @@
     <None Include="ShaderFolder\DeferredPost.vs" />
     <None Include="ShaderFolder\DeferredSecond.fs" />
     <None Include="ShaderFolder\DeferredSecond.vs" />
+    <None Include="ShaderFolder\lineShader.fs" />
+    <None Include="ShaderFolder\lineShader.gs" />
+    <None Include="ShaderFolder\lineShader.vs" />
     <None Include="ShaderFolder\simpleRender.fs" />
     <None Include="ShaderFolder\simpleRender.vs" />
     <None Include="ShaderFolder\wireRender.fs" />

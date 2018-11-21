@@ -42,6 +42,8 @@ void CGProj::TryFirst::initGraphics()
 	bRender.setLineWidth(1.5f, 1.f);
 
 	bRayWrapper.broadPhase = &FirstBroadPhase;
+
+	lineRen = lineRenderer("ShaderFolder/lineShader.vs", "ShaderFolder/lineShader.gs", "ShaderFolder/lineShader.fs");
 }
 
 void CGProj::TryFirst::initImgui()
@@ -176,6 +178,10 @@ void CGProj::TryFirst::display(int width, int height)
 	// Broad Phase Debug Rendering
 	if(BroadDebug)
 		bRender.draw(&wireShader, &projection, &view);
+
+	// ray casting test render
+	for (unsigned i = 0; i < rayCollector.size(); ++i)
+		lineRen.renderline(view, projection, rayCollector[i].first, rayCollector[i].second, glm::vec3(1.0, .0, .0));
 }
 
 void CGProj::TryFirst::key(GLFWwindow* app_window, float deltaTime)
@@ -272,7 +278,8 @@ void CGProj::TryFirst::mouseButton(GLFWwindow* app_window,
 			glm::vec3 rayFrom = camera.Position;
 			glm::vec3 rayTo = GetRayTo((int)x, (int)y, &camera, screen_width, screen_height);
 			GPED::c3RayInput rayInput(rayFrom, rayTo);
-
+			rayCollector.push_back({ rayFrom, rayTo });
+			/*
 			struct CGTestClickCastCallback : CGRayCastCallback
 			{
 				virtual bool process
@@ -298,6 +305,7 @@ void CGProj::TryFirst::mouseButton(GLFWwindow* app_window,
 			CGTestClickCastCallback tempCallback;
 			bRayWrapper.callback = &tempCallback;
 			FirstBroadPhase.RayCast(&bRayWrapper, rayInput);
+			*/
 		}
 	}
 	
@@ -398,7 +406,7 @@ void CGProj::TryFirst::generateContacts(GPED::ContactManager& cData)
 	// std::cout << t_pair.size() << '\n';
 	for (int i = 0; i < t_pair.size(); ++i)
 	{
-		GPED::CollisionDetector::collision(t_pair[i].first, t_pair[i].second, &cData);
+		GPED::CollisionDetector::Collision(t_pair[i].first, t_pair[i].second, &cData);
 	}
 
 	for (int i = 0; i < boxes; ++i)

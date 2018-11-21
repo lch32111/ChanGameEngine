@@ -251,7 +251,8 @@ namespace CGProj
 			void* userData = broadPhase->GetUserData(nodeId);
 
 			GPED::c3RayOutput output;
-			bool hit = GPED::CollisionRayDetector(&output, input, userData);
+			bool hit = GPED::CollisionDetector::RayCollision(
+				output, input, (GPED::CollisionPrimitive*)userData);
 
 			if (hit)
 			{

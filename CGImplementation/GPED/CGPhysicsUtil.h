@@ -18,17 +18,16 @@ namespace CGProj
 		return glm::vec3(1, 0, 0);
 	}
 
+	// Screen-to-World-Ray From Bullet Physics Library
 	static glm::vec3 GetRayTo(int x, int y, 
 		chanQuatCamera* camera, 
 		int screen_width, int screen_height)
 	{
-		GPED::real fov = GPED::real(2.0) * atan(1.0);
+		GPED::real fov = glm::radians(camera->Zoom);
 
 		glm::vec3 rayFrom = camera->Position;
-		glm::quat cameraFront(0, 0, 0, -1);
-		glm::quat qF = camera->Orientation * cameraFront  * glm::conjugate(cameraFront);
-		glm::vec3 rayForward = camera->Position + glm::vec3(qF.x, qF.y, qF.z);
-		rayForward = glm::normalize(rayForward);
+		glm::quat qF = camera->Orientation * glm::quat(0, 0, 0, -1)  * glm::conjugate(camera->Orientation);
+		glm::vec3 rayForward = glm::vec3(qF.x, qF.y, qF.z);
 		GPED::real farPlane = 10000.f;
 		rayForward *= farPlane;
 

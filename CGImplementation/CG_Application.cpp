@@ -99,6 +99,10 @@ void CGProj::Application::mouse(double xpos, double ypos)
 {
 }
 
+void CGProj::Application::mouseButton(int button, int action, int mods)
+{
+}
+
 void CGProj::Application::mousdDrag(double xpos, double ypos)
 {
 }
@@ -179,6 +183,13 @@ void CGProj::PhysicsDemo::mouse(double xpos, double ypos)
 	// Application::mouse(xpos, ypos);
 
 	test1.mouse(xpos, ypos);
+}
+
+void CGProj::PhysicsDemo::mouseButton(int button, int action, int mods)
+{
+	// Application::mouseButton(button, action, mods)
+
+	test1.mouseButton(button, action, mods);
 }
 
 

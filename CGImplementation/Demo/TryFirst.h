@@ -35,6 +35,7 @@ namespace CGProj
 
 		void key(GLFWwindow* app_window, float deltaTime);
 		void mouse(double xpos, double ypos);
+		void mouseButton(int button, int action, int mods);
 		void scroll(double yoffset);
 	private:
 		// User Input Interaction
@@ -73,7 +74,7 @@ namespace CGProj
 		// Simulation Object
 		const static unsigned ammoRounds = 100;
 		AmmoRound ammo[ammoRounds];
-		const static unsigned boxes = 200;
+		const static unsigned boxes = 64;
 		Box boxData[boxes];
 		// Simulation Object
 

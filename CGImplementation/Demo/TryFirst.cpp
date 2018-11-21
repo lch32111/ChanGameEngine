@@ -254,6 +254,14 @@ void CGProj::TryFirst::mouse(double xpos, double ypos)
 	
 }
 
+void CGProj::TryFirst::mouseButton(int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	{
+
+	}
+}
+
 void CGProj::TryFirst::scroll(double yoffset)
 {
 	if (GameControl)

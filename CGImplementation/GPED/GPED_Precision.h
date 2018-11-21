@@ -196,8 +196,9 @@ namespace GPED
 	
 	struct c3RayOutput
 	{
-		glm::vec3 normal;
-		GPED::real fraction;
+		glm::vec3 hitPoint; // literally, hitPoint between ray and object
+		GPED::real t; // startPoint + t * direction from rayInput
+		glm::vec3 startPoint; // From RayInput
 	};
 
 }

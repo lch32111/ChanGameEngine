@@ -10,7 +10,7 @@ namespace CGProj
 	static glm::vec3 safeNormalize(const glm::vec3& vec)
 	{
 		GPED::real l2 = glm::dot(vec, vec);
-		if (l2 >= real_epsilon)
+		if (l2 >= real_epsilon * real_epsilon)
 		{
 			return vec * (GPED::real(1) / real_sqrt(l2));
 		}

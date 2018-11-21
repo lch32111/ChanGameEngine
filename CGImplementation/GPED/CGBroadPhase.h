@@ -237,8 +237,8 @@ namespace CGProj
 	{
 		virtual bool process
 		(
-			const GPED::c3RayOutput& output, 
-			const GPED::c3RayInput& input, 
+			const GPED::c3RayOutput& output,
+			const GPED::c3RayInput& input,
 			void* userData
 		) = 0; // interface
 	};
@@ -246,7 +246,7 @@ namespace CGProj
 	struct BroadRayCastWrapper
 	{
 	public:
-		bool rayCastCallback(const GPED::c3RayInput& input, int nodeId)
+		bool RayCastCallback(const GPED::c3RayInput& input, int nodeId)
 		{
 			void* userData = broadPhase->GetUserData(nodeId);
 
@@ -259,12 +259,14 @@ namespace CGProj
 				return callback->process(output, input, userData);
 			}
 
-			return false;
+			return true;
 		}
 
 		const CGBroadPhase* broadPhase;
 		CGRayCastCallback* callback;
 	};
+
+
 }
 
 #endif

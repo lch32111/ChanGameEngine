@@ -279,7 +279,6 @@ void CGProj::TryFirst::mouseButton(GLFWwindow* app_window,
 			glm::vec3 rayTo = GetRayTo((int)x, (int)y, &camera, screen_width, screen_height);
 			GPED::c3RayInput rayInput(rayFrom, rayTo);
 			rayCollector.push_back({ rayFrom, rayTo });
-			/*
 			struct CGTestClickCastCallback : CGRayCastCallback
 			{
 				virtual bool process
@@ -293,8 +292,8 @@ void CGProj::TryFirst::mouseButton(GLFWwindow* app_window,
 					{
 						GPED::CollisionPrimitive* cP = (GPED::CollisionPrimitive*)userData;
 						glm::vec3 Position = cP->body->getPosition();
-						std::cout << Position.x << ' ' << Position.y << ' ' << Position.z << '\n';
-						
+						cP->body->setPosition(Position.x, 30, Position.z);
+						cP->body->setAwake();
 						return true;
 					}
 
@@ -305,7 +304,6 @@ void CGProj::TryFirst::mouseButton(GLFWwindow* app_window,
 			CGTestClickCastCallback tempCallback;
 			bRayWrapper.callback = &tempCallback;
 			FirstBroadPhase.RayCast(&bRayWrapper, rayInput);
-			*/
 		}
 	}
 	

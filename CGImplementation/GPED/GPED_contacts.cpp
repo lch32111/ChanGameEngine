@@ -179,6 +179,36 @@ inline void GPED::Contact::calculateContactBasis()
 	contactToWorld[2] = contactTangent[1];
 }
 
+glm::vec3 GPED::Contact::calculateLocalVelocity(unsigned bodyIndex, real duration)
+{
+	RigidBody* thisBody = body[bodyIndex];
+
+	// Work out the velocity of the contact point
+	glm::vec3 velocity = glm::cross(thisBody->getRotation(), relativeContactPosition[bodyIndex]);
+	velocity += thisBody->getVelocity();
+
+	// Turn the velocity into contact-coordinates.
+	glm::mat3 WorldToContact = glm::transpose(contactToWorld);
+	glm::vec3 contactVelocity = WorldToContact * velocity;
+
+	// Calculate the amount of velocity that is due to forces without reactions.
+	glm::vec3 accVelocity = thisBody->getLastFrameAcceleration() * duration;
+
+	// Calculate the velocity in contact-coordinates.
+	accVelocity = WorldToContact * accVelocity;
+
+	// We ignore any component of acceleration in the contact normal
+	// direction, we are only interested in planar acceleration
+	accVelocity.x = 0;
+
+	// Add the planar velcities - if there's enough friction they will
+	// be removed during velocity resolution
+	contactVelocity += accVelocity;
+
+	// And return it.
+	return contactVelocity;
+}
+
 void GPED::Contact::calculateDesiredDeltaVelocity(real duration)
 {
 	const static real velocityLimit = (real)0.25f;
@@ -213,37 +243,6 @@ void GPED::Contact::calculateDesiredDeltaVelocity(real duration)
 	*/
 	desiredDeltaVelocity = -(1 + thisRestitution) * contactVelocity.x + thisRestitution * velocityFromAcc;
 }
-
-glm::vec3 GPED::Contact::calculateLocalVelocity(unsigned bodyIndex, real duration)
-{
-	RigidBody* thisBody = body[bodyIndex];
-
-	// Work out the velocity of the contact point
-	glm::vec3 velocity = glm::cross(thisBody->getRotation(), relativeContactPosition[bodyIndex]);
-	velocity += thisBody->getVelocity();
-	
-	// Turn the velocity into contact-coordinates.
-	glm::mat3 WorldToContact = glm::transpose(contactToWorld);
-	glm::vec3 contactVelocity = WorldToContact * velocity;
-
-	// Calculate the amount of velocity that is due to forces without reactions.
-	glm::vec3 accVelocity = thisBody->getLastFrameAcceleration() * duration;
-
-	// Calculate the velocity in contact-coordinates.
-	accVelocity = WorldToContact * accVelocity;
-
-	// We ignore any component of acceleration in the contact normal
-	// direction, we are only interested in planar acceleration
-	accVelocity.x = 0;
-
-	// Add the planar velcities - if there's enough friction they will
-	// be removed during velocity resolution
-	contactVelocity += accVelocity;
-
-	// And return it.
-	return contactVelocity;
-}
-
 
 void GPED::Contact::calculateInternals(real duration)
 {

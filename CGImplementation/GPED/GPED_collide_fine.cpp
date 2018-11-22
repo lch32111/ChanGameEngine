@@ -683,8 +683,8 @@ unsigned GPED::CollisionDetector::rayAndBox(
 	const GPED::c3RayInput & input,
 	const CollisionBox & box)
 {
-	GPED::real tMin = GPED::real(0.0);
-	GPED::real tMax = GPED::real(10000);
+	GPED::real tMin = -REAL_MAX;
+	GPED::real tMax = REAL_MAX;
 
 	glm::vec3 position = box.getAxis(3);
 	glm::vec3 delta = position - input.startPoint;
@@ -709,8 +709,8 @@ unsigned GPED::CollisionDetector::rayAndBox(
 			GPED::real t2 = (aabb.max[i] - e) * f;
 
 			if (t1 > t2) GPED::Swap(t1, t2);
-			if (t1 > tMin) tMin = t1;
-			if (t2 < tMax) tMax = t2;
+			tMin = GPED::rMax(tMin, t1);
+			tMax = GPED::rMin(tMax, t2);
 			if (tMin > tMax) return 0;
 		}
 	}
@@ -727,7 +727,7 @@ unsigned GPED::CollisionDetector::rayAndSphere(
 	const GPED::c3RayInput & input,
 	const CollisionSphere & sphere)
 {
-	glm::vec3 m = input.startPoint - sphere.getAxis(3);
+	glm::vec3 m = sphere.getAxis(3) - input.startPoint;
 	GPED::real b = glm::dot(m, input.direction);
 	GPED::real c = glm::dot(m, m) - sphere.radius * sphere.radius;
 	// Exit if r's origin outside s (c > 0) and r pointing away from  s (b > 0)

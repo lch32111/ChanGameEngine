@@ -121,7 +121,7 @@ bool GPED::aabbOverlap(const GPED::c3AABB & a, const c3AABB & b)
 // RTCD p180 ~ 181.
 bool GPED::rayaabbOverlap(const GPED::c3AABB & a, const GPED::c3RayInput & ray)
 {
-	GPED::real tmin = GPED::real(0.0);
+	GPED::real tmin = -REAL_MAX;
 	GPED::real tmax = REAL_MAX;
 	// For all three slabs
 	for (int i = 0; i < 3; ++i)
@@ -140,8 +140,8 @@ bool GPED::rayaabbOverlap(const GPED::c3AABB & a, const GPED::c3RayInput & ray)
 			// Make t1 be intersection with near plane, t2 with far plane
 			if (t1 > t2) GPED::Swap(t1, t2);
 			// Compute the intersection of slab intersection intervals
-			if (t1 > tmin) tmin = t1;
-			if (t2 > tmax) tmax = t2;
+			tmin = GPED::rMax(tmin, t1);
+			tmax = GPED::rMin(tmax, t2);
 			// Exit with no collision as soon as slab intersection becomes empty
 			if (tmin > tmax) return false;
 		}

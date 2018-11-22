@@ -25,6 +25,7 @@ namespace CGProj
 		virtual void display();
 		virtual void key();
 		virtual void mouse(double xpos, double ypos);
+		virtual void mouseButton(int button, int action, int mods);
 		virtual void mousdDrag(double xpos, double ypos);
 		virtual void resize(int width, int height);
 		virtual void scroll(double yoffset);
@@ -52,6 +53,7 @@ namespace CGProj
 		virtual void display();
 
 		virtual void mouse(double xpos, double ypos);
+		virtual void mouseButton(int button, int action, int mods);
 		virtual void scroll(double yoffset);
 	private:
 		TryFirst test1;

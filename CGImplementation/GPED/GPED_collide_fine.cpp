@@ -676,3 +676,71 @@ unsigned GPED::CollisionDetector::boxAndSphere(
 
 	return 1;
 }
+
+// Intersection between ray and OBB
+unsigned GPED::CollisionDetector::rayAndBox(
+	GPED::c3RayOutput & output,
+	const GPED::c3RayInput & input,
+	const CollisionBox & box)
+{
+	GPED::real tMin = GPED::real(0.0);
+	GPED::real tMax = GPED::real(10000);
+
+	glm::vec3 position = box.getAxis(3);
+	glm::vec3 delta = position - input.startPoint;
+
+	c3AABB aabb;
+	aabb.min = glm::vec3(-1);
+	aabb.max = aabb.min * -1.f;
+	for (int i = 0; i < 3; ++i)
+	{
+		glm::vec3 axis = box.getAxis(i);
+		GPED::real e = glm::dot(axis, delta);
+		GPED::real f = GPED::real(1.0) / glm::dot(input.direction, axis);
+
+		if (real_abs(f) < REAL_EPSILON)
+		{
+			if (e < aabb.min[i] || e > aabb.max[i])
+				return false;
+		}
+		else
+		{
+			GPED::real t1 = (aabb.min[i] - e) * f;
+			GPED::real t2 = (aabb.max[i] - e) * f;
+
+			if (t1 > t2) GPED::Swap(t1, t2);
+			if (t1 > tMin) tMin = t1;
+			if (t2 < tMax) tMax = t2;
+			if (tMin > tMax) return 0;
+		}
+	}
+
+	output.t = tMin;
+	output.startPoint = input.startPoint;
+	output.hitPoint = input.startPoint + input.direction * tMin;
+	return 1;
+}
+
+// RTCD 178p ~ 179p.
+unsigned GPED::CollisionDetector::rayAndSphere(
+	GPED::c3RayOutput & output,
+	const GPED::c3RayInput & input,
+	const CollisionSphere & sphere)
+{
+	glm::vec3 m = input.startPoint - sphere.getAxis(3);
+	GPED::real b = glm::dot(m, input.direction);
+	GPED::real c = glm::dot(m, m) - sphere.radius * sphere.radius;
+	// Exit if r's origin outside s (c > 0) and r pointing away from  s (b > 0)
+	if (c > GPED::real(0.0) && b > GPED::real(0.0)) return 0;
+	GPED::real discr = b * b - c;
+	// A negative discriminant corresponds to ray missing sphere
+	if (discr < GPED::real(0.0)) return 0;
+	// Ray now found to intersect sphere, compute smallest t value of intersection
+	GPED::real t = -b - real_sqrt(discr);
+	// If t is negative, ray started inside sphere so clamp t to zero
+	if (t < GPED::real(0.0)) t = GPED::real(0.0);
+	output.hitPoint = input.startPoint + t * input.direction;
+	output.startPoint = input.startPoint;
+	output.t = t;
+	return 1;
+}

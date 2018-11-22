@@ -309,7 +309,7 @@ namespace GPED
 	class CollisionDetector
 	{
 	public:
-		static unsigned collision
+		static unsigned Collision
 		(
 			const CollisionPrimitive* a, 
 			const CollisionPrimitive* b, 
@@ -345,6 +345,30 @@ namespace GPED
 			if (aKey) return boxAndSphere(*(CollisionBox*)a, *(CollisionSphere*)b, data);
 			else return boxAndSphere(*(CollisionBox*)b, *(CollisionSphere*)a, data);
 		};
+
+		static unsigned RayCollision
+		(
+			c3RayOutput& output,
+			const c3RayInput& input,
+			const CollisionPrimitive* primitive
+		)
+		{
+			int key = 0;
+			switch (primitive->m_primitiveType)
+			{
+			case GPED::CollisionPrimitive::primitiveType::primitive_sphere:
+				key = 0;
+				break;
+			case GPED::CollisionPrimitive::primitiveType::primitive_box:
+				key = 1;
+				break;
+			default:
+				assert(0);
+			}
+
+			if (key) return rayAndBox(output, input, *(CollisionBox*)primitive);
+			else return rayAndSphere(output, input, *(CollisionSphere*)primitive);
+		}
 
 
 		static unsigned sphereAndHalfSpace
@@ -400,9 +424,21 @@ namespace GPED
 			const CollisionSphere& sphere,
 			ContactManager* data
 		);
+
+		static unsigned rayAndBox
+		(
+			GPED::c3RayOutput& output,
+			const GPED::c3RayInput& input,
+			const CollisionBox& box
+		);
+
+		static unsigned rayAndSphere
+		(
+			GPED::c3RayOutput& output,
+			const GPED::c3RayInput& input,
+			const CollisionSphere& sphere
+		);
 	};
-
-
 }
 
 

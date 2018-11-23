@@ -690,8 +690,8 @@ unsigned GPED::CollisionDetector::rayAndBox(
 	glm::vec3 delta = position - input.startPoint;
 
 	c3AABB aabb;
-	aabb.min = glm::vec3(-1);
-	aabb.max = aabb.min * -1.f;
+	aabb.min = box.halfSize * GPED::real(-1);
+	aabb.max = box.halfSize;
 	for (int i = 0; i < 3; ++i)
 	{
 		glm::vec3 axis = box.getAxis(i);

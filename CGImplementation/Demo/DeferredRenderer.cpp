@@ -1,6 +1,9 @@
 #include "DeferredRenderer.h"
-#include <Graphics/GLTextureUtility.h>
+
 #include <Imgui/imgui.h>
+
+#include <Graphics/GLTextureUtility.h>
+#include <Graphics/GLPrimitiveUtil.h>
 
 void CGProj::DeferredRenderer::initGraphics(int width, int height)
 {
@@ -25,6 +28,11 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	Deferred_Post_Shader.loadShader();
 	Deferred_Post_Shader.use();
 	Deferred_Post_Shader.setInt("screenTexture", 0);
+
+	Simple_Shader = Shader("ShaderFolder/simpleRender.vs", "ShaderFolder/simpleRender.fs");
+	Simple_Shader.loadShader();
+	Simple_Shader.use();
+	Simple_Shader.setInt("texture1", 0);
 	// Shader Setup
 
 	// First Pass Setup For Deferred Rendering
@@ -159,10 +167,8 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 1000.f);
 	glm::mat4 model(1.0);
 
-
 	// First Pass
 	glBindFramebuffer(GL_FRAMEBUFFER, gFBO);
-	// glViewport(0, 0, width, height);
 	glClearColor(0, 0, 0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	Deferred_First_Shader.use();
@@ -184,20 +190,19 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		model = glm::scale(model, glm::vec3(0.6));
 		Deferred_First_Shader.setMat4("viewModel", view * model);
 		Deferred_First_Shader.setMat3("MVNormalMatrix", glm::mat3(glm::transpose(glm::inverse(view * model))));
-		renderCube();
+		CGProj::renderCube();
+		CGProj::renderSphere();
 	}
 	
 	model = glm::mat4(1.0);
 	model = glm::translate(model, glm::vec3(0, -5, 0));
-	model = glm::rotate(model, glm::radians(-90.f), glm::vec3(1, 0, 0));
 	model = glm::scale(model, glm::vec3(10));
 	Deferred_First_Shader.setBool("material.isLMemissive", false);
 	Deferred_First_Shader.setMat4("viewModel", view * model);
 	Deferred_First_Shader.setMat3("MVNormalMatrix", glm::mat3(glm::transpose(glm::inverse(view * model))));
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, woodTexture);
-	renderQuad();
-
+	CGProj::renderQuad();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -221,7 +226,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		Deferred_Second_Shader.setFloat("lights[" + std::to_string(i) + "].Linear", linear);
 		Deferred_Second_Shader.setFloat("lights[" + std::to_string(i) + "].Quadratic", quadratic);
 	}
-	renderQuad();
+	CGProj::renderScreenQuad();
 }
 
 void CGProj::DeferredRenderer::key(GLFWwindow * app_window, float deltaTime)
@@ -315,8 +320,7 @@ void CGProj::DeferredRenderer::resize(int width, int height)
 		assert(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
-
-
+/*
 void CGProj::DeferredRenderer::renderCube()
 {
 	// initialize (if necessary)
@@ -417,3 +421,4 @@ void CGProj::DeferredRenderer::renderQuad()
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
 }
+*/

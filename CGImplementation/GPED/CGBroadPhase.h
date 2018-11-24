@@ -11,10 +11,7 @@
 
 #include <GPED/DynamicAABBTree.h>
 #include <GPED/GPED_collide_fine.h>
-#include <Graphics/GLPrimitiveUtil.h>
 #include <Graphics/Shader.h>
-
-
 
 namespace CGProj
 {
@@ -265,8 +262,6 @@ namespace CGProj
 		const CGBroadPhase* broadPhase;
 		CGRayCastCallback* callback;
 	};
-
-
 }
 
 #endif

@@ -1,4 +1,5 @@
 #include "CGBroadPhase.h"
+
 CGProj::CGBroadPhase::CGBroadPhase()
 {
 	m_proxyCount = 0;
@@ -147,6 +148,7 @@ void CGProj::BroadRendererWrapper::recursiveDraw(int index)
 		recursiveDraw(right);
 }
 
+#include <Graphics/GLPrimitiveUtil.h>
 void CGProj::BroadRendererWrapper::render(const GPED::c3AABB& aabb, const glm::vec3& Color, float lineWidth)
 {
 	glm::mat4 model = glm::mat4(1.0);

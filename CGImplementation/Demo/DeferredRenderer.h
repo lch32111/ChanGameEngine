@@ -37,6 +37,7 @@ namespace CGProj
 		Shader Deferred_First_Shader;
 		Shader Deferred_Second_Shader;
 		Shader Deferred_Post_Shader;
+		Shader Simple_Shader;
 
 		unsigned int gFBO;
 		unsigned int gPosition, gNormal, gAlbedoSpec, gEmissive, gBool;
@@ -55,13 +56,14 @@ namespace CGProj
 		std::vector<glm::vec3> lightColors;
 		std::vector<float> lightRadius;
 
+		/*
 		unsigned int cubeVAO = 0;
 		unsigned int cubeVBO = 0;
 		unsigned int quadVAO = 0;
 		unsigned int quadVBO;
-
 		void renderCube();
 		void renderQuad();
+		*/
 	};
 }
 

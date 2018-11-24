@@ -19,7 +19,7 @@
 
 #include <string>
 #include <vector>
-#include <Graphics/GLPrimitiveUtil.h>
+
 
 namespace CGProj
 {

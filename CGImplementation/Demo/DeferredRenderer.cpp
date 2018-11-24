@@ -5,6 +5,8 @@
 #include <Graphics/GLTextureUtility.h>
 #include <Graphics/GLPrimitiveUtil.h>
 
+#include <GPED/CGPhysicsUtil.h>
+
 void CGProj::DeferredRenderer::initGraphics(int width, int height)
 {
 	// Shader Setup
@@ -29,10 +31,12 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	Deferred_Post_Shader.use();
 	Deferred_Post_Shader.setInt("screenTexture", 0);
 
-	Simple_Shader = Shader("ShaderFolder/simpleRender.vs", "ShaderFolder/simpleRender.fs");
+	Simple_Shader = Shader("ShaderFolder/simpleColorRender.vs", "ShaderFolder/simpleColorRender.fs");
 	Simple_Shader.loadShader();
 	Simple_Shader.use();
-	Simple_Shader.setInt("texture1", 0);
+
+	wireShader = Shader("ShaderFolder/wireRender.vs", "ShaderFolder/wireRender.fs");
+	wireShader.loadShader();
 	// Shader Setup
 
 	// First Pass Setup For Deferred Rendering
@@ -111,7 +115,11 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	objectPositions.push_back(glm::vec3(-3.0, -3.0, 3.0));
 	objectPositions.push_back(glm::vec3(0.0, -3.0, 3.0));
 	objectPositions.push_back(glm::vec3(3.0, -3.0, 3.0));
-	
+	for (unsigned i = 0; i < objectPositions.size(); ++i)
+	{
+		objectProxy[i] = dBroadPhase.CreateProxy(CGProj::makeAABB(objectPositions[i], glm::vec3(0.6)), NULL);
+	}
+
 	srand(13);
 	for (unsigned int i = 0; i < NR_LIGHTS; i++)
 	{
@@ -135,6 +143,12 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 			/ (2 * quadratic);
 		lightRadius.push_back(radius);
 	}
+
+	bRender.connectTree(dBroadPhase.getTree());
+	bRender.setColor(glm::vec3(1, 0, 0), glm::vec3(1, 1, 0));
+	bRender.setLineWidth(1.5f, 1.f);
+	bRayWrapper.broadPhase = &dBroadPhase;
+	lineRen = lineRenderer("ShaderFolder/lineShader.vs", "ShaderFolder/lineShader.gs", "ShaderFolder/lineShader.fs");
 }
 
 void CGProj::DeferredRenderer::initImgui()
@@ -153,6 +167,14 @@ void CGProj::DeferredRenderer::updateImgui()
 
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Camera Position %.1f %.1f %.1f", camera.Position.x, camera.Position.y, camera.Position.z);
+
+	ImGui::TextColored(ImVec4(0.99, 0.4, 0.37, 1.0), "Press Tab Button to convert GAME/UI Mode");
+	if (GameControl) ImGui::TextColored(ImVec4(0.78, 0.17, 0.54, 1.0), "GAME mode");
+	else ImGui::TextColored(ImVec4(0.11, 0.7, 0.81, 1.0), "UI mode");
+	
+	ImGui::Checkbox("Light Box Render", &lightDraw);
+	ImGui::Checkbox("Broad Debug Render", &BroadDebug);
+	
 	ImGui::End();
 }
 
@@ -191,9 +213,8 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		Deferred_First_Shader.setMat4("viewModel", view * model);
 		Deferred_First_Shader.setMat3("MVNormalMatrix", glm::mat3(glm::transpose(glm::inverse(view * model))));
 		CGProj::renderCube();
-		CGProj::renderSphere();
 	}
-	
+
 	model = glm::mat4(1.0);
 	model = glm::translate(model, glm::vec3(0, -5, 0));
 	model = glm::scale(model, glm::vec3(10));
@@ -202,8 +223,10 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	Deferred_First_Shader.setMat3("MVNormalMatrix", glm::mat3(glm::transpose(glm::inverse(view * model))));
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, woodTexture);
-	CGProj::renderQuad();
+	renderQuad();
+	// First Pass
 
+	// Second Pass + Post Process
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -226,39 +249,135 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		Deferred_Second_Shader.setFloat("lights[" + std::to_string(i) + "].Linear", linear);
 		Deferred_Second_Shader.setFloat("lights[" + std::to_string(i) + "].Quadratic", quadratic);
 	}
-	CGProj::renderScreenQuad();
+	renderScreenQuad();
+	// Second Pass + Post Process
+
+	// Debug Drawing like forward processing
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, gFBO);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
+	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	if (lightDraw)
+	{
+		Simple_Shader.use();
+		Simple_Shader.setMat4("view", view);
+		Simple_Shader.setMat4("projection", projection);
+		for (unsigned int i = 0; i < lightPositions.size(); ++i)
+		{
+			glm::mat4 t_model(1.0);
+			t_model = glm::translate(t_model, lightPositions[i]);
+			t_model = glm::scale(t_model, glm::vec3(0.25f));
+			Simple_Shader.setMat4("model", t_model);
+			Simple_Shader.setVec3("Color", lightColors[i]);
+			renderCube();
+		}
+	}
+
+	// Broad Phase Debug Rendering
+	if (BroadDebug)
+		bRender.draw(&wireShader, &projection, &view);
+
+	// ray casting test render
+	for (unsigned i = 0; i < rayCollector.size(); ++i)
+		lineRen.renderline(view, projection, rayCollector[i].first, rayCollector[i].second, glm::vec3(1.0, .0, .0));
+	// Debug Drawing like forward processing
 }
 
 void CGProj::DeferredRenderer::key(GLFWwindow * app_window, float deltaTime)
 {
-	if (glfwGetKey(app_window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.ProcessKeyboard(chanQuatCamera::Camera_Movement::FORWARD, deltaTime);
-	if (glfwGetKey(app_window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.ProcessKeyboard(chanQuatCamera::Camera_Movement::BACKWARD, deltaTime);
-	if (glfwGetKey(app_window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.ProcessKeyboard(chanQuatCamera::Camera_Movement::LEFT, deltaTime);
-	if (glfwGetKey(app_window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.ProcessKeyboard(chanQuatCamera::Camera_Movement::RIGHT, deltaTime);
+	if (GameControl)
+	{
+		if (glfwGetKey(app_window, GLFW_KEY_W) == GLFW_PRESS)
+			camera.ProcessKeyboard(chanQuatCamera::Camera_Movement::FORWARD, deltaTime);
+		if (glfwGetKey(app_window, GLFW_KEY_S) == GLFW_PRESS)
+			camera.ProcessKeyboard(chanQuatCamera::Camera_Movement::BACKWARD, deltaTime);
+		if (glfwGetKey(app_window, GLFW_KEY_A) == GLFW_PRESS)
+			camera.ProcessKeyboard(chanQuatCamera::Camera_Movement::LEFT, deltaTime);
+		if (glfwGetKey(app_window, GLFW_KEY_D) == GLFW_PRESS)
+			camera.ProcessKeyboard(chanQuatCamera::Camera_Movement::RIGHT, deltaTime);
 
+
+	}
+	
 	if (glfwGetKey(app_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(app_window, 1);
+
+	if (glfwGetKey(app_window, GLFW_KEY_TAB) == GLFW_PRESS && !tabKey)
+	{
+		tabKey = true;
+		if (GameControl) // GAME -> UI
+		{
+			GameControl = false;
+			UIControl = true;
+			glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+			// Locate the cursor pos on the center of screen
+			glfwSetCursorPos(app_window, ImGui::GetIO().DisplaySize.x / 2, ImGui::GetIO().DisplaySize.y / 2);
+		}
+		else // UI -> GAME
+		{
+			UIControl = false;
+			GameControl = true;
+			glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+			// Locate the cursor pos on the last position 
+			// because of continuous movement of mouse
+			glfwSetCursorPos(app_window, lastX, lastY);
+		}
+	}
+
+	if (glfwGetKey(app_window, GLFW_KEY_TAB) == GLFW_RELEASE)
+	{
+		tabKey = false;
+	}
+	
 }
 
 void CGProj::DeferredRenderer::mouse(double xpos, double ypos)
 {
-	if (firstMouse)
+	if (GameControl)
 	{
-		firstMouse = false;
+		if (firstMouse)
+		{
+			firstMouse = false;
+			lastX = xpos;
+			lastY = ypos;
+		}
+
+		float xoffset = xpos - lastX;
+		float yoffset = lastY - ypos;
 		lastX = xpos;
 		lastY = ypos;
+
+		camera.ProcessMouseMovement(xoffset, yoffset);
+	}
+}
+
+void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window, 
+	int button, int action, int mods, 
+	int screen_width, int screen_height)
+{
+	if (!mouseClick)
+	{
+		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+		{
+			mouseClick = true;
+			double x, y;
+			glfwGetCursorPos(app_window, &x, &y);
+
+			glm::vec3 rayFrom = camera.Position;
+			glm::vec3 rayTo = GetRayTo((int)x, (int)y, &camera, screen_width, screen_height);
+			GPED::c3RayInput rayInput(rayFrom, rayTo);
+			dBroadPhase.RayCast(&bRayWrapper, rayInput);
+			rayCollector.push_back({ rayFrom, rayTo });
+		}
 	}
 
-	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos;
-	lastX = xpos;
-	lastY = ypos;
-
-	camera.ProcessMouseMovement(xoffset, yoffset);
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+	{
+		mouseClick = false;
+	}
 }
 
 void CGProj::DeferredRenderer::scroll(double yoffset)
@@ -320,105 +439,3 @@ void CGProj::DeferredRenderer::resize(int width, int height)
 		assert(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
-/*
-void CGProj::DeferredRenderer::renderCube()
-{
-	// initialize (if necessary)
-	if (cubeVAO == 0)
-	{
-		float vertices[] = {
-			// back face
-			-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-			 1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
-			 1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, // bottom-right         
-			 1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
-			-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-			-1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, // top-left
-			// front face
-			-1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-			 1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
-			 1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
-			 1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
-			-1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, // top-left
-			-1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-			// left face
-			-1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
-			-1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-left
-			-1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
-			-1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
-			-1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-right
-			-1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
-			// right face
-			 1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
-			 1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-			 1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-right         
-			 1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-			 1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
-			 1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-left     
-			// bottom face
-			-1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
-			 1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // top-left
-			 1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
-			 1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
-			-1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // bottom-right
-			-1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
-			// top face
-			-1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
-			 1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
-			 1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // top-right     
-			 1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
-			-1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
-			-1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left        
-		};
-		glGenVertexArrays(1, &cubeVAO);
-		glGenBuffers(1, &cubeVBO);
-		// fill buffer
-		glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-		// link vertex attributes
-		glBindVertexArray(cubeVAO);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-	}
-	// render Cube
-	glBindVertexArray(cubeVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glBindVertexArray(0);
-}
-
-
-void CGProj::DeferredRenderer::renderQuad()
-{
-	if (quadVAO == 0)
-	{
-		float quadVertices[] = {
-			// positions        //Normal       // texture Coords
-			-1.0f,  1.0f, 0.0f, 0.f, 0.f, 1.f, 0.0f, 1.0f,
-			-1.0f, -1.0f, 0.0f, 0.f, 0.f, 1.f, 0.0f, 0.0f,
-			 1.0f,  1.0f, 0.0f, 0.f, 0.f, 1.f, 1.0f, 1.0f,
-			 1.0f, -1.0f, 0.0f, 0.f, 0.f, 1.f, 1.0f, 0.0f,
-		};
-		// setup plane VAO
-		glGenVertexArrays(1, &quadVAO);
-		glGenBuffers(1, &quadVBO);
-		glBindVertexArray(quadVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	}
-	glBindVertexArray(quadVAO);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-}
-*/

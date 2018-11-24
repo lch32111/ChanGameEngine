@@ -337,5 +337,11 @@
     <None Include="ShaderFolder\lineShader.vs">
       <Filter>ShaderFolder</Filter>
     </None>
+    <None Include="ShaderFolder\simpleColorRender.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\simpleColorRender.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
   </ItemGroup>
 </Project>

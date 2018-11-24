@@ -217,6 +217,8 @@
     <None Include="ShaderFolder\lineShader.fs" />
     <None Include="ShaderFolder\lineShader.gs" />
     <None Include="ShaderFolder\lineShader.vs" />
+    <None Include="ShaderFolder\simpleColorRender.fs" />
+    <None Include="ShaderFolder\simpleColorRender.vs" />
     <None Include="ShaderFolder\simpleRender.fs" />
     <None Include="ShaderFolder\simpleRender.vs" />
     <None Include="ShaderFolder\wireRender.fs" />

@@ -259,6 +259,13 @@ void CGProj::GraphicsDemo::mouse(double xpos, double ypos)
 	test2.mouse(xpos, ypos);
 }
 
+void CGProj::GraphicsDemo::mouseButton(int button, int action, int mods)
+{
+	// Application::mouseButton(button, action, mods);
+
+	test2.mouseButton(app_window, button, action, mods, width, height);
+}
+
 void CGProj::GraphicsDemo::scroll(double yoffset)
 {
 	test2.scroll(yoffset);

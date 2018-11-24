@@ -72,6 +72,8 @@ namespace CGProj
 		virtual void display();
 
 		virtual void mouse(double xpos, double ypos);
+		virtual void mouseButton(int button, int action, int mods);
+
 		virtual void scroll(double yoffset);
 		virtual void resize(int width, int height);
 	private:

@@ -3,8 +3,12 @@
 #define __DEFERRED_RENDERER_H__
 
 #include <GLFW/glfw3.h>
+
 #include <Graphics/Shader.h>
 #include <Graphics/chanQuatCamera.h>
+#include <Graphics/chanRenderLine.h>
+
+#include <GPED/CGBroadPhase.h>
 
 #include <vector>
 
@@ -23,6 +27,9 @@ namespace CGProj
 
 		void key(GLFWwindow* app_window, float deltaTime);
 		void mouse(double xpos, double ypos);
+		void mouseButton(GLFWwindow* app_window,
+			int button, int action, int mods,
+			int screen_width, int screen_height);
 		void scroll(double yoffset);
 		void resize(int width, int height);
 	private:
@@ -33,11 +40,16 @@ namespace CGProj
 
 		bool UIControl = false;
 		bool GameControl = true;
+		bool mouseClick = false;
+
+		bool lightDraw = false;
+		bool BroadDebug = false;
 
 		Shader Deferred_First_Shader;
 		Shader Deferred_Second_Shader;
 		Shader Deferred_Post_Shader;
 		Shader Simple_Shader;
+		Shader wireShader;
 
 		unsigned int gFBO;
 		unsigned int gPosition, gNormal, gAlbedoSpec, gEmissive, gBool;
@@ -56,14 +68,26 @@ namespace CGProj
 		std::vector<glm::vec3> lightColors;
 		std::vector<float> lightRadius;
 
-		/*
-		unsigned int cubeVAO = 0;
-		unsigned int cubeVBO = 0;
-		unsigned int quadVAO = 0;
-		unsigned int quadVBO;
-		void renderCube();
-		void renderQuad();
-		*/
+		// Broad Phase
+		CGBroadPhase dBroadPhase;
+		BroadRendererWrapper bRender;
+		
+		struct BroadDeferredRayCast : BroadRayCast
+		{
+			int hitNumb = 0;
+			bool RayCastCallback(const GPED::c3RayInput& input, int nodeId)
+			{
+				++hitNumb;
+				std::cout << hitNumb << '\n';
+				return true;
+			}
+		};
+		BroadDeferredRayCast bRayWrapper;
+		unsigned objectProxy[10];
+		lineRenderer lineRen;
+		std::vector<std::pair<glm::vec3, glm::vec3>> rayCollector;
+		// Broad Phase
+
 	};
 }
 

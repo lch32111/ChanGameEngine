@@ -240,7 +240,17 @@ namespace CGProj
 		) = 0; // interface
 	};
 
-	struct BroadRayCastWrapper
+	struct BroadRayCast
+	{
+	public: 
+		virtual bool RayCastCallback(
+			const GPED::c3RayInput& input, int nodeId) = 0; // Interface
+
+		const CGBroadPhase* broadPhase;
+		CGRayCastCallback* callback;
+	};
+
+	struct BroadRayCastWrapper : BroadRayCast
 	{
 	public:
 		bool RayCastCallback(const GPED::c3RayInput& input, int nodeId)
@@ -258,9 +268,6 @@ namespace CGProj
 
 			return true;
 		}
-
-		const CGBroadPhase* broadPhase;
-		CGRayCastCallback* callback;
 	};
 }
 

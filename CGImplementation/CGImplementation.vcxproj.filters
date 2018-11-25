@@ -171,6 +171,12 @@
     <ClCompile Include="Graphics\chanRenderLine.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\CGEditObject.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\CGRenderLine.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -296,6 +302,12 @@
     <ClInclude Include="Graphics\chanRenderLine.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\CGEditObject.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGRenderLine.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderFolder\DeferredFirst.fs">
@@ -341,6 +353,12 @@
       <Filter>ShaderFolder</Filter>
     </None>
     <None Include="ShaderFolder\simpleColorRender.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGLineShader.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGLineShader.fs">
       <Filter>ShaderFolder</Filter>
     </None>
   </ItemGroup>

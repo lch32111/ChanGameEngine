@@ -6,6 +6,7 @@
 #include <Graphics/GLPrimitiveUtil.h>
 
 #include <GPED/CGPhysicsUtil.h>
+#include <GPED/GPED_random.h>
 
 void CGProj::DeferredRenderer::initGraphics(int width, int height)
 {
@@ -105,7 +106,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	woodTexture = TextureFromFile("ImageFolder/woodpanel.png", true);
 	emissiveTexture = TextureFromFile("ImageFolder/matrix.jpg", true);
 
-
+	std::vector<glm::vec3> objectPositions;
 	objectPositions.push_back(glm::vec3(-3.0, -3.0, -3.0));
 	objectPositions.push_back(glm::vec3(0.0, -3.0, -3.0));
 	objectPositions.push_back(glm::vec3(3.0, -3.0, -3.0));
@@ -115,9 +116,17 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	objectPositions.push_back(glm::vec3(-3.0, -3.0, 3.0));
 	objectPositions.push_back(glm::vec3(0.0, -3.0, 3.0));
 	objectPositions.push_back(glm::vec3(3.0, -3.0, 3.0));
-	for (unsigned i = 0; i < objectPositions.size(); ++i)
+
+	GPED::Random ran(glfwGetTime());
+	for (unsigned i = 0; i < editBoxNumb; ++i)
 	{
-		objectProxy[i] = dBroadPhase.CreateProxy(CGProj::makeAABB(objectPositions[i], glm::vec3(0.6)), NULL);
+		glm::vec3 size(1);
+
+		editBoxes[i] = CGEditBox(EditObjectType::EDIT_PROXY_OBJECT,
+			EditPrimitiveType::EDIT_PRIMITIVE_AABB,
+			EditProxyType::EDIT_PROXY_STATIC, objectPositions[i], size);
+		
+		editBoxes[i].proxyId = dBroadPhase.CreateProxy(editBoxes[i].getFitAABB(), &editBoxes[i]);
 	}
 
 	srand(13);
@@ -147,8 +156,9 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	bRender.connectTree(dBroadPhase.getTree());
 	bRender.setColor(glm::vec3(1, 0, 0), glm::vec3(1, 1, 0));
 	bRender.setLineWidth(1.5f, 1.f);
-	bRayWrapper.broadPhase = &dBroadPhase;
-	lineRen = lineRenderer("ShaderFolder/lineShader.vs", "ShaderFolder/lineShader.gs", "ShaderFolder/lineShader.fs");
+	lineRen = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
+	rayRen = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
+
 }
 
 void CGProj::DeferredRenderer::initImgui()
@@ -174,6 +184,7 @@ void CGProj::DeferredRenderer::updateImgui()
 	
 	ImGui::Checkbox("Light Box Render", &lightDraw);
 	ImGui::Checkbox("Broad Debug Render", &BroadDebug);
+	ImGui::Checkbox("Wire Mode", &wireDraw);
 	
 	ImGui::End();
 }
@@ -191,6 +202,10 @@ void CGProj::DeferredRenderer::display(int width, int height)
 
 	// First Pass
 	glBindFramebuffer(GL_FRAMEBUFFER, gFBO);
+	
+	if (wireDraw) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 	glClearColor(0, 0, 0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	Deferred_First_Shader.use();
@@ -205,11 +220,11 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	glBindTexture(GL_TEXTURE_2D, boxSpecular);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, emissiveTexture);
-	for (unsigned i = 0; i < objectPositions.size(); ++i)
+	for (unsigned i = 0; i < editBoxNumb; ++i)
 	{
 		model = glm::mat4(1.0);
-		model = glm::translate(model, objectPositions[i]);
-		model = glm::scale(model, glm::vec3(0.6));
+		model = glm::translate(model, editBoxes[i].getPosition());
+		model = glm::scale(model, editBoxes[i].getHalfSize());
 		Deferred_First_Shader.setMat4("viewModel", view * model);
 		Deferred_First_Shader.setMat3("MVNormalMatrix", glm::mat3(glm::transpose(glm::inverse(view * model))));
 		CGProj::renderCube();
@@ -228,6 +243,9 @@ void CGProj::DeferredRenderer::display(int width, int height)
 
 	// Second Pass + Post Process
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // This quad always fills the screen plane!
+
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	Deferred_Second_Shader.use();
@@ -253,11 +271,14 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	// Second Pass + Post Process
 
 	// Debug Drawing like forward processing
+	if (wireDraw) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gFBO);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
 	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+	
 	if (lightDraw)
 	{
 		Simple_Shader.use();
@@ -280,8 +301,13 @@ void CGProj::DeferredRenderer::display(int width, int height)
 
 	// ray casting test render
 	for (unsigned i = 0; i < rayCollector.size(); ++i)
-		lineRen.renderline(view, projection, rayCollector[i].first, rayCollector[i].second, glm::vec3(1.0, .0, .0));
+		lineRen.insertLine(rayCollector[i].first, rayCollector[i].second, glm::vec4(1.0, .0, .0, 1.));
+	lineRen.renderLine(view, projection);
+
 	// Debug Drawing like forward processing
+	for (unsigned i = 0; i < hitCollector.size(); ++i)
+		rayRen.insertLine(hitCollector[i].first, hitCollector[i].second, glm::vec4(1.0, 1.0, 0.0, 1.0));
+	rayRen.renderLine(view, projection);
 }
 
 void CGProj::DeferredRenderer::key(GLFWwindow * app_window, float deltaTime)
@@ -368,9 +394,18 @@ void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window,
 
 			glm::vec3 rayFrom = camera.Position;
 			glm::vec3 rayTo = GetRayTo((int)x, (int)y, &camera, screen_width, screen_height);
+			// rayCollector.push_back({ rayFrom, rayTo });
+			
 			GPED::c3RayInput rayInput(rayFrom, rayTo);
-			dBroadPhase.RayCast(&bRayWrapper, rayInput);
-			rayCollector.push_back({ rayFrom, rayTo });
+			BroadClosestRayCast raycastWrapper;
+
+			raycastWrapper.broadPhase = &dBroadPhase;
+			dBroadPhase.RayCast(&raycastWrapper, rayInput);
+			if (raycastWrapper.userData != nullptr)
+			{
+				GPED::c3RayOutput temp = raycastWrapper.rayOutput;
+				hitCollector.push_back({ temp.startPoint, temp.hitPoint });
+			}
 		}
 	}
 

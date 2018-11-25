@@ -117,6 +117,8 @@ namespace GPED
 	real rMax(real a, real b);
 	glm::vec3 rMin(const glm::vec3& a, const glm::vec3& b);
 	glm::vec3 rMax(const glm::vec3& a, const glm::vec3& b);
+	template<class T>
+	void Swap(T& a, T& b) { T t = a; a = b; b = t; }
 	
 	/* 18-11-13 Chanhaneg Lee
 		I referred to http://www.randygaul.net/2013/08/06/dynamic-aabb-tree/ .
@@ -168,10 +170,6 @@ namespace GPED
 
 	class CollisionPrimitive; // Forward Declaration
 	
-	/// The method to enable GPED Object to interact with CGBroadPhase 
-	/// which uses dynamicAABB tree
-	GPED::c3AABB convertFromCollisionPrimitive(const CollisionPrimitive& primitive);
-
 	struct c3RayInput
 	{
 		c3RayInput()
@@ -181,18 +179,12 @@ namespace GPED
 		c3RayInput(const glm::vec3& rayFrom, const glm::vec3& rayTo)
 			: startPoint(rayFrom)
 		{
-			direction = glm::normalize(rayFrom - rayTo);
+			direction = glm::normalize(rayTo - rayFrom);
 		}
 
 		glm::vec3 startPoint;
 		glm::vec3 direction;
 	};
-
-	bool aabbOverlap(const GPED::c3AABB & a, const c3AABB & b);
-	bool rayaabbOverlap(const GPED::c3AABB& a, const GPED::c3RayInput& ray);
-
-	template<class T>
-	void Swap(T& a, T& b) { T t = a; a = b; b = t; }
 	
 	struct c3RayOutput
 	{
@@ -201,6 +193,17 @@ namespace GPED
 		glm::vec3 startPoint; // From RayInput
 	};
 
+	bool aabbOverlap(const GPED::c3AABB & a, const c3AABB & b);
+	bool rayaabbOverlap(const GPED::c3AABB& a, const GPED::c3RayInput& ray);
+	bool rayaabbIntersection(GPED::c3RayOutput& output, 
+		const GPED::c3RayInput& input, const GPED::c3AABB& aaabb);
+
+	/// The method to enable GPED Object to interact with CGBroadPhase 
+	/// which uses dynamicAABB tree
+	GPED::c3AABB convertFromCollisionPrimitive(const CollisionPrimitive& primitive);
+	GPED::c3AABB makeAABB(const glm::vec3& position, const glm::vec3& halfExtents); // from AABB
+	GPED::c3AABB makeAABB(const glm::mat3& orientation, const glm::vec3& position, const glm::vec3& halfExtents); // from OBB
+	GPED::c3AABB makeAABB(const glm::vec3& position, const GPED::real radius); // from Sphere
 }
 
 

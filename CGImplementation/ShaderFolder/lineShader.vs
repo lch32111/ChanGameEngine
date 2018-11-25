@@ -21,6 +21,6 @@ void main()
 	gl_Position = projection * view * vec4(WorldPos, 1.0);
 
 	vs_out.normal = normalize(projection * view * vec4(normalize(vec3(toPoint - WorldPos)), 0.0));
-	vs_out.dist = length(vec3(projection * view * vec4(toPoint,0.0))
+	vs_out.dist = length(vec3(projection * view * vec4(toPoint, 0.0))
 					 -vec3(projection * view * vec4(WorldPos, 0.0)));
 }

@@ -6,7 +6,8 @@
 
 #include <Graphics/Shader.h>
 #include <Graphics/chanQuatCamera.h>
-#include <Graphics/chanRenderLine.h>
+#include <Graphics/CGRenderLine.h>
+#include <Graphics/CGEditObject.h>
 
 #include <GPED/CGBroadPhase.h>
 
@@ -44,6 +45,7 @@ namespace CGProj
 
 		bool lightDraw = false;
 		bool BroadDebug = false;
+		bool wireDraw = false;
 
 		Shader Deferred_First_Shader;
 		Shader Deferred_Second_Shader;
@@ -55,7 +57,6 @@ namespace CGProj
 		unsigned int gPosition, gNormal, gAlbedoSpec, gEmissive, gBool;
 		unsigned gRBO;
 
-		std::vector<glm::vec3> objectPositions;
 		unsigned int boxTexture, boxSpecular;
 		unsigned int woodTexture;
 		unsigned int emissiveTexture;
@@ -72,22 +73,40 @@ namespace CGProj
 		CGBroadPhase dBroadPhase;
 		BroadRendererWrapper bRender;
 		
-		struct BroadDeferredRayCast : BroadRayCast
+		struct BroadClosestRayCast : BroadRayCast
 		{
-			int hitNumb = 0;
 			bool RayCastCallback(const GPED::c3RayInput& input, int nodeId)
 			{
-				++hitNumb;
-				std::cout << hitNumb << '\n';
+				void* data = broadPhase->GetUserData(nodeId);
+				CGEditBox* box = (CGEditBox*)data;
+				GPED::c3RayOutput output;
+				bool hit = GPED::rayaabbIntersection(output, input, box->getFitAABB());
+
+				if (hit)
+				{
+					if (output.t < maxFraction)
+					{
+						maxFraction = output.t;
+						rayOutput = output;
+						userData = data;
+					}
+				}
+
 				return true;
 			}
+
+			GPED::real maxFraction = REAL_MAX;
+			GPED::c3RayOutput rayOutput;
+			void* userData = nullptr;
 		};
-		BroadDeferredRayCast bRayWrapper;
-		unsigned objectProxy[10];
-		lineRenderer lineRen;
+		CGRenderLine lineRen;
 		std::vector<std::pair<glm::vec3, glm::vec3>> rayCollector;
+		CGRenderLine rayRen;
+		std::vector<std::pair<glm::vec3, glm::vec3>> hitCollector;
 		// Broad Phase
 
+		const static int editBoxNumb = 9;
+		CGEditBox editBoxes[editBoxNumb];
 	};
 }
 

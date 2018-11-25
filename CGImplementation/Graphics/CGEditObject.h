@@ -48,6 +48,8 @@ namespace CGProj
 
 		void setLightType(EditLightType t);
 		EditLightType getLightType();
+
+		unsigned proxyId;
 	protected:
 		EditObjectType m_ObjectType;
 		EditPrimitiveType m_PrimitiveType;
@@ -55,11 +57,15 @@ namespace CGProj
 		EditLightType m_LightType;
 	};
 
-	class CGEditBox : CGEditObject
+	class CGEditBox : public CGEditObject
 	{
 	public:
-		CGEditBox(EditObjectType oT, EditPrimitiveType pT, EditProxyType proxyT);
-		CGEditBox(EditObjectType oT, EditPrimitiveType pT, EditLightType lT);
+		CGEditBox() { }
+
+		CGEditBox(EditObjectType oT, EditPrimitiveType pT, EditProxyType proxyT
+		, const glm::vec3& pos, const glm::vec3& halfExtents, const glm::quat& m_orient = glm::quat(0,0,0,-1));
+		CGEditBox(EditObjectType oT, EditPrimitiveType pT, EditLightType lT
+		, const glm::vec3& pos, const glm::vec3& halfExtents, const glm::quat& m_orient = glm::quat(0, 0, 0, -1));
 
 		void setPosition(const glm::vec3& p);
 		void setPosition(const GPED::real x, const GPED::real y, const GPED::real z);
@@ -74,11 +80,45 @@ namespace CGProj
 		void setYHalfSize(const GPED::real y);
 		void setZHalfSize(const GPED::real z);
 		glm::vec3 getHalfSize();
+
+		GPED::c3AABB getFitAABB();
 	protected:
 		glm::vec3 m_position; // center
 		glm::vec3 m_halfExtents; // half size
+		glm::quat m_orientation; // orientation for OBB
+		GPED::c3AABB m_fitAABB;
+	private:
+		void updateAABB();
+	};
+
+	class CGEditSpere : public CGEditObject
+	{
+	public:
+		CGEditSpere() { }
+		CGEditSpere(EditObjectType oT, EditPrimitiveType pT, EditProxyType proxyT,
+			const glm::vec3& pos, const GPED::real radius);
+		CGEditSpere(EditObjectType oT, EditPrimitiveType pT, EditLightType lT,
+			const glm::vec3& pos, const GPED::real radius);
+
+		void setPosition(const glm::vec3& p);
+		void setPosition(const GPED::real x, const GPED::real y, const GPED::real z);
+		void setXposition(const GPED::real x);
+		void setYposition(const GPED::real y);
+		void setZposition(const GPED::real z);
+		glm::vec3 getPosition();
+
+		void setRaidus(GPED::real r);
+		GPED::real getRadius();
+
+		GPED::c3AABB getFitAABB();
+	protected:
+		glm::vec3 m_position; // center
+		GPED::real m_radius;
 
 		GPED::c3AABB m_fitAABB;
+
+	private:
+		void updateAABB();
 	};
 }
 

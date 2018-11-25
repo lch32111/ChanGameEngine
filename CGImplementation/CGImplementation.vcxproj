@@ -151,6 +151,8 @@
     <ClCompile Include="GPED\GPED_world.cpp" />
     <ClCompile Include="GPED\PS_AmmoRound.cpp" />
     <ClCompile Include="GPED\PS_Box.cpp" />
+    <ClCompile Include="Graphics\CGEditObject.cpp" />
+    <ClCompile Include="Graphics\CGRenderLine.cpp" />
     <ClCompile Include="Graphics\chanEulerCamera.cpp" />
     <ClCompile Include="Graphics\chanQuatCamera.cpp" />
     <ClCompile Include="Graphics\chanRenderLine.cpp" />
@@ -191,6 +193,8 @@
     <ClInclude Include="GPED\GPED_world.h" />
     <ClInclude Include="GPED\PS_AmmoRound.h" />
     <ClInclude Include="GPED\PS_Box.h" />
+    <ClInclude Include="Graphics\CGEditObject.h" />
+    <ClInclude Include="Graphics\CGRenderLine.h" />
     <ClInclude Include="Graphics\chanEulerCamera.h" />
     <ClInclude Include="Graphics\chanQuatCamera.h" />
     <ClInclude Include="Graphics\chanRenderLine.h" />
@@ -208,6 +212,8 @@
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ShaderFolder\CGLineShader.fs" />
+    <None Include="ShaderFolder\CGLineShader.vs" />
     <None Include="ShaderFolder\DeferredFirst.fs" />
     <None Include="ShaderFolder\DeferredFirst.vs" />
     <None Include="ShaderFolder\DeferredPost.fs" />

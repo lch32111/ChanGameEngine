@@ -26,8 +26,7 @@ namespace CGProj
 		GPED::real fov = glm::radians(camera->Zoom);
 
 		glm::vec3 rayFrom = camera->Position;
-		glm::quat qF = camera->Orientation * glm::quat(0, 0, 0, -1)  * glm::conjugate(camera->Orientation);
-		glm::vec3 rayForward = glm::vec3(qF.x, qF.y, qF.z);
+		glm::vec3 rayForward = camera->Front;
 		GPED::real farPlane = 10000.f;
 		rayForward *= farPlane;
 

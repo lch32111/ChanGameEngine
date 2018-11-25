@@ -184,6 +184,11 @@ void CGProj::DeferredRenderer::updateImgui()
 	ImGui::Checkbox("Light Box Render", &lightDraw);
 	ImGui::Checkbox("Broad Debug Render", &BroadDebug);
 	ImGui::Checkbox("Wire Mode", &wireDraw);
+	ImGui::Checkbox("Click Ray Render", &clickDraw); ImGui::SameLine();
+	if(ImGui::Button("Click Ray Reset")) rayCollector.clear();
+
+	ImGui::Checkbox("Hit Ray Render", &rayHitDraw); ImGui::SameLine();
+	if (ImGui::Button("Hit Ray Reset")) hitCollector.clear();
 	
 	ImGui::End();
 }
@@ -201,7 +206,6 @@ void CGProj::DeferredRenderer::display(int width, int height)
 
 	// First Pass
 	glBindFramebuffer(GL_FRAMEBUFFER, gFBO);
-	
 	if (wireDraw) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -226,7 +230,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		model = glm::scale(model, editBoxes[i].getHalfSize());
 		Deferred_First_Shader.setMat4("viewModel", view * model);
 		Deferred_First_Shader.setMat3("MVNormalMatrix", glm::mat3(glm::transpose(glm::inverse(view * model))));
-		CGProj::renderCube();
+		renderCube();
 	}
 
 	model = glm::mat4(1.0);
@@ -243,10 +247,9 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	// Second Pass + Post Process
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // This quad always fills the screen plane!
+	if(wireDraw)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // This quad always fills the screen plane!
 
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	Deferred_Second_Shader.use();
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gPosition);
@@ -298,15 +301,19 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	if (BroadDebug)
 		bRender.draw(&wireShader, &projection, &view);
 
-	// ray casting test render
-	for (unsigned i = 0; i < rayCollector.size(); ++i)
-		lineRen.insertLine(rayCollector[i].first, rayCollector[i].second, glm::vec4(1.0, .0, .0, 1.));
-	lineRen.renderLine(view, projection, 0.5);
-
-	// Debug Drawing like forward processing
-	for (unsigned i = 0; i < hitCollector.size(); ++i)
-		rayRen.insertLine(hitCollector[i].first, hitCollector[i].second, glm::vec4(1.0, 1.0, 0.0, 1.0));
-	rayRen.renderLine(view, projection, 1.8);
+	if (clickDraw)
+	{
+		for (unsigned i = 0; i < rayCollector.size(); ++i)
+			lineRen.insertLine(rayCollector[i].first, rayCollector[i].second, glm::vec4(1.0, .0, .0, 1.));
+		lineRen.renderLine(view, projection, 0.5);
+	}
+	
+	if (rayHitDraw)
+	{
+		for (unsigned i = 0; i < hitCollector.size(); ++i)
+			rayRen.insertLine(hitCollector[i].first, hitCollector[i].second, glm::vec4(1.0, 1.0, 0.0, 1.0));
+		rayRen.renderLine(view, projection, 1.8);
+	}
 }
 
 void CGProj::DeferredRenderer::key(GLFWwindow * app_window, float deltaTime)
@@ -391,25 +398,28 @@ void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window,
 			double x, y;
 			glfwGetCursorPos(app_window, &x, &y);
 
+			
 			glm::vec3 rayFrom = camera.Position;
 			glm::vec3 rayTo = GetRayTo((int)x, (int)y, &camera, screen_width, screen_height);
-			// rayCollector.push_back({ rayFrom, rayTo });
+
+			// Place the line a little ahead of camera to 
+			// enable a user to watch the line right after making a line.
+			// Click Ray Collector
+			// the line position is not correct position for the purpose above
+			// But don't worry for this, the collision between ray and object is wokring well.
+			rayCollector.push_back({ rayFrom - camera.Front, rayTo }); 
 			
+			// Find Proxy with ray Input
 			GPED::c3RayInput rayInput(rayFrom, rayTo);
 			BroadClosestRayCast raycastWrapper;
-
 			raycastWrapper.broadPhase = &dBroadPhase;
 			dBroadPhase.RayCast(&raycastWrapper, rayInput);
+			
 			if (raycastWrapper.userData != nullptr)
 			{
-				GPED::c3RayOutput temp = raycastWrapper.rayOutput;
-				hitCollector.push_back({ temp.startPoint, temp.hitPoint });
-
-				CGEditBox* box = (CGEditBox*)raycastWrapper.userData;
-				glm::vec3 pos = box->getPosition();
-				pos += glm::vec3(1);
-				box->setPosition(pos);
-				dBroadPhase.UpdateProxy(box->proxyId, box->getFitAABB());
+				hitCollector.push_back({ 
+					raycastWrapper.rayOutput.startPoint - camera.Front,
+					raycastWrapper.rayOutput.hitPoint });
 			}
 		}
 	}

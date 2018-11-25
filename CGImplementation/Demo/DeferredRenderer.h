@@ -46,6 +46,8 @@ namespace CGProj
 		bool lightDraw = false;
 		bool BroadDebug = false;
 		bool wireDraw = false;
+		bool clickDraw = false;
+		bool rayHitDraw = false;
 
 		Shader Deferred_First_Shader;
 		Shader Deferred_Second_Shader;
@@ -79,6 +81,7 @@ namespace CGProj
 			{
 				void* data = broadPhase->GetUserData(nodeId);
 				CGEditBox* box = (CGEditBox*)data;
+				
 				GPED::c3RayOutput output;
 				bool hit = GPED::rayaabbIntersection(output, input, box->getFitAABB());
 

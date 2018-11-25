@@ -144,8 +144,10 @@ namespace CGProj
 		glLineWidth(linewidth);
 		glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
 
+		// Setting Default
 		glBindVertexArray(0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glLineWidth(1.0);
 	}
 
 	static inline void renderQuad()
@@ -309,6 +311,8 @@ namespace CGProj
 
 		glBindVertexArray(sphereVAO);
 		glDrawElements(GL_TRIANGLE_STRIP, indexCount, GL_UNSIGNED_INT, 0);
+
+		glBindVertexArray(0);
 	}
 }
 

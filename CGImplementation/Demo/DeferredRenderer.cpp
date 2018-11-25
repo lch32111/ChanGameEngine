@@ -158,7 +158,6 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	bRender.setLineWidth(1.5f, 1.f);
 	lineRen = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
 	rayRen = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
-
 }
 
 void CGProj::DeferredRenderer::initImgui()
@@ -302,12 +301,12 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	// ray casting test render
 	for (unsigned i = 0; i < rayCollector.size(); ++i)
 		lineRen.insertLine(rayCollector[i].first, rayCollector[i].second, glm::vec4(1.0, .0, .0, 1.));
-	lineRen.renderLine(view, projection);
+	lineRen.renderLine(view, projection, 0.5);
 
 	// Debug Drawing like forward processing
 	for (unsigned i = 0; i < hitCollector.size(); ++i)
 		rayRen.insertLine(hitCollector[i].first, hitCollector[i].second, glm::vec4(1.0, 1.0, 0.0, 1.0));
-	rayRen.renderLine(view, projection);
+	rayRen.renderLine(view, projection, 1.8);
 }
 
 void CGProj::DeferredRenderer::key(GLFWwindow * app_window, float deltaTime)
@@ -405,6 +404,12 @@ void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window,
 			{
 				GPED::c3RayOutput temp = raycastWrapper.rayOutput;
 				hitCollector.push_back({ temp.startPoint, temp.hitPoint });
+
+				CGEditBox* box = (CGEditBox*)raycastWrapper.userData;
+				glm::vec3 pos = box->getPosition();
+				pos += glm::vec3(1);
+				box->setPosition(pos);
+				dBroadPhase.UpdateProxy(box->proxyId, box->getFitAABB());
 			}
 		}
 	}

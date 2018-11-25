@@ -18,7 +18,7 @@ namespace CGProj
 
 		void insertLine(const glm::vec3& From, const glm::vec3& To,
 			const glm::vec4& Color = glm::vec4(1.0));
-		void renderLine(const glm::mat4& view, const glm::mat4& proj);
+		void renderLine(const glm::mat4& view, const glm::mat4& proj, const float lineWidth);
 	private:
 		Shader m_lineShader;
 

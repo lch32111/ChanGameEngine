@@ -24,7 +24,7 @@ void CGProj::CGRenderLine::insertLine(const glm::vec3 & From, const glm::vec3 & 
 	++m_count;
 }
 
-void CGProj::CGRenderLine::renderLine(const glm::mat4 & view, const glm::mat4 & proj)
+void CGProj::CGRenderLine::renderLine(const glm::mat4 & view, const glm::mat4 & proj, const float lineWidth)
 {
 	if (m_count == 0) return;
 
@@ -41,13 +41,13 @@ void CGProj::CGRenderLine::renderLine(const glm::mat4 & view, const glm::mat4 & 
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO[1]);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, m_count * sizeof(glm::vec4), m_colors);
 
+	glLineWidth(lineWidth);
 	glDrawArrays(GL_LINES, 0, m_count);
 
+	// Setting Default again
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-
-	if (glGetError() != GL_NO_ERROR)
-		__debugbreak();
+	glLineWidth(1.0);
 
 	m_count = 0;
 }

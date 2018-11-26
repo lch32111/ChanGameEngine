@@ -120,13 +120,8 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	GPED::Random ran(glfwGetTime());
 	for (unsigned i = 0; i < editBoxNumb; ++i)
 	{
-		glm::vec3 size(1);
-
-		editBoxes[i] = CGEditBox(EditObjectType::EDIT_PROXY_OBJECT,
-			EditPrimitiveType::EDIT_PRIMITIVE_AABB,
-			EditProxyType::EDIT_PROXY_STATIC, objectPositions[i], size);
-		
-		editBoxes[i].proxyId = dBroadPhase.CreateProxy(editBoxes[i].getFitAABB(), &editBoxes[i]);
+		editBoxes[i].connectBroadPhase(&dBroadPhase);
+		editBoxes[i].setBroadPhaseId(dBroadPhase.CreateProxy(editBoxes[i].getFitAABB(), &editBoxes[i]));
 	}
 
 	srand(13);
@@ -197,7 +192,7 @@ void CGProj::DeferredRenderer::updateImgui()
 	{
 		ImGui::Begin("Edit Object");
 
-		ImGui::Text("Proxy Id : %d", pickedEditBox->proxyId);
+		ImGui::Text("Proxy Id : %d", pickedEditBox->getBroadPhaseId());
 
 		ImGui::End();
 	}
@@ -450,7 +445,7 @@ void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window,
 					raycastWrapper.rayOutput.startPoint - camera.Front,
 					raycastWrapper.rayOutput.hitPoint });
 
-				pickedEditBox = (CGEditBox*)raycastWrapper.userData;
+				pickedEditBox = (CGEditProxyObject*)raycastWrapper.userData;
 			}
 		}
 	}

@@ -110,8 +110,8 @@ namespace CGProj
 		// Broad Phase
 
 		const static int editBoxNumb = 9;
-		CGEditBox editBoxes[editBoxNumb];
-		CGEditBox* pickedEditBox = nullptr;
+		CGEditProxyObject editBoxes[editBoxNumb];
+		CGEditProxyObject* pickedEditBox = nullptr;
 	};
 }
 

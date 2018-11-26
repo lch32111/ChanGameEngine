@@ -334,7 +334,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		orinentLineRen.insertLine(centerPos, centerPos + Xaxis * scale, glm::vec4(1.0, .0, .0, 1.0));
 		orinentLineRen.insertLine(centerPos, centerPos + Yaxis * scale, glm::vec4(.0, 1.0, .0, 1.0));
 		orinentLineRen.insertLine(centerPos, centerPos + Zaxis * scale, glm::vec4(.0, .0, 1.0, 1.0));
-		orinentLineRen.renderLine(view, projection, 5.f);
+		orinentLineRen.renderLine(view, projection, 5);
 	}
 }
 

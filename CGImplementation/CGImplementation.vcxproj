@@ -125,6 +125,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CGGizmo.cpp" />
     <ClCompile Include="CG_Application.cpp" />
     <ClCompile Include="Demo\DeferredRenderer.cpp" />
     <ClCompile Include="Demo\TryFirst.cpp" />
@@ -167,6 +168,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CGGizmo.h" />
     <ClInclude Include="CG_Application.h" />
     <ClInclude Include="Demo\DeferredRenderer.h" />
     <ClInclude Include="Demo\TryFirst.h" />

@@ -125,7 +125,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CGGizmo.cpp" />
     <ClCompile Include="CG_Application.cpp" />
     <ClCompile Include="Demo\DeferredRenderer.cpp" />
     <ClCompile Include="Demo\TryFirst.cpp" />
@@ -153,6 +152,7 @@
     <ClCompile Include="GPED\PS_AmmoRound.cpp" />
     <ClCompile Include="GPED\PS_Box.cpp" />
     <ClCompile Include="Graphics\CGEditObject.cpp" />
+    <ClCompile Include="Graphics\CGGizmo.cpp" />
     <ClCompile Include="Graphics\CGRenderLine.cpp" />
     <ClCompile Include="Graphics\chanEulerCamera.cpp" />
     <ClCompile Include="Graphics\chanQuatCamera.cpp" />
@@ -168,7 +168,6 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CGGizmo.h" />
     <ClInclude Include="CG_Application.h" />
     <ClInclude Include="Demo\DeferredRenderer.h" />
     <ClInclude Include="Demo\TryFirst.h" />
@@ -196,6 +195,7 @@
     <ClInclude Include="GPED\PS_AmmoRound.h" />
     <ClInclude Include="GPED\PS_Box.h" />
     <ClInclude Include="Graphics\CGEditObject.h" />
+    <ClInclude Include="Graphics\CGGizmo.h" />
     <ClInclude Include="Graphics\CGRenderLine.h" />
     <ClInclude Include="Graphics\chanEulerCamera.h" />
     <ClInclude Include="Graphics\chanQuatCamera.h" />

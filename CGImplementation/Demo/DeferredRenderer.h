@@ -8,6 +8,8 @@
 #include <Graphics/chanQuatCamera.h>
 #include <Graphics/CGRenderLine.h>
 #include <Graphics/CGEditObject.h>
+#include <Graphics/CGGizmo.h>
+
 
 #include <GPED/CGBroadPhase.h>
 
@@ -35,7 +37,8 @@ namespace CGProj
 		void resize(int width, int height);
 	private:
 		chanQuatCamera camera;
-		float lastX = 400, lastY = 300;
+		float GamelastX = 400, GamelastY = 300;
+		float UILastX = 400, UILastY = 300;
 		bool firstMouse = true;
 		bool tabKey = false;
 
@@ -112,6 +115,7 @@ namespace CGProj
 		const static int editBoxNumb = 9;
 		CGEditProxyObject editBoxes[editBoxNumb];
 		CGEditProxyObject* pickedEditBox = nullptr;
+		CGGizmo gizmoTest;
 	};
 }
 

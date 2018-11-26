@@ -13,31 +13,31 @@ namespace CGProj
 	public:
 		CGGizmo();
 
-		void registerGizmoOnBroadPhase(CGBroadPhase* broadphase);
-		void updateGizmoBroadPhase(glm::vec3 position);
+		void initGizmo();
 
 		void renderGizmo(const glm::mat4& view, const glm::mat4& proj);
 		void renderGizmoBox(const glm::mat4& view, const glm::mat4& proj);
 
 		void setAxisWidth(float width);
 		void setAxisLength(float length);
-
 		void setEditProxyObject(CGEditProxyObject* object);
+
+		bool isActivated();
+		bool isHitActivated();
+		bool rayOverlapBoxes(const GPED::c3RayInput& rayInput);
+
+		void translate(float xoffset, float yoffset);
 	private:
-		CGBroadPhase* m_broadPhase;
 		CGEditProxyObject* m_editProxyObject;
 		CGRenderLine m_lineRenderer;
 		
 		float m_axisWidth = 1.0f;
 		float m_axisLengthScale = 1.0f;
+		float m_axisWidthScale = 0.01f;
+		float MOUSE_SENSITIVITY = 0.01F;
 
-		int m_xAxis_BroadId;
 		GPED::c3AABB m_xAxisBox;
-
-		int m_yAxis_BroadId;
 		GPED::c3AABB m_yAxisBox;
-
-		int m_zAxis_BroadId;
 		GPED::c3AABB m_zAxisBox;
 
 		glm::vec3 worldXAxis = glm::vec3(1, 0, 0);
@@ -48,6 +48,15 @@ namespace CGProj
 		glm::vec4 zAxisColor = glm::vec4(0, 0, 1, 1);
 
 		glm::vec3 center = glm::vec3(0);
+
+		enum GizmoBox
+		{
+			GIZMO_BOX_XAXIS = 0,
+			GIZMO_BOX_YAXIS,
+			GIZMO_BOX_ZAXIS,
+			GIZMO_BOX_NONE,
+		};
+		GizmoBox m_hitBox;
 
 		void updateAABBs();
 		void insertAABBwithLine(const GPED::c3AABB& aabb, glm::vec4 color);

@@ -35,6 +35,7 @@ namespace CGProj
 	protected:
 		int width = 800;
 		int height = 600;
+		bool canDisplay = true;
 
 		float deltaTime = 0;
 		float lastFrame = 0;

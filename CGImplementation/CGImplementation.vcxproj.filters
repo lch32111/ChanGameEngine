@@ -177,7 +177,7 @@
     <ClCompile Include="Graphics\CGRenderLine.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
-    <ClCompile Include="CGGizmo.cpp">
+    <ClCompile Include="Graphics\CGGizmo.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -311,7 +311,7 @@
     <ClInclude Include="Graphics\CGRenderLine.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
-    <ClInclude Include="CGGizmo.h">
+    <ClInclude Include="Graphics\CGGizmo.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
   </ItemGroup>

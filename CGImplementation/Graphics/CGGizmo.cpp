@@ -3,24 +3,14 @@
 
 CGProj::CGGizmo::CGGizmo()
 {
+	m_editProxyObject = nullptr;
+	m_hitBox = GIZMO_BOX_NONE;
 	updateAABBs();
 }
 
-void CGProj::CGGizmo::registerGizmoOnBroadPhase(CGBroadPhase * broadphase)
+void CGProj::CGGizmo::initGizmo()
 {
-	m_broadPhase = broadphase;
-	m_xAxis_BroadId = m_broadPhase->CreateProxy(m_xAxisBox, this);
-	m_yAxis_BroadId = m_broadPhase->CreateProxy(m_yAxisBox, this);
-	m_zAxis_BroadId = m_broadPhase->CreateProxy(m_zAxisBox, this);
-}
-
-void CGProj::CGGizmo::updateGizmoBroadPhase(glm::vec3 position)
-{
-	center = position;
-	updateAABBs();
-	m_broadPhase->UpdateProxy(m_xAxis_BroadId, m_xAxisBox);
-	m_broadPhase->UpdateProxy(m_yAxis_BroadId, m_yAxisBox);
-	m_broadPhase->UpdateProxy(m_zAxis_BroadId, m_zAxisBox);
+	m_lineRenderer = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
 }
 
 void CGProj::CGGizmo::renderGizmo(const glm::mat4& view, const glm::mat4& proj)
@@ -51,11 +41,120 @@ void CGProj::CGGizmo::setAxisLength(float length)
 
 void CGProj::CGGizmo::setEditProxyObject(CGEditProxyObject * object)
 {
+	if (object != nullptr && m_editProxyObject != object)
+	{
+		center = object->getPosition();
+		updateAABBs();
+	}
+
 	m_editProxyObject = object;
+}
+
+bool CGProj::CGGizmo::rayOverlapBoxes(const GPED::c3RayInput & rayInput)
+{
+	bool OverlapResult = false;
+	GPED::c3RayOutput rayOutput;
+	GPED::real minT = REAL_MAX;
+	m_hitBox = GIZMO_BOX_NONE;
+
+	if (GPED::rayaabbIntersection(rayOutput, rayInput, m_xAxisBox))
+	{
+		OverlapResult = true;
+		minT = rayOutput.t;
+		m_hitBox = GIZMO_BOX_XAXIS;
+	}
+	
+	if (GPED::rayaabbIntersection(rayOutput, rayInput, m_yAxisBox))
+	{
+		OverlapResult = true;
+		if (rayOutput.t < minT)
+		{
+			minT = rayOutput.t;
+			m_hitBox = GIZMO_BOX_YAXIS;
+		}
+	}
+
+	if (GPED::rayaabbIntersection(rayOutput, rayInput, m_zAxisBox))
+	{
+		OverlapResult = true;
+		if (rayOutput.t < minT)
+		{
+			m_hitBox = GIZMO_BOX_ZAXIS;
+		}
+	}
+
+	return OverlapResult;
+}
+
+void CGProj::CGGizmo::translate(float xoffset, float yoffset)
+{
+	assert(m_editProxyObject != nullptr);
+
+	xoffset *= MOUSE_SENSITIVITY;
+	yoffset *= MOUSE_SENSITIVITY;
+
+
+
+	glm::vec3 proxyPosition = m_editProxyObject->getPosition();
+	GPED::real deltaPos;
+
+	switch (m_hitBox)
+	{
+	case GIZMO_BOX_XAXIS:
+	{
+		deltaPos = proxyPosition.x;
+		deltaPos += xoffset;
+		m_editProxyObject->setXposition(deltaPos);
+
+		// Gizmo Center Update
+		center.x = deltaPos;
+		break;
+	}
+	case GIZMO_BOX_YAXIS:
+	{
+		deltaPos = proxyPosition.y;
+		deltaPos += yoffset;
+		m_editProxyObject->setYposition(deltaPos);
+
+		// Gizmo Center Update
+		center.y = deltaPos;
+		break;
+	}
+	case GIZMO_BOX_ZAXIS:
+	{
+		deltaPos = proxyPosition.z;
+		deltaPos += xoffset;
+		m_editProxyObject->setZposition(deltaPos);
+
+		// Gizmo Center Update
+		center.z = deltaPos;
+		break;
+	}
+	default:
+		// If you come to this case,
+		// your collision detection between ray and aabb failed.
+		assert(0);
+		break;
+	}
+
+	updateAABBs();
+}
+
+bool CGProj::CGGizmo::isActivated()
+{
+	return (m_editProxyObject != nullptr);
+}
+
+bool CGProj::CGGizmo::isHitActivated()
+{
+	return (m_hitBox != GIZMO_BOX_NONE);
 }
 
 void CGProj::CGGizmo::updateAABBs()
 {
+	float temp = m_axisWidth;
+	m_axisWidth *= m_axisWidthScale;
+
 	m_xAxisBox.min = center;
 	m_xAxisBox.max = center;
 	m_xAxisBox.min += glm::vec3(0, -m_axisWidth, -m_axisWidth);
@@ -70,6 +169,8 @@ void CGProj::CGGizmo::updateAABBs()
 	m_zAxisBox.max = center;
 	m_zAxisBox.min += glm::vec3(-m_axisWidth, -m_axisWidth, 0);
 	m_zAxisBox.max += glm::vec3(m_axisWidth, m_axisWidth, m_axisLengthScale);
+
+	m_axisWidth = temp;
 }
 
 void CGProj::CGGizmo::insertAABBwithLine(const GPED::c3AABB & aabb, glm::vec4 color)

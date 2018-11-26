@@ -154,6 +154,9 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	lineRen = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
 	rayRen = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
 	orinentLineRen = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
+
+	gizmoTest.initGizmo();
+	gizmoTest.setAxisWidth(5.0);
 }
 
 void CGProj::DeferredRenderer::initImgui()
@@ -323,18 +326,10 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	// Picked One
 	if (pickedEditBox)
 	{
-		glm::vec3 centerPos = pickedEditBox->getPosition();
-
-		// X-axis
-		glm::vec3 Xaxis(1.0, 0.0, 0.0);
-		glm::vec3 Yaxis(.0, 1.0, 0.0);
-		glm::vec3 Zaxis(.0, 0.0, 1.0);
-		float scale = pickedEditBox->getHalfSize().x + 1.f;
-
-		orinentLineRen.insertLine(centerPos, centerPos + Xaxis * scale, glm::vec4(1.0, .0, .0, 1.0));
-		orinentLineRen.insertLine(centerPos, centerPos + Yaxis * scale, glm::vec4(.0, 1.0, .0, 1.0));
-		orinentLineRen.insertLine(centerPos, centerPos + Zaxis * scale, glm::vec4(.0, .0, 1.0, 1.0));
-		orinentLineRen.renderLine(view, projection, 5);
+		gizmoTest.setAxisLength(pickedEditBox->getHalfSize().x + 1.0f);
+		gizmoTest.setEditProxyObject(pickedEditBox);
+		gizmoTest.renderGizmo(view, projection);
+		// gizmoTest.renderGizmoBox(view, projection);
 	}
 }
 
@@ -377,7 +372,7 @@ void CGProj::DeferredRenderer::key(GLFWwindow * app_window, float deltaTime)
 
 			// Locate the cursor pos on the last position 
 			// because of continuous movement of mouse
-			glfwSetCursorPos(app_window, lastX, lastY);
+			glfwSetCursorPos(app_window, GamelastX, GamelastY);
 		}
 	}
 
@@ -395,17 +390,34 @@ void CGProj::DeferredRenderer::mouse(double xpos, double ypos)
 		if (firstMouse)
 		{
 			firstMouse = false;
-			lastX = xpos;
-			lastY = ypos;
+			GamelastX = xpos;
+			GamelastY = ypos;
 		}
 
-		float xoffset = xpos - lastX;
-		float yoffset = lastY - ypos;
-		lastX = xpos;
-		lastY = ypos;
+		float xoffset = xpos - GamelastX;
+		float yoffset = GamelastY - ypos;
+		GamelastX = xpos;
+		GamelastY = ypos;
 
 		camera.ProcessMouseMovement(xoffset, yoffset);
 	}
+	else
+	{
+		float xoffset = xpos - UILastX;
+		float yoffset = UILastY - ypos;
+		UILastX = xpos;
+		UILastY = ypos;
+
+		if (mouseClick) // Mouse Holding and Moving
+		{
+			if (gizmoTest.isActivated() && gizmoTest.isHitActivated())
+			{
+				gizmoTest.translate(xoffset, yoffset);
+			}
+		}
+	}
+
+
 }
 
 void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window, 
@@ -432,9 +444,21 @@ void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window,
 			// the line position is not correct position for the purpose above
 			// But don't worry for this, the collision between ray and object is working well.
 			rayCollector.push_back({ rayFrom - camera.Front, rayTo }); 
+
+			// Make Ray
+			GPED::c3RayInput rayInput(rayFrom, rayTo);
+
+			// Manual Gizmo Intersection
+			if (gizmoTest.isActivated())
+				if (gizmoTest.rayOverlapBoxes(rayInput))
+				{
+					// Do not Find other objects since user 
+					// clicks the gizmo Box
+					return;
+				}
 			
 			// Find Proxy with ray Input
-			GPED::c3RayInput rayInput(rayFrom, rayTo);
+			
 			BroadClosestRayCast raycastWrapper;
 			raycastWrapper.broadPhase = &dBroadPhase;
 			dBroadPhase.RayCast(&raycastWrapper, rayInput);
@@ -446,6 +470,11 @@ void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window,
 					raycastWrapper.rayOutput.hitPoint });
 
 				pickedEditBox = (CGEditProxyObject*)raycastWrapper.userData;
+			}
+			else
+			{
+				pickedEditBox = nullptr;
+				gizmoTest.setEditProxyObject(nullptr);
 			}
 		}
 	}
@@ -463,6 +492,8 @@ void CGProj::DeferredRenderer::scroll(double yoffset)
 
 void CGProj::DeferredRenderer::resize(int width, int height)
 {
+	if (width <= 0 || height <= 0) return; // Ignore window minimization case
+
 	// First Pass Setup For Deferred Rendering
 	glBindFramebuffer(GL_FRAMEBUFFER, gFBO);
 

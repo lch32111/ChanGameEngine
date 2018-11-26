@@ -158,6 +158,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	bRender.setLineWidth(1.5f, 1.f);
 	lineRen = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
 	rayRen = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
+	orinentLineRen = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
 }
 
 void CGProj::DeferredRenderer::initImgui()
@@ -182,7 +183,7 @@ void CGProj::DeferredRenderer::updateImgui()
 	else ImGui::TextColored(ImVec4(0.11, 0.7, 0.81, 1.0), "UI mode");
 	
 	ImGui::Checkbox("Light Box Render", &lightDraw);
-	ImGui::Checkbox("Broad Debug Render", &BroadDebug);
+	ImGui::Checkbox("Broad Phase Debug Render", &BroadDebug);
 	ImGui::Checkbox("Wire Mode", &wireDraw);
 	ImGui::Checkbox("Click Ray Render", &clickDraw); ImGui::SameLine();
 	if(ImGui::Button("Click Ray Reset")) rayCollector.clear();
@@ -191,6 +192,15 @@ void CGProj::DeferredRenderer::updateImgui()
 	if (ImGui::Button("Hit Ray Reset")) hitCollector.clear();
 	
 	ImGui::End();
+
+	if (pickedEditBox)
+	{
+		ImGui::Begin("Edit Object");
+
+		ImGui::Text("Proxy Id : %d", pickedEditBox->proxyId);
+
+		ImGui::End();
+	}
 }
 
 void CGProj::DeferredRenderer::updateSimulation(float deltaTime, float lastFrame)
@@ -314,6 +324,23 @@ void CGProj::DeferredRenderer::display(int width, int height)
 			rayRen.insertLine(hitCollector[i].first, hitCollector[i].second, glm::vec4(1.0, 1.0, 0.0, 1.0));
 		rayRen.renderLine(view, projection, 1.8);
 	}
+
+	// Picked One
+	if (pickedEditBox)
+	{
+		glm::vec3 centerPos = pickedEditBox->getPosition();
+
+		// X-axis
+		glm::vec3 Xaxis(1.0, 0.0, 0.0);
+		glm::vec3 Yaxis(.0, 1.0, 0.0);
+		glm::vec3 Zaxis(.0, 0.0, 1.0);
+		float scale = pickedEditBox->getHalfSize().x + 1.f;
+
+		orinentLineRen.insertLine(centerPos, centerPos + Xaxis * scale, glm::vec4(1.0, .0, .0, 1.0));
+		orinentLineRen.insertLine(centerPos, centerPos + Yaxis * scale, glm::vec4(.0, 1.0, .0, 1.0));
+		orinentLineRen.insertLine(centerPos, centerPos + Zaxis * scale, glm::vec4(.0, .0, 1.0, 1.0));
+		orinentLineRen.renderLine(view, projection, 5.f);
+	}
 }
 
 void CGProj::DeferredRenderer::key(GLFWwindow * app_window, float deltaTime)
@@ -390,6 +417,9 @@ void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window,
 	int button, int action, int mods, 
 	int screen_width, int screen_height)
 {
+	// Exit out if mouse clicks on Imgui GUI
+	if (ImGui::IsMouseHoveringAnyWindow()) return;
+
 	if (!mouseClick)
 	{
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
@@ -397,7 +427,6 @@ void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window,
 			mouseClick = true;
 			double x, y;
 			glfwGetCursorPos(app_window, &x, &y);
-
 			
 			glm::vec3 rayFrom = camera.Position;
 			glm::vec3 rayTo = GetRayTo((int)x, (int)y, &camera, screen_width, screen_height);
@@ -406,7 +435,7 @@ void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window,
 			// enable a user to watch the line right after making a line.
 			// Click Ray Collector
 			// the line position is not correct position for the purpose above
-			// But don't worry for this, the collision between ray and object is wokring well.
+			// But don't worry for this, the collision between ray and object is working well.
 			rayCollector.push_back({ rayFrom - camera.Front, rayTo }); 
 			
 			// Find Proxy with ray Input
@@ -420,6 +449,8 @@ void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window,
 				hitCollector.push_back({ 
 					raycastWrapper.rayOutput.startPoint - camera.Front,
 					raycastWrapper.rayOutput.hitPoint });
+
+				pickedEditBox = (CGEditBox*)raycastWrapper.userData;
 			}
 		}
 	}
@@ -443,47 +474,26 @@ void CGProj::DeferredRenderer::resize(int width, int height)
 	// Position Buffer
 	glBindTexture(GL_TEXTURE_2D, gPosition);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
 
 	// Normal Buffer
 	glBindTexture(GL_TEXTURE_2D, gNormal);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
 
 	// Albedo + specular Buffer
 	glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoSpec, 0);
 
 	// Emissive Buffer
 	glBindTexture(GL_TEXTURE_2D, gEmissive);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, gEmissive, 0);
 
 	// Boolean Buffer
 	glBindTexture(GL_TEXTURE_2D, gBool);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, gBool, 0);
-
-	// Tell OpenGL which color attachments we'll use (of this framebuffeer) for rendering
-	unsigned attachments[5] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2,
-		GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
-	glDrawBuffers(5, attachments);
 
 	// attach the depth component with renderbuffer
 	glBindRenderbuffer(GL_RENDERBUFFER, gRBO);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, gRBO);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		assert(0);

@@ -106,10 +106,12 @@ namespace CGProj
 		std::vector<std::pair<glm::vec3, glm::vec3>> rayCollector;
 		CGRenderLine rayRen;
 		std::vector<std::pair<glm::vec3, glm::vec3>> hitCollector;
+		CGRenderLine orinentLineRen;
 		// Broad Phase
 
 		const static int editBoxNumb = 9;
 		CGEditBox editBoxes[editBoxNumb];
+		CGEditBox* pickedEditBox = nullptr;
 	};
 }
 

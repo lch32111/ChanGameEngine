@@ -412,12 +412,10 @@ void CGProj::DeferredRenderer::mouse(double xpos, double ypos)
 		{
 			if (gizmoTest.isActivated() && gizmoTest.isHitActivated())
 			{
-				gizmoTest.translate(xoffset, yoffset);
+				gizmoTest.translate(xoffset, yoffset, camera);
 			}
 		}
 	}
-
-
 }
 
 void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window, 
@@ -458,7 +456,6 @@ void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window,
 				}
 			
 			// Find Proxy with ray Input
-			
 			BroadClosestRayCast raycastWrapper;
 			raycastWrapper.broadPhase = &dBroadPhase;
 			dBroadPhase.RayCast(&raycastWrapper, rayInput);

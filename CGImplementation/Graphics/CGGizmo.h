@@ -3,6 +3,7 @@
 #define __CG_GIZMO_H__
 
 #include <GPED/CGBroadPhase.h>
+#include <Graphics/chanQuatCamera.h>
 #include <Graphics/CGRenderLine.h>
 #include <Graphics/CGEditObject.h>
 
@@ -26,7 +27,7 @@ namespace CGProj
 		bool isHitActivated();
 		bool rayOverlapBoxes(const GPED::c3RayInput& rayInput);
 
-		void translate(float xoffset, float yoffset);
+		void translate(float xoffset, float yoffset, const chanQuatCamera& camera);
 	private:
 		CGEditProxyObject* m_editProxyObject;
 		CGRenderLine m_lineRenderer;

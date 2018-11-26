@@ -86,24 +86,27 @@ bool CGProj::CGGizmo::rayOverlapBoxes(const GPED::c3RayInput & rayInput)
 	return OverlapResult;
 }
 
-void CGProj::CGGizmo::translate(float xoffset, float yoffset)
+void CGProj::CGGizmo::translate(float xoffset, float yoffset, const chanQuatCamera& camera)
 {
 	assert(m_editProxyObject != nullptr);
 
 	xoffset *= MOUSE_SENSITIVITY;
 	yoffset *= MOUSE_SENSITIVITY;
 
-
-
 	glm::vec3 proxyPosition = m_editProxyObject->getPosition();
 	GPED::real deltaPos;
+	GPED::real sign;
 
 	switch (m_hitBox)
 	{
 	case GIZMO_BOX_XAXIS:
 	{
+		// glm::dot(camera.Right, worldXAxis) makes correct direction for translation.
+		// below command is the same as dot equation above.
+		sign = ((camera.Right.x > 0) ? 1 : -1);
+
 		deltaPos = proxyPosition.x;
-		deltaPos += xoffset;
+		deltaPos += xoffset * sign;
 		m_editProxyObject->setXposition(deltaPos);
 
 		// Gizmo Center Update
@@ -122,8 +125,12 @@ void CGProj::CGGizmo::translate(float xoffset, float yoffset)
 	}
 	case GIZMO_BOX_ZAXIS:
 	{
+		// screen is 2D(X, Y), and we need to sync z-axis move with x-axis
+		// beow command is the same as glm::dot(camera.Right, worldZAxis)
+		sign = ((camera.Right.z > 0) ? 1 : -1);
+
 		deltaPos = proxyPosition.z;
-		deltaPos += xoffset;
+		deltaPos += xoffset * sign;
 		m_editProxyObject->setZposition(deltaPos);
 
 		// Gizmo Center Update

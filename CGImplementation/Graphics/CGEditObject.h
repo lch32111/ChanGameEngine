@@ -129,7 +129,7 @@ namespace CGProj
 
 		/*** Graphics Method ***/
 		void render(const glm::mat4& view, const glm::mat4& proj);
-		void UIrender(const CGAssetManager& am);
+		void UIrender(CGAssetManager& am);
 
 		bool getCMorLM();
 		void setCMorLM(bool flag);

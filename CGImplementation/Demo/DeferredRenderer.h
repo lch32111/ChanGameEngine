@@ -63,7 +63,7 @@ namespace CGProj
 		unsigned int gPosition, gNormal, gAlbedoSpec, gEmissive, gBool;
 		unsigned gRBO;
 
-		unsigned int NR_LIGHTS = 5;
+		unsigned int NR_LIGHTS = 100;
 
 		float constant = 1.0;
 		float linear = 0.7;

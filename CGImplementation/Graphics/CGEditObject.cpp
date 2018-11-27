@@ -303,7 +303,7 @@ void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 &
 	renderPrimitive();
 }
 
-void CGProj::CGEditProxyObject::UIrender(const CGAssetManager& am)
+void CGProj::CGEditProxyObject::UIrender(CGAssetManager& am)
 {
 	ImGui::Begin("Edit Object");
 
@@ -341,11 +341,36 @@ void CGProj::CGEditProxyObject::UIrender(const CGAssetManager& am)
 		break;
 	}
 
+	int cmorlm = (int)m_CMorLM;
+	ImGui::RadioButton("Color Material", &cmorlm, 0); ImGui::SameLine();
+	ImGui::RadioButton("Light Map Material", &cmorlm, 1);
+	m_CMorLM = bool(cmorlm);
+
 	if (m_CMorLM) // Light Map Material
 	{
 		ImGui::Checkbox("Diffuse Texture", &m_isLMdiffuse);
+		if (m_isLMdiffuse)
+		{
+			int selected = 0;
+			if(ImGui::Combo("Set Diffuse", &selected, CG_TEXTURE_LIST, NUM_CG_TEXTURE_ENUM))
+				setDiffuseTexture(am.getTexture(CG_TEXTURE_ENUM(selected), true));
+		}
+
 		ImGui::Checkbox("Specular Texture", &m_isLMspecular);
+		if (m_isLMspecular)
+		{
+			int selected = 0;
+			if (ImGui::Combo("Set Specular", &selected, CG_TEXTURE_LIST, NUM_CG_TEXTURE_ENUM))
+				setSpecularTexture(am.getTexture(CG_TEXTURE_ENUM(selected), true));
+		}
+
 		ImGui::Checkbox("Emissive Texture", &m_isLMemissive);
+		if (m_isLMemissive)
+		{
+			int selected = 0;
+			if (ImGui::Combo("Set Emissive", &selected, CG_TEXTURE_LIST, NUM_CG_TEXTURE_ENUM))
+				setEmissiveTexture(am.getTexture(CG_TEXTURE_ENUM(selected), true));
+		}
 	}
 	else // Colro Material
 	{

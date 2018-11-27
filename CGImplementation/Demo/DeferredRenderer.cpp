@@ -460,6 +460,9 @@ void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window,
 
 void CGProj::DeferredRenderer::scroll(double yoffset)
 {
+	// Exit out if mouse clicks on Imgui GUI
+	if (ImGui::IsMouseHoveringAnyWindow()) return;
+
 	camera.ProcessMouseScroll(yoffset);
 }
 

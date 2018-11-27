@@ -2,6 +2,9 @@
 #ifndef __CG_ASSET_UTIL_H__
 #define __CG_ASSET_UTIL_H__
 
+#include <vector>
+#include <string>
+
 namespace CGProj
 {
 	enum CG_SHADER_ENUM
@@ -27,6 +30,19 @@ namespace CGProj
 		TEXTURE_BLUE_MATRIX,
 		TEXTURE_WOOD_PANEL,
 		NUM_CG_TEXTURE_ENUM
+	};
+
+	static const char* CG_TEXTURE_LIST[] =
+	{
+		"TEXTURE_CONTAINER_DIFFUSE",
+		"TEXTURE_CONTAINER_SPECULAR",
+		"TEXTURE_FIELD_GRASS",
+		"TEXTURE_GOLD",
+		"TEXTURE_MARBLE",
+		"TEXTURE_RED_MARBLE",
+		"TEXTURE_MATRIX",
+		"TEXTURE_BLUE_MATRIX",
+		"TEXTURE_WOOD_PANEL"
 	};
 }
 

@@ -1,5 +1,10 @@
 #include "CGEditObject.h"
+
+#include <Imgui/imgui.h>
+
 #include <Graphics/GLPrimitiveUtil.h>
+#include <Graphics/CGAssetManager.h>
+
 
 // =================================================================
 /*** CG EDIT BOX    ***/
@@ -292,10 +297,63 @@ void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 &
 	// View Model Calculation Second
 	viewModel = view * viewModel;
 	m_FirstPassDefShader->setMat4("viewModel", viewModel);
-	m_FirstPassDefShader->setMat3("MVNormalMatrix", glm::mat3(glm::transpose(viewModel)));
+	m_FirstPassDefShader->setMat3("MVNormalMatrix", glm::mat3(glm::transpose(glm::inverse(viewModel))));
 	
 	// Now Ready to render. Go render according to the primitive
 	renderPrimitive();
+}
+
+void CGProj::CGEditProxyObject::UIrender(const CGAssetManager& am)
+{
+	ImGui::Begin("Edit Object");
+
+	// Proxy Id
+	ImGui::Text("Proxy Id : %d", m_BroadPhaseId);
+
+	// Primitive Type
+	switch (CGEditProxyObject::m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+		ImGui::Text("Primitive Type : AABB");
+		break;
+	case EDIT_PRIMITIVE_OBB:
+		ImGui::Text("Primitive Type : OBB");
+		break;
+	case EDIT_PRIMITIVE_SPHERE:
+		ImGui::Text("Primitive Type : Sphere");
+		break;
+	}
+
+	// Position
+	glm::vec3 pickedPos = this->getPosition();
+	ImGui::Text("Position %.2f %.2f %.2f", pickedPos.x, pickedPos.y, pickedPos.z);
+
+	// Primitive Dimension
+	switch (CGEditProxyObject::m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		glm::vec3 halfExtents = this->getHalfSize();
+		ImGui::Text("HalfSize : %.2f %.2f %.2f", halfExtents.x, halfExtents.y, halfExtents.z);
+		break;
+	case EDIT_PRIMITIVE_SPHERE:
+		ImGui::Text("Radius : %.2f", this->getRadius());
+		break;
+	}
+
+	if (m_CMorLM) // Light Map Material
+	{
+		ImGui::Checkbox("Diffuse Texture", &m_isLMdiffuse);
+		ImGui::Checkbox("Specular Texture", &m_isLMspecular);
+		ImGui::Checkbox("Emissive Texture", &m_isLMemissive);
+	}
+	else // Colro Material
+	{
+
+	}
+
+
+	ImGui::End();
 }
 
 void CGProj::CGEditProxyObject::renderPrimitive()

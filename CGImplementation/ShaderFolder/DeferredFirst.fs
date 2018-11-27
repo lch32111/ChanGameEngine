@@ -50,7 +50,7 @@ void main()
         // Light Map
         if(material.isLMdiffuse)	gAlbedoSpec.rgb = texture(material.LMdiffuse, TexCoords).rgb;
         else    gBool.r = 0;   
-        if(material.isLMspecular)    gAlbedoSpec.a = texture(material.LMspecular, TexCoords).a;
+        if(material.isLMspecular)    gAlbedoSpec.a = texture(material.LMspecular, TexCoords).r;
         else    gBool.g = 0;
         if(material.isLMemissive)    gEmissive.rgb = texture(material.LMemissive, TexCoords).rgb;
         else    gBool.b = 0;

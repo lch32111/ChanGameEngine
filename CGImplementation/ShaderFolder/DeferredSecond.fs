@@ -47,7 +47,6 @@ void main()
         
 		lighting = LMAlbedo * 0.1; // hard-coded ambient component
 		
-        
         for(int i = 0; i < NR_LIGHTS; ++i)
         {
             // calculate distance between light source and current fragment

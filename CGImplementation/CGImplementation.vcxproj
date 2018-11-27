@@ -151,6 +151,7 @@
     <ClCompile Include="GPED\GPED_world.cpp" />
     <ClCompile Include="GPED\PS_AmmoRound.cpp" />
     <ClCompile Include="GPED\PS_Box.cpp" />
+    <ClCompile Include="Graphics\CGAssetManager.cpp" />
     <ClCompile Include="Graphics\CGEditObject.cpp" />
     <ClCompile Include="Graphics\CGGizmo.cpp" />
     <ClCompile Include="Graphics\CGRenderLine.cpp" />
@@ -194,6 +195,8 @@
     <ClInclude Include="GPED\GPED_world.h" />
     <ClInclude Include="GPED\PS_AmmoRound.h" />
     <ClInclude Include="GPED\PS_Box.h" />
+    <ClInclude Include="Graphics\CGAssetManager.h" />
+    <ClInclude Include="Graphics\CGAssetUtil.h" />
     <ClInclude Include="Graphics\CGEditObject.h" />
     <ClInclude Include="Graphics\CGGizmo.h" />
     <ClInclude Include="Graphics\CGRenderLine.h" />

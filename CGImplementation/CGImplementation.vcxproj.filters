@@ -180,6 +180,9 @@
     <ClCompile Include="Graphics\CGGizmo.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\CGAssetManager.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -312,6 +315,12 @@
       <Filter>Graphics Header</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\CGGizmo.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGAssetManager.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGAssetUtil.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
   </ItemGroup>

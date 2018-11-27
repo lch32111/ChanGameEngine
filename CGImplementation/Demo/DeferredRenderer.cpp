@@ -10,34 +10,25 @@
 
 void CGProj::DeferredRenderer::initGraphics(int width, int height)
 {
+	assetManager.assetInit();
+
 	// Shader Setup
-	Deferred_First_Shader = Shader("ShaderFolder/DeferredFirst.vs", "ShaderFolder/DeferredFirst.fs");
-	Deferred_First_Shader.loadShader();
-	Deferred_First_Shader.use();
-	Deferred_First_Shader.setInt("material.LMdiffuse", 0);
-	Deferred_First_Shader.setInt("material.LMspecular", 1);
-	Deferred_First_Shader.setInt("material.LMemissive", 2);
+	Deferred_First_Shader = assetManager.getShader(SHADER_DEFERRED_FIRST);
+	Deferred_First_Shader->use();
+	Deferred_First_Shader->setInt("material.LMdiffuse", 0);
+	Deferred_First_Shader->setInt("material.LMspecular", 1);
+	Deferred_First_Shader->setInt("material.LMemissive", 2);
 
-	Deferred_Second_Shader = Shader("ShaderFolder/DeferredSecond.vs", "ShaderFolder/DeferredSecond.fs");
-	Deferred_Second_Shader.loadShader();
-	Deferred_Second_Shader.use();
-	Deferred_Second_Shader.setInt("gPosition", 0);
-	Deferred_Second_Shader.setInt("gNormal", 1);
-	Deferred_Second_Shader.setInt("gAlbedoSpec", 2);
-	Deferred_Second_Shader.setInt("gEmissive", 3);
-	Deferred_Second_Shader.setInt("gBool", 4);
+	Deferred_Second_Shader = assetManager.getShader(SHADER_DEFERRED_SECOND);
+	Deferred_Second_Shader->use();
+	Deferred_Second_Shader->setInt("gPosition", 0);
+	Deferred_Second_Shader->setInt("gNormal", 1);
+	Deferred_Second_Shader->setInt("gAlbedoSpec", 2);
+	Deferred_Second_Shader->setInt("gEmissive", 3);
+	Deferred_Second_Shader->setInt("gBool", 4);
 
-	Deferred_Post_Shader = Shader("ShaderFolder/DeferredPost.vs", "ShaderFolder/DeferredPost.fs");
-	Deferred_Post_Shader.loadShader();
-	Deferred_Post_Shader.use();
-	Deferred_Post_Shader.setInt("screenTexture", 0);
-
-	Simple_Shader = Shader("ShaderFolder/simpleColorRender.vs", "ShaderFolder/simpleColorRender.fs");
-	Simple_Shader.loadShader();
-	Simple_Shader.use();
-
-	wireShader = Shader("ShaderFolder/wireRender.vs", "ShaderFolder/wireRender.fs");
-	wireShader.loadShader();
+	Simple_Shader = assetManager.getShader(SHADER_SIMPLE_COLOR_RENDER);
+	wireShader = assetManager.getShader(SHADER_WIRE_RENDER);
 	// Shader Setup
 
 	// First Pass Setup For Deferred Rendering
@@ -101,10 +92,6 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	// First Pass Setup For Deferred Rendering
 
 	// Object Manual Setting + Light Manual Setting
-	boxTexture = TextureFromFile("ImageFolder/container2.png", true);
-	boxSpecular = TextureFromFile("ImageFolder/container2_specular.png", true);
-	woodTexture = TextureFromFile("ImageFolder/woodpanel.png", true);
-	emissiveTexture = TextureFromFile("ImageFolder/matrix.jpg", true);
 
 	editProxies.reserve(20); // prevent STL from reallocating dynamically because of broad phase user data
 	for (unsigned i = 0; i < 15; ++i)
@@ -112,18 +99,18 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 		editProxies.push_back(CGEditProxyObject());
 		editProxies[i].connectBroadPhase(&dBroadPhase);
 		editProxies[i].setBroadPhaseId(dBroadPhase.CreateProxy(editProxies[i].getFitAABB(), &editProxies[i]));
-		editProxies[i].setFirstPassDefShader(&Deferred_First_Shader);
+		editProxies[i].setFirstPassDefShader(Deferred_First_Shader);
 		
 		editProxies[i].setCMorLM(true);
 		
 		editProxies[i].setDiffuseFlag(true);
-		editProxies[i].setDiffuseTexture(boxTexture);
+		editProxies[i].setDiffuseTexture(assetManager.getTexture(TEXTURE_CONTAINER_DIFFUSE, true));
 
 		editProxies[i].setSpecularFlag(true);
-		editProxies[i].setSpecularTexture(boxSpecular);
+		editProxies[i].setSpecularTexture(assetManager.getTexture(TEXTURE_CONTAINER_SPECULAR, true));
 
 		editProxies[i].setEmissiveFlag(true);
-		editProxies[i].setEmissiveTexture(emissiveTexture);
+		editProxies[i].setEmissiveTexture(assetManager.getTexture(TEXTURE_BLUE_MATRIX, true));
 	}
 
 
@@ -200,50 +187,7 @@ void CGProj::DeferredRenderer::updateImgui()
 
 	if (pickedEditBox)
 	{
-		ImGui::Begin("Edit Object");
-
-		// Proxy Id
-		ImGui::Text("Proxy Id : %d", pickedEditBox->getBroadPhaseId());
-		
-		// Primitive Type
-		EditPrimitiveType pType = pickedEditBox->getEditShape();
-		switch (pType)
-		{
-		case EDIT_PRIMITIVE_AABB:
-			ImGui::Text("Primitive Type : AABB");
-			break;
-		case EDIT_PRIMITIVE_OBB:
-			ImGui::Text("Primitive Type : OBB");
-			break;
-		case EDIT_PRIMITIVE_SPHERE:
-			ImGui::Text("Primitive Type : Sphere");
-			break;
-		}
-
-		// Position
-		glm::vec3 pickedPos = pickedEditBox->getPosition();
-		ImGui::Text("Position %.2f %.2f %.2f", pickedPos.x, pickedPos.y, pickedPos.z);
-
-		// Primitive Dimension
-		switch (pType)
-		{
-		case EDIT_PRIMITIVE_AABB:
-		case EDIT_PRIMITIVE_OBB:
-			glm::vec3 halfExtents = pickedEditBox->getHalfSize();
-			ImGui::Text("HalfSize : %.2f %.2f %.2f", halfExtents.x, halfExtents.y, halfExtents.z);
-			break;
-		case EDIT_PRIMITIVE_SPHERE:
-			ImGui::Text("Radius : %.2f", pickedEditBox->getRadius());
-			break;
-		}
-
-		if (pickedEditBox->getCMorLM()) // Light Map Material
-		{
-
-		}
-		
-
-		ImGui::End();
+		pickedEditBox->UIrender(assetManager);
 	}
 }
 
@@ -273,11 +217,14 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	model = glm::mat4(1.0);
 	model = glm::translate(model, glm::vec3(0, -5, 0));
 	model = glm::scale(model, glm::vec3(10));
-	Deferred_First_Shader.setBool("material.isLMemissive", false);
-	Deferred_First_Shader.setMat4("viewModel", view * model);
-	Deferred_First_Shader.setMat3("MVNormalMatrix", glm::mat3(glm::transpose(glm::inverse(view * model))));
+	Deferred_First_Shader->setBool("material.CMorLM", true);
+	Deferred_First_Shader->setBool("material.isLMdiffuse", true);
+	Deferred_First_Shader->setBool("material.isLMspecular", false);
+	Deferred_First_Shader->setBool("material.isLMemissive", false);
+	Deferred_First_Shader->setMat4("viewModel", view * model);
+	Deferred_First_Shader->setMat3("MVNormalMatrix", glm::mat3(glm::transpose(glm::inverse(view * model))));
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, woodTexture);
+	glBindTexture(GL_TEXTURE_2D, assetManager.getTexture(TEXTURE_WOOD_PANEL, true));
 	renderQuad();
 	// First Pass
 
@@ -287,7 +234,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	if(wireDraw)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // This quad always fills the screen plane!
 
-	Deferred_Second_Shader.use();
+	Deferred_Second_Shader->use();
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gPosition);
 	glActiveTexture(GL_TEXTURE1);
@@ -300,11 +247,11 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	glBindTexture(GL_TEXTURE_2D, gBool);
 	for (unsigned int i = 0; i < lightPositions.size(); ++i)
 	{
-		Deferred_Second_Shader.setVec3("lights[" + std::to_string(i) + "].Position", glm::vec3(view * glm::vec4(lightPositions[i], 1.0)));
-		Deferred_Second_Shader.setVec3("lights[" + std::to_string(i) + "].Color", lightColors[i]);
-		Deferred_Second_Shader.setFloat("lights[" + std::to_string(i) + "].Radius", lightRadius[i]);
-		Deferred_Second_Shader.setFloat("lights[" + std::to_string(i) + "].Linear", linear);
-		Deferred_Second_Shader.setFloat("lights[" + std::to_string(i) + "].Quadratic", quadratic);
+		Deferred_Second_Shader->setVec3("lights[" + std::to_string(i) + "].Position", glm::vec3(view * glm::vec4(lightPositions[i], 1.0)));
+		Deferred_Second_Shader->setVec3("lights[" + std::to_string(i) + "].Color", lightColors[i]);
+		Deferred_Second_Shader->setFloat("lights[" + std::to_string(i) + "].Radius", lightRadius[i]);
+		Deferred_Second_Shader->setFloat("lights[" + std::to_string(i) + "].Linear", linear);
+		Deferred_Second_Shader->setFloat("lights[" + std::to_string(i) + "].Quadratic", quadratic);
 	}
 	renderScreenQuad();
 	// Second Pass + Post Process
@@ -320,23 +267,23 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	
 	if (lightDraw)
 	{
-		Simple_Shader.use();
-		Simple_Shader.setMat4("view", view);
-		Simple_Shader.setMat4("projection", projection);
+		Simple_Shader->use();
+		Simple_Shader->setMat4("view", view);
+		Simple_Shader->setMat4("projection", projection);
 		for (unsigned int i = 0; i < lightPositions.size(); ++i)
 		{
 			glm::mat4 t_model(1.0);
 			t_model = glm::translate(t_model, lightPositions[i]);
 			t_model = glm::scale(t_model, glm::vec3(0.25f));
-			Simple_Shader.setMat4("model", t_model);
-			Simple_Shader.setVec3("Color", lightColors[i]);
+			Simple_Shader->setMat4("model", t_model);
+			Simple_Shader->setVec3("Color", lightColors[i]);
 			renderCube();
 		}
 	}
 
 	// Broad Phase Debug Rendering
 	if (BroadDebug)
-		bRender.draw(&wireShader, &projection, &view);
+		bRender.draw(wireShader, &projection, &view);
 
 	if (clickDraw)
 	{

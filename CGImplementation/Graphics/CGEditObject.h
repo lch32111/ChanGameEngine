@@ -4,6 +4,8 @@
 #include <GPED/GPED_Precision.h>
 #include <GPED/CGBroadPhase.h>
 
+#include <Graphics/CGAssetManager.h>
+
 namespace CGProj
 {
 	enum EditPrimitiveType // this enum is used to represent object collider
@@ -127,6 +129,7 @@ namespace CGProj
 
 		/*** Graphics Method ***/
 		void render(const glm::mat4& view, const glm::mat4& proj);
+		void UIrender(const CGAssetManager& am);
 
 		bool getCMorLM();
 		void setCMorLM(bool flag);

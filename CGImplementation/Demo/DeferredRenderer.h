@@ -9,6 +9,7 @@
 #include <Graphics/CGRenderLine.h>
 #include <Graphics/CGEditObject.h>
 #include <Graphics/CGGizmo.h>
+#include <Graphics/CGAssetManager.h>
 
 
 #include <GPED/CGBroadPhase.h>
@@ -52,20 +53,17 @@ namespace CGProj
 		bool clickDraw = false;
 		bool rayHitDraw = false;
 
-		Shader Deferred_First_Shader;
-		Shader Deferred_Second_Shader;
-		Shader Deferred_Post_Shader;
-		Shader Simple_Shader;
-		Shader wireShader;
+		Shader* Deferred_First_Shader;
+		Shader* Deferred_Second_Shader;
+		Shader* Deferred_Post_Shader;
+		Shader* Simple_Shader;
+		Shader* wireShader;
 
 		unsigned int gFBO;
 		unsigned int gPosition, gNormal, gAlbedoSpec, gEmissive, gBool;
 		unsigned gRBO;
 
-		unsigned int boxTexture, boxSpecular;
-		unsigned int woodTexture;
-		unsigned int emissiveTexture;
-		unsigned int NR_LIGHTS = 200;
+		unsigned int NR_LIGHTS = 5;
 
 		float constant = 1.0;
 		float linear = 0.7;
@@ -115,6 +113,8 @@ namespace CGProj
 		std::vector<CGEditProxyObject> editProxies;
 		CGEditProxyObject* pickedEditBox = nullptr;
 		CGGizmo gizmoTest;
+
+		CGAssetManager assetManager;
 	};
 }
 

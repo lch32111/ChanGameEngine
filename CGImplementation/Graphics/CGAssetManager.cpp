@@ -14,7 +14,7 @@ Shader * CGProj::CGAssetManager::getShader(CG_SHADER_ENUM _shaderEnum)
 	return &m_shaders[_shaderEnum];
 }
 
-Shader CGProj::CGAssetManager::getShader(CG_SHADER_ENUM _shaderEnum, char none)
+Shader CGProj::CGAssetManager::getShader(CG_SHADER_ENUM _shaderEnum, char none = 0)
 {
 	if (m_shaders[_shaderEnum].isloadad == false)
 	{

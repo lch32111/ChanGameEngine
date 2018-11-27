@@ -15,7 +15,7 @@ namespace CGProj
 	{
 	public:
 		Shader* getShader(CG_SHADER_ENUM _shaderEnum);
-		Shader getShader(CG_SHADER_ENUM _shaderEnum, char none = '\0'); // add a char parameter to distinguish pointer-return type
+		Shader getShader(CG_SHADER_ENUM _shaderEnum, char); // add a char parameter to distinguish pointer-return type
 
 		unsigned getTexture(CG_TEXTURE_ENUM _textureEnum, bool gamma);
 
@@ -50,6 +50,9 @@ namespace CGProj
 
 			m_NoGammaTexture[TEXTURE_MATRIX] = TextureFromFile("ImageFolder/matrix.jpg", false);
 			m_GammaTextures[TEXTURE_MATRIX] = TextureFromFile("ImageFolder/matrix.jpg", true);
+
+			m_NoGammaTexture[TEXTURE_BLUE_MATRIX] = TextureFromFile("ImageFolder/bluematrix.jpg", false);
+			m_GammaTextures[TEXTURE_BLUE_MATRIX] = TextureFromFile("ImageFolder/bluematrix.jpg", true);
 
 			m_NoGammaTexture[TEXTURE_WOOD_PANEL] = TextureFromFile("ImageFolder/woodpanel.png", false);
 			m_GammaTextures[TEXTURE_WOOD_PANEL] = TextureFromFile("ImageFolder/woodpanel.png", true);

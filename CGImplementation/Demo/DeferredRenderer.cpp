@@ -118,11 +118,27 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	objectPositions.push_back(glm::vec3(3.0, -3.0, 3.0));
 
 	GPED::Random ran(glfwGetTime());
-	for (unsigned i = 0; i < editBoxNumb; ++i)
+
+	editProxies.reserve(20);
+	for (unsigned i = 0; i < 15; ++i)
 	{
-		editBoxes[i].connectBroadPhase(&dBroadPhase);
-		editBoxes[i].setBroadPhaseId(dBroadPhase.CreateProxy(editBoxes[i].getFitAABB(), &editBoxes[i]));
+		editProxies.push_back(CGEditProxyObject());
+		editProxies[i].connectBroadPhase(&dBroadPhase);
+		editProxies[i].setBroadPhaseId(dBroadPhase.CreateProxy(editProxies[i].getFitAABB(), &editProxies[i]));
+		editProxies[i].setFirstPassDefShader(&Deferred_First_Shader);
+		
+		editProxies[i].setCMorLM(true);
+		
+		editProxies[i].setDiffuseFlag(true);
+		editProxies[i].setDiffuseTexture(boxTexture);
+
+		editProxies[i].setSpecularFlag(true);
+		editProxies[i].setSpecularTexture(boxSpecular);
+
+		editProxies[i].setEmissiveFlag(true);
+		editProxies[i].setEmissiveTexture(emissiveTexture);
 	}
+
 
 	srand(13);
 	for (unsigned int i = 0; i < NR_LIGHTS; i++)
@@ -195,7 +211,41 @@ void CGProj::DeferredRenderer::updateImgui()
 	{
 		ImGui::Begin("Edit Object");
 
+		// Proxy Id
 		ImGui::Text("Proxy Id : %d", pickedEditBox->getBroadPhaseId());
+		
+		// Primitive Type
+		EditPrimitiveType pType = pickedEditBox->getEditShape();
+		switch (pType)
+		{
+		case EDIT_PRIMITIVE_AABB:
+			ImGui::Text("Primitive Type : AABB");
+			break;
+		case EDIT_PRIMITIVE_OBB:
+			ImGui::Text("Primitive Type : OBB");
+			break;
+		case EDIT_PRIMITIVE_SPHERE:
+			ImGui::Text("Primitive Type : Sphere");
+			break;
+		}
+
+		// Position
+		glm::vec3 pickedPos = pickedEditBox->getPosition();
+		ImGui::Text("Position %.2f %.2f %.2f", pickedPos.x, pickedPos.y, pickedPos.z);
+
+		// Primitive Dimension
+		switch (pType)
+		{
+		case EDIT_PRIMITIVE_AABB:
+		case EDIT_PRIMITIVE_OBB:
+			glm::vec3 halfExtents = pickedEditBox->getHalfSize();
+			ImGui::Text("HalfSize : %.2f %.2f %.2f", halfExtents.x, halfExtents.y, halfExtents.z);
+			break;
+		case EDIT_PRIMITIVE_SPHERE:
+			ImGui::Text("Radius : %.2f", pickedEditBox->getRadius());
+			break;
+		}
+		
 
 		ImGui::End();
 	}
@@ -219,26 +269,9 @@ void CGProj::DeferredRenderer::display(int width, int height)
 
 	glClearColor(0, 0, 0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	Deferred_First_Shader.use();
-	Deferred_First_Shader.setMat4("projection", projection);
-	Deferred_First_Shader.setBool("material.CMorLM", true);
-	Deferred_First_Shader.setBool("material.isLMdiffuse", true);
-	Deferred_First_Shader.setBool("material.isLMspecular", true);
-	Deferred_First_Shader.setBool("material.isLMemissive", true);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, boxTexture);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, boxSpecular);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, emissiveTexture);
-	for (unsigned i = 0; i < editBoxNumb; ++i)
+	for (unsigned i = 0; i < editProxies.size(); ++i)
 	{
-		model = glm::mat4(1.0);
-		model = glm::translate(model, editBoxes[i].getPosition());
-		model = glm::scale(model, editBoxes[i].getHalfSize());
-		Deferred_First_Shader.setMat4("viewModel", view * model);
-		Deferred_First_Shader.setMat3("MVNormalMatrix", glm::mat3(glm::transpose(glm::inverse(view * model))));
-		renderCube();
+		editProxies[i].render(view, projection);
 	}
 
 	model = glm::mat4(1.0);

@@ -1,4 +1,5 @@
 #include "CGEditObject.h"
+#include <Graphics/GLPrimitiveUtil.h>
 
 // =================================================================
 /*** CG EDIT BOX    ***/
@@ -211,7 +212,7 @@ void CGProj::CGEditSpere::updateAABB()
 
 CGProj::CGEditProxyObject::CGEditProxyObject()
 {
-	CGEditProxyObject::setProxyType(EDIT_PROXY_DYNAMIC);
+	CGEditProxyObject::setProxyType(EDIT_PROXY_STATIC);
 	CGEditProxyObject::setEditShape(EDIT_PRIMITIVE_AABB);
 }
 
@@ -231,6 +232,11 @@ int CGProj::CGEditProxyObject::getBroadPhaseId()
 	return m_BroadPhaseId;
 }
 
+void CGProj::CGEditProxyObject::setFirstPassDefShader(Shader * shader)
+{
+	CGEditProxyObject::m_FirstPassDefShader = shader;
+}
+
 void CGProj::CGEditProxyObject::updateBroadPhaseProxy()
 {
 	if (m_BroadPhaseId != Node_Null)
@@ -241,7 +247,7 @@ void CGProj::CGEditProxyObject::setEditShape(EditPrimitiveType e)
 {
 	CGEditProxyObject::m_PrimitiveType = e;
 
-	if (e <= EDIT_PRIMITIVE_OBB) // e may be AABBor OBB
+	if (e <= EDIT_PRIMITIVE_OBB) // e may be AABB or OBB
 	{
 		// You need to set specific primitive type for the bounding volume.
 		CGEditBox::setPrimitiveType(e);
@@ -253,6 +259,115 @@ void CGProj::CGEditProxyObject::setEditShape(EditPrimitiveType e)
 CGProj::EditPrimitiveType CGProj::CGEditProxyObject::getEditShape()
 {
 	return m_PrimitiveType;
+}
+
+void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 & proj)
+{
+	m_FirstPassDefShader->use();
+	
+	// Material Setting
+	m_FirstPassDefShader->setBool("material.CMorLM", m_CMorLM);
+	m_FirstPassDefShader->setBool("material.isLMdiffuse", m_isLMdiffuse);
+	m_FirstPassDefShader->setBool("material.isLMspecular", m_isLMspecular);
+	m_FirstPassDefShader->setBool("material.isLMemissive", m_isLMemissive);
+
+	if (m_CMorLM) // CM == false, LM == true
+	{
+		if (m_isLMdiffuse) glActiveTexture(GL_TEXTURE0), glBindTexture(GL_TEXTURE_2D, m_diffuseTexture);
+		if (m_isLMspecular) glActiveTexture(GL_TEXTURE1), glBindTexture(GL_TEXTURE_2D, m_specularTexture);
+		if (m_isLMemissive) glActiveTexture(GL_TEXTURE2), glBindTexture(GL_TEXTURE_2D, m_emissiveTexture);
+	}
+	// Material Setting
+
+	// Vertex Setting
+	m_FirstPassDefShader->setMat4("projection", proj);
+	
+	glm::mat4 viewModel(1.0);
+	
+	// Model Calculation First
+	viewModel = glm::translate(viewModel, this->getPosition());
+	// model = glm::rotate(model, ) // TODO: add the rotation function later
+	viewModel = glm::scale(viewModel, this->getScale());
+
+	// View Model Calculation Second
+	viewModel = view * viewModel;
+	m_FirstPassDefShader->setMat4("viewModel", viewModel);
+	m_FirstPassDefShader->setMat3("MVNormalMatrix", glm::mat3(glm::transpose(viewModel)));
+	
+	// Now Ready to render. Go render according to the primitive
+	renderPrimitive();
+}
+
+void CGProj::CGEditProxyObject::renderPrimitive()
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		renderCube();
+		break;
+	case EDIT_PRIMITIVE_SPHERE:
+		renderSphere();
+		break;
+	default:
+		assert(0);
+		break;
+	}
+}
+
+bool CGProj::CGEditProxyObject::getCMorLM()
+{
+	return CGEditProxyObject::m_CMorLM;
+}
+
+void CGProj::CGEditProxyObject::setCMorLM(bool flag)
+{
+	CGEditProxyObject::m_CMorLM = flag;
+}
+
+bool CGProj::CGEditProxyObject::isDiffuseOn()
+{
+	return CGEditProxyObject::m_isLMdiffuse;
+}
+
+void CGProj::CGEditProxyObject::setDiffuseFlag(bool flag)
+{
+	CGEditProxyObject::m_isLMdiffuse = flag;
+}
+
+void CGProj::CGEditProxyObject::setDiffuseTexture(unsigned texId)
+{
+	CGEditProxyObject::m_diffuseTexture = texId;
+}
+
+bool CGProj::CGEditProxyObject::isSpecularOn()
+{
+	return CGEditProxyObject::m_isLMspecular;
+}
+
+void CGProj::CGEditProxyObject::setSpecularFlag(bool flag)
+{
+	CGEditProxyObject::m_isLMspecular = flag;
+}
+
+void CGProj::CGEditProxyObject::setSpecularTexture(unsigned texId)
+{
+	CGEditProxyObject::m_specularTexture = texId;
+}
+
+bool CGProj::CGEditProxyObject::isEmissiveOn()
+{
+	return CGEditProxyObject::m_isLMemissive;
+}
+
+void CGProj::CGEditProxyObject::setEmissiveFlag(bool flag)
+{
+	CGEditProxyObject::m_isLMemissive = flag;
+}
+
+void CGProj::CGEditProxyObject::setEmissiveTexture(unsigned texId)
+{
+	CGEditProxyObject::m_emissiveTexture = texId;
 }
 
 void CGProj::CGEditProxyObject::setProxyType(EditProxyType e)
@@ -369,6 +484,21 @@ glm::vec3 CGProj::CGEditProxyObject::getPosition()
 		return CGEditBox::getPosition();
 	case EDIT_PRIMITIVE_SPHERE:
 		return CGEditSpere::getPosition();
+	default:
+		assert(0);
+		break;
+	}
+}
+
+glm::vec3 CGProj::CGEditProxyObject::getScale()
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		return CGEditBox::getHalfSize();
+	case EDIT_PRIMITIVE_SPHERE:
+		return glm::vec3(CGEditSpere::getRadius());
 	default:
 		assert(0);
 		break;

@@ -83,7 +83,7 @@ namespace CGProj
 			bool RayCastCallback(const GPED::c3RayInput& input, int nodeId)
 			{
 				void* data = broadPhase->GetUserData(nodeId);
-				CGEditBox* box = (CGEditBox*)data;
+				CGEditProxyObject* box = (CGEditProxyObject*)data;
 				
 				GPED::c3RayOutput output;
 				bool hit = GPED::rayaabbIntersection(output, input, box->getFitAABB());
@@ -112,8 +112,7 @@ namespace CGProj
 		CGRenderLine orinentLineRen;
 		// Broad Phase
 
-		const static int editBoxNumb = 9;
-		CGEditProxyObject editBoxes[editBoxNumb];
+		std::vector<CGEditProxyObject> editProxies;
 		CGEditProxyObject* pickedEditBox = nullptr;
 		CGGizmo gizmoTest;
 	};

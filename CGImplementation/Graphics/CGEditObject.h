@@ -83,9 +83,15 @@ namespace CGProj
 	public:
 		CGEditProxyObject();
 
+		/***  Init Method(you should use these methods to activate this class) ***/
+		// You should connect EditProxyObject with BroadPhase
 		void connectBroadPhase(CGBroadPhase* broad);
 		void setBroadPhaseId(int id);
 		int getBroadPhaseId();
+
+		void setFirstPassDefShader(Shader* shader);
+
+		/***  Init Method ***/
 
 		/*** Primitive Method ***/
 		void setEditShape(EditPrimitiveType e);
@@ -98,6 +104,8 @@ namespace CGProj
 		void setYposition(const GPED::real y);
 		void setZposition(const GPED::real z);
 		glm::vec3 getPosition();
+
+		glm::vec3 getScale();
 
 		GPED::c3AABB getFitAABB();
 		// Common Method for Box, Sphere
@@ -117,15 +125,54 @@ namespace CGProj
 		// Sphere Specific Method
 		/*** Primitive Method ***/
 
+		/*** Graphics Method ***/
+		void render(const glm::mat4& view, const glm::mat4& proj);
+
+		bool getCMorLM();
+		void setCMorLM(bool flag);
+
+		bool isDiffuseOn();
+		void setDiffuseFlag(bool flag);
+		void setDiffuseTexture(unsigned texId);
+
+		bool isSpecularOn();
+		void setSpecularFlag(bool flag);
+		void setSpecularTexture(unsigned texId);
+
+		bool isEmissiveOn();
+		void setEmissiveFlag(bool flag);
+		void setEmissiveTexture(unsigned texId);
+		/*** Graphics Method ***/
+
+		/*** Proxy(Physics) Method ***/
 		void setProxyType(EditProxyType e);
 		EditProxyType getProxyType();
+		/*** Proxy(Physics) Method ***/
 	private:
 		int m_BroadPhaseId = Node_Null;
 		CGBroadPhase* m_BroadPhase;
 		void updateBroadPhaseProxy();
 
-		EditProxyType m_ProxyType;
 		EditPrimitiveType m_PrimitiveType;
+
+		// Graphics
+		Shader* m_FirstPassDefShader = nullptr; 
+
+		bool m_CMorLM = false; // CM == false, LM == true
+
+		// Light Map Materal
+		bool m_isLMdiffuse = false;
+		bool m_isLMspecular = false;
+		bool m_isLMemissive = false;
+		unsigned m_diffuseTexture = 0;
+		unsigned m_specularTexture = 0;
+		unsigned m_emissiveTexture = 0;
+		// Light Map Materal
+
+		void renderPrimitive();
+		// Graphics
+
+		EditProxyType m_ProxyType;
 	};
 
 	enum EditLightType

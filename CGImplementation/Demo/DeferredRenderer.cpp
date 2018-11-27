@@ -106,20 +106,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	woodTexture = TextureFromFile("ImageFolder/woodpanel.png", true);
 	emissiveTexture = TextureFromFile("ImageFolder/matrix.jpg", true);
 
-	std::vector<glm::vec3> objectPositions;
-	objectPositions.push_back(glm::vec3(-3.0, -3.0, -3.0));
-	objectPositions.push_back(glm::vec3(0.0, -3.0, -3.0));
-	objectPositions.push_back(glm::vec3(3.0, -3.0, -3.0));
-	objectPositions.push_back(glm::vec3(-3.0, -3.0, 0.0));
-	objectPositions.push_back(glm::vec3(0.0, -3.0, 0.0));
-	objectPositions.push_back(glm::vec3(3.0, -3.0, 0.0));
-	objectPositions.push_back(glm::vec3(-3.0, -3.0, 3.0));
-	objectPositions.push_back(glm::vec3(0.0, -3.0, 3.0));
-	objectPositions.push_back(glm::vec3(3.0, -3.0, 3.0));
-
-	GPED::Random ran(glfwGetTime());
-
-	editProxies.reserve(20);
+	editProxies.reserve(20); // prevent STL from reallocating dynamically because of broad phase user data
 	for (unsigned i = 0; i < 15; ++i)
 	{
 		editProxies.push_back(CGEditProxyObject());
@@ -164,15 +151,19 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 		lightRadius.push_back(radius);
 	}
 
+	// Debug Render Setting
 	bRender.connectTree(dBroadPhase.getTree());
 	bRender.setColor(glm::vec3(1, 0, 0), glm::vec3(1, 1, 0));
 	bRender.setLineWidth(1.5f, 1.f);
 	lineRen = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
 	rayRen = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
 	orinentLineRen = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
+	// Debug Render Setting
 
+	// Gizmo Setting
 	gizmoTest.initGizmo();
 	gizmoTest.setAxisWidth(5.0);
+	// Gizmo Setting
 }
 
 void CGProj::DeferredRenderer::initImgui()
@@ -244,6 +235,11 @@ void CGProj::DeferredRenderer::updateImgui()
 		case EDIT_PRIMITIVE_SPHERE:
 			ImGui::Text("Radius : %.2f", pickedEditBox->getRadius());
 			break;
+		}
+
+		if (pickedEditBox->getCMorLM()) // Light Map Material
+		{
+
 		}
 		
 

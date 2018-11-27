@@ -1,0 +1,65 @@
+#pragma once
+#ifndef __CG_ASSET_MANAGER_H__
+#define __CG_ASSET_MANAGER_H__
+
+#include <Graphics/Shader.h>
+#include <Graphics/CGAssetUtil.h>
+#include <Graphics/GLTextureUtility.h>
+
+namespace CGProj
+{
+	/** 2018-11-27 Chanhaeng Lee 
+	 * This class manages all of assets such as model, shader, texture and so on.
+	 */
+	class CGAssetManager
+	{
+	public:
+		Shader* getShader(CG_SHADER_ENUM _shaderEnum);
+		Shader getShader(CG_SHADER_ENUM _shaderEnum, char none = '\0'); // add a char parameter to distinguish pointer-return type
+
+		unsigned getTexture(CG_TEXTURE_ENUM _textureEnum, bool gamma);
+
+		// Manual Setting
+		void assetInit()
+		{
+			m_shaders[SHADER_DEFERRED_FIRST] = Shader("ShaderFolder/DeferredFirst.vs", "ShaderFolder/DeferredFirst.fs");
+			m_shaders[SHADER_DEFERRED_SECOND] = Shader("ShaderFolder/DeferredSecond.vs", "ShaderFolder/DeferredSecond.fs");
+			m_shaders[SHADER_CG_LINE] = Shader("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
+			m_shaders[SHADER_SIMPLE_RENDER] = Shader("ShaderFolder/simpleRender.vs", "ShaderFolder/simpleRender.fs");
+			m_shaders[SHADER_SIMPLE_COLOR_RENDER] = Shader("ShaderFolder/simpleColorRender.vs", "ShaderFolder/simpleColorRender.fs");
+			m_shaders[SHADER_WIRE_RENDER] = Shader("ShaderFolder/wireRender.vs", "ShaderFolder/wireRender.fs");
+
+			// TODO: make texture class for on-demand process. TextureFromFile() is just loading the image...
+			m_NoGammaTexture[TEXTURE_CONTAINER_DIFFUSE] = TextureFromFile("ImageFolder/container2.png", false);
+			m_GammaTextures[TEXTURE_CONTAINER_DIFFUSE] = TextureFromFile("ImageFolder/container2.png", true);
+
+			m_NoGammaTexture[TEXTURE_CONTAINER_SPECULAR] = TextureFromFile("ImageFolder/container2_specular.png", false);
+			m_GammaTextures[TEXTURE_CONTAINER_SPECULAR] = TextureFromFile("ImageFolder/container2_specular.png", true);
+
+			m_NoGammaTexture[TEXTURE_FIELD_GRASS] = TextureFromFile("ImageFolder/fieldGrass.jpg", false);
+			m_GammaTextures[TEXTURE_FIELD_GRASS] = TextureFromFile("ImageFolder/fieldGrass.jpg", true);
+
+			m_NoGammaTexture[TEXTURE_GOLD] = TextureFromFile("ImageFolder/gold.jpg", false);
+			m_GammaTextures[TEXTURE_GOLD] = TextureFromFile("ImageFolder/gold.jpg", true);
+			
+			m_NoGammaTexture[TEXTURE_MARBLE] = TextureFromFile("ImageFolder/marble.jpg", false);
+			m_GammaTextures[TEXTURE_MARBLE] = TextureFromFile("ImageFolder/marble.jpg", true);
+
+			m_NoGammaTexture[TEXTURE_RED_MARBLE] = TextureFromFile("ImageFolder/redMarble.jpg", false);
+			m_GammaTextures[TEXTURE_RED_MARBLE] = TextureFromFile("ImageFolder/redMarble.jpg", true);
+
+			m_NoGammaTexture[TEXTURE_MATRIX] = TextureFromFile("ImageFolder/matrix.jpg", false);
+			m_GammaTextures[TEXTURE_MATRIX] = TextureFromFile("ImageFolder/matrix.jpg", true);
+
+			m_NoGammaTexture[TEXTURE_WOOD_PANEL] = TextureFromFile("ImageFolder/woodpanel.png", false);
+			m_GammaTextures[TEXTURE_WOOD_PANEL] = TextureFromFile("ImageFolder/woodpanel.png", true);
+		}
+	private:
+		Shader m_shaders[NUM_CG_SHADER_ENUM];
+
+		unsigned m_NoGammaTexture[NUM_CG_TEXTURE_ENUM];
+		unsigned m_GammaTextures[NUM_CG_TEXTURE_ENUM];
+	};
+}
+
+#endif

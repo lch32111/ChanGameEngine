@@ -5,7 +5,6 @@
 #include <Graphics/GLPrimitiveUtil.h>
 #include <Graphics/CGAssetManager.h>
 
-
 // =================================================================
 /*** CG EDIT BOX    ***/
 CGProj::CGEditBox::CGEditBox()
@@ -213,68 +212,376 @@ void CGProj::CGEditSpere::updateAABB()
 // =================================================================
 
 // =================================================================
-/*** CG EDIT Proxy Object  ***/
-
-CGProj::CGEditProxyObject::CGEditProxyObject()
+/*** CG EDIT Object  ***/
+CGProj::CGEditObject::CGEditObject()
 {
-	CGEditProxyObject::setProxyType(EDIT_PROXY_STATIC);
-	CGEditProxyObject::setEditShape(EDIT_PRIMITIVE_AABB);
+	setObjectType(EDIT_OBJECT_PROXY);
+	setEditShape(EDIT_PRIMITIVE_AABB);
 }
 
-void CGProj::CGEditProxyObject::connectBroadPhase(CGBroadPhase * broad)
+void CGProj::CGEditObject::connectBroadPhase(CGBroadPhase * broad)
 {
 	assert(broad != nullptr);
 	m_BroadPhase = broad;
 }
 
-void CGProj::CGEditProxyObject::setBroadPhaseId(int id)
+void CGProj::CGEditObject::setBroadPhaseId(int id)
 {
 	m_BroadPhaseId = id;
 }
 
-int CGProj::CGEditProxyObject::getBroadPhaseId()
+int CGProj::CGEditObject::getBroadPhaseId()
 {
 	return m_BroadPhaseId;
 }
 
-void CGProj::CGEditProxyObject::setFirstPassDefShader(Shader * shader)
+void CGProj::CGEditObject::setFirstPassDefShader(Shader * shader)
 {
-	CGEditProxyObject::m_FirstPassDefShader = shader;
+	m_DefShader = shader;
 }
 
-void CGProj::CGEditProxyObject::updateBroadPhaseProxy()
+void CGProj::CGEditObject::setEditShape(EditPrimitiveType e)
 {
-	if (m_BroadPhaseId != Node_Null)
-		m_BroadPhase->UpdateProxy(m_BroadPhaseId, CGEditProxyObject::getFitAABB());
-}
-
-void CGProj::CGEditProxyObject::setEditShape(EditPrimitiveType e)
-{
-	CGEditProxyObject::m_PrimitiveType = e;
+	m_PrimitiveType = e;
 
 	if (e <= EDIT_PRIMITIVE_OBB) // e may be AABB or OBB
 	{
 		// You need to set specific primitive type for the bounding volume.
-		CGEditBox::setPrimitiveType(e);
+		m_EditBox.setPrimitiveType(e);
 	}
 
 	updateBroadPhaseProxy();
 }
 
-CGProj::EditPrimitiveType CGProj::CGEditProxyObject::getEditShape()
+CGProj::EditPrimitiveType CGProj::CGEditObject::getEditShape()
 {
 	return m_PrimitiveType;
 }
 
+void CGProj::CGEditObject::setPosition(const glm::vec3 & p)
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		m_EditBox.setPosition(p);
+		break;
+	case EDIT_PRIMITIVE_SPHERE:
+		m_EditSphere.setPosition(p);
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	updateBroadPhaseProxy();
+}
+
+void CGProj::CGEditObject::setPosition(const GPED::real x, const GPED::real y, const GPED::real z)
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		m_EditBox.setPosition(x, y, z);
+		break;
+	case EDIT_PRIMITIVE_SPHERE:
+		m_EditSphere.setPosition(x, y, z);
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	updateBroadPhaseProxy();
+}
+
+void CGProj::CGEditObject::setXposition(const GPED::real x)
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		m_EditBox.setXposition(x);
+		break;
+	case EDIT_PRIMITIVE_SPHERE:
+		m_EditSphere.setXposition(x);
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	updateBroadPhaseProxy();
+}
+
+void CGProj::CGEditObject::setYposition(const GPED::real y)
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		m_EditBox.setYposition(y);
+		break;
+	case EDIT_PRIMITIVE_SPHERE:
+		m_EditSphere.setYposition(y);
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	updateBroadPhaseProxy();
+}
+
+void CGProj::CGEditObject::setZposition(const GPED::real z)
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		m_EditBox.setZposition(z);
+		break;
+	case EDIT_PRIMITIVE_SPHERE:
+		m_EditSphere.setZposition(z);
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	updateBroadPhaseProxy();
+}
+
+glm::vec3 CGProj::CGEditObject::getPosition()
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		return m_EditBox.getPosition();
+	case EDIT_PRIMITIVE_SPHERE:
+		return m_EditSphere.getPosition();
+	default:
+		assert(0);
+		break;
+	}
+}
+
+glm::vec3 CGProj::CGEditObject::getScale()
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		return m_EditBox.getHalfSize();
+	case EDIT_PRIMITIVE_SPHERE:
+		return glm::vec3(m_EditSphere.getRadius());
+	default:
+		assert(0);
+		break;
+	}
+}
+
+GPED::c3AABB CGProj::CGEditObject::getFitAABB()
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		return m_EditBox.getFitAABB();
+	case EDIT_PRIMITIVE_SPHERE:
+		return m_EditSphere.getFitAABB();
+	default:
+		assert(0);
+		break;
+	}
+}
+
+void CGProj::CGEditObject::setHalfSize(const glm::vec3 & h)
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		m_EditBox.setHalfSize(h);
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	updateBroadPhaseProxy();
+}
+
+void CGProj::CGEditObject::setHalfSize(const GPED::real x, GPED::real y, GPED::real z)
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		m_EditBox.setHalfSize(x, y, z);
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	updateBroadPhaseProxy();
+}
+
+void CGProj::CGEditObject::setXHalfSize(const GPED::real x)
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		m_EditBox.setXHalfSize(x);
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	updateBroadPhaseProxy();
+}
+
+void CGProj::CGEditObject::setYHalfSize(const GPED::real y)
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		m_EditBox.setYHalfSize(y);
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	updateBroadPhaseProxy();
+}
+
+void CGProj::CGEditObject::setZHalfSize(const GPED::real z)
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		m_EditBox.setZHalfSize(z);
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	updateBroadPhaseProxy();
+}
+
+glm::vec3 CGProj::CGEditObject::getHalfSize()
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		return m_EditBox.getHalfSize();
+	default:
+		assert(0);
+		break;
+	}
+}
+
+void CGProj::CGEditObject::setRaidus(GPED::real r)
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_SPHERE:
+		m_EditSphere.setRaidus(r);
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	updateBroadPhaseProxy();
+}
+
+GPED::real CGProj::CGEditObject::getRadius()
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_SPHERE:
+		return m_EditSphere.getRadius();
+	default:
+		assert(0);
+		break;
+	}
+}
+
+void CGProj::CGEditObject::render(const glm::mat4 & view, const glm::mat4 & proj)
+{
+
+}
+
+void CGProj::CGEditObject::UIrender(CGAssetManager & am)
+{
+}
+
+CGProj::EditObjectType CGProj::CGEditObject::getObjectType()
+{
+	return m_ObjectType;
+}
+
+void CGProj::CGEditObject::setObjectType(EditObjectType e)
+{
+	m_ObjectType = e;
+}
+
+void CGProj::CGEditObject::updateBroadPhaseProxy()
+{
+	if (m_BroadPhaseId != Node_Null)
+		m_BroadPhase->UpdateProxy(m_BroadPhaseId, getFitAABB());
+}
+
+void CGProj::CGEditObject::renderPrimitive()
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		renderCube();
+		break;
+	case EDIT_PRIMITIVE_SPHERE:
+		renderSphere();
+		break;
+	default:
+		assert(0);
+		break;
+	}
+}
+/*** CG EDIT Object  ***/
+// =================================================================
+
+
+// =================================================================
+/*** CG EDIT Proxy Object  ***/
+
+CGProj::CGEditProxyObject::CGEditProxyObject()
+{
+	setProxyType(EDIT_PROXY_STATIC);
+}
+
 void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 & proj)
 {
-	m_FirstPassDefShader->use();
+	// CGEditObject::render(view, proj);
+
+	m_DefShader->use();
 	
 	// 1. Material Setting
-	m_FirstPassDefShader->setBool("material.CMorLM", m_CMorLM);
-	m_FirstPassDefShader->setBool("material.isLMdiffuse", m_isLMdiffuse);
-	m_FirstPassDefShader->setBool("material.isLMspecular", m_isLMspecular);
-	m_FirstPassDefShader->setBool("material.isLMemissive", m_isLMemissive);
+	m_DefShader->setBool("material.CMorLM", m_CMorLM);
+	m_DefShader->setBool("material.isLMdiffuse", m_isLMdiffuse);
+	m_DefShader->setBool("material.isLMspecular", m_isLMspecular);
+	m_DefShader->setBool("material.isLMemissive", m_isLMemissive);
 	if (m_CMorLM) // CM == false, LM == true
 	{
 		if (m_isLMdiffuse) glActiveTexture(GL_TEXTURE0), glBindTexture(GL_TEXTURE_2D, m_diffuseTexture);
@@ -283,15 +590,15 @@ void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 &
 	}
 	else
 	{
-		m_FirstPassDefShader->setVec3("material.CMambient", m_CMambient);
-		m_FirstPassDefShader->setVec3("material.CMdiffuse", m_CMdiffuse);
-		m_FirstPassDefShader->setVec3("material.CMspecular", m_CMspecular);
-		m_FirstPassDefShader->setFloat("material.CMshininess", m_CMshininess);
+		m_DefShader->setVec3("material.CMambient", m_CMambient);
+		m_DefShader->setVec3("material.CMdiffuse", m_CMdiffuse);
+		m_DefShader->setVec3("material.CMspecular", m_CMspecular);
+		m_DefShader->setFloat("material.CMshininess", m_CMshininess);
 	}
 	// 1. Material Setting
 
 	// 2. Vertex Setting
-	m_FirstPassDefShader->setMat4("projection", proj);
+	m_DefShader->setMat4("projection", proj);
 	
 	glm::mat4 viewModel(1.0);
 	
@@ -302,8 +609,8 @@ void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 &
 
 	// View Model Calculation Second
 	viewModel = view * viewModel;
-	m_FirstPassDefShader->setMat4("viewModel", viewModel);
-	m_FirstPassDefShader->setMat3("MVNormalMatrix", glm::mat3(glm::transpose(glm::inverse(viewModel))));
+	m_DefShader->setMat4("viewModel", viewModel);
+	m_DefShader->setMat3("MVNormalMatrix", glm::mat3(glm::transpose(glm::inverse(viewModel))));
 	// 2. Vertex Setting
 
 	// Now Ready to render. Go render according to the primitive
@@ -312,6 +619,8 @@ void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 &
 
 void CGProj::CGEditProxyObject::UIrender(CGAssetManager& am)
 {
+	// CGEditObject::UIrender(am);
+
 	ImGui::Begin("Edit Object");
 
 	// Proxy Id
@@ -411,23 +720,6 @@ void CGProj::CGEditProxyObject::UIrender(CGAssetManager& am)
 	ImGui::End();
 }
 
-void CGProj::CGEditProxyObject::renderPrimitive()
-{
-	switch (m_PrimitiveType)
-	{
-	case EDIT_PRIMITIVE_AABB:
-	case EDIT_PRIMITIVE_OBB:
-		renderCube();
-		break;
-	case EDIT_PRIMITIVE_SPHERE:
-		renderSphere();
-		break;
-	default:
-		assert(0);
-		break;
-	}
-}
-
 bool CGProj::CGEditProxyObject::getCMorLM()
 {
 	return CGEditProxyObject::m_CMorLM;
@@ -511,266 +803,6 @@ void CGProj::CGEditProxyObject::setProxyType(EditProxyType e)
 CGProj::EditProxyType CGProj::CGEditProxyObject::getProxyType()
 {
 	return m_ProxyType;
-}
-
-void CGProj::CGEditProxyObject::setPosition(const glm::vec3 & p)
-{
-	switch (m_PrimitiveType)
-	{
-	case EDIT_PRIMITIVE_AABB: 
-	case EDIT_PRIMITIVE_OBB:
-		CGEditBox::setPosition(p);
-		break;
-	case EDIT_PRIMITIVE_SPHERE:
-		CGEditSpere::setPosition(p);
-		break;
-	default:
-		assert(0);
-		break;
-	}
-
-	updateBroadPhaseProxy();
-}
-
-void CGProj::CGEditProxyObject::setPosition(const GPED::real x, const GPED::real y, const GPED::real z)
-{
-	switch (m_PrimitiveType)
-	{
-	case EDIT_PRIMITIVE_AABB:
-	case EDIT_PRIMITIVE_OBB:
-		CGEditBox::setPosition(x, y, z);
-		break;
-	case EDIT_PRIMITIVE_SPHERE:
-		CGEditSpere::setPosition(x, y, z);
-		break;
-	default:
-		assert(0);
-		break;
-	}
-
-	updateBroadPhaseProxy();
-}
-
-void CGProj::CGEditProxyObject::setXposition(const GPED::real x)
-{
-	switch (m_PrimitiveType)
-	{
-	case EDIT_PRIMITIVE_AABB:
-	case EDIT_PRIMITIVE_OBB:
-		CGEditBox::setXposition(x);
-		break;
-	case EDIT_PRIMITIVE_SPHERE:
-		CGEditSpere::setXposition(x);
-		break;
-	default:
-		assert(0);
-		break;
-	}
-
-	updateBroadPhaseProxy();
-}
-
-void CGProj::CGEditProxyObject::setYposition(const GPED::real y)
-{
-	switch (m_PrimitiveType)
-	{
-	case EDIT_PRIMITIVE_AABB:
-	case EDIT_PRIMITIVE_OBB:
-		CGEditBox::setYposition(y);
-		break;
-	case EDIT_PRIMITIVE_SPHERE:
-		CGEditSpere::setYposition(y);
-		break;
-	default:
-		assert(0);
-		break;
-	}
-
-	updateBroadPhaseProxy();
-}
-
-void CGProj::CGEditProxyObject::setZposition(const GPED::real z)
-{
-	switch (m_PrimitiveType)
-	{
-	case EDIT_PRIMITIVE_AABB:
-	case EDIT_PRIMITIVE_OBB:
-		CGEditBox::setZposition(z);
-		break;
-	case EDIT_PRIMITIVE_SPHERE:
-		CGEditSpere::setZposition(z);
-		break;
-	default:
-		assert(0);
-		break;
-	}
-
-	updateBroadPhaseProxy();
-}
-
-glm::vec3 CGProj::CGEditProxyObject::getPosition()
-{
-	switch (m_PrimitiveType)
-	{
-	case EDIT_PRIMITIVE_AABB:
-	case EDIT_PRIMITIVE_OBB:
-		return CGEditBox::getPosition();
-	case EDIT_PRIMITIVE_SPHERE:
-		return CGEditSpere::getPosition();
-	default:
-		assert(0);
-		break;
-	}
-}
-
-glm::vec3 CGProj::CGEditProxyObject::getScale()
-{
-	switch (m_PrimitiveType)
-	{
-	case EDIT_PRIMITIVE_AABB:
-	case EDIT_PRIMITIVE_OBB:
-		return CGEditBox::getHalfSize();
-	case EDIT_PRIMITIVE_SPHERE:
-		return glm::vec3(CGEditSpere::getRadius());
-	default:
-		assert(0);
-		break;
-	}
-}
-
-GPED::c3AABB CGProj::CGEditProxyObject::getFitAABB()
-{
-	switch (m_PrimitiveType)
-	{
-	case EDIT_PRIMITIVE_AABB:
-	case EDIT_PRIMITIVE_OBB:
-		return CGEditBox::getFitAABB();
-	case EDIT_PRIMITIVE_SPHERE:
-		return CGEditSpere::getFitAABB();
-	default:
-		assert(0);
-		break;
-	}
-}
-
-void CGProj::CGEditProxyObject::setHalfSize(const glm::vec3 & h)
-{
-	switch (m_PrimitiveType)
-	{
-	case EDIT_PRIMITIVE_AABB:
-	case EDIT_PRIMITIVE_OBB:
-		CGEditBox::setHalfSize(h);
-		break;
-	default:
-		assert(0);
-		break;
-	}
-
-	updateBroadPhaseProxy();
-}
-
-void CGProj::CGEditProxyObject::setHalfSize(const GPED::real x, GPED::real y, GPED::real z)
-{
-	switch (m_PrimitiveType)
-	{
-	case EDIT_PRIMITIVE_AABB:
-	case EDIT_PRIMITIVE_OBB:
-		CGEditBox::setHalfSize(x, y, z);
-		break;
-	default:
-		assert(0);
-		break;
-	}
-
-	updateBroadPhaseProxy();
-}
-
-void CGProj::CGEditProxyObject::setXHalfSize(const GPED::real x)
-{
-	switch (m_PrimitiveType)
-	{
-	case EDIT_PRIMITIVE_AABB:
-	case EDIT_PRIMITIVE_OBB:
-		CGEditBox::setXHalfSize(x);
-		break;
-	default:
-		assert(0);
-		break;
-	}
-
-	updateBroadPhaseProxy();
-}
-
-void CGProj::CGEditProxyObject::setYHalfSize(const GPED::real y)
-{
-	switch (m_PrimitiveType)
-	{
-	case EDIT_PRIMITIVE_AABB:
-	case EDIT_PRIMITIVE_OBB:
-		CGEditBox::setYHalfSize(y);
-		break;
-	default:
-		assert(0);
-		break;
-	}
-
-	updateBroadPhaseProxy();
-}
-
-void CGProj::CGEditProxyObject::setZHalfSize(const GPED::real z)
-{
-	switch (m_PrimitiveType)
-	{
-	case EDIT_PRIMITIVE_AABB:
-	case EDIT_PRIMITIVE_OBB:
-		CGEditBox::setZHalfSize(z);
-		break;
-	default:
-		assert(0);
-		break;
-	}
-
-	updateBroadPhaseProxy();
-}
-
-glm::vec3 CGProj::CGEditProxyObject::getHalfSize()
-{
-	switch (m_PrimitiveType)
-	{
-	case EDIT_PRIMITIVE_AABB:
-	case EDIT_PRIMITIVE_OBB:
-		return CGEditBox::getHalfSize();
-	default:
-		assert(0);
-		break;
-	}
-}
-
-void CGProj::CGEditProxyObject::setRaidus(GPED::real r)
-{
-	switch (m_PrimitiveType)
-	{
-	case EDIT_PRIMITIVE_SPHERE:
-		CGEditSpere::setRaidus(r);
-		break;
-	default:
-		assert(0);
-		break;
-	}
-
-	updateBroadPhaseProxy();
-}
-
-GPED::real CGProj::CGEditProxyObject::getRadius()
-{
-	switch (m_PrimitiveType)
-	{
-	case EDIT_PRIMITIVE_SPHERE:
-		return CGEditSpere::getRadius();
-	default:
-		assert(0);
-		break;
-	}
 }
 /*** CG EDIT Proxy Object  ***/
 // =================================================================

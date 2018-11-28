@@ -302,7 +302,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	// Picked One
 	if (pickedEditBox)
 	{
-		gizmoTest.setAxisLength(pickedEditBox->getHalfSize().x + 1.0f);
+		gizmoTest.setAxisLength(pickedEditBox->getScale().x + 1.0f);
 		gizmoTest.setEditProxyObject(pickedEditBox);
 		gizmoTest.renderGizmo(view, projection);
 		// gizmoTest.renderGizmoBox(view, projection);

@@ -39,13 +39,13 @@ namespace CGProj
 
 		void setPrimitiveType(EditPrimitiveType e);
 		EditPrimitiveType getPrimitiveType();
-	protected:
+	private:
 		EditPrimitiveType m_BoxType; // AABB for Default Setting
 		glm::vec3 m_position; // center
 		glm::vec3 m_halfExtents; // half size
 		glm::quat m_orientation; // orientation for OBB
 		GPED::c3AABB m_fitAABB;
-	private:
+	
 		void updateAABB();
 	};
 
@@ -66,40 +66,41 @@ namespace CGProj
 		GPED::real getRadius();
 
 		GPED::c3AABB getFitAABB();
-	protected:
+	private:
 		glm::vec3 m_position; // center
 		GPED::real m_radius;
 		GPED::c3AABB m_fitAABB;
-	private:
+	
 		void updateAABB();
 	};
-
-	enum EditProxyType
+	
+	enum EditObjectType
 	{
-		EDIT_PROXY_STATIC = 0,
-		EDIT_PROXY_DYNAMIC
+		EDIT_OBJECT_PROXY,
+		EDIT_OBJECT_LIGHT
 	};
 
-	class CGEditProxyObject : private CGEditBox, private CGEditSpere
+	class CGEditObject // Base Class
 	{
 	public:
-		CGEditProxyObject();
+		CGEditObject();
 
-		/***  Init Method(you should use these methods to activate this class) ***/
-		// You should connect EditProxyObject with BroadPhase
+		// Must Init Method
 		void connectBroadPhase(CGBroadPhase* broad);
 		void setBroadPhaseId(int id);
 		int getBroadPhaseId();
 
-		void setFirstPassDefShader(Shader* shader);
-
-		/***  Init Method ***/
+		// The basic primitive render is deferred rendering.
+		// Proxy Object should have first pass deferred shader !
+		// Light Object should have second pass deferred shader !
+		void setFirstPassDefShader(Shader* shader); 
+		// Must Init Method
 
 		/*** Primitive Method ***/
+		
+		// Common Method
 		void setEditShape(EditPrimitiveType e);
 		EditPrimitiveType getEditShape();
-
-		// Common Method for Box, Sphere
 		void setPosition(const glm::vec3& p);
 		void setPosition(const GPED::real x, const GPED::real y, const GPED::real z);
 		void setXposition(const GPED::real x);
@@ -110,10 +111,33 @@ namespace CGProj
 		glm::vec3 getScale();
 
 		GPED::c3AABB getFitAABB();
-		// Common Method for Box, Sphere
+		// Common Method
+		/*** Primitive Method ***/
+
+		/*** Graphics Method ***/
+		virtual void render(const glm::mat4& view, const glm::mat4& proj);
+		virtual void UIrender(CGAssetManager& am);
+		/*** Graphics Method ***/
+
+		EditObjectType getObjectType();
+		void setObjectType(EditObjectType e);
+	protected:
+		EditObjectType m_ObjectType;
+
+		EditPrimitiveType m_PrimitiveType;
+		CGEditBox m_EditBox;
+		CGEditSpere m_EditSphere;
+		bool m_EditPrimitiveDraw = false;
+
+		int m_BroadPhaseId = Node_Null;
+		CGBroadPhase* m_BroadPhase;
+		void updateBroadPhaseProxy();
+
+		Shader* m_DefShader = nullptr;
+		void renderPrimitive();
 
 		// Box Specific Method
-		void setHalfSize(const glm::vec3& h);
+		void setHalfSize(const glm::vec3 & h);
 		void setHalfSize(const GPED::real x, GPED::real y, GPED::real z);
 		void setXHalfSize(const GPED::real x);
 		void setYHalfSize(const GPED::real y);
@@ -125,11 +149,23 @@ namespace CGProj
 		void setRaidus(GPED::real r);
 		GPED::real getRadius();
 		// Sphere Specific Method
-		/*** Primitive Method ***/
+	};
+
+
+	enum EditProxyType
+	{
+		EDIT_PROXY_STATIC = 0,
+		EDIT_PROXY_DYNAMIC
+	};
+
+	class CGEditProxyObject : public CGEditObject // Child1 of Base Class
+	{
+	public:
+		CGEditProxyObject();
 
 		/*** Graphics Method ***/
-		void render(const glm::mat4& view, const glm::mat4& proj);
-		void UIrender(CGAssetManager& am);
+		virtual void render(const glm::mat4& view, const glm::mat4& proj);
+		virtual void UIrender(CGAssetManager& am);
 
 		bool getCMorLM();
 		void setCMorLM(bool flag);
@@ -157,15 +193,7 @@ namespace CGProj
 		EditProxyType getProxyType();
 		/*** Proxy(Physics) Method ***/
 	private:
-		int m_BroadPhaseId = Node_Null;
-		CGBroadPhase* m_BroadPhase;
-		void updateBroadPhaseProxy();
-
-		EditPrimitiveType m_PrimitiveType;
-
-		// Graphics
-		Shader* m_FirstPassDefShader = nullptr; 
-
+		/*** Graphics ***/
 		bool m_CMorLM = false; // CM == false, LM == true
 
 		// Light Map Materal
@@ -184,8 +212,7 @@ namespace CGProj
 		float m_CMshininess = 1.f;
 		// Color Map Material
 
-		void renderPrimitive();
-		// Graphics
+		/*** Graphics ***/
 
 		EditProxyType m_ProxyType;
 	};
@@ -197,9 +224,11 @@ namespace CGProj
 		EDIT_SPOT_LIGHT
 	};
 
-	class CGEditLightObject : private CGEditBox, private CGEditSpere
+	class CGEditLightObject : public CGEditObject // Child2 of Base Class
 	{
 	public:
+		CGEditLightObject();
+
 
 	private:
 		EditLightType m_LightType;

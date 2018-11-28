@@ -106,7 +106,7 @@ void main()
     }
 
 
-    // post=processing for HDR with tone mapping and gamma corection
+    // post-processing for HDR with tone mapping and gamma corection
     const float gamma = 2.2;
     const float exposure = 1.0;
 

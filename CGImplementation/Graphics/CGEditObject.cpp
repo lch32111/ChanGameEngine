@@ -270,21 +270,27 @@ void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 &
 {
 	m_FirstPassDefShader->use();
 	
-	// Material Setting
+	// 1. Material Setting
 	m_FirstPassDefShader->setBool("material.CMorLM", m_CMorLM);
 	m_FirstPassDefShader->setBool("material.isLMdiffuse", m_isLMdiffuse);
 	m_FirstPassDefShader->setBool("material.isLMspecular", m_isLMspecular);
 	m_FirstPassDefShader->setBool("material.isLMemissive", m_isLMemissive);
-
 	if (m_CMorLM) // CM == false, LM == true
 	{
 		if (m_isLMdiffuse) glActiveTexture(GL_TEXTURE0), glBindTexture(GL_TEXTURE_2D, m_diffuseTexture);
 		if (m_isLMspecular) glActiveTexture(GL_TEXTURE1), glBindTexture(GL_TEXTURE_2D, m_specularTexture);
 		if (m_isLMemissive) glActiveTexture(GL_TEXTURE2), glBindTexture(GL_TEXTURE_2D, m_emissiveTexture);
 	}
-	// Material Setting
+	else
+	{
+		m_FirstPassDefShader->setVec3("material.CMambient", m_CMambient);
+		m_FirstPassDefShader->setVec3("material.CMdiffuse", m_CMdiffuse);
+		m_FirstPassDefShader->setVec3("material.CMspecular", m_CMspecular);
+		m_FirstPassDefShader->setFloat("material.CMshininess", m_CMshininess);
+	}
+	// 1. Material Setting
 
-	// Vertex Setting
+	// 2. Vertex Setting
 	m_FirstPassDefShader->setMat4("projection", proj);
 	
 	glm::mat4 viewModel(1.0);
@@ -298,7 +304,8 @@ void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 &
 	viewModel = view * viewModel;
 	m_FirstPassDefShader->setMat4("viewModel", viewModel);
 	m_FirstPassDefShader->setMat3("MVNormalMatrix", glm::mat3(glm::transpose(glm::inverse(viewModel))));
-	
+	// 2. Vertex Setting
+
 	// Now Ready to render. Go render according to the primitive
 	renderPrimitive();
 }
@@ -374,7 +381,30 @@ void CGProj::CGEditProxyObject::UIrender(CGAssetManager& am)
 	}
 	else // Colro Material
 	{
+		float temp[3] = { m_CMambient.x,m_CMambient.y, m_CMambient.z };
+		ImGui::ColorEdit3("Ambient", temp);
+		m_CMambient = { temp[0], temp[1], temp[2] };
+		
+		temp[0] = m_CMdiffuse.x, temp[1] = m_CMdiffuse.y, temp[2] = m_CMdiffuse.z;
+		ImGui::ColorEdit3("Diffuse", temp);
+		m_CMdiffuse = { temp[0], temp[1], temp[2] };
 
+		temp[0] = m_CMspecular.x, temp[1] = m_CMspecular.y, temp[2] = m_CMspecular.z;
+		ImGui::ColorEdit3("specular", temp);
+		m_CMspecular = { temp[0], temp[1], temp[2] };
+
+		float min = 0.001f;
+		float max = 1.f;
+		ImGui::DragScalar("shininess", ImGuiDataType_Float, &m_CMshininess, 0.005f, &min, &max, "%f", 1.0f);
+
+		int selected = 0;
+		if (ImGui::Combo("Set Color Material", &selected, CG_COLOR_MATERIAL_LIST, 24))
+		{
+			setCMambinet(CG_COLOR_MATERIAL_AMBIENT[selected]);
+			setCMdiffuse(CG_COLOR_MATERIAL_DIFFUSE[selected]);
+			setCMspecular(CG_COLOR_MATERIAL_SPECULAR[selected]);
+			setCMshininess(CG_COLOR_MATERIAL_SHININESS[selected]);
+		}
 	}
 
 
@@ -451,6 +481,26 @@ void CGProj::CGEditProxyObject::setEmissiveFlag(bool flag)
 void CGProj::CGEditProxyObject::setEmissiveTexture(unsigned texId)
 {
 	CGEditProxyObject::m_emissiveTexture = texId;
+}
+
+void CGProj::CGEditProxyObject::setCMambinet(const glm::vec3 & ambient)
+{
+	CGEditProxyObject::m_CMambient = ambient;
+}
+
+void CGProj::CGEditProxyObject::setCMdiffuse(const glm::vec3 & diffuse)
+{
+	CGEditProxyObject::m_CMdiffuse = diffuse;
+}
+
+void CGProj::CGEditProxyObject::setCMspecular(const glm::vec3 & specular)
+{
+	CGEditProxyObject::m_CMspecular = specular;
+}
+
+void CGProj::CGEditProxyObject::setCMshininess(float s)
+{
+	CGEditProxyObject::m_CMshininess = s;
 }
 
 void CGProj::CGEditProxyObject::setProxyType(EditProxyType e)

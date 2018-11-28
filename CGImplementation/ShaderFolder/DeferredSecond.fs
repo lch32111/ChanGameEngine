@@ -92,7 +92,7 @@ void main()
                 vec3 diffuse = max(dot(Normal, lightDir), 0.0) * CMdiffuse * lights[i].Color;
 
                 vec3 halfwayDir = normalize(lightDir + viewDir);
-                float spec = pow(max(dot(Normal, halfwayDir), 0.0), CMshininess);
+                float spec = pow(max(dot(Normal, halfwayDir), 0.0), CMshininess * 128); // 128 should be set according to article
                 vec3 specular = spec * CMspecular * lights[i].Color;
                 
                 float attenuation = (1.0) / (1.0 + lights[i].Linear * dist + lights[i].Quadratic * dist * dist);

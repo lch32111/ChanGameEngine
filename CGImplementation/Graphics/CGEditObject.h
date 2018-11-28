@@ -145,6 +145,11 @@ namespace CGProj
 		bool isEmissiveOn();
 		void setEmissiveFlag(bool flag);
 		void setEmissiveTexture(unsigned texId);
+
+		void setCMambinet(const glm::vec3& ambient);
+		void setCMdiffuse(const glm::vec3& diffuse);
+		void setCMspecular(const glm::vec3& specular);
+		void setCMshininess(float s);
 		/*** Graphics Method ***/
 
 		/*** Proxy(Physics) Method ***/
@@ -171,6 +176,13 @@ namespace CGProj
 		unsigned m_specularTexture = 0;
 		unsigned m_emissiveTexture = 0;
 		// Light Map Materal
+
+		// Color Map Material
+		glm::vec3 m_CMambient = glm::vec3(1);
+		glm::vec3 m_CMdiffuse = glm::vec3(1);
+		glm::vec3 m_CMspecular = glm::vec3(1);
+		float m_CMshininess = 1.f;
+		// Color Map Material
 
 		void renderPrimitive();
 		// Graphics

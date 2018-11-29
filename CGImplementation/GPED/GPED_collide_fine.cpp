@@ -727,7 +727,7 @@ unsigned GPED::CollisionDetector::rayAndSphere(
 	const GPED::c3RayInput & input,
 	const CollisionSphere & sphere)
 {
-	glm::vec3 m = sphere.getAxis(3) - input.startPoint;
+	glm::vec3 m = input.startPoint - sphere.getAxis(3);
 	GPED::real b = glm::dot(m, input.direction);
 	GPED::real c = glm::dot(m, m) - sphere.radius * sphere.radius;
 	// Exit if r's origin outside s (c > 0) and r pointing away from  s (b > 0)

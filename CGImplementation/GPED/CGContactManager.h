@@ -62,7 +62,6 @@ constexpr int NODE_NULL = -1;
 		void InsertNode(int nodeId);
 		void DeleteNode(int nodeId);
 		
-
 		int m_root;
 
 		Contact* m_nodes;

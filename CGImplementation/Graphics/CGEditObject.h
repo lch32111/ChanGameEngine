@@ -317,7 +317,6 @@ namespace CGProj
 		// Notice the Cutoff value is the cos value with radians measure.
 		float m_SpotInnerCutOff;
 		float m_SpotOuterCutOff;
-
 	};
 
 }

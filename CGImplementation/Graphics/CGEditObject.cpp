@@ -807,3 +807,278 @@ CGProj::EditProxyType CGProj::CGEditProxyObject::getProxyType()
 /*** CG EDIT Proxy Object  ***/
 // =================================================================
 
+
+// =================================================================
+/*** CG Light Object  ***/
+
+
+
+
+/*** CG Light Object  ***/
+// =================================================================
+
+CGProj::CGEditLightObject::CGEditLightObject()
+{
+}
+
+void CGProj::CGEditLightObject::setPosition(const glm::vec3 & p)
+{
+	CGEditObject::setPosition(p); // set Edit Object Position 
+
+	// and then set Light Position
+	m_lightPosition = p;
+}
+
+void CGProj::CGEditLightObject::setPosition(const GPED::real x, const GPED::real y, const GPED::real z)
+{
+	CGEditObject::setPosition(x, y, z);
+	
+	m_lightPosition.x = x;
+	m_lightPosition.y = y;
+	m_lightPosition.z = z;
+}
+
+void CGProj::CGEditLightObject::setXposition(const GPED::real x)
+{
+	CGEditObject::setXposition(x);
+	m_lightPosition.x = x;
+}
+
+void CGProj::CGEditLightObject::setYposition(const GPED::real y)
+{
+	CGEditObject::setYposition(y);
+	m_lightPosition.y = y;
+}
+
+void CGProj::CGEditLightObject::setZposition(const GPED::real z)
+{
+	CGEditObject::setZposition(z);
+	m_lightPosition.z = z;
+}
+
+glm::vec3 CGProj::CGEditLightObject::getPosition()
+{
+	// You can get the edit object position 
+	// However I will return the light position for the Obect-Oriented Programming(OOP)
+	return m_lightPosition;
+}
+
+void CGProj::CGEditLightObject::setLightDirection(const glm::vec3 & d)
+{
+	// Notice the direction should be normalized
+	m_lightDirection = glm::normalize(d);
+}
+
+void CGProj::CGEditLightObject::setLightDirection(const GPED::real x, const GPED::real y, const GPED::real z)
+{
+	m_lightDirection = glm::normalize(glm::vec3(x, y, z));
+}
+
+void CGProj::CGEditLightObject::setLightXdirection(const GPED::real x)
+{
+	m_lightDirection.x = x;
+	m_lightDirection = glm::normalize(m_lightDirection);
+}
+
+void CGProj::CGEditLightObject::setLightYdirection(const GPED::real y)
+{
+	m_lightDirection.y = y;
+	m_lightDirection = glm::normalize(m_lightDirection);
+}
+
+void CGProj::CGEditLightObject::setLightZdirection(const GPED::real z)
+{
+	m_lightDirection.z = z;
+	m_lightDirection = glm::normalize(m_lightDirection);
+}
+
+glm::vec3 CGProj::CGEditLightObject::getLightDirection()
+{
+	return m_lightDirection;
+}
+
+void CGProj::CGEditLightObject::setAmbientColor(const glm::vec3 & ac)
+{
+	m_lightAmbient = ac;
+}
+
+void CGProj::CGEditLightObject::setAmbientColor(const GPED::real r, const GPED::real g, const GPED::real b)
+{
+	m_lightAmbient.r = r;
+	m_lightAmbient.g = g;
+	m_lightAmbient.b = b;
+}
+
+void CGProj::CGEditLightObject::setAmbientRedColor(const GPED::real r)
+{
+	m_lightAmbient.r = r;
+}
+
+void CGProj::CGEditLightObject::setAmbientGreenColor(const GPED::real g)
+{
+	m_lightAmbient.g = g;
+}
+
+void CGProj::CGEditLightObject::setAmbientBlueColor(const GPED::real b)
+{
+	m_lightAmbient.b = b;
+}
+
+glm::vec3 CGProj::CGEditLightObject::getAmbientColor()
+{
+	return m_lightAmbient;
+}
+
+void CGProj::CGEditLightObject::setDiffuseColor(const glm::vec3 & dc)
+{
+	m_lightDiffuse = dc;
+}
+
+void CGProj::CGEditLightObject::setDiffuseColor(const GPED::real r, const GPED::real g, const GPED::real b)
+{
+	m_lightDiffuse.r = r;
+	m_lightDiffuse.g = g;
+	m_lightDiffuse.b = b;
+}
+
+void CGProj::CGEditLightObject::setDiffuseRedColor(const GPED::real r)
+{
+	m_lightDiffuse.r = r;
+}
+
+void CGProj::CGEditLightObject::setDiffuseGreenColor(const GPED::real g)
+{
+	m_lightDiffuse.g = g;
+}
+
+void CGProj::CGEditLightObject::setDiffuseBlueColor(const GPED::real b)
+{
+	m_lightDiffuse.b = b;
+}
+
+glm::vec3 CGProj::CGEditLightObject::getDiffuseColor()
+{
+	return m_lightDiffuse;
+}
+
+void CGProj::CGEditLightObject::setSpecularColor(const glm::vec3 & sc)
+{
+	m_lightSpecular = sc;
+}
+
+void CGProj::CGEditLightObject::setSpecularColor(const GPED::real r, const GPED::real g, const GPED::real b)
+{
+	m_lightSpecular.r = r;
+	m_lightSpecular.g = g;
+	m_lightSpecular.b = b;
+}
+
+void CGProj::CGEditLightObject::setSpecularRedColor(const GPED::real r)
+{
+	m_lightSpecular.r = r;
+}
+
+void CGProj::CGEditLightObject::setSpecularGreenColor(const GPED::real g)
+{
+	m_lightSpecular.g = g;
+}
+
+void CGProj::CGEditLightObject::setSpecularBlueColor(const GPED::real b)
+{
+	m_lightSpecular.b = b;
+}
+
+glm::vec3 CGProj::CGEditLightObject::getSpecularColor()
+{
+	return m_lightSpecular;
+}
+
+void CGProj::CGEditLightObject::setAttnConstant(const float c)
+{
+	m_AttnConstant = c;
+	updateRadius();
+}
+
+float CGProj::CGEditLightObject::getAttnConsant()
+{
+	return m_AttnConstant;
+}
+
+void CGProj::CGEditLightObject::setAttnLinear(const float l)
+{
+	m_AttnLinear = l;
+	updateRadius();
+}
+
+float CGProj::CGEditLightObject::getAttnLinear()
+{
+	return m_AttnLinear;
+}
+
+void CGProj::CGEditLightObject::setAttnQuadratic(const float q)
+{
+	m_AttnQuadratic = q;
+	updateRadius();
+}
+
+float CGProj::CGEditLightObject::getAttnQuadratic()
+{
+	return m_AttnQuadratic;
+}
+
+float CGProj::CGEditLightObject::getLightRadius()
+{
+	return m_AttnRadius;
+}
+
+void CGProj::CGEditLightObject::updateRadius()
+{
+	// the diffuse color of light is used for the max component of light
+	float lightMin = 1 / (5.f / 256.f);
+	float lightMax = std::fmaxf(std::fmaxf(m_lightDiffuse.r, m_lightDiffuse.g), m_lightDiffuse.b);
+
+	// Calculate the radius of light volume
+	m_AttnRadius = 
+		(
+			-m_AttnLinear +
+			std::sqrtf(
+						m_AttnLinear * m_AttnLinear - 4 * m_AttnQuadratic *
+						(m_AttnConstant - lightMax * lightMin))
+		) 
+			/ 
+		(2 * m_AttnQuadratic);
+}
+
+void CGProj::CGEditLightObject::setInnerCutOffInDegree(const float degree)
+{
+	// Notice the measure of angle
+	m_SpotInnerCutOff = glm::cos(glm::radians(degree));
+}
+
+void CGProj::CGEditLightObject::setInnerCutoffInRadian(const float radian)
+{
+	m_SpotInnerCutOff = glm::cos(radian);
+}
+
+float CGProj::CGEditLightObject::getInnerCutOff()
+{
+	return m_SpotInnerCutOff;
+}
+
+void CGProj::CGEditLightObject::setOuterCutOffInDegree(const float degree)
+{
+	m_SpotOuterCutOff = glm::cos(glm::radians(degree));
+}
+
+void CGProj::CGEditLightObject::setOuterCutOffInRadian(const float radian)
+{
+	m_SpotOuterCutOff = glm::cos(radian);
+}
+
+float CGProj::CGEditLightObject::getOuterCutOff()
+{
+	return m_SpotOuterCutOff;
+}
+
+
+

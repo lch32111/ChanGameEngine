@@ -101,12 +101,12 @@ namespace CGProj
 		// Common Method
 		void setEditShape(EditPrimitiveType e);
 		EditPrimitiveType getEditShape();
-		void setPosition(const glm::vec3& p);
-		void setPosition(const GPED::real x, const GPED::real y, const GPED::real z);
-		void setXposition(const GPED::real x);
-		void setYposition(const GPED::real y);
-		void setZposition(const GPED::real z);
-		glm::vec3 getPosition();
+		virtual void setPosition(const glm::vec3& p);
+		virtual void setPosition(const GPED::real x, const GPED::real y, const GPED::real z);
+		virtual void setXposition(const GPED::real x);
+		virtual void setYposition(const GPED::real y);
+		virtual void setZposition(const GPED::real z);
+		virtual glm::vec3 getPosition();
 
 		glm::vec3 getScale();
 
@@ -193,7 +193,9 @@ namespace CGProj
 		EditProxyType getProxyType();
 		/*** Proxy(Physics) Method ***/
 	private:
-		/*** Graphics ***/
+		/*** Graphics ***/ 
+		// The variables in this graphics comments are 
+		// related to the shader uniform variables
 		bool m_CMorLM = false; // CM == false, LM == true
 
 		// Light Map Materal
@@ -229,9 +231,93 @@ namespace CGProj
 	public:
 		CGEditLightObject();
 
+		/*** Light Method ***/
+
+		// These Methods are overrided from CGEditObect
+		// in order to sync the edit positoin and light position.
+		// This structure makes clear that the names of edit object position and
+		// light position are different, but the values of them should be same.
+		virtual void setPosition(const glm::vec3& p) override;
+		virtual void setPosition(const GPED::real x, const GPED::real y, const GPED::real z) override;
+		virtual void setXposition(const GPED::real x) override;
+		virtual void setYposition(const GPED::real y) override;
+		virtual void setZposition(const GPED::real z) override;
+		virtual glm::vec3 getPosition() override;
+
+		void setLightDirection(const glm::vec3& d);
+		void setLightDirection(const GPED::real x, const GPED::real y, const GPED::real z);
+		void setLightXdirection(const GPED::real x);
+		void setLightYdirection(const GPED::real y);
+		void setLightZdirection(const GPED::real z);
+		glm::vec3 getLightDirection();
+		
+		void setAmbientColor(const glm::vec3& ac);
+		void setAmbientColor(const GPED::real r, const GPED::real g, const GPED::real b);
+		void setAmbientRedColor(const GPED::real r);
+		void setAmbientGreenColor(const GPED::real g);
+		void setAmbientBlueColor(const GPED::real b);
+		glm::vec3 getAmbientColor();
+
+		void setDiffuseColor(const glm::vec3& dc);
+		void setDiffuseColor(const GPED::real r, const GPED::real g, const GPED::real b);
+		void setDiffuseRedColor(const GPED::real r);
+		void setDiffuseGreenColor(const GPED::real g);
+		void setDiffuseBlueColor(const GPED::real b);
+		glm::vec3 getDiffuseColor();
+
+		void setSpecularColor(const glm::vec3& sc);
+		void setSpecularColor(const GPED::real r, const GPED::real g, const GPED::real b);
+		void setSpecularRedColor(const GPED::real r);
+		void setSpecularGreenColor(const GPED::real g);
+		void setSpecularBlueColor(const GPED::real b);
+		glm::vec3 getSpecularColor();
+
+		void setAttnConstant(const float c);
+		float getAttnConsant();
+
+		void setAttnLinear(const float l);
+		float getAttnLinear();
+
+		void setAttnQuadratic(const float q);
+		float getAttnQuadratic();
+
+		float getLightRadius();
+
+		void setInnerCutOffInDegree(const float degree);
+		void setInnerCutoffInRadian(const float radian);
+		float getInnerCutOff();
+
+		void setOuterCutOffInDegree(const float degree);
+		void setOuterCutOffInRadian(const float radian);
+		float getOuterCutOff();
+		/*** Light Method ***/
 
 	private:
 		EditLightType m_LightType;
+
+		// Point and Spot Light(Flash Light)
+		glm::vec3 m_lightPosition;
+
+		// Directional and Spot Light
+		glm::vec3 m_lightDirection;
+
+		// Light Colors
+		glm::vec3 m_lightAmbient;
+		glm::vec3 m_lightDiffuse;
+		glm::vec3 m_lightSpecular;
+
+		// Attenuation 
+		float m_AttnConstant = 1.0f;
+		float m_AttnLinear = 0.0f;
+		float m_AttnQuadratic = 0.0f;
+		float m_AttnRadius = 0.0f;
+		void updateRadius();
+
+		// Spot Light Factors
+		// Notice the Cutoff value is the cos value with radians measure.
+		float m_SpotInnerCutOff;
+		float m_SpotOuterCutOff;
+
 	};
 
 }

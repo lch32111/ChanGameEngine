@@ -151,6 +151,8 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	gizmoTest.initGizmo();
 	gizmoTest.setAxisWidth(5.0);
 	// Gizmo Setting
+
+	editLightTest.getPosition();
 }
 
 void CGProj::DeferredRenderer::initImgui()

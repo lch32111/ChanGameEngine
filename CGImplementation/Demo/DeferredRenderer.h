@@ -63,7 +63,7 @@ namespace CGProj
 		unsigned int gPosition, gNormal, gAlbedoSpec, gEmissive, gBool;
 		unsigned gRBO;
 
-		unsigned int NR_LIGHTS = 128;
+		unsigned int NR_LIGHTS = 32;
 
 		float constant = 1.0;
 		float linear = 0.7;
@@ -115,6 +115,8 @@ namespace CGProj
 		CGGizmo gizmoTest;
 
 		CGAssetManager assetManager;
+
+		CGEditLightObject editLightTest;
 	};
 }
 

@@ -50,12 +50,14 @@ void main()
         for(int i = 0; i < NR_LIGHTS; ++i)
         {
             // calculate distance between light source and current fragment
-            float dist = length(lights[i].Position - FragPos);
+            vec3 FragToLight = lights[i].Position - FragPos;
+            float SquaredDist = dot(FragToLight, FragToLight);
             
-            if(dist < lights[i].Radius)
+            if(SquaredDist < lights[i].Radius * lights[i].Radius)
             {
                 // diffuse
-                vec3 lightDir = (lights[i].Position - FragPos) * (1.0 / dist);
+                float dist = sqrt(SquaredDist);
+                vec3 lightDir = FragToLight * (1.0 / dist);
                 vec3 diffuse = max(dot(Normal, lightDir), 0.0) * LMAlbedo * lights[i].Color;
                 
                 vec3 halfwayDir = normalize(lightDir + viewDir);
@@ -84,11 +86,13 @@ void main()
         
         for(int i = 0; i < NR_LIGHTS; ++i)
         {
-            float dist = length(lights[i].Position - FragPos);
+            vec3 FragToLight = lights[i].Position - FragPos;
+            float SquaredDist = dot(FragToLight, FragToLight);
             
-            if(dist < lights[i].Radius)
+            if(SquaredDist < lights[i].Radius * lights[i].Radius)
             {
-                vec3 lightDir = (lights[i].Position - FragPos) * (1.0 / dist);
+                float dist = sqrt(SquaredDist);
+                vec3 lightDir = FragToLight * (1.0 / dist);
                 vec3 diffuse = max(dot(Normal, lightDir), 0.0) * CMdiffuse * lights[i].Color;
 
                 vec3 halfwayDir = normalize(lightDir + viewDir);

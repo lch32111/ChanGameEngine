@@ -63,15 +63,6 @@ namespace CGProj
 		unsigned int gPosition, gNormal, gAlbedoSpec, gEmissive, gBool;
 		unsigned gRBO;
 
-		unsigned int NR_LIGHTS = 32;
-
-		float constant = 1.0;
-		float linear = 0.7;
-		float quadratic = 1.8;
-		std::vector<glm::vec3> lightPositions;
-		std::vector<glm::vec3> lightColors;
-		std::vector<float> lightRadius;
-
 		// Broad Phase
 		CGBroadPhase dBroadPhase;
 		BroadRendererWrapper bRender;
@@ -81,7 +72,7 @@ namespace CGProj
 			bool RayCastCallback(const GPED::c3RayInput& input, int nodeId)
 			{
 				void* data = broadPhase->GetUserData(nodeId);
-				CGEditProxyObject* box = (CGEditProxyObject*)data;
+				CGEditObject* box = (CGEditObject*)data;
 				
 				GPED::c3RayOutput output;
 				bool hit = GPED::rayaabbIntersection(output, input, box->getFitAABB());
@@ -111,12 +102,15 @@ namespace CGProj
 		// Broad Phase
 
 		std::vector<CGEditProxyObject> editProxies;
-		CGEditProxyObject* pickedEditBox = nullptr;
+		std::vector<CGEditLightObject> editLights;
+		int num_dir_light = 0;
+		int num_point_light = 0;
+		int num_spot_light = 0;
+
+		CGEditObject* pickedEditBox = nullptr;
 		CGGizmo gizmoTest;
 
 		CGAssetManager assetManager;
-
-		CGEditLightObject editLightTest;
 	};
 }
 

@@ -3,7 +3,7 @@
 
 CGProj::CGGizmo::CGGizmo()
 {
-	m_editProxyObject = nullptr;
+	m_editObject = nullptr;
 	m_hitBox = GIZMO_BOX_NONE;
 	updateAABBs();
 }
@@ -39,15 +39,31 @@ void CGProj::CGGizmo::setAxisLength(float length)
 	m_axisLengthScale = length;
 }
 
-void CGProj::CGGizmo::setEditProxyObject(CGEditProxyObject * object)
+void CGProj::CGGizmo::setEditObject(CGEditObject * object)
 {
-	if (object != nullptr && m_editProxyObject != object)
+	if (object == nullptr)
+	{
+		object == nullptr; 
+		return;
+	}
+
+	if (m_editObject != object)
 	{
 		center = object->getPosition();
 		updateAABBs();
 	}
 
-	m_editProxyObject = object;
+	switch (object->getObjectType())
+	{
+	case EDIT_OBJECT_PROXY:
+		m_editObject = (CGEditProxyObject*)object;
+		break;
+	case EDIT_OBJECT_LIGHT:
+		m_editObject = (CGEditLightObject*)object;
+		break;
+	default:
+		assert(0);
+	}
 }
 
 bool CGProj::CGGizmo::rayOverlapBoxes(const GPED::c3RayInput & rayInput)
@@ -88,12 +104,12 @@ bool CGProj::CGGizmo::rayOverlapBoxes(const GPED::c3RayInput & rayInput)
 
 void CGProj::CGGizmo::translate(float xoffset, float yoffset, const chanQuatCamera& camera)
 {
-	assert(m_editProxyObject != nullptr);
+	assert(m_editObject != nullptr);
 
 	xoffset *= MOUSE_SENSITIVITY;
 	yoffset *= MOUSE_SENSITIVITY;
 
-	glm::vec3 proxyPosition = m_editProxyObject->getPosition();
+	glm::vec3 objectPosition = m_editObject->getPosition();
 	GPED::real deltaPos;
 	GPED::real sign;
 
@@ -105,9 +121,9 @@ void CGProj::CGGizmo::translate(float xoffset, float yoffset, const chanQuatCame
 		// below command is the same as dot equation above.
 		sign = ((camera.Right.x > 0) ? 1 : -1);
 
-		deltaPos = proxyPosition.x;
+		deltaPos = objectPosition.x;
 		deltaPos += xoffset * sign;
-		m_editProxyObject->setXposition(deltaPos);
+		m_editObject->setXposition(deltaPos);
 
 		// Gizmo Center Update
 		center.x = deltaPos;
@@ -115,9 +131,9 @@ void CGProj::CGGizmo::translate(float xoffset, float yoffset, const chanQuatCame
 	}
 	case GIZMO_BOX_YAXIS:
 	{
-		deltaPos = proxyPosition.y;
+		deltaPos = objectPosition.y;
 		deltaPos += yoffset;
-		m_editProxyObject->setYposition(deltaPos);
+		m_editObject->setYposition(deltaPos);
 
 		// Gizmo Center Update
 		center.y = deltaPos;
@@ -129,9 +145,9 @@ void CGProj::CGGizmo::translate(float xoffset, float yoffset, const chanQuatCame
 		// beow command is the same as glm::dot(camera.Right, worldZAxis)
 		sign = ((camera.Right.z > 0) ? 1 : -1);
 
-		deltaPos = proxyPosition.z;
+		deltaPos = objectPosition.z;
 		deltaPos += xoffset * sign;
-		m_editProxyObject->setZposition(deltaPos);
+		m_editObject->setZposition(deltaPos);
 
 		// Gizmo Center Update
 		center.z = deltaPos;
@@ -149,7 +165,7 @@ void CGProj::CGGizmo::translate(float xoffset, float yoffset, const chanQuatCame
 
 bool CGProj::CGGizmo::isActivated()
 {
-	return (m_editProxyObject != nullptr);
+	return (m_editObject != nullptr);
 }
 
 bool CGProj::CGGizmo::isHitActivated()

@@ -92,14 +92,13 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	// First Pass Setup For Deferred Rendering
 
 	// Object Manual Setting + Light Manual Setting
-
 	editProxies.reserve(20); // prevent STL from reallocating dynamically because of broad phase user data
-	for (unsigned i = 0; i < 15; ++i)
+	for (unsigned i = 0; i < 2; ++i)
 	{
 		editProxies.push_back(CGEditProxyObject());
 		editProxies[i].connectBroadPhase(&dBroadPhase);
 		editProxies[i].setBroadPhaseId(dBroadPhase.CreateProxy(editProxies[i].getFitAABB(), &editProxies[i]));
-		editProxies[i].setFirstPassDefShader(Deferred_First_Shader);
+		editProxies[i].setDefShader(Deferred_First_Shader);
 		
 		editProxies[i].setCMorLM(true);
 		
@@ -113,30 +112,29 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 		editProxies[i].setEmissiveTexture(assetManager.getTexture(TEXTURE_BLUE_MATRIX, true));
 	}
 
-
-	srand(13);
-	for (unsigned int i = 0; i < NR_LIGHTS; i++)
+	GPED::Random random(331);
+	editLights.reserve(20);
+	for (unsigned i = 0; i < 2; ++i)
 	{
-		// calculate slightly random offsets
-		float xPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
-		float yPos = ((rand() % 100) / 100.0) * 6.0 - 4.0;
-		float zPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
-		lightPositions.push_back(glm::vec3(xPos, yPos, zPos));
-		// also calculate random color
-		float rColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
-		float gColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
-		float bColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
-		lightColors.push_back(glm::vec3(rColor, gColor, bColor));
-	}
+		editLights.push_back(CGEditLightObject());
+		editLights[i].setObjectType(EDIT_OBJECT_LIGHT);
+		editLights[i].setScale(0.3);
+		editLights[i].connectBroadPhase(&dBroadPhase);
+		editLights[i].setBroadPhaseId(dBroadPhase.CreateProxy(editLights[i].getFitAABB(), &editLights[i]));
+		editLights[i].setDefShader(Deferred_Second_Shader);
+		editLights[i].setForwardShader(Simple_Shader);
 
-	for (unsigned int i = 0; i < NR_LIGHTS; ++i)
-	{
-		float lightMax = std::fmaxf(std::fmaxf(lightColors[i].r, lightColors[i].g), lightColors[i].b);
-		float radius =
-			(-linear + std::sqrtf(linear * linear - 4 * quadratic * (constant - (256.0 / 5.0) * lightMax)))
-			/ (2 * quadratic);
-		lightRadius.push_back(radius);
+		editLights[i].setPosition(random.randomVector(-5));
 	}
+	editLights[0].setLightType(EDIT_DIRECTION_LIGHT);
+	editLights[0].setLightDirection(glm::vec3(-0.2f, -1.0f, -0.3f));
+	editLights[0].setAmbientColor(glm::vec3(0.05));
+	editLights[0].setDiffuseColor(glm::vec3(0.4));
+	editLights[0].setSpecularColor(glm::vec3(0.5));
+
+
+	// Object Manual Setting + Light Manual Setting
+
 
 	// Debug Render Setting
 	bRender.connectTree(dBroadPhase.getTree());
@@ -151,8 +149,6 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	gizmoTest.initGizmo();
 	gizmoTest.setAxisWidth(5.0);
 	// Gizmo Setting
-
-	editLightTest.getPosition();
 }
 
 void CGProj::DeferredRenderer::initImgui()
@@ -223,8 +219,10 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	Deferred_First_Shader->setBool("material.isLMdiffuse", true);
 	Deferred_First_Shader->setBool("material.isLMspecular", false);
 	Deferred_First_Shader->setBool("material.isLMemissive", false);
-	Deferred_First_Shader->setMat4("viewModel", view * model);
-	Deferred_First_Shader->setMat3("MVNormalMatrix", glm::mat3(glm::transpose(glm::inverse(view * model))));
+	Deferred_First_Shader->setMat4("projection", projection);
+	Deferred_First_Shader->setMat4("view", view);
+	Deferred_First_Shader->setMat4("model", model);
+	Deferred_First_Shader->setMat3("ModelNormalMatrix", glm::mat3(glm::transpose(glm::inverse(model))));
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, assetManager.getTexture(TEXTURE_WOOD_PANEL, true));
 	renderQuad();
@@ -232,7 +230,8 @@ void CGProj::DeferredRenderer::display(int width, int height)
 
 	// Second Pass + Post Process
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
+	glClearColor(0, 0, 0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	if(wireDraw)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // This quad always fills the screen plane!
 
@@ -247,14 +246,31 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	glBindTexture(GL_TEXTURE_2D, gEmissive);
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, gBool);
-	for (unsigned int i = 0; i < lightPositions.size(); ++i)
+
+	for (unsigned i = 0; i < editLights.size(); ++i)
 	{
-		Deferred_Second_Shader->setVec3("lights[" + std::to_string(i) + "].Position", glm::vec3(view * glm::vec4(lightPositions[i], 1.0)));
-		Deferred_Second_Shader->setVec3("lights[" + std::to_string(i) + "].Color", lightColors[i]);
-		Deferred_Second_Shader->setFloat("lights[" + std::to_string(i) + "].Radius", lightRadius[i]);
-		Deferred_Second_Shader->setFloat("lights[" + std::to_string(i) + "].Linear", linear);
-		Deferred_Second_Shader->setFloat("lights[" + std::to_string(i) + "].Quadratic", quadratic);
+		EditLightType type = editLights[i].getLightType();
+		
+		switch (type)
+		{
+		case EDIT_DIRECTION_LIGHT: 
+			editLights[i].setLightPropertyOnShader(num_dir_light++, camera.Position);
+			break;
+		case EDIT_POINT_LIGHT:
+			editLights[i].setLightPropertyOnShader(num_point_light++, camera.Position);
+			break;
+		case EDIT_SPOT_LIGHT:
+			editLights[i].setLightPropertyOnShader(num_spot_light++, camera.Position);
+			break;
+		}
 	}
+	Deferred_Second_Shader->setInt("DIR_USED_NUM", num_dir_light);
+	Deferred_Second_Shader->setInt("POINT_USED_NUM", num_point_light);
+	Deferred_Second_Shader->setInt("SPOT_USED_NUM", num_spot_light);
+	num_dir_light = 0;
+	num_point_light = 0;
+	num_spot_light = 0;
+
 	renderScreenQuad();
 	// Second Pass + Post Process
 
@@ -266,22 +282,12 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
 	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClearColor(0, 0, 0, 1.0);
+	// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	if (lightDraw)
-	{
-		Simple_Shader->use();
-		Simple_Shader->setMat4("view", view);
-		Simple_Shader->setMat4("projection", projection);
-		for (unsigned int i = 0; i < lightPositions.size(); ++i)
-		{
-			glm::mat4 t_model(1.0);
-			t_model = glm::translate(t_model, lightPositions[i]);
-			t_model = glm::scale(t_model, glm::vec3(0.25f));
-			Simple_Shader->setMat4("model", t_model);
-			Simple_Shader->setVec3("Color", lightColors[i]);
-			renderCube();
-		}
-	}
+		for (unsigned int i = 0; i < editLights.size(); ++i)
+			editLights[i].forwardRender(view, projection);
 
 	// Broad Phase Debug Rendering
 	if (BroadDebug)
@@ -302,10 +308,10 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	}
 
 	// Picked One
-	if (pickedEditBox)
+	if (pickedEditBox != nullptr)
 	{
 		gizmoTest.setAxisLength(pickedEditBox->getScale().x + 1.0f);
-		gizmoTest.setEditProxyObject(pickedEditBox);
+		gizmoTest.setEditObject(pickedEditBox);
 		gizmoTest.renderGizmo(view, projection);
 		gizmoTest.renderGizmoBox(view, projection);
 	}
@@ -444,12 +450,12 @@ void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window,
 					raycastWrapper.rayOutput.startPoint - camera.Front,
 					raycastWrapper.rayOutput.hitPoint });
 
-				pickedEditBox = (CGEditProxyObject*)raycastWrapper.userData;
+				pickedEditBox = (CGEditObject*)raycastWrapper.userData;
 			}
 			else
 			{
 				pickedEditBox = nullptr;
-				gizmoTest.setEditProxyObject(nullptr);
+				gizmoTest.setEditObject(nullptr);
 			}
 		}
 	}

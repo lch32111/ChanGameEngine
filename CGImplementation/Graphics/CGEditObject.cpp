@@ -235,7 +235,7 @@ int CGProj::CGEditObject::getBroadPhaseId()
 	return m_BroadPhaseId;
 }
 
-void CGProj::CGEditObject::setFirstPassDefShader(Shader * shader)
+void CGProj::CGEditObject::setDefShader(Shader * shader)
 {
 	m_DefShader = shader;
 }
@@ -366,6 +366,25 @@ glm::vec3 CGProj::CGEditObject::getPosition()
 		assert(0);
 		break;
 	}
+}
+
+void CGProj::CGEditObject::setScale(float scale)
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		m_EditBox.setHalfSize(scale, scale, scale);
+		break;
+	case EDIT_PRIMITIVE_SPHERE:
+		m_EditSphere.setRaidus(scale);
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	updateBroadPhaseProxy();
 }
 
 glm::vec3 CGProj::CGEditObject::getScale()
@@ -599,18 +618,15 @@ void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 &
 
 	// 2. Vertex Setting
 	m_DefShader->setMat4("projection", proj);
+	m_DefShader->setMat4("view", view);
 	
-	glm::mat4 viewModel(1.0);
-	
-	// Model Calculation First
-	viewModel = glm::translate(viewModel, this->getPosition());
+	glm::mat4 model(1.0);
+	model = glm::translate(model, this->getPosition());
 	// model = glm::rotate(model, ) // TODO: add the rotation function later
-	viewModel = glm::scale(viewModel, this->getScale());
+	model = glm::scale(model, this->getScale());
 
-	// View Model Calculation Second
-	viewModel = view * viewModel;
-	m_DefShader->setMat4("viewModel", viewModel);
-	m_DefShader->setMat3("MVNormalMatrix", glm::mat3(glm::transpose(glm::inverse(viewModel))));
+	m_DefShader->setMat4("model", model);
+	m_DefShader->setMat3("ModelNormalMatrix", glm::mat3(glm::transpose(glm::inverse(model))));
 	// 2. Vertex Setting
 
 	// Now Ready to render. Go render according to the primitive
@@ -811,14 +827,146 @@ CGProj::EditProxyType CGProj::CGEditProxyObject::getProxyType()
 // =================================================================
 /*** CG Light Object  ***/
 
-
-
-
-/*** CG Light Object  ***/
-// =================================================================
-
 CGProj::CGEditLightObject::CGEditLightObject()
 {
+	setLightType(EDIT_POINT_LIGHT);
+	setPosition(glm::vec3(0));
+	setLightDirection(glm::vec3(0, 1, 0));
+	setAmbientColor(glm::vec3(0.1));
+	setDiffuseColor(glm::vec3(0.2));
+	setSpecularColor(glm::vec3(1.0));
+	
+	m_AttnConstant = 1.0;
+	m_AttnLinear = 0.7;
+	m_AttnQuadratic = 1.8;
+	updateRadius();
+
+	setInnerCutOffInDegree(30);
+	setOuterCutOffInDegree(50);
+}
+
+void CGProj::CGEditLightObject::setForwardShader(Shader * shader)
+{
+	m_forwardShader = shader;
+}
+
+void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm::mat4 & proj)
+{
+	glm::mat4 model(1.0);
+	model = glm::translate(model, this->getPosition());
+	model = glm::scale(model, this->getScale());
+
+	m_forwardShader->use();
+	m_forwardShader->setMat4("projection", proj);
+	m_forwardShader->setMat4("view", view);
+	m_forwardShader->setMat4("model", model);
+	m_forwardShader->setVec3("Color", m_lightDiffuse);
+
+	renderPrimitive();
+}
+
+void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
+{
+	// CGEditObject::UIrender(am);
+
+	ImGui::Begin("Edit Object");
+
+	// Proxy Id
+	ImGui::Text("Proxy Id : %d", m_BroadPhaseId);
+
+	// Primitive Type
+	switch (CGEditLightObject::m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+		ImGui::Text("Primitive Type : AABB");
+		break;
+	case EDIT_PRIMITIVE_OBB:
+		ImGui::Text("Primitive Type : OBB");
+		break;
+	case EDIT_PRIMITIVE_SPHERE:
+		ImGui::Text("Primitive Type : Sphere");
+		break;
+	}
+
+	// Position
+	glm::vec3 pickedPos = this->getPosition();
+	ImGui::Text("Position %.2f %.2f %.2f", pickedPos.x, pickedPos.y, pickedPos.z);
+
+	// Primitive Dimension
+	switch (CGEditLightObject::m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		glm::vec3 halfExtents = this->getHalfSize();
+		ImGui::Text("HalfSize : %.2f %.2f %.2f", halfExtents.x, halfExtents.y, halfExtents.z);
+		break;
+	case EDIT_PRIMITIVE_SPHERE:
+		ImGui::Text("Radius : %.2f", this->getRadius());
+		break;
+	}
+
+	// Light Type
+	int lightType = (int)m_LightType;
+	ImGui::RadioButton("Dir Light", &lightType, 0); ImGui::SameLine();
+	ImGui::RadioButton("Point Light", &lightType, 1); ImGui::SameLine();
+	ImGui::RadioButton("Spot Light", &lightType, 2);
+	m_LightType = (EditLightType)lightType;
+
+	switch (m_LightType)
+	{
+	case EDIT_DIRECTION_LIGHT:
+	{
+
+		break;
+	}
+	case EDIT_POINT_LIGHT:
+	{
+		// Attenuation
+		ImGui::Text("Light Radius : %.2f", m_AttnRadius);
+		ImGui::Text("Attn Constant : %.2f", m_AttnConstant);
+		if (ImGui::SliderFloat("linear", &m_AttnLinear, 0.0001, 1.0, "Attn Linear : %f")) updateRadius();
+		if (ImGui::SliderFloat("quadratic", &m_AttnQuadratic, 0.000001, 1.0, "Attn Quadratic : %f")) updateRadius();
+		break;
+	}
+	case EDIT_SPOT_LIGHT:
+	{
+		// Attenuation
+		ImGui::Text("Light Radius : %.2f", m_AttnRadius);
+		ImGui::Text("Attn Constant : %.2f", m_AttnConstant);
+		if (ImGui::SliderFloat("linear", &m_AttnLinear, 0.0001, 1.0, "Attn Linear : %f")) updateRadius();
+		if (ImGui::SliderFloat("quadratic", &m_AttnQuadratic, 0.000001, 1.0, "Attn Quadratic : %f")) updateRadius();
+		break;
+	}
+	}
+
+	// Light Color
+	float temp[3] = { m_lightAmbient.x,m_lightAmbient.y, m_lightAmbient.z };
+	ImGui::ColorEdit3("Ambient", temp);
+	m_lightAmbient = { temp[0], temp[1], temp[2] };
+
+	temp[0] = m_lightDiffuse.x, temp[1] = m_lightDiffuse.y, temp[2] = m_lightDiffuse.z;
+	ImGui::ColorEdit3("Diffuse", temp);
+	m_lightDiffuse = { temp[0], temp[1], temp[2] };
+
+	temp[0] = m_lightSpecular.x, temp[1] = m_lightSpecular.y, temp[2] = m_lightSpecular.z;
+	ImGui::ColorEdit3("specular", temp);
+	m_lightSpecular = { temp[0], temp[1], temp[2] };
+
+	
+
+
+
+	ImGui::End();
+}
+
+void CGProj::CGEditLightObject::setLightType(EditLightType e)
+{
+	m_LightType = e;
+}
+
+CGProj::EditLightType CGProj::CGEditLightObject::getLightType()
+{
+	return m_LightType;
 }
 
 void CGProj::CGEditLightObject::setPosition(const glm::vec3 & p)
@@ -832,7 +980,7 @@ void CGProj::CGEditLightObject::setPosition(const glm::vec3 & p)
 void CGProj::CGEditLightObject::setPosition(const GPED::real x, const GPED::real y, const GPED::real z)
 {
 	CGEditObject::setPosition(x, y, z);
-	
+
 	m_lightPosition.x = x;
 	m_lightPosition.y = y;
 	m_lightPosition.z = z;
@@ -1034,18 +1182,18 @@ float CGProj::CGEditLightObject::getLightRadius()
 void CGProj::CGEditLightObject::updateRadius()
 {
 	// the diffuse color of light is used for the max component of light
-	float lightMin = 1 / (5.f / 256.f);
+	float lightMin = 1 / (1.f / 256.f);
 	float lightMax = std::fmaxf(std::fmaxf(m_lightDiffuse.r, m_lightDiffuse.g), m_lightDiffuse.b);
 
 	// Calculate the radius of light volume
-	m_AttnRadius = 
+	m_AttnRadius =
 		(
 			-m_AttnLinear +
 			std::sqrtf(
-						m_AttnLinear * m_AttnLinear - 4 * m_AttnQuadratic *
-						(m_AttnConstant - lightMax * lightMin))
-		) 
-			/ 
+				m_AttnLinear * m_AttnLinear - 4 * m_AttnQuadratic *
+				(m_AttnConstant - lightMax * lightMin))
+			)
+		/
 		(2 * m_AttnQuadratic);
 }
 
@@ -1080,5 +1228,59 @@ float CGProj::CGEditLightObject::getOuterCutOff()
 	return m_SpotOuterCutOff;
 }
 
+void CGProj::CGEditLightObject::setLightPropertyOnShader(int index, const glm::vec3& cameraPos)
+{
+	std::string sIndex = std::to_string(index);
+
+	m_DefShader->setVec3("cameraPos", cameraPos);
+	switch (m_LightType)
+	{
+	case EDIT_DIRECTION_LIGHT:
+	{
+		m_DefShader->setVec3("dirLights[" + sIndex + "].Direction", m_lightDirection);
+
+		m_DefShader->setVec3("dirLights[" + sIndex + "].Ambient", m_lightAmbient);
+		m_DefShader->setVec3("dirLights[" + sIndex + "].Diffuse", m_lightDiffuse);
+		m_DefShader->setVec3("dirLights[" + sIndex + "].Specular", m_lightSpecular);
+		break;
+	}
+	case EDIT_POINT_LIGHT:
+	{	
+		m_DefShader->setVec3("pointLights[" + sIndex + "].Position", m_lightPosition);
+
+		m_DefShader->setFloat("pointLights[" + sIndex + "].Constant", m_AttnConstant);
+		m_DefShader->setFloat("pointLights[" + sIndex + "].Linear", m_AttnLinear);
+		m_DefShader->setFloat("pointLights[" + sIndex + "].Quadratic", m_AttnQuadratic);
+		m_DefShader->setFloat("pointLights[" + sIndex + "].Radius", m_AttnRadius);
+
+		m_DefShader->setVec3("pointLights[" + sIndex + "].Ambient", m_lightAmbient);
+		m_DefShader->setVec3("pointLights[" + sIndex + "].Diffuse", m_lightDiffuse);
+		m_DefShader->setVec3("pointLights[" + sIndex + "].Specular", m_lightSpecular);
+		break;
+	}
+	case EDIT_SPOT_LIGHT:
+	{	
+		m_DefShader->setVec3("spotLights[" + sIndex + "].Position", m_lightPosition);
+		m_DefShader->setVec3("spotLights[" + sIndex + "].Direction", m_lightDirection);
+
+		m_DefShader->setFloat("spotLights[" + sIndex + "].Inner_CutOff", m_SpotInnerCutOff);
+		m_DefShader->setFloat("spotLights[" + sIndex + "].Outer_CutOff", m_SpotOuterCutOff);
+
+		m_DefShader->setFloat("spotLights[" + sIndex + "].Constant", m_AttnConstant);
+		m_DefShader->setFloat("spotLights[" + sIndex + "].Linear", m_AttnLinear);
+		m_DefShader->setFloat("spotLights[" + sIndex + "].Quadratic", m_AttnQuadratic);
+		m_DefShader->setFloat("spotLights[" + sIndex + "].Radius", m_AttnRadius);
+
+		m_DefShader->setVec3("spotLights[" + sIndex + "].Ambient", m_lightAmbient);
+		m_DefShader->setVec3("spotLights[" + sIndex + "].Diffuse", m_lightDiffuse);
+		m_DefShader->setVec3("spotLights[" + sIndex + "].Specular", m_lightSpecular);
+		break;
+	}
+	default:
+		assert(0);
+	}
+}
 
 
+/*** CG Light Object  ***/
+// =================================================================

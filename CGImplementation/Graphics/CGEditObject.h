@@ -93,7 +93,7 @@ namespace CGProj
 		// The basic primitive render is deferred rendering.
 		// Proxy Object should have first pass deferred shader !
 		// Light Object should have second pass deferred shader !
-		void setFirstPassDefShader(Shader* shader); 
+		void setDefShader(Shader* shader); 
 		// Must Init Method
 
 		/*** Primitive Method ***/
@@ -108,6 +108,8 @@ namespace CGProj
 		virtual void setZposition(const GPED::real z);
 		virtual glm::vec3 getPosition();
 
+		// smae size for XYZ axes
+		void setScale(float scale);
 		glm::vec3 getScale();
 
 		GPED::c3AABB getFitAABB();
@@ -232,6 +234,12 @@ namespace CGProj
 		CGEditLightObject();
 
 		/*** Light Method ***/
+		void setForwardShader(Shader* shader);
+		void forwardRender(const glm::mat4& view, const glm::mat4& proj);
+		virtual void UIrender(CGAssetManager& am);
+
+		void setLightType(EditLightType e);
+		EditLightType getLightType();
 
 		// These Methods are overrided from CGEditObect
 		// in order to sync the edit positoin and light position.
@@ -290,9 +298,13 @@ namespace CGProj
 		void setOuterCutOffInDegree(const float degree);
 		void setOuterCutOffInRadian(const float radian);
 		float getOuterCutOff();
+
+		// lighting Setting in World Space
+		void setLightPropertyOnShader(int index, const glm::vec3& cameraPos);
 		/*** Light Method ***/
 
 	private:
+		Shader* m_forwardShader;
 		EditLightType m_LightType;
 
 		// Point and Spot Light(Flash Light)
@@ -307,10 +319,10 @@ namespace CGProj
 		glm::vec3 m_lightSpecular;
 
 		// Attenuation 
-		float m_AttnConstant = 1.0f;
-		float m_AttnLinear = 0.0f;
-		float m_AttnQuadratic = 0.0f;
-		float m_AttnRadius = 0.0f;
+		float m_AttnConstant;
+		float m_AttnLinear;
+		float m_AttnQuadratic;
+		float m_AttnRadius;
 		void updateRadius();
 
 		// Spot Light Factors

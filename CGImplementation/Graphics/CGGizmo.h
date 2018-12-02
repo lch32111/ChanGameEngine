@@ -21,7 +21,7 @@ namespace CGProj
 
 		void setAxisWidth(float width);
 		void setAxisLength(float length);
-		void setEditProxyObject(CGEditProxyObject* object);
+		void setEditObject(CGEditObject* object);
 
 		bool isActivated();
 		bool isHitActivated();
@@ -29,7 +29,7 @@ namespace CGProj
 
 		void translate(float xoffset, float yoffset, const chanQuatCamera& camera);
 	private:
-		CGEditProxyObject* m_editProxyObject;
+		CGEditObject* m_editObject;
 		CGRenderLine m_lineRenderer;
 		
 		float m_axisWidth = 1.0f;

@@ -1,6 +1,6 @@
 // shadertype=glsl
 // Deferred Second Pass Fragment Shader
-// The lighting will be calculated in View Space.
+// The lighting will be calculated in World Space.
 
 #version 330 core
 out vec4 FragColor;
@@ -72,10 +72,15 @@ uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform int SPOT_USED_NUM;
 uniform SpotLight spotLights[NR_SPOT_LIGHTS];
 
+uniform vec3 cameraPos;
+
 // function prototypes
-vec3 CalcDirLight(DirLight light, vec3 albedo, float specular, vec3 fragpos, vec3 normal);
-vec3 CalcPointLight(PointLight light, vec3 albedo, float specular, vec3 fragpos, vec3 normal);
-vec3 CalcSpotLight(SpotLight light, vec3 albedo, float specular, vec3 fragpos, vec3 normal);
+vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal);
+vec3 CalcLMPointLight(PointLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal);
+vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal);
+vec3 CalcCMDirLight(DirLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal);
+vec3 CalcCMPointLight(PointLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal);
+vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal);
 
 void main()
 {
@@ -84,7 +89,6 @@ void main()
     vec3 FragPos = texture(gPosition, TexCoords).rgb;
     vec3 Normal = texture(gNormal, TexCoords).rgb;
     
-    vec3 viewDir = normalize(-FragPos); // because this is in viewSpace!
 	vec3 lighting = vec3(0.0);
     if(MyBool.a == 1)
     {
@@ -97,13 +101,13 @@ void main()
         if(MyBool.b == 1) LMemissive = texture(gEmissive, TexCoords).rgb;
         
 		for(int i = 0; i < DIR_USED_NUM; ++i)
-            lighting += CalcDirLight(dirLights[i], LMAlbedo, LMSpecular, fragpos, normal);
+            lighting += CalcLMDirLight(dirLights[i], LMAlbedo, LMSpecular, 128, FragPos, Normal);
         
         for(int i = 0; i < POINT_USED_NUM; ++i)
-            lighting += CalcPointLight(pointLights[i], LMAlbedo, LMSpecular, fragpos, normal);
+            lighting += CalcLMPointLight(pointLights[i], LMAlbedo, LMSpecular, 128, FragPos, Normal);
 
         for(int i = 0; i < SPOT_USED_NUM; ++i)
-            lighting += CalcSpotLight(spotLights[i], LMAlbedo, LMSpecular, fragpos, normal);
+            lighting += CalcLMSpotLight(spotLights[i], LMAlbedo, LMSpecular, 128, FragPos, Normal);
 
         lighting += LMemissive;
     }
@@ -115,8 +119,15 @@ void main()
         float CMshininess = texture(gAlbedoSpec, TexCoords).a;
         vec3 CMspecular = texture(gEmissive, TexCoords).rgb;
         
-    }
+		for(int i = 0; i < DIR_USED_NUM; ++i)
+            lighting += CalcCMDirLight(dirLights[i], CMambient, CMdiffuse, CMspecular, CMshininess * 128.0, FragPos, Normal);
+        
+        for(int i = 0; i < POINT_USED_NUM; ++i)
+            lighting += CalcCMPointLight(pointLights[i], CMambient, CMdiffuse, CMspecular, CMshininess * 128.0, FragPos, Normal);
 
+        for(int i = 0; i < SPOT_USED_NUM; ++i)
+            lighting += CalcCMSpotLight(spotLights[i], CMambient, CMdiffuse, CMspecular, CMshininess * 128.0, FragPos, Normal);
+    }
 
     // post-processing for HDR with tone mapping and gamma corection
     const float gamma = 2.2;
@@ -129,23 +140,198 @@ void main()
 	// FragColor = vec4(lighting, 1.0);
 }
 
-vec3 CalcDirLight(DirLight light, vec3 albedo, float specular, vec3 fragpos, vec3 normal)
+vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal)
 {
-    // View Space + Blin-Phong Lighting
+    // World Space + Blinn-Phong Lighting
     vec3 lightDir = normalize(-light.Direction);
-    vec3 viewDir = normalize(-fragpos);
+    vec3 viewDir = normalize(cameraPos - fragpos);
+    
+    // diffuse shading
+    float diff = max(dot(normal, lightDir), 0.0);
+
+    // specular shading
+    vec3 halfwayDir = normalize(lightDir + viewDir);	
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), shininess);
+    
+    // No attenuation for Directional Light
+    // Then Combine the result
+    vec3 ambient = light.Ambient * albedo;
+    vec3 diffuse = light.Diffuse * diff * albedo;
+    vec3 specular = light.Specular * spec * spclr;
+    return (ambient + diffuse + specular);
+}
+
+vec3 CalcLMPointLight(PointLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal)
+{
+	// World Space + Blinn-Phong Lighting
+	
+	// Early Exit
+	vec3 FragToLight = light.Position - fragpos;
+	float SquaredDist = dot(FragToLight, FragToLight);
+	if(SquaredDist > light.Radius * light.Radius) return vec3(0);
+
+	// Calculate point light
+	float dist = sqrt(SquaredDist);
+	vec3 lightDir = FragToLight * (1.0 / dist);
+
+	// diffuse shading
+	float diff = max(dot(normal, lightDir), 0.0);
+	
+	// specular shading
+	vec3 viewDir = normalize(cameraPos - fragpos);
+	vec3 halfwayDir = normalize(lightDir + viewDir);
+	float spec = pow(max(dot(normal, halfwayDir), 0.0), shininess);
+
+	// attenuation
+	float attenuation = 1.0 / (light.Constant + light.Linear * dist + light.Quadratic * dist * dist);
+	
+	// combine the result
+	vec3 ambient = light.Ambient * albedo;
+	vec3 diffuse = light.Diffuse * diff * albedo;
+	vec3 specular = light.Specular * spec * spclr;
+
+	ambient *= attenuation;
+	diffuse *= attenuation;
+	specular *= attenuation;
+	
+	return (ambient + diffuse + specular);
+}
+
+vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal)
+{
+	// World Space + Blinn-Phong Lighting
+	
+	// Early Exit
+	vec3 FragToLight = light.Position - fragpos;
+	float SquaredDist = dot(FragToLight, FragToLight);
+	if(SquaredDist > light.Radius * light.Radius) return vec3(0);
+
+	// Calculate Spot Light
+	float dist = sqrt(SquaredDist);
+	vec3 lightDir = FragToLight * (1.0 / dist);
+	
+	// diffuse shading
+	float diff = max(dot(normal, lightDir), 0.0);
+
+	// specular shading
+	vec3 viewDir = normalize(cameraPos - fragpos);
+	vec3 halfwayDir = normalize(lightDir + viewDir);
+	float spec = pow(max(dot(normal, halfwayDir), 0.0), shininess);
+
+	// attenuation
+	float attenuation = 1.0 / (light.Constant + light.Linear * dist + light.Quadratic * dist * dist);
+
+	// smooth the spotlight
+	float theta = dot(lightDir, -normalize(light.Direction));
+	float epsilon = light.Inner_CutOff - light.Outer_CutOff;
+	float spot_intensity = clamp((theta - light.Outer_CutOff) / epsilon, 0.0, 1.0);
+
+	// combine the result
+	vec3 ambient = light.Ambient * albedo;
+	vec3 diffuse = light.Diffuse * diff * albedo;
+	vec3 specular = light.Specular * spec * spclr;
+
+	ambient *= attenuation * spot_intensity;
+	diffuse *= attenuation * spot_intensity;
+	specular *= attenuation * spot_intensity;
+
+	return  (ambient + diffuse + specular);
+}
+
+vec3 CalcCMDirLight(DirLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal)
+{
+    // World Space + Blinn-Phong Lighting
+    vec3 lightDir = normalize(-light.Direction);
+    vec3 viewDir = normalize(cameraPos - fragpos);
     
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
 
     // specular shading
     vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 128.0);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), shininess);
     
     // No attenuation for Directional Light
     // Then Combine the result
-    vec3 ambient = light.Ambient * albedo;
+    vec3 ambient = light.Ambient * ambnt;
     vec3 diffuse = light.Diffuse * diff * albedo;
-    vec3 specular = light.Specular * spec * specular;
+    vec3 specular = light.Specular * spec * spclr;
     return (ambient + diffuse + specular);
+}
+
+vec3 CalcCMPointLight(PointLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal)
+{
+	// World Space + Blinn-Phong Lighting
+	
+	// Early Exit
+	vec3 FragToLight = light.Position - fragpos;
+	float SquaredDist = dot(FragToLight, FragToLight);
+	if(SquaredDist > light.Radius * light.Radius) return vec3(0);
+
+	// Calculate point light
+	float dist = sqrt(SquaredDist);
+	vec3 lightDir = FragToLight * (1.0 / dist);
+
+	// diffuse shading
+	float diff = max(dot(normal, lightDir), 0.0);
+	
+	// specular shading
+	vec3 viewDir = normalize(cameraPos - fragpos);
+	vec3 halfwayDir = normalize(lightDir + viewDir);
+	float spec = pow(max(dot(normal, halfwayDir), 0.0), shininess);
+
+	// attenuation
+	float attenuation = 1.0 / (light.Constant + light.Linear * dist + light.Quadratic * dist * dist);
+	
+	// combine the result
+	vec3 ambient = light.Ambient * ambnt;
+	vec3 diffuse = light.Diffuse * diff * albedo;
+	vec3 specular = light.Specular * spec * spclr;
+
+	ambient *= attenuation;
+	diffuse *= attenuation;
+	specular *= attenuation;
+	
+	return (ambient + diffuse + specular);
+}
+
+vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal)
+{
+	// World Space + Blinn-Phong Lighting
+	
+	// Early Exit
+	vec3 FragToLight = light.Position - fragpos;
+	float SquaredDist = dot(FragToLight, FragToLight);
+	if(SquaredDist > light.Radius * light.Radius) return vec3(0);
+
+	// Calculate Spot Light
+	float dist = sqrt(SquaredDist);
+	vec3 lightDir = FragToLight * (1.0 / dist);
+	
+	// diffuse shading
+	float diff = max(dot(normal, lightDir), 0.0);
+
+	// specular shading
+	vec3 viewDir = normalize(cameraPos - fragpos);
+	vec3 halfwayDir = normalize(lightDir + viewDir);
+	float spec = pow(max(dot(normal, halfwayDir), 0.0), shininess);
+
+	// attenuation
+	float attenuation = 1.0 / (light.Constant + light.Linear * dist + light.Quadratic * dist * dist);
+
+	// smooth the spotlight
+	float theta = dot(lightDir, -normalize(light.Direction));
+	float epsilon = light.Inner_CutOff - light.Outer_CutOff;
+	float spot_intensity = clamp((theta - light.Outer_CutOff) / epsilon, 0.0, 1.0);
+
+	// combine the result
+	vec3 ambient = light.Ambient * ambnt;
+	vec3 diffuse = light.Diffuse * diff * albedo;
+	vec3 specular = light.Specular * spec * spclr;
+
+	ambient *= attenuation * spot_intensity;
+	diffuse *= attenuation * spot_intensity;
+	specular *= attenuation * spot_intensity;
+
+	return  (ambient + diffuse + specular);
 }

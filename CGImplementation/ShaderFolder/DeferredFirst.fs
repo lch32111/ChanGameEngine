@@ -1,7 +1,7 @@
 // shadertype=glsl
 
 // Deferred First Pass Fragment Shader
-// The lighting will be calculated in View Space.
+// The lighting will be calculated in World Space.
 
 #version 330 core
 
@@ -42,8 +42,8 @@ void main()
     gPosition = FragPos;
     // also store the per-fragment normals into the gbuffer
     gNormal = normalize(Normal);
-
-    gBool.a = material.CMorLM ? 1 : 0;
+    
+	gBool.a = material.CMorLM ? 1 : 0;
     if(material.CMorLM)
     {
         gBool.rgb = vec3(1.0);

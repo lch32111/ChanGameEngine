@@ -85,12 +85,15 @@ vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float
 void main()
 {
     // retrieve data from G-buffer
-    vec4 MyBool = texture(gBool, TexCoords);
+    vec4 MyBool = texture(gBool, TexCoords).rgba;
+	if(MyBool.a >= 1.0) discard; // BackGround Pixel
+
     vec3 FragPos = texture(gPosition, TexCoords).rgb;
     vec3 Normal = texture(gNormal, TexCoords).rgb;
     
 	vec3 lighting = vec3(0.0);
-    if(MyBool.a == 1)
+	
+    if(MyBool.a - 0.5 >= 0.0)
     {
         // Light Map Calculation
         vec3 LMAlbedo = vec3(1.0); 
@@ -110,11 +113,13 @@ void main()
             lighting += CalcLMSpotLight(spotLights[i], LMAlbedo, LMSpecular, 128, FragPos, Normal);
 
         lighting += LMemissive;
+
+		// lighting += vec3(0.98, 0.88, 0);
     }
     else
     {
         // Color Material Calculation
-        vec3 CMambient = texture(gBool, TexCoords).rgb;
+        vec3 CMambient = vec3(MyBool.rgb);
         vec3 CMdiffuse = texture(gAlbedoSpec, TexCoords).rgb;
         float CMshininess = texture(gAlbedoSpec, TexCoords).a;
         vec3 CMspecular = texture(gEmissive, TexCoords).rgb;
@@ -127,7 +132,11 @@ void main()
 
         for(int i = 0; i < SPOT_USED_NUM; ++i)
             lighting += CalcCMSpotLight(spotLights[i], CMambient, CMdiffuse, CMspecular, CMshininess * 128.0, FragPos, Normal);
+
     }
+
+	// if (MyBool.x == 0 && MyBool.y == 0 && MyBool.z == 0)
+		// lighting = vec3(1, 0, 0);
 
     // post-processing for HDR with tone mapping and gamma corection
     const float gamma = 2.2;

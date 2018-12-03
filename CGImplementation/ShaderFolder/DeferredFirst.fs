@@ -43,7 +43,7 @@ void main()
     // also store the per-fragment normals into the gbuffer
     gNormal = normalize(Normal);
     
-	gBool.a = material.CMorLM ? 1 : 0;
+	gBool.a = material.CMorLM ? 0.9 : 0.1; 
     if(material.CMorLM)
     {
         gBool.rgb = vec3(1.0);

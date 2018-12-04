@@ -718,7 +718,7 @@ void CGProj::CGEditProxyObject::UIrender(CGAssetManager& am)
 		ImGui::ColorEdit3("specular", temp);
 		m_CMspecular = { temp[0], temp[1], temp[2] };
 
-		float min = 0.001f;
+		float min = 0.1f;
 		float max = 1.f;
 		ImGui::DragScalar("shininess", ImGuiDataType_Float, &m_CMshininess, 0.005f, &min, &max, "%f", 1.0f);
 
@@ -838,11 +838,11 @@ CGProj::CGEditLightObject::CGEditLightObject()
 	
 	m_AttnConstant = 1.0;
 	m_AttnLinear = 0.7;
-	m_AttnQuadratic = 1.8;
+	m_AttnQuadratic = 1.0;
 	updateRadius();
 
-	setInnerCutOffInDegree(30);
-	setOuterCutOffInDegree(50);
+	setInnerCutOffInDegree(12.5);
+	setOuterCutOffInDegree(17.5);
 }
 
 void CGProj::CGEditLightObject::setForwardShader(Shader * shader)
@@ -916,7 +916,11 @@ void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
 	{
 	case EDIT_DIRECTION_LIGHT:
 	{
-
+		// Light Direction
+		float t_dir[3] = { m_lightDirection.x, m_lightDirection.y, m_lightDirection.z };
+		ImGui::InputFloat3("Light Direction", t_dir, "%.2f");
+		m_lightDirection.x = t_dir[0], m_lightDirection.y = t_dir[1], m_lightDirection.z = t_dir[2];
+		m_lightDirection = glm::normalize(m_lightDirection);
 		break;
 	}
 	case EDIT_POINT_LIGHT:
@@ -930,6 +934,20 @@ void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
 	}
 	case EDIT_SPOT_LIGHT:
 	{
+		// Light Direction
+		float t_dir[3] = { m_lightDirection.x, m_lightDirection.y, m_lightDirection.z };
+		ImGui::InputFloat3("Light Direction", t_dir, "%.2f");
+		m_lightDirection.x = t_dir[0], m_lightDirection.y = t_dir[1], m_lightDirection.z = t_dir[2];
+		m_lightDirection = glm::normalize(m_lightDirection);
+
+		// Cut off of Spot Light
+		float inner_Indegree = glm::acos(m_SpotInnerCutOff) * 180.f / glm::pi<float>();
+		float outer_Indegree = glm::acos(m_SpotOuterCutOff) * 180.f / glm::pi<float>();
+		if(ImGui::SliderFloat("In", &inner_Indegree, 0, outer_Indegree, "Inner Cutoff In Degree :  %.2f"))
+			setInnerCutOffInDegree(inner_Indegree);
+		if(ImGui::SliderFloat("Out", &outer_Indegree, inner_Indegree, 45, "Outer Cutoff In Degree : %.2f"))
+			setOuterCutOffInDegree(outer_Indegree);
+
 		// Attenuation
 		ImGui::Text("Light Radius : %.2f", m_AttnRadius);
 		ImGui::Text("Attn Constant : %.2f", m_AttnConstant);
@@ -951,9 +969,6 @@ void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
 	temp[0] = m_lightSpecular.x, temp[1] = m_lightSpecular.y, temp[2] = m_lightSpecular.z;
 	ImGui::ColorEdit3("specular", temp);
 	m_lightSpecular = { temp[0], temp[1], temp[2] };
-
-	
-
 
 
 	ImGui::End();

@@ -86,13 +86,11 @@ void main()
 {
     // retrieve data from G-buffer
     vec4 MyBool = texture(gBool, TexCoords).rgba;
-	if(MyBool.a >= 1.0) discard; // BackGround Pixel
-
+    if(MyBool.a >= 1.0) discard;
     vec3 FragPos = texture(gPosition, TexCoords).rgb;
     vec3 Normal = texture(gNormal, TexCoords).rgb;
     
 	vec3 lighting = vec3(0.0);
-	
     if(MyBool.a - 0.5 >= 0.0)
     {
         // Light Map Calculation
@@ -134,9 +132,6 @@ void main()
             lighting += CalcCMSpotLight(spotLights[i], CMambient, CMdiffuse, CMspecular, CMshininess * 128.0, FragPos, Normal);
 
     }
-
-	// if (MyBool.x == 0 && MyBool.y == 0 && MyBool.z == 0)
-		// lighting = vec3(1, 0, 0);
 
     // post-processing for HDR with tone mapping and gamma corection
     const float gamma = 2.2;
@@ -231,7 +226,7 @@ vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess,
 	float attenuation = 1.0 / (light.Constant + light.Linear * dist + light.Quadratic * dist * dist);
 
 	// smooth the spotlight
-	float theta = dot(lightDir, -normalize(light.Direction));
+	float theta = dot(lightDir, normalize(-light.Direction));
 	float epsilon = light.Inner_CutOff - light.Outer_CutOff;
 	float spot_intensity = clamp((theta - light.Outer_CutOff) / epsilon, 0.0, 1.0);
 
@@ -240,7 +235,7 @@ vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess,
 	vec3 diffuse = light.Diffuse * diff * albedo;
 	vec3 specular = light.Specular * spec * spclr;
 
-	ambient *= attenuation * spot_intensity;
+	ambient *= attenuation;
 	diffuse *= attenuation * spot_intensity;
 	specular *= attenuation * spot_intensity;
 
@@ -329,7 +324,7 @@ vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float
 	float attenuation = 1.0 / (light.Constant + light.Linear * dist + light.Quadratic * dist * dist);
 
 	// smooth the spotlight
-	float theta = dot(lightDir, -normalize(light.Direction));
+	float theta = dot(lightDir, normalize(-light.Direction));
 	float epsilon = light.Inner_CutOff - light.Outer_CutOff;
 	float spot_intensity = clamp((theta - light.Outer_CutOff) / epsilon, 0.0, 1.0);
 
@@ -338,7 +333,7 @@ vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float
 	vec3 diffuse = light.Diffuse * diff * albedo;
 	vec3 specular = light.Specular * spec * spclr;
 
-	ambient *= attenuation * spot_intensity;
+	ambient *= attenuation;
 	diffuse *= attenuation * spot_intensity;
 	specular *= attenuation * spot_intensity;
 

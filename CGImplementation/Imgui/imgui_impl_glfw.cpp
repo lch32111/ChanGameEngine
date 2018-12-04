@@ -110,7 +110,7 @@ void ImGui_ImplGlfw_InstallCallbacks(GLFWwindow* window)
     // glfwSetMouseButtonCallback(window, ImGui_ImplGlfw_MouseButtonCallback);
     // glfwSetScrollCallback(window, ImGui_ImplGlfw_ScrollCallback);
     // glfwSetKeyCallback(window, ImGui_ImplGlfw_KeyCallback);
-    // glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
+    glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
 }
 
 static bool ImGui_ImplGlfw_Init(GLFWwindow* window, bool install_callbacks, GlfwClientApi client_api)

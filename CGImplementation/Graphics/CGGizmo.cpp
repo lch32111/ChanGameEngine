@@ -18,7 +18,11 @@ void CGProj::CGGizmo::renderGizmo(const glm::mat4& view, const glm::mat4& proj)
 	m_lineRenderer.insertLine(center, center + worldXAxis * m_axisLengthScale, xAxisColor);
 	m_lineRenderer.insertLine(center, center + worldYAxis * m_axisLengthScale, yAxisColor);
 	m_lineRenderer.insertLine(center, center + worldZAxis * m_axisLengthScale, zAxisColor);
+
+	// convinience for using Gizmo
+	glDisable(GL_DEPTH_TEST);
 	m_lineRenderer.renderLine(view, proj, m_axisWidth);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void CGProj::CGGizmo::renderGizmoBox(const glm::mat4& view, const glm::mat4& proj)
@@ -26,7 +30,11 @@ void CGProj::CGGizmo::renderGizmoBox(const glm::mat4& view, const glm::mat4& pro
 	insertAABBwithLine(m_xAxisBox, xAxisColor);
 	insertAABBwithLine(m_yAxisBox, yAxisColor);
 	insertAABBwithLine(m_zAxisBox, zAxisColor);
+	
+	// convinience for using Gizmo
+	glDisable(GL_DEPTH_TEST);
 	m_lineRenderer.renderLine(view, proj, 1.0);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void CGProj::CGGizmo::setAxisWidth(float width)

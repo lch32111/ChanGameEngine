@@ -5,6 +5,7 @@
 #include <GPED/CGBroadPhase.h>
 
 #include <Graphics/CGAssetManager.h>
+#include <Graphics/CGEditSpotLightVisualizer.h>
 
 namespace CGProj
 {
@@ -306,6 +307,7 @@ namespace CGProj
 	private:
 		Shader* m_forwardShader;
 		EditLightType m_LightType;
+		CGEditSpotLightVisualizer m_spotVis;
 
 		// Point and Spot Light(Flash Light)
 		glm::vec3 m_lightPosition;

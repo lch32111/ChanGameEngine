@@ -183,6 +183,9 @@
     <ClCompile Include="Graphics\CGAssetManager.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\CGEditSpotLightVisualizer.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -321,6 +324,12 @@
       <Filter>Graphics Header</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\CGAssetUtil.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Imgui\CGimguiUtil.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGEditSpotLightVisualizer.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
   </ItemGroup>

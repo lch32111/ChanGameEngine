@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{792F3151-E667-41A8-A222-CF178CF2FC13}</ProjectGuid>
     <RootNamespace>CGImplementation</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -153,6 +153,7 @@
     <ClCompile Include="GPED\PS_Box.cpp" />
     <ClCompile Include="Graphics\CGAssetManager.cpp" />
     <ClCompile Include="Graphics\CGEditObject.cpp" />
+    <ClCompile Include="Graphics\CGEditSpotLightVisualizer.cpp" />
     <ClCompile Include="Graphics\CGGizmo.cpp" />
     <ClCompile Include="Graphics\CGRenderLine.cpp" />
     <ClCompile Include="Graphics\chanEulerCamera.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="Graphics\CGAssetManager.h" />
     <ClInclude Include="Graphics\CGAssetUtil.h" />
     <ClInclude Include="Graphics\CGEditObject.h" />
+    <ClInclude Include="Graphics\CGEditSpotLightVisualizer.h" />
     <ClInclude Include="Graphics\CGGizmo.h" />
     <ClInclude Include="Graphics\CGRenderLine.h" />
     <ClInclude Include="Graphics\chanEulerCamera.h" />
@@ -206,6 +208,7 @@
     <ClInclude Include="Graphics\GLPrimitiveUtil.h" />
     <ClInclude Include="Graphics\GLTextureUtility.h" />
     <ClInclude Include="Graphics\Shader.h" />
+    <ClInclude Include="Imgui\CGimguiUtil.h" />
     <ClInclude Include="Imgui\imconfig.h" />
     <ClInclude Include="Imgui\imgui.h" />
     <ClInclude Include="Imgui\imgui_impl_glfw.h" />

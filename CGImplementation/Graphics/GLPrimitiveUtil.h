@@ -314,6 +314,47 @@ namespace CGProj
 
 		glBindVertexArray(0);
 	}
+
+	// 2D Circle on XZ plane. Wire Circle means it has no normal.
+	static inline void renderWireCircle2D()
+	{
+		static unsigned int circleVAO = 0;
+		static unsigned int circleVBO = 0;
+		static unsigned int circleVerticesNumb = 0;
+		if (circleVAO == 0)
+		{
+			glGenVertexArrays(1, &circleVAO);
+			glGenBuffers(1, &circleVBO);
+
+			std::vector<float> vertices;
+			float width = 360 / 50;
+			float PI = glm::pi<float>();
+			for(int i = 0; i < 360; i += width)
+			{
+				float angle = (float)i *  PI / 180.f;
+
+				float tempZ = std::sinf(angle);
+				float tempX = std::cosf(angle);
+
+				vertices.push_back(tempX);
+				vertices.push_back(0);  // Y
+				vertices.push_back(tempZ);
+			}
+			
+			circleVerticesNumb = vertices.size() / 3;
+
+			glBindVertexArray(circleVAO);
+			glBindBuffer(GL_ARRAY_BUFFER, circleVBO);
+			glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+			glEnableVertexAttribArray(0);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		}
+
+		glBindVertexArray(circleVAO);
+		glDrawArrays(GL_LINE_LOOP, 0, circleVerticesNumb);
+
+		glBindVertexArray(0);
+	}
 }
 
 #endif

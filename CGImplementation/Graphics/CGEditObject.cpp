@@ -1,6 +1,7 @@
 #include "CGEditObject.h"
 
 #include <Imgui/imgui.h>
+#include <Imgui/CGimguiUtil.h>
 
 #include <Graphics/GLPrimitiveUtil.h>
 #include <Graphics/CGAssetManager.h>
@@ -843,6 +844,10 @@ CGProj::CGEditLightObject::CGEditLightObject()
 
 	setInnerCutOffInDegree(12.5);
 	setOuterCutOffInDegree(17.5);
+
+	m_spotVis.prepareData();
+	m_spotVis.setOuterConeInRadians(glm::acos(m_SpotOuterCutOff), m_AttnRadius);
+	m_spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_AttnRadius);
 }
 
 void CGProj::CGEditLightObject::setForwardShader(Shader * shader)
@@ -852,8 +857,11 @@ void CGProj::CGEditLightObject::setForwardShader(Shader * shader)
 
 void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm::mat4 & proj)
 {
+	// Refer to the simpleColorRender!
+
+	// Edit Object Render
 	glm::mat4 model(1.0);
-	model = glm::translate(model, this->getPosition());
+	model = glm::translate(model, m_lightPosition);
 	model = glm::scale(model, this->getScale());
 
 	m_forwardShader->use();
@@ -861,8 +869,41 @@ void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm:
 	m_forwardShader->setMat4("view", view);
 	m_forwardShader->setMat4("model", model);
 	m_forwardShader->setVec3("Color", m_lightDiffuse);
-
 	renderPrimitive();
+	// Edit Object Render
+
+	// Light Range Render
+	switch(m_LightType)
+	{
+	case EDIT_POINT_LIGHT:
+		m_forwardShader->setVec3("Color", glm::vec3(0.662, 0.831, 0.87));
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, m_lightPosition);
+		model = glm::scale(model, glm::vec3(m_AttnRadius));
+
+		// XZ Circle
+		m_forwardShader->setMat4("model", model);
+		renderWireCircle2D();
+
+		// XY Circle
+		glm::mat4 rot(1.0);
+		rot = glm::rotate(rot, glm::radians(90.f), glm::vec3(1, 0, 0));
+		m_forwardShader->setMat4("model", model * rot);
+		renderWireCircle2D();
+
+		// YZ Circle
+		rot = glm::mat4(1.0);
+		rot = glm::rotate(rot, glm::radians(90.f), glm::vec3(0, 0, 1));
+		m_forwardShader->setMat4("model", model * rot);
+		renderWireCircle2D();
+		break;
+	case EDIT_SPOT_LIGHT:
+		
+		m_spotVis.render(view, proj, m_lightPosition, m_lightDirection);
+		break;
+	}
+	// Light Range Render
 }
 
 void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
@@ -926,8 +967,12 @@ void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
 	case EDIT_POINT_LIGHT:
 	{
 		// Attenuation
-		ImGui::Text("Light Radius : %.2f", m_AttnRadius);
-		ImGui::Text("Attn Constant : %.2f", m_AttnConstant);
+		ImGui::PushItemWidth(50);
+		ImGui::InputFloat("Light Radius", &m_AttnRadius); ImGui::SameLine();
+		ShowHelpMarker("If you control the attn parameters,\nthe light radius will be set automatically.\nHowever, If you want to set the radius manually,\nyou can set it manually");
+		ImGui::PopItemWidth();
+		ImGui::Text("Attn Constant : %.2f", m_AttnConstant); ImGui::SameLine();
+		ShowHelpMarker("As you know in the code,\nthe radius calculated in updateRadius() is also based on the diffuse color value");
 		if (ImGui::SliderFloat("linear", &m_AttnLinear, 0.0001, 1.0, "Attn Linear : %f")) updateRadius();
 		if (ImGui::SliderFloat("quadratic", &m_AttnQuadratic, 0.000001, 1.0, "Attn Quadratic : %f")) updateRadius();
 		break;
@@ -943,16 +988,42 @@ void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
 		// Cut off of Spot Light
 		float inner_Indegree = glm::acos(m_SpotInnerCutOff) * 180.f / glm::pi<float>();
 		float outer_Indegree = glm::acos(m_SpotOuterCutOff) * 180.f / glm::pi<float>();
-		if(ImGui::SliderFloat("In", &inner_Indegree, 0, outer_Indegree, "Inner Cutoff In Degree :  %.2f"))
+		if (ImGui::SliderFloat("In", &inner_Indegree, 0, outer_Indegree, "Inner Cutoff In Degree :  %.2f"))
+		{
 			setInnerCutOffInDegree(inner_Indegree);
-		if(ImGui::SliderFloat("Out", &outer_Indegree, inner_Indegree, 45, "Outer Cutoff In Degree : %.2f"))
+			m_spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_AttnRadius);
+			
+		}
+		if (ImGui::SliderFloat("Out", &outer_Indegree, inner_Indegree, 45, "Outer Cutoff In Degree : %.2f"))
+		{
 			setOuterCutOffInDegree(outer_Indegree);
+			m_spotVis.setOuterConeInRadians(glm::acos(m_SpotOuterCutOff), m_AttnRadius);
+		}
 
 		// Attenuation
-		ImGui::Text("Light Radius : %.2f", m_AttnRadius);
-		ImGui::Text("Attn Constant : %.2f", m_AttnConstant);
-		if (ImGui::SliderFloat("linear", &m_AttnLinear, 0.0001, 1.0, "Attn Linear : %f")) updateRadius();
-		if (ImGui::SliderFloat("quadratic", &m_AttnQuadratic, 0.000001, 1.0, "Attn Quadratic : %f")) updateRadius();
+		ImGui::PushItemWidth(50);
+		if (ImGui::InputFloat("Light Radius", &m_AttnRadius))
+		{
+			m_spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_AttnRadius);
+			m_spotVis.setOuterConeInRadians(glm::acos(m_SpotOuterCutOff), m_AttnRadius);
+		}
+		ImGui::SameLine();
+		ShowHelpMarker("If you control the attn parameters,\nthe light radius will be set automatically.\nHowever, If you want to set the radius manually,\nyou can set it manually");
+		ImGui::PopItemWidth();
+		ImGui::Text("Attn Constant : %.2f", m_AttnConstant); ImGui::SameLine();
+		ShowHelpMarker("As you know in the code,\nthe radius calculated in updateRadius() is also based on the diffuse color value");
+		if (ImGui::SliderFloat("linear", &m_AttnLinear, 0.0001, 1.0, "Attn Linear : %f"))
+		{
+			m_spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_AttnRadius);
+			m_spotVis.setOuterConeInRadians(glm::acos(m_SpotOuterCutOff), m_AttnRadius);
+			updateRadius();
+		}
+		if (ImGui::SliderFloat("quadratic", &m_AttnQuadratic, 0.000001, 1.0, "Attn Quadratic : %f"))
+		{
+			m_spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_AttnRadius);
+			m_spotVis.setOuterConeInRadians(glm::acos(m_SpotOuterCutOff), m_AttnRadius);
+			updateRadius();
+		}
 		break;
 	}
 	}
@@ -969,7 +1040,6 @@ void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
 	temp[0] = m_lightSpecular.x, temp[1] = m_lightSpecular.y, temp[2] = m_lightSpecular.z;
 	ImGui::ColorEdit3("specular", temp);
 	m_lightSpecular = { temp[0], temp[1], temp[2] };
-
 
 	ImGui::End();
 }
@@ -1197,10 +1267,12 @@ float CGProj::CGEditLightObject::getLightRadius()
 void CGProj::CGEditLightObject::updateRadius()
 {
 	// the diffuse color of light is used for the max component of light
+	// You need to keep in mind that the radius will be bigger if the m_lightDiffuse will be bigger
 	float lightMin = 1 / (1.f / 256.f);
 	float lightMax = std::fmaxf(std::fmaxf(m_lightDiffuse.r, m_lightDiffuse.g), m_lightDiffuse.b);
 
 	// Calculate the radius of light volume
+	
 	m_AttnRadius =
 		(
 			-m_AttnLinear +

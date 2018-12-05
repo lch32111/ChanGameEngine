@@ -111,8 +111,6 @@ void main()
             lighting += CalcLMSpotLight(spotLights[i], LMAlbedo, LMSpecular, 128, FragPos, Normal);
 
         lighting += LMemissive;
-
-		// lighting += vec3(0.98, 0.88, 0);
     }
     else
     {
@@ -220,7 +218,9 @@ vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess,
 	// specular shading
 	vec3 viewDir = normalize(cameraPos - fragpos);
 	vec3 halfwayDir = normalize(lightDir + viewDir);
-	float spec = pow(max(dot(normal, halfwayDir), 0.0), shininess);
+	vec3 reflectDir = reflect(-lightDir, normal);
+	// float spec = pow(max(dot(normal, halfwayDir), 0.0), shininess);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
 
 	// attenuation
 	float attenuation = 1.0 / (light.Constant + light.Linear * dist + light.Quadratic * dist * dist);
@@ -231,11 +231,11 @@ vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess,
 	float spot_intensity = clamp((theta - light.Outer_CutOff) / epsilon, 0.0, 1.0);
 
 	// combine the result
-	vec3 ambient = light.Ambient * albedo;
+	vec3 ambient = light.Ambient * albedo;	
 	vec3 diffuse = light.Diffuse * diff * albedo;
 	vec3 specular = light.Specular * spec * spclr;
 
-	ambient *= attenuation;
+	ambient *= attenuation * spot_intensity;
 	diffuse *= attenuation * spot_intensity;
 	specular *= attenuation * spot_intensity;
 
@@ -333,7 +333,7 @@ vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float
 	vec3 diffuse = light.Diffuse * diff * albedo;
 	vec3 specular = light.Specular * spec * spclr;
 
-	ambient *= attenuation;
+	ambient *= attenuation * spot_intensity;
 	diffuse *= attenuation * spot_intensity;
 	specular *= attenuation * spot_intensity;
 

@@ -321,6 +321,7 @@ namespace CGProj
 		glm::vec3 m_lightSpecular;
 
 		// Attenuation 
+		bool m_isRangeRender = false;
 		float m_AttnConstant;
 		float m_AttnLinear;
 		float m_AttnQuadratic;

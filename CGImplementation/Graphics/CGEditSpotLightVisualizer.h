@@ -21,7 +21,7 @@ namespace CGProj
 		float m_OuterCutoffInRadian;
 
 		glm::vec3 m_OuterColor = glm::vec3(0, 0.38, 1.0);
-		glm::vec3 m_InnerColor = glm::vec3(0, 0.38, 0.73);
+		glm::vec3 m_InnerColor = glm::vec3(0, 0.38, 0.47);
 		glm::vec3 m_localDirection = glm::vec3(0, -1, 0);
 
 		enum {e_maxVertices = 2 * 512};
@@ -31,11 +31,9 @@ namespace CGProj
 		unsigned m_VAO;
 		unsigned m_VBO;
 
-		unsigned cutOne;
-		unsigned cutTwo;
-		unsigned cutThree;
+		int cutArray[4] = { 0, };
+		int cutNumArray[4] = { 0, };
 		unsigned m_count;
-
 	};
 }
 

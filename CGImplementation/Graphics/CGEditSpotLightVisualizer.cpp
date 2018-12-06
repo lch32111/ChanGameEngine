@@ -3,7 +3,7 @@
 
 void CGProj::CGEditSpotLightVisualizer::setInnerConeInRadians(float inner_radian, float radius)
 {
-	m_count = cutTwo;
+	m_count = cutArray[2];
 
 	m_InnerCutoffInRadian = inner_radian;
 
@@ -14,15 +14,16 @@ void CGProj::CGEditSpotLightVisualizer::setInnerConeInRadians(float inner_radian
 	int width = 360 / 20;
 	float radiPI = glm::pi<float>() / 180.f;
 
+	// Cone
 	for (int i = 0; i <= 360; i += width)
 	{
 		float angle = (float)i * radiPI;
 
-		// Model * Local;
 		m_vertices[m_count++] = glm::vec3(0); // connection with origin
 		m_vertices[m_count++] = glm::vec3(radiusLocalX * std::cosf(angle), -radiusLocalY, std::sinf(angle) * radiusLocalX);
 	}
 
+	// XZ Circle
 	for (int i = 0; i <= 360; i += width)
 	{
 		float angle = (float)i * radiPI;
@@ -34,9 +35,10 @@ void CGProj::CGEditSpotLightVisualizer::setInnerConeInRadians(float inner_radian
 	for (int i = 180; i <= 360; i += width)
 	{
 		float angle = (float)i * radiPI;
-		m_vertices[m_count++] = glm::vec3(radiusLocalX * std::cosf(angle), -radiusLocalY + HalfLocalY * std::sinf(angle), 0);
+		m_vertices[m_count++] = glm::vec3(-radiusLocalX * std::cosf(angle), -radiusLocalY + HalfLocalY * std::sinf(angle), 0);
 	}
-	cutThree = m_count;
+	cutArray[3] = m_count;
+	cutNumArray[2] = cutArray[3] - cutArray[2];
 
 	// YZ Half Circle
 	for (int i = 180; i <= 360; i += width)
@@ -44,10 +46,12 @@ void CGProj::CGEditSpotLightVisualizer::setInnerConeInRadians(float inner_radian
 		float angle = (float)i * radiPI;
 		m_vertices[m_count++] = glm::vec3(0, -radiusLocalY + HalfLocalY * std::sinf(angle), radiusLocalX * std::cosf(angle));
 	}
+
+	cutNumArray[3] = m_count - cutArray[3];
 	
 	glBindVertexArray(m_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferSubData(GL_ARRAY_BUFFER, cutTwo * sizeof(glm::vec3), (m_count - cutTwo) * sizeof(glm::vec3), m_vertices + cutTwo);
+	glBufferSubData(GL_ARRAY_BUFFER, cutArray[2] * sizeof(glm::vec3), (m_count - cutArray[2]) * sizeof(glm::vec3), m_vertices + cutArray[2]);
 
 	glBindVertexArray(0);
 }
@@ -69,7 +73,6 @@ void CGProj::CGEditSpotLightVisualizer::setOuterConeInRadians(float outer_radian
 	{
 		float angle = i * radiPI;
 
-		// Model * Local;
 		m_vertices[m_count++] = glm::vec3(0); // connection with origin
 		m_vertices[m_count++] = glm::vec4(glm::vec3(radiusLocalX * std::cosf(angle), -radiusLocalY, std::sinf(angle) * radiusLocalX), 1.0);
 	}
@@ -89,7 +92,8 @@ void CGProj::CGEditSpotLightVisualizer::setOuterConeInRadians(float outer_radian
 		m_vertices[m_count++] = glm::vec3(-radiusLocalX * std::cosf(angle), -radiusLocalY + HalfLocalY * std::sinf(angle), 0);
 	}
 
-	cutOne = m_count;
+	cutArray[1] = m_count; // Cut Index for first draw call
+	cutNumArray[0] = m_count; // number of vertices for first draw call
 
 	// YZ Half Circle
 	for (int i = 180; i <= 360; i += width)
@@ -98,11 +102,12 @@ void CGProj::CGEditSpotLightVisualizer::setOuterConeInRadians(float outer_radian
 		m_vertices[m_count++] = glm::vec3(0, -radiusLocalY + HalfLocalY * std::sinf(angle), radiusLocalX * std::cosf(angle));
 	}
 
-	cutTwo = m_count;
+	cutArray[2] = m_count;
+	cutNumArray[1] = cutArray[2] - cutArray[1];
 
 	glBindVertexArray(m_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, cutTwo * sizeof(glm::vec3), m_vertices);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, m_count * sizeof(glm::vec3), m_vertices);
 
 	glBindVertexArray(0);
 }
@@ -124,13 +129,11 @@ void CGProj::CGEditSpotLightVisualizer::render(const glm::mat4& view, const glm:
 
 	// Outer Cone
 	glUniform3fv(glGetUniformLocation(m_shaderID, "Color"), 1, &m_OuterColor[0]);
-	glDrawArrays(GL_LINE_STRIP, 0, cutOne);
-	glDrawArrays(GL_LINE_STRIP, cutOne, cutTwo - cutOne);
+	glMultiDrawArrays(GL_LINE_STRIP, cutArray, cutNumArray, 2);
 
 	// Inner Cone
 	glUniform3fv(glGetUniformLocation(m_shaderID, "Color"), 1, &m_InnerColor[0]);
-	glDrawArrays(GL_LINE_STRIP, cutTwo, cutThree - cutTwo);
-	glDrawArrays(GL_LINE_STRIP, cutThree, m_count - cutThree);
+	glMultiDrawArrays(GL_LINE_STRIP, cutArray + 2, cutNumArray + 2, 2);
 
 	glBindVertexArray(0);
 }

@@ -873,35 +873,37 @@ void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm:
 	// Edit Object Render
 
 	// Light Range Render
-	switch(m_LightType)
+	if (m_isRangeRender)
 	{
-	case EDIT_POINT_LIGHT:
-		m_forwardShader->setVec3("Color", glm::vec3(0.662, 0.831, 0.87));
+		switch (m_LightType)
+		{
+		case EDIT_POINT_LIGHT:
+			m_forwardShader->setVec3("Color", glm::vec3(0.662, 0.831, 0.87));
 
-		model = glm::mat4(1.0);
-		model = glm::translate(model, m_lightPosition);
-		model = glm::scale(model, glm::vec3(m_AttnRadius));
+			model = glm::mat4(1.0);
+			model = glm::translate(model, m_lightPosition);
+			model = glm::scale(model, glm::vec3(m_AttnRadius));
 
-		// XZ Circle
-		m_forwardShader->setMat4("model", model);
-		renderWireCircle2D();
+			// XZ Circle
+			m_forwardShader->setMat4("model", model);
+			renderWireCircle2D();
 
-		// XY Circle
-		glm::mat4 rot(1.0);
-		rot = glm::rotate(rot, glm::radians(90.f), glm::vec3(1, 0, 0));
-		m_forwardShader->setMat4("model", model * rot);
-		renderWireCircle2D();
+			// XY Circle
+			glm::mat4 rot(1.0);
+			rot = glm::rotate(rot, glm::radians(90.f), glm::vec3(1, 0, 0));
+			m_forwardShader->setMat4("model", model * rot);
+			renderWireCircle2D();
 
-		// YZ Circle
-		rot = glm::mat4(1.0);
-		rot = glm::rotate(rot, glm::radians(90.f), glm::vec3(0, 0, 1));
-		m_forwardShader->setMat4("model", model * rot);
-		renderWireCircle2D();
-		break;
-	case EDIT_SPOT_LIGHT:
-		
-		m_spotVis.render(view, proj, m_lightPosition, m_lightDirection);
-		break;
+			// YZ Circle
+			rot = glm::mat4(1.0);
+			rot = glm::rotate(rot, glm::radians(90.f), glm::vec3(0, 0, 1));
+			m_forwardShader->setMat4("model", model * rot);
+			renderWireCircle2D();
+			break;
+		case EDIT_SPOT_LIGHT:
+			m_spotVis.render(view, proj, m_lightPosition, m_lightDirection);
+			break;
+		}
 	}
 	// Light Range Render
 }
@@ -952,6 +954,8 @@ void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
 	ImGui::RadioButton("Point Light", &lightType, 1); ImGui::SameLine();
 	ImGui::RadioButton("Spot Light", &lightType, 2);
 	m_LightType = (EditLightType)lightType;
+
+	ImGui::Checkbox("Range Redner", &m_isRangeRender);
 
 	switch (m_LightType)
 	{

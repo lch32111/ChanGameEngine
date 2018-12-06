@@ -58,7 +58,6 @@ void CGProj::Application::deinit()
 
 void CGProj::Application::execute()
 {
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 	while (!glfwWindowShouldClose(app_window))
 	{
 		float currentFrame = glfwGetTime();
@@ -71,7 +70,9 @@ void CGProj::Application::execute()
 		ImGui::NewFrame();
 
 		update(deltaTime, lastFrame);
-		display();
+
+		if(canDisplay)
+			display();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -111,6 +112,7 @@ void CGProj::Application::resize(int width, int height)
 {
 	Application::width = width;
 	Application::height = height;
+	Application::canDisplay = ((width <= 0 || height <= 0) ? false : true);
 	glViewport(0, 0, width, height);
 }
 
@@ -259,6 +261,13 @@ void CGProj::GraphicsDemo::mouse(double xpos, double ypos)
 	test2.mouse(xpos, ypos);
 }
 
+void CGProj::GraphicsDemo::mouseButton(int button, int action, int mods)
+{
+	// Application::mouseButton(button, action, mods);
+
+	test2.mouseButton(app_window, button, action, mods, width, height);
+}
+
 void CGProj::GraphicsDemo::scroll(double yoffset)
 {
 	test2.scroll(yoffset);
@@ -276,5 +285,6 @@ void CGProj::GraphicsDemo::resize(int width, int height)
 
 CGProj::Application* getApplication()
 {
-	return new CGProj::PhysicsDemo();
+	return new CGProj::GraphicsDemo();
 }
+	

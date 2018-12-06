@@ -4,9 +4,10 @@
 
 #include <Imgui/imgui.h>
 #include <GPED/GPED_random.h>
-#include <Graphics/GLTextureUtility.h>
 #include <GPED/CGPhysicsUtil.h>
 
+#include <Graphics/GLPrimitiveUtil.h>
+#include <Graphics/GLTextureUtility.h>
 
 void CGProj::TryFirst::initGraphics()
 {

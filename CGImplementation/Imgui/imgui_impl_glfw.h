@@ -30,4 +30,3 @@ void     ImGui_ImplGlfw_MouseButtonCallback(GLFWwindow* window, int button, int 
 void     ImGui_ImplGlfw_ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 void     ImGui_ImplGlfw_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void     ImGui_ImplGlfw_CharCallback(GLFWwindow* window, unsigned int c);
-

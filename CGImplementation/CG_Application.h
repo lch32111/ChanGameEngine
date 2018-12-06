@@ -35,6 +35,7 @@ namespace CGProj
 	protected:
 		int width = 800;
 		int height = 600;
+		bool canDisplay = true;
 
 		float deltaTime = 0;
 		float lastFrame = 0;
@@ -72,6 +73,8 @@ namespace CGProj
 		virtual void display();
 
 		virtual void mouse(double xpos, double ypos);
+		virtual void mouseButton(int button, int action, int mods);
+
 		virtual void scroll(double yoffset);
 		virtual void resize(int width, int height);
 	private:

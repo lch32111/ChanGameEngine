@@ -32,6 +32,9 @@ public:
 	float RightAngle;
 	float UpAngle;
 
+	glm::vec3 Front;
+	glm::vec3 Right;
+
 	// Camera options
 	float MovementSpeed;
 	float MouseSensitivity;
@@ -42,13 +45,14 @@ public:
 		glm::vec3 position = glm::vec3(0.f, 0.f, 0.f),
 		glm::vec3 up = glm::vec3(0.f, 1.0f, 0.f)
 	);
-	chanQuatCamera(float posX, float posY, float posZ, float upX, float upY, float upZ);
+	chanQuatCamera(float posX, float posY, float posZ);
 
 	glm::mat4 GetViewMatrix();
+	void GetViewMatrix(glm::mat4& View);
+
 	void ProcessKeyboard(Camera_Movement direction, float deltaTime);
 	void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
 	void ProcessMouseScroll(float yoffset);
-
 private:
 	void updateCameraVectors();
 };

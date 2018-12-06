@@ -6,8 +6,6 @@ CGProj::Application* app = getApplication();
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-	
-
 	app->resize(width, height);
 }
 

@@ -151,7 +151,88 @@ bool GPED::rayaabbOverlap(const GPED::c3AABB & a, const GPED::c3RayInput & ray)
 	return true;
 }
 
+bool GPED::rayaabbIntersection(GPED::c3RayOutput & output, const GPED::c3RayInput & input, const GPED::c3AABB & aaabb)
+{
+	GPED::real tmin = -REAL_MAX;
+	GPED::real tmax = REAL_MAX;
+	// For all three slabs
+	for (int i = 0; i < 3; ++i)
+	{
+		if (real_abs(input.direction[i]) < REAL_EPSILON)
+		{
+			// Ray is parallel to slab. No hit if origin not within slab
+			if (input.startPoint[i] < aaabb.min[i] || input.startPoint[i] > aaabb.max[i]) return false;
+		}
+		else
+		{
+			// Compute intersection t value of ray with near and far plane of slabe
+			GPED::real ood = GPED::real(1.0) / input.direction[i];
+			GPED::real t1 = (aaabb.min[i] - input.startPoint[i]) * ood;
+			GPED::real t2 = (aaabb.max[i] - input.startPoint[i]) * ood;
+			// Make t1 be intersection with near plane, t2 with far plane
+			if (t1 > t2) GPED::Swap(t1, t2);
+			// Compute the intersection of slab intersection intervals
+			tmin = GPED::rMax(tmin, t1);
+			tmax = GPED::rMin(tmax, t2);
+			// Exit with no collision as soon as slab intersection becomes empty
+			if (tmin > tmax) return false;
+		}
+	}
+	// Ray intersects all 3slabs. Return point (q) and intersection t value (tmin)
+	output.startPoint = input.startPoint;
+	output.t = tmin;
+	output.hitPoint = input.startPoint + input.direction * tmin;
+	return true;
+}
+
 GPED::c3AABB GPED::convertFromCollisionPrimitive(const CollisionPrimitive & primitive)
 {
 	return primitive.makeAABB();
+}
+
+GPED::c3AABB GPED::makeAABB(const glm::vec3 & position, const glm::vec3 & halfExtents)
+{
+	c3AABB aabb;
+
+	aabb.min = position - halfExtents;
+	aabb.max = position + halfExtents;
+
+	return aabb;
+}
+
+GPED::c3AABB GPED::makeAABB(const glm::mat3 & orientation, const glm::vec3 & position, const glm::vec3 & halfExtents)
+{
+	c3AABB aabb;
+	aabb.min = glm::vec3(REAL_MAX);
+	aabb.max = glm::vec3(-REAL_MAX);
+
+	glm::vec3 v[8] =
+	{
+		glm::vec3(-halfExtents.x,-halfExtents.y, -halfExtents.z),
+		glm::vec3(-halfExtents.x,-halfExtents.y, halfExtents.z),
+		glm::vec3(halfExtents.x, -halfExtents.y, halfExtents.z),
+		glm::vec3(halfExtents.x,-halfExtents.y, -halfExtents.z),
+		glm::vec3(-halfExtents.x, halfExtents.y, -halfExtents.z),
+		glm::vec3(-halfExtents.x, halfExtents.y, halfExtents.z),
+		glm::vec3(halfExtents.x, halfExtents.y, halfExtents.z),
+		glm::vec3(halfExtents.x, halfExtents.y, -halfExtents.z)
+	};
+
+	for (int i = 0; i < 8; ++i)
+	{
+		v[i] = position + orientation * v[i];
+
+		aabb.min = GPED::rMin(aabb.min, v[i]);
+		aabb.max = GPED::rMax(aabb.max, v[i]);
+	}
+
+	return aabb;
+}
+
+GPED::c3AABB GPED::makeAABB(const glm::vec3 & position, const GPED::real radius)
+{
+	c3AABB aabb;
+	aabb.min = position - glm::vec3(radius);
+	aabb.max = position + glm::vec3(radius);
+	return aabb;
 }

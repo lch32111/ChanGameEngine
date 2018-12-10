@@ -232,7 +232,7 @@ namespace CGProj
 	class CGEditLightObject : public CGEditObject // Child2 of Base Class
 	{
 	public:
-		CGEditLightObject();
+		CGEditLightObject(CGAssetManager& am);
 
 		/*** Light Method ***/
 		void setForwardShader(Shader* shader);

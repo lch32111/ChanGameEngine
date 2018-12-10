@@ -113,10 +113,23 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	}
 
 	GPED::Random random(331);
-	editLights.reserve(20);
-	for (unsigned i = 0; i < 2; ++i)
+	editLights.reserve(400);
+	editLights.push_back(CGEditLightObject(assetManager));
+	editLights[0].setLightType(EDIT_DIRECTION_LIGHT);
+	editLights[0].setScale(0.3);
+	editLights[0].connectBroadPhase(&dBroadPhase);
+	editLights[0].setBroadPhaseId(dBroadPhase.CreateProxy(editLights[0].getFitAABB(), &editLights[0]));
+	editLights[0].setDefShader(Deferred_Second_Shader);
+	editLights[0].setForwardShader(Simple_Shader);
+	editLights[0].setLightDirection(glm::vec3(-0.2f, -1.0f, -0.3f));
+	editLights[0].setAmbientColor(glm::vec3(0.05));
+	editLights[0].setDiffuseColor(glm::vec3(0.4));
+	editLights[0].setSpecularColor(glm::vec3(0.5));
+
+	// Point Light
+	for (unsigned i = 1; i < 126; ++i)
 	{
-		editLights.push_back(CGEditLightObject());
+		editLights.push_back(CGEditLightObject(assetManager));
 		editLights[i].setObjectType(EDIT_OBJECT_LIGHT);
 		editLights[i].setScale(0.3);
 		editLights[i].connectBroadPhase(&dBroadPhase);
@@ -124,13 +137,14 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 		editLights[i].setDefShader(Deferred_Second_Shader);
 		editLights[i].setForwardShader(Simple_Shader);
 
-		editLights[i].setPosition(random.randomVector(-5));
+		editLights[i].setPosition(random.randomVector(glm::vec3(-20, -5, -20), glm::vec3(20, 5, 20)));
+		editLights[i].setAmbientColor(random.randomVector(1.0));
+		editLights[i].setDiffuseColor(random.randomVector(1.0));
+		editLights[i].setSpecularColor(random.randomVector(1.0));
+		editLights[i].setAttnLinear(0.7);
+		editLights[i].setAttnQuadratic(0.5);
 	}
-	editLights[0].setLightType(EDIT_DIRECTION_LIGHT);
-	editLights[0].setLightDirection(glm::vec3(-0.2f, -1.0f, -0.3f));
-	editLights[0].setAmbientColor(glm::vec3(0.05));
-	editLights[0].setDiffuseColor(glm::vec3(0.4));
-	editLights[0].setSpecularColor(glm::vec3(0.5));
+	
 
 
 	// Object Manual Setting + Light Manual Setting
@@ -214,7 +228,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 
 	model = glm::mat4(1.0);
 	model = glm::translate(model, glm::vec3(0, -5, 0));
-	model = glm::scale(model, glm::vec3(10));
+	model = glm::scale(model, glm::vec3(25));
 	Deferred_First_Shader->setBool("material.CMorLM", true);
 	Deferred_First_Shader->setBool("material.isLMdiffuse", true);
 	Deferred_First_Shader->setBool("material.isLMspecular", false);

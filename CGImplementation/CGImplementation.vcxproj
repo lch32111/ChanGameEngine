@@ -222,6 +222,8 @@
   <ItemGroup>
     <None Include="ShaderFolder\CGLineShader.fs" />
     <None Include="ShaderFolder\CGLineShader.vs" />
+    <None Include="ShaderFolder\CGSpotVisualizer.fs" />
+    <None Include="ShaderFolder\CGSpotVisualizer.vs" />
     <None Include="ShaderFolder\DeferredFirst.fs" />
     <None Include="ShaderFolder\DeferredFirst.vs" />
     <None Include="ShaderFolder\DeferredPost.fs" />

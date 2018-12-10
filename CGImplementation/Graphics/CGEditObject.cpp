@@ -828,7 +828,7 @@ CGProj::EditProxyType CGProj::CGEditProxyObject::getProxyType()
 // =================================================================
 /*** CG Light Object  ***/
 
-CGProj::CGEditLightObject::CGEditLightObject()
+CGProj::CGEditLightObject::CGEditLightObject(CGAssetManager& am)
 {
 	setLightType(EDIT_POINT_LIGHT);
 	setPosition(glm::vec3(0));
@@ -845,7 +845,7 @@ CGProj::CGEditLightObject::CGEditLightObject()
 	setInnerCutOffInDegree(12.5);
 	setOuterCutOffInDegree(17.5);
 
-	m_spotVis.prepareData();
+	m_spotVis.prepareData(am.getShader(SHADER_SPOT_VISUALIZER));
 	m_spotVis.setOuterConeInRadians(glm::acos(m_SpotOuterCutOff), m_AttnRadius);
 	m_spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_AttnRadius);
 }

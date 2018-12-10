@@ -355,6 +355,36 @@ namespace CGProj
 
 		glBindVertexArray(0);
 	}
+
+	// 3D Cylinder whose local Direction is pointing (0, 1, 0)
+	// The local height is 1. It means that the one end point is
+	// (0, -0.5, 0), and the other one is (0, 0.5, 0).
+	// The original radius of the cylinder is 1.
+	static inline void renderCylinder()
+	{
+		static unsigned int cylinderVAO = 0;
+		static unsigned int cylinderVBO = 0;
+		if (cylinderVAO == 0)
+		{
+			glGenVertexArrays(1, &cylinderVAO);
+			glGenBuffers(1, &cylinderVBO);
+
+			glm::vec3 p1(0, 0.5, 0);
+			glm::vec3 p2(0, -0.5, 0);
+			glm::vec3 a = glm::cross((p2 - p1), glm::vec3(1, 0.5, 0));
+			glm::vec3 b = glm::cross(a, (p2 - p1));
+			a = glm::normalize(a);
+			b = glm::normalize(b);
+
+			std::vector<float> vertices;
+			float width = 360 / 50;
+			float PI = glm::pi<float>();
+			for (int i = 0; i < 360; i += width)
+			{
+				float theta1 = i * 2 * PI / N;
+			}
+		}
+	}
 }
 
 #endif

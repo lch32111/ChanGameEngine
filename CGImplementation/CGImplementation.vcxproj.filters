@@ -391,5 +391,11 @@
     <None Include="ShaderFolder\CGSpotVisualizer.fs">
       <Filter>ShaderFolder</Filter>
     </None>
+    <None Include="ShaderFolder\CGDepthMap.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGDepthMap.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
   </ItemGroup>
 </Project>

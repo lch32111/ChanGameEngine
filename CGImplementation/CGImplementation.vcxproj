@@ -220,6 +220,8 @@
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ShaderFolder\CGDepthMap.fs" />
+    <None Include="ShaderFolder\CGDepthMap.vs" />
     <None Include="ShaderFolder\CGLineShader.fs" />
     <None Include="ShaderFolder\CGLineShader.vs" />
     <None Include="ShaderFolder\CGSpotVisualizer.fs" />

@@ -877,6 +877,9 @@ void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm:
 	{
 		switch (m_LightType)
 		{
+		case EDIT_DIRECTION_LIGHT:
+
+			break;
 		case EDIT_POINT_LIGHT:
 			m_forwardShader->setVec3("Color", glm::vec3(0.662, 0.831, 0.87));
 

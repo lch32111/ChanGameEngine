@@ -115,7 +115,6 @@ void CGProj::CGEditSpotLightVisualizer::setOuterConeInRadians(float outer_radian
 void CGProj::CGEditSpotLightVisualizer::render(const glm::mat4& view, const glm::mat4& proj, 
 	const glm::vec3& position, const glm::vec3& direction)
 {
-
 	glm::mat4 mvpMatrix = glm::mat4_cast(glm::quat(m_localDirection, direction)); // rotation
 	mvpMatrix[3] = glm::vec4(position, 1); // translate
 	mvpMatrix = proj * view * mvpMatrix;
@@ -125,7 +124,6 @@ void CGProj::CGEditSpotLightVisualizer::render(const glm::mat4& view, const glm:
 	m_shader->setMat4("mvpMatrix", mvpMatrix);
 	
 	glBindVertexArray(m_VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 
 	// Outer Cone
 	m_shader->setVec3("Color", m_OuterColor);

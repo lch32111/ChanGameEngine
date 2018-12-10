@@ -111,6 +111,13 @@ namespace CGProj
 		CGGizmo gizmoTest;
 
 		CGAssetManager assetManager;
+
+		// Shadow Mapping test
+		unsigned int depthMapFBO, depthMap;
+		unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+		glm::mat4 lightView, lightProjection, lightSpaceMatrix;
+		Shader depthMapShader;
+
 	};
 }
 

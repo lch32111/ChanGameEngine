@@ -21,6 +21,8 @@ struct DirLight
     vec3 Ambient;
     vec3 Diffuse;
     vec3 Specular;
+
+	mat4 LightSpace;
 };
 
 struct PointLight {
@@ -59,12 +61,14 @@ struct SpotLight {
 };
 
 // Limit of the array size for each kind of light
-#define NR_DIR_LIGHTS 1
-#define NR_POINT_LIGHTS 125
-#define NR_SPOT_LIGHTS 1
+#define NR_DIR_LIGHTS 5
+#define NR_POINT_LIGHTS 10
+#define NR_SPOT_LIGHTS 10
 
 uniform int DIR_USED_NUM;
 uniform DirLight dirLights[NR_DIR_LIGHTS];
+uniform sampler2D dirShadowMap[NR_DIR_LIGHTS];
+uniform mat4 dirLightSpace[NR_DIR_LIGHTS];
 
 uniform int POINT_USED_NUM;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
@@ -75,12 +79,13 @@ uniform SpotLight spotLights[NR_SPOT_LIGHTS];
 uniform vec3 cameraPos;
 
 // function prototypes
-vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal);
+vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal, int index);
 vec3 CalcLMPointLight(PointLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal);
 vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal);
 vec3 CalcCMDirLight(DirLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal);
 vec3 CalcCMPointLight(PointLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal);
 vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal);
+float ShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index);
 
 void main()
 {
@@ -102,7 +107,7 @@ void main()
         if(MyBool.b == 1) LMemissive = texture(gEmissive, TexCoords).rgb;
         
 		for(int i = 0; i < DIR_USED_NUM; ++i)
-            lighting += CalcLMDirLight(dirLights[i], LMAlbedo, LMSpecular, 128, FragPos, Normal);
+            lighting += CalcLMDirLight(dirLights[i], LMAlbedo, LMSpecular, 128, FragPos, Normal, i);
         
         for(int i = 0; i < POINT_USED_NUM; ++i)
             lighting += CalcLMPointLight(pointLights[i], LMAlbedo, LMSpecular, 128, FragPos, Normal);
@@ -142,7 +147,7 @@ void main()
 	// FragColor = vec4(lighting, 1.0);
 }
 
-vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal)
+vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal, int index)
 {
     // World Space + Blinn-Phong Lighting
     vec3 lightDir = normalize(-light.Direction);
@@ -160,7 +165,11 @@ vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, v
     vec3 ambient = light.Ambient * albedo;
     vec3 diffuse = light.Diffuse * diff * albedo;
     vec3 specular = light.Specular * spec * spclr;
-    return (ambient + diffuse + specular);
+	
+	// Calculate Shadow
+	float shadow = ShadowCalculation(normal, lightDir, fragpos, index);
+
+    return (ambient + (1.0 - shadow) * (diffuse + specular));
 }
 
 vec3 CalcLMPointLight(PointLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal)
@@ -338,4 +347,25 @@ vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float
 	specular *= attenuation * spot_intensity;
 
 	return  (ambient + diffuse + specular);
+}
+
+float ShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index)
+{
+	// transform world into lightspace
+	vec4 fragPosLightSpace = dirLightSpace[index] * vec4(fragpos, 1.0);
+	
+	// perform perspective divide (range -1 ~ 1)
+	vec3 projCoords = vec3(fragPosLightSpace * (1.0 / fragPosLightSpace.w));
+	
+	// adjust the range from 0 ~ 1
+	projCoords = projCoords * 0.5 + 0.5;
+
+	float closestDepth = texture(dirShadowMap[index], projCoords.xy).r;
+
+	float currentDepth = projCoords.z;
+
+	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+	float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+	
+	return shadow;
 }

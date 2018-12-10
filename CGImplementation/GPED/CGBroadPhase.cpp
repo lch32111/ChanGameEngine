@@ -1,4 +1,6 @@
 #include "CGBroadPhase.h"
+#include <Graphics/GLPrimitiveUtil.h>
+
 CGProj::CGBroadPhase::CGBroadPhase()
 {
 	m_proxyCount = 0;

@@ -1,0 +1,36 @@
+#include "CGAssetManager.h"
+
+Shader * CGProj::CGAssetManager::getShader(CG_SHADER_ENUM _shaderEnum)
+{
+	if (m_shaders[_shaderEnum].isloadad == false)
+	{
+		if (m_shaders[_shaderEnum].loadShader() == false)
+		{
+			std::cout << "CG_ASSET_MANAGER::GETSHADER::The number of Shader Enum : " << _shaderEnum << '\n';
+			return nullptr;
+		}
+	}
+
+	return &m_shaders[_shaderEnum];
+}
+
+Shader CGProj::CGAssetManager::getShader(CG_SHADER_ENUM _shaderEnum, char none = 0)
+{
+	if (m_shaders[_shaderEnum].isloadad == false)
+	{
+		if (m_shaders[_shaderEnum].loadShader() == false)
+		{
+			std::cout << "CG_ASSET_MANAGER::GETSHADER::The number of Shader Enum : " << _shaderEnum << '\n';
+			return Shader();
+		}
+	}
+
+	return m_shaders[_shaderEnum];
+}
+
+unsigned CGProj::CGAssetManager::getTexture(CG_TEXTURE_ENUM _textureEnum, bool gamma)
+{
+	// TODO: make texture class for on-demand process. TextureFromFile() is just loading the image...
+	if (gamma) return m_GammaTextures[_textureEnum];
+	else return m_NoGammaTexture[_textureEnum];
+}

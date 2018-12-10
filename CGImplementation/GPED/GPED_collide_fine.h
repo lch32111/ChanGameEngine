@@ -353,6 +353,8 @@ namespace GPED
 			const CollisionPrimitive* primitive
 		)
 		{
+			assert(primitive);
+
 			int key = 0;
 			switch (primitive->m_primitiveType)
 			{

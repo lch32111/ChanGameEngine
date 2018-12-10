@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{792F3151-E667-41A8-A222-CF178CF2FC13}</ProjectGuid>
     <RootNamespace>CGImplementation</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -151,6 +151,11 @@
     <ClCompile Include="GPED\GPED_world.cpp" />
     <ClCompile Include="GPED\PS_AmmoRound.cpp" />
     <ClCompile Include="GPED\PS_Box.cpp" />
+    <ClCompile Include="Graphics\CGAssetManager.cpp" />
+    <ClCompile Include="Graphics\CGEditObject.cpp" />
+    <ClCompile Include="Graphics\CGEditSpotLightVisualizer.cpp" />
+    <ClCompile Include="Graphics\CGGizmo.cpp" />
+    <ClCompile Include="Graphics\CGRenderLine.cpp" />
     <ClCompile Include="Graphics\chanEulerCamera.cpp" />
     <ClCompile Include="Graphics\chanQuatCamera.cpp" />
     <ClCompile Include="Graphics\chanRenderLine.cpp" />
@@ -191,12 +196,19 @@
     <ClInclude Include="GPED\GPED_world.h" />
     <ClInclude Include="GPED\PS_AmmoRound.h" />
     <ClInclude Include="GPED\PS_Box.h" />
+    <ClInclude Include="Graphics\CGAssetManager.h" />
+    <ClInclude Include="Graphics\CGAssetUtil.h" />
+    <ClInclude Include="Graphics\CGEditObject.h" />
+    <ClInclude Include="Graphics\CGEditSpotLightVisualizer.h" />
+    <ClInclude Include="Graphics\CGGizmo.h" />
+    <ClInclude Include="Graphics\CGRenderLine.h" />
     <ClInclude Include="Graphics\chanEulerCamera.h" />
     <ClInclude Include="Graphics\chanQuatCamera.h" />
     <ClInclude Include="Graphics\chanRenderLine.h" />
     <ClInclude Include="Graphics\GLPrimitiveUtil.h" />
     <ClInclude Include="Graphics\GLTextureUtility.h" />
     <ClInclude Include="Graphics\Shader.h" />
+    <ClInclude Include="Imgui\CGimguiUtil.h" />
     <ClInclude Include="Imgui\imconfig.h" />
     <ClInclude Include="Imgui\imgui.h" />
     <ClInclude Include="Imgui\imgui_impl_glfw.h" />
@@ -208,6 +220,8 @@
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ShaderFolder\CGLineShader.fs" />
+    <None Include="ShaderFolder\CGLineShader.vs" />
     <None Include="ShaderFolder\DeferredFirst.fs" />
     <None Include="ShaderFolder\DeferredFirst.vs" />
     <None Include="ShaderFolder\DeferredPost.fs" />
@@ -217,6 +231,8 @@
     <None Include="ShaderFolder\lineShader.fs" />
     <None Include="ShaderFolder\lineShader.gs" />
     <None Include="ShaderFolder\lineShader.vs" />
+    <None Include="ShaderFolder\simpleColorRender.fs" />
+    <None Include="ShaderFolder\simpleColorRender.vs" />
     <None Include="ShaderFolder\simpleRender.fs" />
     <None Include="ShaderFolder\simpleRender.vs" />
     <None Include="ShaderFolder\wireRender.fs" />

@@ -1,7 +1,7 @@
 // shadertype=glsl
 
 // Deferred First Pass Fragment Shader
-// The lighting will be calculated in View Space.
+// The lighting will be calculated in World Space.
 
 #version 330 core
 
@@ -42,15 +42,15 @@ void main()
     gPosition = FragPos;
     // also store the per-fragment normals into the gbuffer
     gNormal = normalize(Normal);
-
-    gBool.a = material.CMorLM ? 1 : 0;
+    
+	gBool.a = material.CMorLM ? 0.9 : 0.1; 
     if(material.CMorLM)
     {
         gBool.rgb = vec3(1.0);
         // Light Map
         if(material.isLMdiffuse)	gAlbedoSpec.rgb = texture(material.LMdiffuse, TexCoords).rgb;
         else    gBool.r = 0;   
-        if(material.isLMspecular)    gAlbedoSpec.a = texture(material.LMspecular, TexCoords).a;
+        if(material.isLMspecular)    gAlbedoSpec.a = texture(material.LMspecular, TexCoords).r;
         else    gBool.g = 0;
         if(material.isLMemissive)    gEmissive.rgb = texture(material.LMemissive, TexCoords).rgb;
         else    gBool.b = 0;

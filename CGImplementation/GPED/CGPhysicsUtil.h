@@ -26,8 +26,7 @@ namespace CGProj
 		GPED::real fov = glm::radians(camera->Zoom);
 
 		glm::vec3 rayFrom = camera->Position;
-		glm::quat qF = camera->Orientation * glm::quat(0, 0, 0, -1)  * glm::conjugate(camera->Orientation);
-		glm::vec3 rayForward = glm::vec3(qF.x, qF.y, qF.z);
+		glm::vec3 rayForward = camera->Front;
 		GPED::real farPlane = 10000.f;
 		rayForward *= farPlane;
 
@@ -56,6 +55,35 @@ namespace CGProj
 		rayTo += GPED::real(x) * dHor;
 		rayTo -= GPED::real(y) * dVert;
 		return rayTo;
+	}
+
+	static GPED::c3AABB makeAABB(const glm::vec3& pos, const glm::vec3& halfSize)
+	{
+		GPED::c3AABB aabb;
+		aabb.min = glm::vec3(REAL_MAX);
+		aabb.max = glm::vec3(-REAL_MAX);
+
+		glm::vec3 v[8] =
+		{
+			glm::vec3(-halfSize.x,-halfSize.y, -halfSize.z),
+			glm::vec3(-halfSize.x,-halfSize.y, halfSize.z),
+			glm::vec3(halfSize.x, -halfSize.y, halfSize.z),
+			glm::vec3(halfSize.x,-halfSize.y, -halfSize.z),
+			glm::vec3(-halfSize.x, halfSize.y, -halfSize.z),
+			glm::vec3(-halfSize.x, halfSize.y, halfSize.z),
+			glm::vec3(halfSize.x, halfSize.y, halfSize.z),
+			glm::vec3(halfSize.x, halfSize.y, -halfSize.z)
+		};
+
+		// No Rotation
+		for (int i = 0; i < 8; ++i)
+		{
+			v[i] = pos +  v[i];
+			aabb.min = GPED::rMin(aabb.min, v[i]);
+			aabb.max = GPED::rMax(aabb.max, v[i]);
+		}
+
+		return aabb;
 	}
 }
 

@@ -683,8 +683,8 @@ unsigned GPED::CollisionDetector::rayAndBox(
 	const GPED::c3RayInput & input,
 	const CollisionBox & box)
 {
-	GPED::real tMin = GPED::real(0.0);
-	GPED::real tMax = GPED::real(10000);
+	GPED::real tMin = -REAL_MAX;
+	GPED::real tMax = REAL_MAX;
 
 	glm::vec3 position = box.getAxis(3);
 	glm::vec3 delta = position - input.startPoint;
@@ -709,14 +709,14 @@ unsigned GPED::CollisionDetector::rayAndBox(
 			GPED::real t2 = (aabb.max[i] - e) * f;
 
 			if (t1 > t2) GPED::Swap(t1, t2);
-			if (t1 > tMin) tMin = t1;
-			if (t2 < tMax) tMax = t2;
+			tMin = GPED::rMax(tMin, t1);
+			tMax = GPED::rMin(tMax, t2);
 			if (tMin > tMax) return 0;
 		}
 	}
 
-	output.t = tMin;
 	output.startPoint = input.startPoint;
+	output.t = tMin;
 	output.hitPoint = input.startPoint + input.direction * tMin;
 	return 1;
 }
@@ -739,8 +739,8 @@ unsigned GPED::CollisionDetector::rayAndSphere(
 	GPED::real t = -b - real_sqrt(discr);
 	// If t is negative, ray started inside sphere so clamp t to zero
 	if (t < GPED::real(0.0)) t = GPED::real(0.0);
-	output.hitPoint = input.startPoint + t * input.direction;
 	output.startPoint = input.startPoint;
+	output.hitPoint = input.startPoint + t * input.direction;
 	output.t = t;
 	return 1;
 }

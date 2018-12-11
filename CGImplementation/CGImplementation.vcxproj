@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{792F3151-E667-41A8-A222-CF178CF2FC13}</ProjectGuid>
     <RootNamespace>CGImplementation</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -152,6 +152,7 @@
     <ClCompile Include="GPED\PS_AmmoRound.cpp" />
     <ClCompile Include="GPED\PS_Box.cpp" />
     <ClCompile Include="Graphics\CGAssetManager.cpp" />
+    <ClCompile Include="Graphics\CGEditDirLightVisualizer.cpp" />
     <ClCompile Include="Graphics\CGEditObject.cpp" />
     <ClCompile Include="Graphics\CGEditSpotLightVisualizer.cpp" />
     <ClCompile Include="Graphics\CGGizmo.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="GPED\PS_Box.h" />
     <ClInclude Include="Graphics\CGAssetManager.h" />
     <ClInclude Include="Graphics\CGAssetUtil.h" />
+    <ClInclude Include="Graphics\CGEditDirLightVisualizer.h" />
     <ClInclude Include="Graphics\CGEditObject.h" />
     <ClInclude Include="Graphics\CGEditSpotLightVisualizer.h" />
     <ClInclude Include="Graphics\CGGizmo.h" />
@@ -222,6 +224,8 @@
   <ItemGroup>
     <None Include="ShaderFolder\CGDepthMap.fs" />
     <None Include="ShaderFolder\CGDepthMap.vs" />
+    <None Include="ShaderFolder\CGDirVisualizer.fs" />
+    <None Include="ShaderFolder\CGDirVisualizer.vs" />
     <None Include="ShaderFolder\CGLineShader.fs" />
     <None Include="ShaderFolder\CGLineShader.vs" />
     <None Include="ShaderFolder\CGSpotVisualizer.fs" />

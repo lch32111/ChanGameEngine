@@ -5,6 +5,7 @@
 #include <GPED/CGBroadPhase.h>
 
 #include <Graphics/CGAssetManager.h>
+#include <Graphics/CGEditDirLightVisualizer.h>
 #include <Graphics/CGEditSpotLightVisualizer.h>
 
 namespace CGProj
@@ -307,6 +308,7 @@ namespace CGProj
 	private:
 		Shader* m_forwardShader;
 		EditLightType m_LightType;
+		CGEditDirLightVisualizer m_dirVis;
 		CGEditSpotLightVisualizer m_spotVis;
 
 		// Point and Spot Light(Flash Light)

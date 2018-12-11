@@ -247,8 +247,8 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 	{
 		lightView = glm::lookAt(
-			editLights[0].getPosition(),
-			editLights[0].getPosition() + editLights[0].getLightDirection() * 100.f,
+			editLights[0].getPosition() - editLights[0].getLightDirection() * 5.f,
+			editLights[0].getPosition() + editLights[0].getLightDirection(),
 			glm::vec3(0, 1, 0));
 		lightSpaceMatrix = lightProjection * lightView;
 

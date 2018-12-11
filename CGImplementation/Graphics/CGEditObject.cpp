@@ -848,6 +848,10 @@ CGProj::CGEditLightObject::CGEditLightObject(CGAssetManager& am)
 	m_spotVis.prepareData(am.getShader(SHADER_SPOT_VISUALIZER));
 	m_spotVis.setOuterConeInRadians(glm::acos(m_SpotOuterCutOff), m_AttnRadius);
 	m_spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_AttnRadius);
+
+	m_dirVis.prepareData(am.getShader(SHADER_DIR_VISUALIZER));
+	m_dirVis.setCylinderDimension(5, 3, 3);
+	m_dirVis.setConeDimension(3, 0, 5);
 }
 
 void CGProj::CGEditLightObject::setForwardShader(Shader * shader)
@@ -878,7 +882,7 @@ void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm:
 		switch (m_LightType)
 		{
 		case EDIT_DIRECTION_LIGHT:
-
+			m_dirVis.render(view, proj, m_lightPosition, m_lightDirection);
 			break;
 		case EDIT_POINT_LIGHT:
 			m_forwardShader->setVec3("Color", glm::vec3(0.662, 0.831, 0.87));

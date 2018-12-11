@@ -186,6 +186,9 @@
     <ClCompile Include="Graphics\CGEditSpotLightVisualizer.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\CGEditDirLightVisualizer.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -332,6 +335,9 @@
     <ClInclude Include="Graphics\CGEditSpotLightVisualizer.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\CGEditDirLightVisualizer.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderFolder\DeferredFirst.fs">
@@ -395,6 +401,12 @@
       <Filter>ShaderFolder</Filter>
     </None>
     <None Include="ShaderFolder\CGDepthMap.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGDirVisualizer.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGDirVisualizer.fs">
       <Filter>ShaderFolder</Filter>
     </None>
   </ItemGroup>

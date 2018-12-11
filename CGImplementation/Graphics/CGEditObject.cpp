@@ -850,8 +850,8 @@ CGProj::CGEditLightObject::CGEditLightObject(CGAssetManager& am)
 	m_spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_AttnRadius);
 
 	m_dirVis.prepareData(am.getShader(SHADER_DIR_VISUALIZER));
-	m_dirVis.setCylinderDimension(5, 3, 3);
-	m_dirVis.setConeDimension(3, 0, 5);
+	m_dirVis.setCylinderDimension(5, 0.1, 0.1);
+	m_dirVis.setConeDimension(1.5, 0, 0.5);
 }
 
 void CGProj::CGEditLightObject::setForwardShader(Shader * shader)

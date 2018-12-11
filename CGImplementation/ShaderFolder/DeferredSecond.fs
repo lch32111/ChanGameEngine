@@ -61,7 +61,7 @@ struct SpotLight {
 };
 
 // Limit of the array size for each kind of light
-#define NR_DIR_LIGHTS 5
+#define NR_DIR_LIGHTS 15
 #define NR_POINT_LIGHTS 10
 #define NR_SPOT_LIGHTS 10
 

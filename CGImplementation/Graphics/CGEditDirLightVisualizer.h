@@ -46,9 +46,6 @@ namespace CGProj
 		unsigned m_coneVAO;
 		unsigned m_coneVBO;
 		unsigned m_coneEBO;
-
-
-
 	};
 }
 #endif

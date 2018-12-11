@@ -184,7 +184,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 		assert(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	float near_plane = 1.0f, far_plane = 7.5f;
+	float near_plane = 1.0f, far_plane = 500.f;
 	lightProjection = glm::ortho(-10.f, 10.f, -10.f, 10.f, near_plane, far_plane);
 	
 	
@@ -247,8 +247,8 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 	{
 		lightView = glm::lookAt(
-			editLights[0].getPosition() - editLights[0].getLightDirection() * 5.f,
-			editLights[0].getPosition() + editLights[0].getLightDirection(),
+			editLights[0].getPosition() - editLights[0].getLightDirection() * 10.f,
+			editLights[0].getPosition() + editLights[0].getLightDirection() * 10.f,
 			glm::vec3(0, 1, 0));
 		lightSpaceMatrix = lightProjection * lightView;
 

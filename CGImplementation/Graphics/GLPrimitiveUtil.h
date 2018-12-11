@@ -11,11 +11,9 @@ namespace CGProj
 	static inline void renderCube()
 	{
 		static unsigned int cubeVAO = 0;
-		static unsigned int cubeVBO = 0;
-
-		// initialize (if necessary)
 		if (cubeVAO == 0)
 		{
+			unsigned int cubeVBO = 0;
 			float vertices[] = {
 				// back face
 				-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
@@ -85,12 +83,10 @@ namespace CGProj
 	static inline void wireRenderCube(float linewidth = 1.f)
 	{
 		static unsigned int wireCubeVAO = 0;
-		static unsigned int wireCubeEBO = 0;
-		static unsigned int wireCubeVBO = 0;
-
-		// initialize (if necessary)
 		if (wireCubeVAO == 0)
 		{
+			unsigned int wireCubeEBO = 0;
+			unsigned int wireCubeVBO = 0;
 			float vertices[] =
 			{
 				   -1.0, -1.0, -1.0,
@@ -131,32 +127,24 @@ namespace CGProj
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices[0], GL_STATIC_DRAW);
 
 			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-			glBindVertexArray(0);
-
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 		}
 		// render Cube
-		glBindVertexArray(wireCubeVAO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wireCubeEBO);
 		glLineWidth(linewidth);
+		glBindVertexArray(wireCubeVAO);
 		glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
 
 		// Setting Default
-		glBindVertexArray(0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glLineWidth(1.0);
+		glBindVertexArray(0);
 	}
 
 	static inline void renderQuad()
 	{
 		static unsigned int quadVAO = 0;
-		static unsigned int quadVBO;
-
 		if (quadVAO == 0)
 		{
+			unsigned int quadVBO;
 			float quadVertices[] = {
 				// positions         // normal          // texture Coords
 				-1.0f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
@@ -189,10 +177,10 @@ namespace CGProj
 	static inline void renderScreenQuad()
 	{
 		static unsigned int screenQuadVAO = 0;
-		static unsigned int screenQuadVBO;
-
 		if (screenQuadVAO == 0)
 		{
+			unsigned int screenQuadVBO;
+
 			float quadVertices[] = {
 				// positions        //Normal       // texture Coords
 				-1.0f,  1.0f, 0.0f, 0.f, 0.f, 1.f, 0.0f, 1.0f,
@@ -319,10 +307,12 @@ namespace CGProj
 	static inline void renderWireCircle2D()
 	{
 		static unsigned int circleVAO = 0;
-		static unsigned int circleVBO = 0;
 		static unsigned int circleVerticesNumb = 0;
+
 		if (circleVAO == 0)
 		{
+			unsigned int circleVBO = 0;
+
 			glGenVertexArrays(1, &circleVAO);
 			glGenBuffers(1, &circleVBO);
 
@@ -356,110 +346,14 @@ namespace CGProj
 		glBindVertexArray(0);
 	}
 
-	// 3D Cylinder whose local cylinder axis is pointing (0, 1, 0)
-	// The local height is 1. It means that the one end point is
-	// (0, -0.5, 0), and the other one is (0, 0.5, 0).
-	// The original radius of the cylinder is 1.
-	// This method is for the practice...
 	static inline void renderCylinder()
 	{
-		static unsigned int cylinderVAO = 0;
-		static unsigned int cylinderVBO = 0;
-		static unsigned int cylinderSide = 0;
-		static unsigned int cylinderTopCircle = 0;
-		static unsigned int cylinderBottomCircle = 0;
-		if (cylinderVAO == 0)
-		{
-			glGenVertexArrays(1, &cylinderVAO);
-			glGenBuffers(1, &cylinderVBO);
-
-			glm::vec3 p1(0, -0.5, 0);
-			glm::vec3 p2(0, 0.5, 0);
-
-			std::vector<float> vertices;
-			float width = 360 / 30;
-			float PI = glm::pi<float>();
-			float bRadii = 1.0f;
-			float tRadii = 1.0f;
-
-			// The Side of Cylinder
-			for (int i = 0; i <= 360; i += width)
-			{
-				float theta1 = i * PI / 180.f * -1;
-				float theta2 = (i + 1) * PI / 180.f * -1;
-
-				vertices.push_back(p2.x + cosf(theta1));
-				vertices.push_back(p2.y);
-				vertices.push_back(p2.z + sinf(theta1));
-
-				vertices.push_back(p1.x + cosf(theta1));
-				vertices.push_back(p1.y);
-				vertices.push_back(p1.z + sinf(theta1));
-
-				vertices.push_back(p2.x + cosf(theta2));
-				vertices.push_back(p2.y);
-				vertices.push_back(p2.z + sinf(theta2));
-
-				vertices.push_back(p1.x + cosf(theta2));
-				vertices.push_back(p1.y);
-				vertices.push_back(p1.z + sinf(theta2));
-			}
-			cylinderSide = vertices.size() / 3;
-			
-			// Top Circle made of triangle fan
-			vertices.push_back(p2.x);
-			vertices.push_back(p2.y);
-			vertices.push_back(p2.z);
-			for (int i = 0; i <= 360; i += width)
-			{
-				float angle = i * PI / 180.f * -1;
-				vertices.push_back(p2.x + cosf(angle));
-				vertices.push_back(p2.y);
-				vertices.push_back(p2.z+ sinf(angle));
-			}
-			cylinderTopCircle = (vertices.size() - cylinderSide * 3) / 3;
-
-			// Bottom Circle made of triangle fan
-			vertices.push_back(p1.x);
-			vertices.push_back(p1.y);
-			vertices.push_back(p1.z);
-			for (int i = 0; i <= 360; i += width)
-			{
-				float angle = i * PI / 180.f;
-				vertices.push_back(p1.x + cosf(angle));
-				vertices.push_back(p1.y);
-				vertices.push_back(p1.z + sinf(angle));
-			}
-			cylinderBottomCircle = (vertices.size() - (cylinderSide * 3 + cylinderTopCircle * 3)) / 3;
-
-			glBindVertexArray(cylinderVAO);
-			glBindBuffer(GL_ARRAY_BUFFER, cylinderVBO);
-
-			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
-
-			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		}
-
-		// glDisable(GL_CULL_FACE);
-		glBindVertexArray(cylinderVAO);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, cylinderSide);
-		glDrawArrays(GL_TRIANGLE_FAN, cylinderSide, cylinderTopCircle);
-		glDrawArrays(GL_TRIANGLE_FAN, cylinderSide + cylinderTopCircle, cylinderBottomCircle);
-		// glEnable(GL_CULL_FACE);
-		glBindVertexArray(0);
-	}
-
-	static inline void renderTestCylinder()
-	{
 		static unsigned int tcylinderVAO = 0;
-		static unsigned int tcylinderVBO = 0;
-		static unsigned int tcylinderEBO = 0;
 		static unsigned int tcylinderCount = 0;
 		if (tcylinderVAO == 0)
 		{
-			glGenVertexArrays(1, &tcylinderVAO);
-			glGenBuffers(1, &tcylinderVBO);
+			unsigned int tcylinderVBO;
+			unsigned int tcylinderEBO;
 
 			std::vector<glm::vec3> vertices;
 			std::vector<unsigned> indices;
@@ -478,7 +372,7 @@ namespace CGProj
 			}
 			unsigned TopSideCut = vertices.size();
 
-			for (int i = 0; i < 360; i += width)
+			for (int i = 0; i <= 360; i += width)
 			{
 				float angle = i * radPI;
 
@@ -495,9 +389,9 @@ namespace CGProj
 				indices.push_back(i + TopSideCut);
 				indices.push_back(i + 1);
 
-				indices.push_back(i);
-				indices.push_back(i + TopSideCut);
 				indices.push_back(i + 1);
+				indices.push_back(i + TopSideCut);
+				indices.push_back(i + TopSideCut +1);
 			}
 
 			// Top Center Vertex
@@ -522,16 +416,19 @@ namespace CGProj
 
 			tcylinderCount = indices.size();
 
+			glGenVertexArrays(1, &tcylinderVAO);
+			glGenBuffers(1, &tcylinderVBO);
+			glGenBuffers(1, &tcylinderEBO);
+
 			glBindVertexArray(tcylinderVAO);
-			
 			glBindBuffer(GL_ARRAY_BUFFER, tcylinderVBO);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size() * 3, &vertices[0], GL_STATIC_DRAW);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tcylinderEBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(unsigned) * tcylinderCount, &indices[0], GL_STATIC_DRAW);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * tcylinderCount, &indices[0], GL_STATIC_DRAW);
 
 			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
 		}
 
 		glBindVertexArray(tcylinderVAO);
@@ -543,7 +440,7 @@ namespace CGProj
 	// The cylinder axis is pointing toward (0, 1, 0)
 	static inline void getCylinderVerts(float tRadius, float bRadius, float height, 
 		glm::vec3 OutVertices[], unsigned OutIndices[], 
-		unsigned maxIndex, unsigned& indexCount)
+		unsigned maxIndex, unsigned& vertexCount, unsigned& indexCount)
 	{
 		/**
 		 * The Process of building the vertices of cylinder is making the side first,
@@ -559,8 +456,8 @@ namespace CGProj
 		unsigned vertexN = 0;
 		unsigned indexN = 0;
 
-		glm::vec3 TopCenter(0, height / 2, 0);
-		glm::vec3 BottomCenter(0, -height / 2, 0);
+		glm::vec3 TopCenter(0, height, 0);
+		glm::vec3 BottomCenter(0, 0, 0);
 
 		float radPI = glm::pi<float>() / 180.f;
 		for (int i = 0; i <= 360; i += width)
@@ -573,7 +470,7 @@ namespace CGProj
 		}
 		unsigned TopSideCut = vertexN;
 		
-		for (int i = 0; i < 360; i += width)
+		for (int i = 0; i <= 360; i += width)
 		{
 			float angle = i * radPI;
 
@@ -583,39 +480,40 @@ namespace CGProj
 		}
 		unsigned BottomSideCut = vertexN;
 
-		// Make indices of cylinder side in CCW
+		// Make indices of cylinder side in CW  
 		for (int i = 0; i < TopSideCut; ++i)
 		{
 			OutIndices[indexN++] = i;
-			OutIndices[indexN++] = i + TopSideCut;
-			OutIndices[indexN++] = i + 1;
-
 			OutIndices[indexN++] = i + 1;
 			OutIndices[indexN++] = i + TopSideCut;
+			
+			OutIndices[indexN++] = i + TopSideCut;
+			OutIndices[indexN++] = i + 1;
 			OutIndices[indexN++] = i + TopSideCut + 1;
 		}
 
 		// Top Center Vertex
 		OutVertices[vertexN++] = TopCenter;
-		// Make indices of top cap of cylinder in CCW
+		// Make indices of top cap of cylinder in CW
 		for (int i = 0; i < TopSideCut; ++i)
 		{
 			OutIndices[indexN++] = vertexN - 1; // center
-			OutIndices[indexN++] = i;
 			OutIndices[indexN++] = i + 1;
+			OutIndices[indexN++] = i;
 		}
 
 		// Bottom Center Vertex
 		OutVertices[vertexN++] = BottomCenter;
-		// Make indices of bottom cap of cylinder in CCW
+		// Make indices of bottom cap of cylinder in CW
 		for (int i = TopSideCut; i < BottomSideCut; ++i)
 		{
 			OutIndices[indexN++] = vertexN - 1;
-			OutIndices[indexN++] = i + 1;
 			OutIndices[indexN++] = i;
+			OutIndices[indexN++] = i + 1;
 		}
 
 		indexCount = indexN;
+		vertexCount = vertexN;
 	}
 }
 

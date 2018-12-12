@@ -167,7 +167,7 @@ namespace CGProj
 	{
 		friend class CGEditLightObject;
 	public:
-		CGEditProxyObject();
+		CGEditProxyObject(CGAssetManager& am);
 
 		/*** Graphics Method ***/
 		virtual void render(const glm::mat4& view, const glm::mat4& proj);

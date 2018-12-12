@@ -587,9 +587,14 @@ void CGProj::CGEditObject::renderPrimitive()
 // =================================================================
 /*** CG EDIT Proxy Object  ***/
 
-CGProj::CGEditProxyObject::CGEditProxyObject()
+CGProj::CGEditProxyObject::CGEditProxyObject(CGAssetManager& am)
 {
 	setProxyType(EDIT_PROXY_STATIC);
+
+	// Note that the Def shader should be already initialized before this constructor
+	setDefShader(am.getShader(SHADER_DEFERRED_FIRST));
+
+	// other member variables of this class should be in the class header declaration!
 }
 
 void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 & proj)
@@ -830,6 +835,14 @@ CGProj::EditProxyType CGProj::CGEditProxyObject::getProxyType()
 
 CGProj::CGEditLightObject::CGEditLightObject(CGAssetManager& am)
 {
+	// Basic Shader Setup 
+	// Note that you should initialize the shader before
+	// the edit objects get the shader uninitialized.
+	setDefShader(am.getShader(SHADER_DEFERRED_SECOND));
+	setForwardShader(am.getShader(SHADER_SIMPLE_COLOR_RENDER)); // for the light util rendering
+	// Basic Shader Setup
+
+	// Light Init
 	setLightType(EDIT_POINT_LIGHT);
 	setPosition(glm::vec3(0));
 	setLightDirection(glm::vec3(0, 1, 0));
@@ -854,8 +867,12 @@ CGProj::CGEditLightObject::CGEditLightObject(CGAssetManager& am)
 	m_spotVis.prepareData(am.getShader(SHADER_SPOT_VISUALIZER));
 	m_spotVis.setOuterConeInRadians(glm::acos(m_SpotOuterCutOff), m_AttnRadius);
 	m_spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_AttnRadius);
+	// Light Init
 
 	// Shadow Map Initialization
+	// Also note that the shadow map shader should be initialized before this constructor!
+	setDepthMapShader(am.getShader(SHADER_SHADOW_MAP));
+	setDepthDebugMap(am.getShader(SHADER_SHADOW_MAP_DEBUG_RENDER));
 	glGenFramebuffers(1, &m_depthMapFBO);
 
 	glGenTextures(1, &m_depthMapTexture);
@@ -895,7 +912,7 @@ void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm:
 		return;
 	}
 
-	// Refer to the simpleColorRender!
+	// Refer to the simpleColorRender Shader!
 	// Edit Object Render
 	glm::mat4 model(1.0);
 	model = glm::translate(model, m_lightPosition);

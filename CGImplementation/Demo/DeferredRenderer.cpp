@@ -13,6 +13,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 {
 	assetManager.assetInit();
 	camera.Position = glm::vec3(10, 10, 10);
+
 	// Shader Setup
 	Deferred_First_Shader = assetManager.getShader(SHADER_DEFERRED_FIRST);
 	Deferred_First_Shader->use();
@@ -30,8 +31,16 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	for (unsigned i = 0; i < NR_DIR_SHADOWS; ++i)
 		Deferred_Second_Shader->setInt("dirShadowMap[" + std::to_string(i) + "]", NR_GBUFFER_TEXTURES + i);
 
-	Simple_Shader = assetManager.getShader(SHADER_SIMPLE_COLOR_RENDER);
-	wireShader = assetManager.getShader(SHADER_WIRE_RENDER);
+	// Shadow shader setting
+	Shader* depthMapShader = assetManager.getShader(SHADER_SHADOW_MAP);
+	Shader* depthMapDebugShader = assetManager.getShader(SHADER_SHADOW_MAP_DEBUG_RENDER);
+	depthMapDebugShader->use();
+	depthMapDebugShader->setInt("depthMap", 0);
+	depthMapDebugShader->setBool("shadowProjection", false); // Orthographic
+	depthMapDebugShader->setFloat("near_plane", 1.f);
+	depthMapDebugShader->setFloat("far_plane", 7.5f);
+	// Shadow shader setting
+
 	// Shader Setup
 
 	// First Pass Setup For Deferred Rendering
@@ -99,10 +108,9 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	editProxies.reserve(20); // prevent STL from reallocating dynamically because of broad phase user data
 	for (unsigned i = 0; i < 2; ++i)
 	{
-		editProxies.push_back(CGEditProxyObject());
+		editProxies.push_back(CGEditProxyObject(assetManager));
 		editProxies[i].connectBroadPhase(&dBroadPhase);
 		editProxies[i].setBroadPhaseId(dBroadPhase.CreateProxy(editProxies[i].getFitAABB(), &editProxies[i]));
-		editProxies[i].setDefShader(Deferred_First_Shader);
 		
 		editProxies[i].setCMorLM(true);
 		
@@ -118,16 +126,6 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 		editProxies[i].setPosition(prandom.randomVector(glm::vec3(-7, -5, 0), glm::vec3(-4, -4, 5)));
 	}
 
-	// Shadow shader setting
-	Shader* depthMapShader = assetManager.getShader(SHADER_SHADOW_MAP);
-	Shader* depthMapDebugShader = assetManager.getShader(SHADER_SHADOW_MAP_DEBUG_RENDER);
-	depthMapDebugShader->use();
-	depthMapDebugShader->setInt("depthMap", 0);
-	depthMapDebugShader->setBool("shadowProjection", false); // Orthographic
-	depthMapDebugShader->setFloat("near_plane", 1.f);
-	depthMapDebugShader->setFloat("far_plane", 7.5f);
-	// Shadow shader setting
-
 	GPED::Random random(331);
 	editLights.reserve(400);
 	editLights.push_back(CGEditLightObject(assetManager));
@@ -135,25 +133,19 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	editLights[0].setScale(0.3);
 	editLights[0].connectBroadPhase(&dBroadPhase);
 	editLights[0].setBroadPhaseId(dBroadPhase.CreateProxy(editLights[0].getFitAABB(), &editLights[0]));
-	editLights[0].setDefShader(Deferred_Second_Shader);
-	editLights[0].setForwardShader(Simple_Shader);
 	editLights[0].setLightDirection(glm::vec3(-0.2f, -1.0f, -0.3f));
 	editLights[0].setAmbientColor(glm::vec3(0.05));
 	editLights[0].setDiffuseColor(glm::vec3(0.4));
 	editLights[0].setSpecularColor(glm::vec3(0.5));
-	editLights[0].setDepthMapShader(depthMapShader);
-	editLights[0].setDepthDebugMap(depthMapDebugShader);
 
 	// Point Light
 	for (unsigned i = 1; i < 11; ++i)
 	{
 		editLights.push_back(CGEditLightObject(assetManager));
-		editLights[i].setObjectType(EDIT_OBJECT_LIGHT);
+		editLights[i].setLightType(EDIT_POINT_LIGHT);
 		editLights[i].setScale(0.3);
 		editLights[i].connectBroadPhase(&dBroadPhase);
 		editLights[i].setBroadPhaseId(dBroadPhase.CreateProxy(editLights[i].getFitAABB(), &editLights[i]));
-		editLights[i].setDefShader(Deferred_Second_Shader);
-		editLights[i].setForwardShader(Simple_Shader);
 
 		editLights[i].setPosition(random.randomVector(glm::vec3(-20, -5, -20), glm::vec3(20, 5, 20)));
 		editLights[i].setAmbientColor(random.randomVector(glm::vec3(0, 0, 0) ,glm::vec3(1, 1, 1)));
@@ -161,11 +153,8 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 		editLights[i].setSpecularColor(random.randomVector(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
 		editLights[i].setAttnLinear(0.7);
 		editLights[i].setAttnQuadratic(0.5);
-		editLights[i].setDepthMapShader(depthMapShader);
-		editLights[i].setDepthDebugMap(depthMapDebugShader);
 	}
 	// Object Manual Setting + Light Manual Setting
-
 
 	// Debug Render Setting
 	bRender.connectTree(dBroadPhase.getTree());
@@ -233,6 +222,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 
 	// Shadow Mapping Pass
 	{
+		// TODO : use the shadow light array in case of lots of lights
 		for (unsigned i = 0; i < editLights.size(); ++i)
 		{
 			if (editLights[i].getIsShadowRender() == false)

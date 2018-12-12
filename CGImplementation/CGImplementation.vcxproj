@@ -199,6 +199,7 @@
     <ClInclude Include="GPED\PS_Box.h" />
     <ClInclude Include="Graphics\CGAssetManager.h" />
     <ClInclude Include="Graphics\CGAssetUtil.h" />
+    <ClInclude Include="Graphics\CGDefSecondUtil.h" />
     <ClInclude Include="Graphics\CGEditDirLightVisualizer.h" />
     <ClInclude Include="Graphics\CGEditObject.h" />
     <ClInclude Include="Graphics\CGEditSpotLightVisualizer.h" />

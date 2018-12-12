@@ -338,6 +338,9 @@
     <ClInclude Include="Graphics\CGEditDirLightVisualizer.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\CGDefSecondUtil.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderFolder\DeferredFirst.fs">

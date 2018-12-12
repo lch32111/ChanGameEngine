@@ -320,9 +320,9 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		Deferred_Second_Shader->setInt("DIR_USED_NUM", num_dir_light);
 		Deferred_Second_Shader->setInt("POINT_USED_NUM", num_point_light);
 		Deferred_Second_Shader->setInt("SPOT_USED_NUM", num_spot_light);
-		num_dir_light = 0;
-		num_point_light = 0;
-		num_spot_light = 0;
+		num_dir_light = num_point_light = num_spot_light = 0;
+		num_dir_shadow = num_point_shadow = num_spot_shadow = 0;
+
 
 		renderScreenQuad();
 	}
@@ -356,6 +356,10 @@ void CGProj::DeferredRenderer::display(int width, int height)
 			rayRen.renderLine(view, projection, 1.8);
 		}
 
+		if (lightDraw)
+			for (unsigned int i = 0; i < editLights.size(); ++i)
+				editLights[i].forwardRender(view, projection);
+
 		// Picked One
 		if (pickedEditBox != nullptr)
 		{
@@ -364,10 +368,6 @@ void CGProj::DeferredRenderer::display(int width, int height)
 			gizmoTest.renderGizmo(view, projection);
 			gizmoTest.renderGizmoBox(view, projection);
 		}
-
-		if (lightDraw)
-			for (unsigned int i = 0; i < editLights.size(); ++i)
-				editLights[i].forwardRender(view, projection);
 	}
 	// Debug Drawing and UI Render like forward processing
 }

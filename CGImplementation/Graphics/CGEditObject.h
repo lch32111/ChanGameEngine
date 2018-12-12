@@ -369,9 +369,22 @@ namespace CGProj
 		
 		unsigned int m_depthMapFBO, m_depthMapTexture;
 		unsigned int m_shadowWidth = 1024, m_shadowHeight = 1024;
+		
 		bool m_shadowProjection = false; // true : perspective, false orthogonal
+		// In case of Orthographic
+		float m_orthoLeft = -10.f;
+		float m_orthoRight = 10.f;
+		float m_orthoBottom = -10.f;
+		float m_orthoTop = 10.f;
+
+		// In case of Perspective
+		float m_perFOV = 45.f;
+		float m_perAspect = 4.f / 3.f;
+
 		float m_shadowNearPlane = 1.0f;
 		float m_shadowFarPlane = 7.5f;
+
+
 		glm::mat4 m_shadowLightView;
 		glm::mat4 m_shadowLightProjection;
 		glm::mat4 m_shadowLightSpaceMatrix;

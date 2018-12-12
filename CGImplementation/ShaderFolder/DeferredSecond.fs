@@ -78,8 +78,8 @@ struct SpotLight {
 
 uniform int DIR_USED_NUM;
 uniform DirLight dirLights[NR_DIR_LIGHTS];
-uniform sampler2D dirShadowMap[NR_DIR_SHADOW];
-uniform mat4 dirLightSpace[NR_DIR_SHADOW];
+uniform sampler2D dirShadowMap[NR_DIR_SHADOWS];
+uniform mat4 dirLightSpace[NR_DIR_SHADOWS];
 
 uniform int POINT_USED_NUM;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
@@ -362,7 +362,7 @@ vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float
 	return  (ambient + diffuse + specular);
 }
 
-float ShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, unsigned index)
+float ShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index)
 {
 	// transform world into lightspace
 	vec4 fragPosLightSpace = dirLightSpace[index] * vec4(fragpos, 1.0);

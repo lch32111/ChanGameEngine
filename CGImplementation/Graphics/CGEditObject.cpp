@@ -885,7 +885,12 @@ void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm:
 {
 	if (m_isShadowMapRender)
 	{
-
+		m_DebugDepthMapShader->use();
+		m_DebugDepthMapShader->setBool("shadowProjection", m_shadowProjection);
+		m_DebugDepthMapShader->setFloat("near_plane", m_shadowNearPlane);
+		m_DebugDepthMapShader->setFloat("far_plane", m_shadowFarPlane);
+		renderScreenQuad();
+		return;
 	}
 
 	// Refer to the simpleColorRender!
@@ -1078,7 +1083,39 @@ void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
 	ImGui::ColorEdit3("specular", temp);
 	m_lightSpecular = { temp[0], temp[1], temp[2] };
 
-	ImGui::Checkbox("ShadowMap Debug Render", &m_isShadowMapRender);
+	ImGui::Checkbox("Shadow Cast", &m_isShadow);
+
+	if (m_isShadow)
+	{
+		ImGui::Checkbox("ShadowMap Debug Render", &m_isShadowMapRender);
+		
+		int wharr[2] = { m_shadowWidth, m_shadowHeight };
+		if (ImGui::InputInt2("shadow width & height", wharr))
+		{
+			setShadowWidth(wharr[0]);
+			setShadowHeight(wharr[1]);
+		}
+
+		ImGui::Checkbox("Shadow Projection", &m_shadowProjection);
+		ImGui::SameLine(); ShowHelpMarker("Check -> Perspective, NonCheck -> Orthographic");
+		
+		if (m_shadowProjection)
+		{
+			ImGui::InputFloat("FOV", &m_perFOV);
+			ImGui::InputFloat("Aspect", &m_perAspect);
+		}
+		else
+		{
+			ImGui::InputFloat("ortho Left", &m_orthoLeft);
+			ImGui::InputFloat("ortho Right", &m_orthoRight);
+			ImGui::InputFloat("ortho Bottom", &m_orthoBottom);
+			ImGui::InputFloat("ortho Top", &m_orthoTop);
+		}
+
+		ImGui::InputFloat("shadow near plane", &m_shadowNearPlane);
+		ImGui::InputFloat("shadow far plane", &m_shadowFarPlane);
+	}
+	
 
 	ImGui::End();
 }
@@ -1371,7 +1408,7 @@ void CGProj::CGEditLightObject::setLightPropertyOnShader(unsigned lightIndex, un
 		m_DefShader->setVec3("dirLights[" + sLightIndex + "].Specular", m_lightSpecular);
 		m_DefShader->setInt("dirLights[" + sLightIndex + "].ShadowIndex", SHADOW_INDEX_NONE);
 
-		// NR_DIR_SHADOW is limitation of 
+		// NR_DIR_SHADOW is limitation of shadow mapping texture
 		if (m_isShadow && shadowIndex < NR_DIR_SHADOWS)
 		{
 			m_DefShader->setInt("dirLights[" + sLightIndex + "].ShadowIndex", shadowIndex);
@@ -1463,6 +1500,16 @@ float CGProj::CGEditLightObject::getShadowFarPlane()
 void CGProj::CGEditLightObject::setShadowWidth(unsigned width)
 {
 	m_shadowWidth = width;
+
+	// Set the texture setting again
+	glBindTexture(GL_TEXTURE_2D, m_depthMapTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_shadowWidth, m_shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthMapTexture, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		assert(0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 unsigned CGProj::CGEditLightObject::getShadowWidth()
@@ -1473,6 +1520,16 @@ unsigned CGProj::CGEditLightObject::getShadowWidth()
 void CGProj::CGEditLightObject::setShadowHeight(unsigned height)
 {
 	m_shadowHeight = height;
+
+	// Set the texture setting again
+	glBindTexture(GL_TEXTURE_2D, m_depthMapTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_shadowWidth, m_shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthMapTexture, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		assert(0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 unsigned CGProj::CGEditLightObject::getShadowHeight()
@@ -1495,11 +1552,28 @@ void CGProj::CGEditLightObject::renderShadowMap(std::vector<CGEditProxyObject>& 
 	// Light Space Setting
 	m_shadowLightView = glm::lookAt
 	(
-		m_lightPosition,
+		m_lightPosition + glm::vec3(0, 10, 0),
 		m_lightPosition + m_lightDirection,
 		glm::vec3(0, 1, 0)
 	);
-	m_shadowLightProjection = glm::ortho(-10.f, 10.f, -10.f, 10.f, m_shadowNearPlane, m_shadowFarPlane);
+
+	if (m_shadowProjection)
+	{
+		m_shadowLightProjection = glm::perspective
+		(
+			m_perFOV, m_perAspect,
+			m_shadowNearPlane, m_shadowFarPlane
+		);
+	}
+	else
+	{
+		m_shadowLightProjection = glm::ortho
+		(
+			m_orthoLeft, m_orthoRight, m_orthoBottom, m_orthoTop,
+			m_shadowNearPlane, m_shadowFarPlane
+		);
+	}
+	
 
 	m_shadowLightSpaceMatrix = m_shadowLightProjection * m_shadowLightView;
 	// Light Space Setting

@@ -189,6 +189,9 @@
     <ClCompile Include="Graphics\CGEditDirLightVisualizer.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\CGEditPointLightVisualizer.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -341,6 +344,9 @@
     <ClInclude Include="Graphics\CGDefSecondUtil.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\CGEditPointLightVisualizer.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderFolder\DeferredFirst.fs">
@@ -416,6 +422,12 @@
       <Filter>ShaderFolder</Filter>
     </None>
     <None Include="ShaderFolder\CGDepthMapDebugRender.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGPointVisualizer.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGPointVisualizer.fs">
       <Filter>ShaderFolder</Filter>
     </None>
   </ItemGroup>

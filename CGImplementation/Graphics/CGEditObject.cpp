@@ -845,13 +845,15 @@ CGProj::CGEditLightObject::CGEditLightObject(CGAssetManager& am)
 	setInnerCutOffInDegree(12.5);
 	setOuterCutOffInDegree(17.5);
 
-	m_spotVis.prepareData(am.getShader(SHADER_SPOT_VISUALIZER));
-	m_spotVis.setOuterConeInRadians(glm::acos(m_SpotOuterCutOff), m_AttnRadius);
-	m_spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_AttnRadius);
-
 	m_dirVis.prepareData(am.getShader(SHADER_DIR_VISUALIZER));
 	m_dirVis.setCylinderDimension(5, 0.1, 0.1);
 	m_dirVis.setConeDimension(1.5, 0, 0.5);
+
+	m_pointVis.prepareData(am.getShader(SHADER_POINT_VISUALIZER));
+
+	m_spotVis.prepareData(am.getShader(SHADER_SPOT_VISUALIZER));
+	m_spotVis.setOuterConeInRadians(glm::acos(m_SpotOuterCutOff), m_AttnRadius);
+	m_spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_AttnRadius);
 
 	// Shadow Map Initialization
 	glGenFramebuffers(1, &m_depthMapFBO);
@@ -916,27 +918,7 @@ void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm:
 			m_dirVis.render(view, proj, m_lightPosition, m_lightDirection);
 			break;
 		case EDIT_POINT_LIGHT:
-			m_forwardShader->setVec3("Color", glm::vec3(0.662, 0.831, 0.87));
-
-			model = glm::mat4(1.0);
-			model = glm::translate(model, m_lightPosition);
-			model = glm::scale(model, glm::vec3(m_AttnRadius));
-
-			// XZ Circle
-			m_forwardShader->setMat4("model", model);
-			renderWireCircle2D();
-
-			// XY Circle
-			glm::mat4 rot(1.0);
-			rot = glm::rotate(rot, glm::radians(90.f), glm::vec3(1, 0, 0));
-			m_forwardShader->setMat4("model", model * rot);
-			renderWireCircle2D();
-
-			// YZ Circle
-			rot = glm::mat4(1.0);
-			rot = glm::rotate(rot, glm::radians(90.f), glm::vec3(0, 0, 1));
-			m_forwardShader->setMat4("model", model * rot);
-			renderWireCircle2D();
+			m_pointVis.render(view, proj, m_lightPosition, m_AttnRadius);
 			break;
 		case EDIT_SPOT_LIGHT:
 			m_spotVis.render(view, proj, m_lightPosition, m_lightDirection);
@@ -1083,21 +1065,21 @@ void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
 	ImGui::ColorEdit3("specular", temp);
 	m_lightSpecular = { temp[0], temp[1], temp[2] };
 
+	// Shadow
 	ImGui::Checkbox("Shadow Cast", &m_isShadow);
-
 	if (m_isShadow)
 	{
 		ImGui::Checkbox("ShadowMap Debug Render", &m_isShadowMapRender);
-		
+		ImGui::Checkbox("Shadow Frustum Render", &m_isShadowFrustumRender);
+		ImGui::Checkbox("Shadow Projection", &m_shadowProjection);
+		ImGui::SameLine(); ShowHelpMarker("Check -> Perspective, NonCheck -> Orthographic");
+
 		int wharr[2] = { m_shadowWidth, m_shadowHeight };
 		if (ImGui::InputInt2("shadow width & height", wharr))
 		{
 			setShadowWidth(wharr[0]);
 			setShadowHeight(wharr[1]);
 		}
-
-		ImGui::Checkbox("Shadow Projection", &m_shadowProjection);
-		ImGui::SameLine(); ShowHelpMarker("Check -> Perspective, NonCheck -> Orthographic");
 		
 		if (m_shadowProjection)
 		{
@@ -1116,7 +1098,6 @@ void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
 		ImGui::InputFloat("shadow far plane", &m_shadowFarPlane);
 	}
 	
-
 	ImGui::End();
 }
 
@@ -1348,14 +1329,13 @@ void CGProj::CGEditLightObject::updateRadius()
 	float lightMax = std::fmaxf(std::fmaxf(m_lightDiffuse.r, m_lightDiffuse.g), m_lightDiffuse.b);
 
 	// Calculate the radius of light volume
-	
 	m_AttnRadius =
 		(
 			-m_AttnLinear +
 			std::sqrtf(
 				m_AttnLinear * m_AttnLinear - 4 * m_AttnQuadratic *
 				(m_AttnConstant - lightMax * lightMin))
-			)
+		)
 		/
 		(2 * m_AttnQuadratic);
 }
@@ -1393,6 +1373,7 @@ float CGProj::CGEditLightObject::getOuterCutOff()
 
 void CGProj::CGEditLightObject::setLightPropertyOnShader(unsigned lightIndex, unsigned shadowIndex, const glm::vec3& cameraPos)
 {
+	// TODO : STL string do the dynamic allocation. Replace it with c-style string for performance.
 	std::string sLightIndex = std::to_string(lightIndex);
 	std::string sShadowIndex = std::to_string(shadowIndex);
 
@@ -1432,6 +1413,11 @@ void CGProj::CGEditLightObject::setLightPropertyOnShader(unsigned lightIndex, un
 		m_DefShader->setVec3("pointLights[" + sLightIndex + "].Ambient", m_lightAmbient);
 		m_DefShader->setVec3("pointLights[" + sLightIndex + "].Diffuse", m_lightDiffuse);
 		m_DefShader->setVec3("pointLights[" + sLightIndex + "].Specular", m_lightSpecular);
+
+		if (m_isShadow && shadowIndex < NR_POINT_SHADOWS)
+		{
+			// TODO : Do the point light shadow!
+		}
 		break;
 	}
 	case EDIT_SPOT_LIGHT:
@@ -1450,6 +1436,12 @@ void CGProj::CGEditLightObject::setLightPropertyOnShader(unsigned lightIndex, un
 		m_DefShader->setVec3("spotLights[" + sLightIndex + "].Ambient", m_lightAmbient);
 		m_DefShader->setVec3("spotLights[" + sLightIndex + "].Diffuse", m_lightDiffuse);
 		m_DefShader->setVec3("spotLights[" + sLightIndex + "].Specular", m_lightSpecular);
+
+		if (m_isShadow && shadowIndex < NR_SPOT_SHADOWS)
+		{
+			// TODO: DO the spot light shadow!
+		}
+
 		break;
 	}
 	default:
@@ -1549,53 +1541,64 @@ bool CGProj::CGEditLightObject::getShadowProjection()
 
 void CGProj::CGEditLightObject::renderShadowMap(std::vector<CGEditProxyObject>& objects)
 {
-	// Light Space Setting
-	m_shadowLightView = glm::lookAt
-	(
-		m_lightPosition + glm::vec3(0, 10, 0),
-		m_lightPosition + m_lightDirection,
-		glm::vec3(0, 1, 0)
-	);
-
-	if (m_shadowProjection)
+	switch (m_LightType)
 	{
-		m_shadowLightProjection = glm::perspective
+	case EDIT_DIRECTION_LIGHT:
+	{
+		// Light Space Setting
+		m_shadowLightView = glm::lookAt
 		(
-			m_perFOV, m_perAspect,
-			m_shadowNearPlane, m_shadowFarPlane
+			m_lightPosition + glm::vec3(0, 10, 0),
+			m_lightPosition + m_lightDirection,
+			glm::vec3(0, 1, 0)
 		);
-	}
-	else
-	{
-		m_shadowLightProjection = glm::ortho
-		(
-			m_orthoLeft, m_orthoRight, m_orthoBottom, m_orthoTop,
-			m_shadowNearPlane, m_shadowFarPlane
-		);
-	}
-	
 
-	m_shadowLightSpaceMatrix = m_shadowLightProjection * m_shadowLightView;
-	// Light Space Setting
+		if (m_shadowProjection)
+		{
+			m_shadowLightProjection = glm::perspective
+			(
+				m_perFOV, m_perAspect,
+				m_shadowNearPlane, m_shadowFarPlane
+			);
+		}
+		else
+		{
+			m_shadowLightProjection = glm::ortho
+			(
+				m_orthoLeft, m_orthoRight, m_orthoBottom, m_orthoTop,
+				m_shadowNearPlane, m_shadowFarPlane
+			);
+		}
 
-	// Shadow Mapping Pass
-	glViewport(0, 0, m_shadowWidth, m_shadowHeight);
-	glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	m_DepthMapShader->use();
-	m_DepthMapShader->setMat4("lightSpaceMatrix", m_shadowLightSpaceMatrix);
+		m_shadowLightSpaceMatrix = m_shadowLightProjection * m_shadowLightView;
+		// Light Space Setting
 
-	glCullFace(GL_FRONT);
-	glm::mat4 model(1.0);
-	for (unsigned i = 0; i < objects.size(); ++i)
-	{
-		model = glm::mat4(1.0);
-		model = glm::translate(model, objects[i].getPosition());
-		model = glm::scale(model, objects[i].getScale());
-		m_DepthMapShader->setMat4("model", model);
-		objects[i].renderPrimitive();
+		// Shadow Mapping Pass
+		glViewport(0, 0, m_shadowWidth, m_shadowHeight);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		m_DepthMapShader->use();
+		m_DepthMapShader->setMat4("lightSpaceMatrix", m_shadowLightSpaceMatrix);
+
+		glCullFace(GL_FRONT);
+		// TODO : Do the Frustum Culling!
+		glm::mat4 model(1.0);
+		for (unsigned i = 0; i < objects.size(); ++i)
+		{
+			model = glm::mat4(1.0);
+			model = glm::translate(model, objects[i].getPosition());
+			model = glm::scale(model, objects[i].getScale());
+			m_DepthMapShader->setMat4("model", model);
+			objects[i].renderPrimitive();
+		}
+		glCullFace(GL_BACK);
 	}
-	glCullFace(GL_BACK);
+		break;
+	case EDIT_POINT_LIGHT:
+		break;
+	case EDIT_SPOT_LIGHT:
+		break;
+	}
 }
 
 

@@ -6,6 +6,7 @@
 
 #include <Graphics/CGAssetManager.h>
 #include <Graphics/CGEditDirLightVisualizer.h>
+#include <Graphics/CGEditPointLightVisualizer.h>
 #include <Graphics/CGEditSpotLightVisualizer.h>
 
 namespace CGProj
@@ -334,6 +335,7 @@ namespace CGProj
 		Shader* m_forwardShader;
 		EditLightType m_LightType;
 		CGEditDirLightVisualizer m_dirVis;
+		CGEditPointLightVisualizer m_pointVis;
 		CGEditSpotLightVisualizer m_spotVis;
 
 		// Point and Spot Light(Flash Light)
@@ -370,6 +372,7 @@ namespace CGProj
 		unsigned int m_depthMapFBO, m_depthMapTexture;
 		unsigned int m_shadowWidth = 1024, m_shadowHeight = 1024;
 		
+		bool m_isShadowFrustumRender = false;
 		bool m_shadowProjection = false; // true : perspective, false orthogonal
 		// In case of Orthographic
 		float m_orthoLeft = -10.f;
@@ -383,7 +386,6 @@ namespace CGProj
 
 		float m_shadowNearPlane = 1.0f;
 		float m_shadowFarPlane = 7.5f;
-
 
 		glm::mat4 m_shadowLightView;
 		glm::mat4 m_shadowLightProjection;

@@ -5,6 +5,7 @@
 
 #include <Graphics/GLPrimitiveUtil.h>
 #include <Graphics/CGAssetManager.h>
+#include <Graphics/CGDefSecondUtil.h>
 
 // =================================================================
 /*** CG EDIT BOX    ***/
@@ -733,7 +734,6 @@ void CGProj::CGEditProxyObject::UIrender(CGAssetManager& am)
 		}
 	}
 
-
 	ImGui::End();
 }
 
@@ -852,6 +852,28 @@ CGProj::CGEditLightObject::CGEditLightObject(CGAssetManager& am)
 	m_dirVis.prepareData(am.getShader(SHADER_DIR_VISUALIZER));
 	m_dirVis.setCylinderDimension(5, 0.1, 0.1);
 	m_dirVis.setConeDimension(1.5, 0, 0.5);
+
+	// Shadow Map Initialization
+	glGenFramebuffers(1, &m_depthMapFBO);
+
+	glGenTextures(1, &m_depthMapTexture);
+	glBindTexture(GL_TEXTURE_2D, m_depthMapTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_shadowWidth, m_shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.f, 1.f, 1.f, 1.f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthMapTexture, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		assert(0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	// Shadow Map Initialization
 }
 
 void CGProj::CGEditLightObject::setForwardShader(Shader * shader)
@@ -861,8 +883,12 @@ void CGProj::CGEditLightObject::setForwardShader(Shader * shader)
 
 void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm::mat4 & proj)
 {
-	// Refer to the simpleColorRender!
+	if (m_isShadowMapRender)
+	{
 
+	}
+
+	// Refer to the simpleColorRender!
 	// Edit Object Render
 	glm::mat4 model(1.0);
 	model = glm::translate(model, m_lightPosition);
@@ -1051,6 +1077,8 @@ void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
 	temp[0] = m_lightSpecular.x, temp[1] = m_lightSpecular.y, temp[2] = m_lightSpecular.z;
 	ImGui::ColorEdit3("specular", temp);
 	m_lightSpecular = { temp[0], temp[1], temp[2] };
+
+	ImGui::Checkbox("ShadowMap Debug Render", &m_isShadowMapRender);
 
 	ImGui::End();
 }
@@ -1326,57 +1354,174 @@ float CGProj::CGEditLightObject::getOuterCutOff()
 	return m_SpotOuterCutOff;
 }
 
-void CGProj::CGEditLightObject::setLightPropertyOnShader(int index, const glm::vec3& cameraPos)
+void CGProj::CGEditLightObject::setLightPropertyOnShader(unsigned lightIndex, unsigned shadowIndex, const glm::vec3& cameraPos)
 {
-	std::string sIndex = std::to_string(index);
+	std::string sLightIndex = std::to_string(lightIndex);
+	std::string sShadowIndex = std::to_string(shadowIndex);
 
 	m_DefShader->setVec3("cameraPos", cameraPos);
 	switch (m_LightType)
 	{
 	case EDIT_DIRECTION_LIGHT:
 	{
-		m_DefShader->setVec3("dirLights[" + sIndex + "].Direction", m_lightDirection);
+		m_DefShader->setVec3("dirLights[" + sLightIndex + "].Direction", m_lightDirection);
 
-		m_DefShader->setVec3("dirLights[" + sIndex + "].Ambient", m_lightAmbient);
-		m_DefShader->setVec3("dirLights[" + sIndex + "].Diffuse", m_lightDiffuse);
-		m_DefShader->setVec3("dirLights[" + sIndex + "].Specular", m_lightSpecular);
+		m_DefShader->setVec3("dirLights[" + sLightIndex + "].Ambient", m_lightAmbient);
+		m_DefShader->setVec3("dirLights[" + sLightIndex + "].Diffuse", m_lightDiffuse);
+		m_DefShader->setVec3("dirLights[" + sLightIndex + "].Specular", m_lightSpecular);
+		m_DefShader->setInt("dirLights[" + sLightIndex + "].ShadowIndex", SHADOW_INDEX_NONE);
+
+		// NR_DIR_SHADOW is limitation of 
+		if (m_isShadow && shadowIndex < NR_DIR_SHADOWS)
+		{
+			m_DefShader->setInt("dirLights[" + sLightIndex + "].ShadowIndex", shadowIndex);
+			m_DefShader->setMat4("dirLightSpace[" + sShadowIndex + "]", m_shadowLightSpaceMatrix);
+
+			glActiveTexture(GL_TEXTURE0 + NR_GBUFFER_TEXTURES + shadowIndex);
+			glBindTexture(GL_TEXTURE_2D, m_depthMapTexture);
+		}
+		else
 		break;
 	}
 	case EDIT_POINT_LIGHT:
 	{	
-		m_DefShader->setVec3("pointLights[" + sIndex + "].Position", m_lightPosition);
+		m_DefShader->setVec3("pointLights[" + sLightIndex + "].Position", m_lightPosition);
 
-		m_DefShader->setFloat("pointLights[" + sIndex + "].Constant", m_AttnConstant);
-		m_DefShader->setFloat("pointLights[" + sIndex + "].Linear", m_AttnLinear);
-		m_DefShader->setFloat("pointLights[" + sIndex + "].Quadratic", m_AttnQuadratic);
-		m_DefShader->setFloat("pointLights[" + sIndex + "].Radius", m_AttnRadius);
+		m_DefShader->setFloat("pointLights[" + sLightIndex + "].Constant", m_AttnConstant);
+		m_DefShader->setFloat("pointLights[" + sLightIndex + "].Linear", m_AttnLinear);
+		m_DefShader->setFloat("pointLights[" + sLightIndex + "].Quadratic", m_AttnQuadratic);
+		m_DefShader->setFloat("pointLights[" + sLightIndex + "].Radius", m_AttnRadius);
 
-		m_DefShader->setVec3("pointLights[" + sIndex + "].Ambient", m_lightAmbient);
-		m_DefShader->setVec3("pointLights[" + sIndex + "].Diffuse", m_lightDiffuse);
-		m_DefShader->setVec3("pointLights[" + sIndex + "].Specular", m_lightSpecular);
+		m_DefShader->setVec3("pointLights[" + sLightIndex + "].Ambient", m_lightAmbient);
+		m_DefShader->setVec3("pointLights[" + sLightIndex + "].Diffuse", m_lightDiffuse);
+		m_DefShader->setVec3("pointLights[" + sLightIndex + "].Specular", m_lightSpecular);
 		break;
 	}
 	case EDIT_SPOT_LIGHT:
 	{	
-		m_DefShader->setVec3("spotLights[" + sIndex + "].Position", m_lightPosition);
-		m_DefShader->setVec3("spotLights[" + sIndex + "].Direction", m_lightDirection);
+		m_DefShader->setVec3("spotLights[" + sLightIndex + "].Position", m_lightPosition);
+		m_DefShader->setVec3("spotLights[" + sLightIndex + "].Direction", m_lightDirection);
 
-		m_DefShader->setFloat("spotLights[" + sIndex + "].Inner_CutOff", m_SpotInnerCutOff);
-		m_DefShader->setFloat("spotLights[" + sIndex + "].Outer_CutOff", m_SpotOuterCutOff);
+		m_DefShader->setFloat("spotLights[" + sLightIndex + "].Inner_CutOff", m_SpotInnerCutOff);
+		m_DefShader->setFloat("spotLights[" + sLightIndex + "].Outer_CutOff", m_SpotOuterCutOff);
 
-		m_DefShader->setFloat("spotLights[" + sIndex + "].Constant", m_AttnConstant);
-		m_DefShader->setFloat("spotLights[" + sIndex + "].Linear", m_AttnLinear);
-		m_DefShader->setFloat("spotLights[" + sIndex + "].Quadratic", m_AttnQuadratic);
-		m_DefShader->setFloat("spotLights[" + sIndex + "].Radius", m_AttnRadius);
+		m_DefShader->setFloat("spotLights[" + sLightIndex + "].Constant", m_AttnConstant);
+		m_DefShader->setFloat("spotLights[" + sLightIndex + "].Linear", m_AttnLinear);
+		m_DefShader->setFloat("spotLights[" + sLightIndex + "].Quadratic", m_AttnQuadratic);
+		m_DefShader->setFloat("spotLights[" + sLightIndex + "].Radius", m_AttnRadius);
 
-		m_DefShader->setVec3("spotLights[" + sIndex + "].Ambient", m_lightAmbient);
-		m_DefShader->setVec3("spotLights[" + sIndex + "].Diffuse", m_lightDiffuse);
-		m_DefShader->setVec3("spotLights[" + sIndex + "].Specular", m_lightSpecular);
+		m_DefShader->setVec3("spotLights[" + sLightIndex + "].Ambient", m_lightAmbient);
+		m_DefShader->setVec3("spotLights[" + sLightIndex + "].Diffuse", m_lightDiffuse);
+		m_DefShader->setVec3("spotLights[" + sLightIndex + "].Specular", m_lightSpecular);
 		break;
 	}
 	default:
 		assert(0);
 	}
+}
+
+void CGProj::CGEditLightObject::setIsShadowRender(bool shadow)
+{
+	m_isShadow = shadow;
+}
+
+bool CGProj::CGEditLightObject::getIsShadowRender()
+{
+	return m_isShadow;
+}
+
+void CGProj::CGEditLightObject::setDepthMapShader(Shader * shader)
+{
+	m_DepthMapShader = shader;
+}
+
+void CGProj::CGEditLightObject::setDepthDebugMap(Shader * shader)
+{
+	m_DebugDepthMapShader = shader;
+}
+
+void CGProj::CGEditLightObject::setShadowNearPlane(float nearPlane)
+{
+	m_shadowNearPlane = nearPlane;
+}
+
+float CGProj::CGEditLightObject::getShadowNearPlane()
+{
+	return m_shadowNearPlane;
+}
+
+void CGProj::CGEditLightObject::setShadowFarPlane(float farPlane)
+{
+	m_shadowFarPlane = farPlane;
+}
+
+float CGProj::CGEditLightObject::getShadowFarPlane()
+{
+	return m_shadowFarPlane;
+}
+
+void CGProj::CGEditLightObject::setShadowWidth(unsigned width)
+{
+	m_shadowWidth = width;
+}
+
+unsigned CGProj::CGEditLightObject::getShadowWidth()
+{
+	return m_shadowWidth;
+}
+
+void CGProj::CGEditLightObject::setShadowHeight(unsigned height)
+{
+	m_shadowHeight = height;
+}
+
+unsigned CGProj::CGEditLightObject::getShadowHeight()
+{
+	return m_shadowHeight;
+}
+
+void CGProj::CGEditLightObject::setShadowProjection(bool proj)
+{
+	m_shadowProjection = proj;
+}
+
+bool CGProj::CGEditLightObject::getShadowProjection()
+{
+	return m_shadowProjection;
+}
+
+void CGProj::CGEditLightObject::renderShadowMap(std::vector<CGEditProxyObject>& objects)
+{
+	// Light Space Setting
+	m_shadowLightView = glm::lookAt
+	(
+		m_lightPosition,
+		m_lightPosition + m_lightDirection,
+		glm::vec3(0, 1, 0)
+	);
+	m_shadowLightProjection = glm::ortho(-10.f, 10.f, -10.f, 10.f, m_shadowNearPlane, m_shadowFarPlane);
+
+	m_shadowLightSpaceMatrix = m_shadowLightProjection * m_shadowLightView;
+	// Light Space Setting
+
+	// Shadow Mapping Pass
+	glViewport(0, 0, m_shadowWidth, m_shadowHeight);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	m_DepthMapShader->use();
+	m_DepthMapShader->setMat4("lightSpaceMatrix", m_shadowLightSpaceMatrix);
+
+	glCullFace(GL_FRONT);
+	glm::mat4 model(1.0);
+	for (unsigned i = 0; i < objects.size(); ++i)
+	{
+		model = glm::mat4(1.0);
+		model = glm::translate(model, objects[i].getPosition());
+		model = glm::scale(model, objects[i].getScale());
+		m_DepthMapShader->setMat4("model", model);
+		objects[i].renderPrimitive();
+	}
+	glCullFace(GL_BACK);
 }
 
 

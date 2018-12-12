@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{792F3151-E667-41A8-A222-CF178CF2FC13}</ProjectGuid>
     <RootNamespace>CGImplementation</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -224,6 +224,8 @@
   <ItemGroup>
     <None Include="ShaderFolder\CGDepthMap.fs" />
     <None Include="ShaderFolder\CGDepthMap.vs" />
+    <None Include="ShaderFolder\CGDepthMapDebugRender.fs" />
+    <None Include="ShaderFolder\CGDepthMapDebugRender.vs" />
     <None Include="ShaderFolder\CGDirVisualizer.fs" />
     <None Include="ShaderFolder\CGDirVisualizer.vs" />
     <None Include="ShaderFolder\CGLineShader.fs" />

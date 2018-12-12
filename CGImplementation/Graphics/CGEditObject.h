@@ -164,6 +164,7 @@ namespace CGProj
 
 	class CGEditProxyObject : public CGEditObject // Child1 of Base Class
 	{
+		friend class CGEditLightObject;
 	public:
 		CGEditProxyObject();
 
@@ -302,9 +303,33 @@ namespace CGProj
 		float getOuterCutOff();
 
 		// lighting Setting in World Space
-		void setLightPropertyOnShader(int index, const glm::vec3& cameraPos);
+		void setLightPropertyOnShader(unsigned lightIndex, unsigned shadowIndex, const glm::vec3& cameraPos);
 		/*** Light Method ***/
 
+		/*** Shadow Method ***/
+		void setIsShadowRender(bool shadow);
+		bool getIsShadowRender();
+
+		void setDepthMapShader(Shader* shader);
+		void setDepthDebugMap(Shader* shader);
+
+		void setShadowNearPlane(float nearPlane);
+		float getShadowNearPlane();
+
+		void setShadowFarPlane(float farPlane);
+		float getShadowFarPlane();
+
+		void setShadowWidth(unsigned width);
+		unsigned getShadowWidth();
+
+		void setShadowHeight(unsigned height);
+		unsigned getShadowHeight();
+		
+		void setShadowProjection(bool proj); // true : perspective, false orthogonal
+		bool getShadowProjection();
+
+		void renderShadowMap(std::vector<CGEditProxyObject>& objects);
+		/*** Shadow Method ***/
 	private:
 		Shader* m_forwardShader;
 		EditLightType m_LightType;
@@ -334,6 +359,23 @@ namespace CGProj
 		// Notice the Cutoff value is the cos value with radians measure.
 		float m_SpotInnerCutOff;
 		float m_SpotOuterCutOff;
+
+		/*** Shader Properties ***/
+		bool m_isShadow = false;
+
+		Shader* m_DepthMapShader;
+		Shader* m_DebugDepthMapShader;
+		bool m_isShadowMapRender = false;
+		
+		unsigned int m_depthMapFBO, m_depthMapTexture;
+		unsigned int m_shadowWidth = 1024, m_shadowHeight = 1024;
+		bool m_shadowProjection = false; // true : perspective, false orthogonal
+		float m_shadowNearPlane = 1.0f;
+		float m_shadowFarPlane = 7.5f;
+		glm::mat4 m_shadowLightView;
+		glm::mat4 m_shadowLightProjection;
+		glm::mat4 m_shadowLightSpaceMatrix;
+		/*** Shader Properties ***/
 	};
 
 }

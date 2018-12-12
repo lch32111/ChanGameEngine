@@ -409,5 +409,11 @@
     <None Include="ShaderFolder\CGDirVisualizer.fs">
       <Filter>ShaderFolder</Filter>
     </None>
+    <None Include="ShaderFolder\CGDepthMapDebugRender.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGDepthMapDebugRender.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
   </ItemGroup>
 </Project>

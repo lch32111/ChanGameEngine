@@ -4,6 +4,7 @@
 
 #include <Graphics/GLTextureUtility.h>
 #include <Graphics/GLPrimitiveUtil.h>
+#include <Graphics/CGDefSecondUtil.h>
 
 #include <GPED/CGPhysicsUtil.h>
 #include <GPED/GPED_random.h>
@@ -26,8 +27,8 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	Deferred_Second_Shader->setInt("gAlbedoSpec", 2);
 	Deferred_Second_Shader->setInt("gEmissive", 3);
 	Deferred_Second_Shader->setInt("gBool", 4);
-	for (unsigned i = 0; i < 5; ++i)
-		Deferred_Second_Shader->setInt("dirShadowMap[" + std::to_string(i) + "]", 5 + i);
+	for (unsigned i = 0; i < NR_DIR_SHADOWS; ++i)
+		Deferred_Second_Shader->setInt("dirShadowMap[" + std::to_string(i) + "]", NR_GBUFFER_TEXTURES + i);
 
 	Simple_Shader = assetManager.getShader(SHADER_SIMPLE_COLOR_RENDER);
 	wireShader = assetManager.getShader(SHADER_WIRE_RENDER);
@@ -94,6 +95,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	// First Pass Setup For Deferred Rendering
 
 	// Object Manual Setting + Light Manual Setting
+	GPED::Random prandom(554);
 	editProxies.reserve(20); // prevent STL from reallocating dynamically because of broad phase user data
 	for (unsigned i = 0; i < 2; ++i)
 	{
@@ -112,7 +114,19 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 
 		editProxies[i].setEmissiveFlag(true);
 		editProxies[i].setEmissiveTexture(assetManager.getTexture(TEXTURE_BLUE_MATRIX, true));
+
+		editProxies[i].setPosition(prandom.randomVector(glm::vec3(-7, -5, 0), glm::vec3(-4, -4, 5)));
 	}
+
+	// Shadow shader setting
+	Shader* depthMapShader = assetManager.getShader(SHADER_SHADOW_MAP);
+	Shader* depthMapDebugShader = assetManager.getShader(SHADER_SHADOW_MAP_DEBUG_RENDER);
+	depthMapDebugShader->use();
+	depthMapDebugShader->setInt("depthMap", 0);
+	depthMapDebugShader->setBool("shadowProjection", false); // Orthographic
+	depthMapDebugShader->setFloat("near_plane", 1.f);
+	depthMapDebugShader->setFloat("far_plane", 7.5f);
+	// Shadow shader setting
 
 	GPED::Random random(331);
 	editLights.reserve(400);
@@ -127,6 +141,8 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	editLights[0].setAmbientColor(glm::vec3(0.05));
 	editLights[0].setDiffuseColor(glm::vec3(0.4));
 	editLights[0].setSpecularColor(glm::vec3(0.5));
+	editLights[0].setDepthMapShader(depthMapShader);
+	editLights[0].setDepthDebugMap(depthMapDebugShader);
 
 	// Point Light
 	for (unsigned i = 1; i < 11; ++i)
@@ -145,6 +161,8 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 		editLights[i].setSpecularColor(random.randomVector(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
 		editLights[i].setAttnLinear(0.7);
 		editLights[i].setAttnQuadratic(0.5);
+		editLights[i].setDepthMapShader(depthMapShader);
+		editLights[i].setDepthDebugMap(depthMapDebugShader);
 	}
 	// Object Manual Setting + Light Manual Setting
 
@@ -162,35 +180,6 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	gizmoTest.initGizmo();
 	gizmoTest.setAxisWidth(5.0);
 	// Gizmo Setting
-
-	// Shadow Mapping Test
-	glGenFramebuffers(1, &depthMapFBO);
-
-	glGenTextures(1, &depthMap);
-	glBindTexture(GL_TEXTURE_2D, depthMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float borderColor[] = { 1.f, 1.f, 1.f, 1.f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		assert(0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	float near_plane = 1.0f, far_plane = 500.f;
-	lightProjection = glm::ortho(-10.f, 10.f, -10.f, 10.f, near_plane, far_plane);
-	
-	
-	depthMapShader = Shader("ShaderFolder/CGDepthMap.vs", "ShaderFolder/CGDepthMap.fs");
-	depthMapShader.loadShader();
-	// Shadow Mapping Test
 }
 
 void CGProj::DeferredRenderer::initImgui()
@@ -243,29 +232,14 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	glm::mat4 model(1.0);
 
 	// Shadow Mapping Pass
-	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 	{
-		lightView = glm::lookAt(
-			editLights[0].getPosition() - editLights[0].getLightDirection() * 10.f,
-			editLights[0].getPosition() + editLights[0].getLightDirection() * 10.f,
-			glm::vec3(0, 1, 0));
-		lightSpaceMatrix = lightProjection * lightView;
-
-
-		glClear(GL_DEPTH_BUFFER_BIT);
-		depthMapShader.use();
-		depthMapShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-		glCullFace(GL_FRONT);
-		for (unsigned i = 0; i < editProxies.size(); ++i)
+		for (unsigned i = 0; i < editLights.size(); ++i)
 		{
-			glm::mat4 model(1.0);
-			model = glm::translate(model, editProxies[i].getPosition());
-			model = glm::scale(model, editProxies[i].getScale());
-			depthMapShader.setMat4("model", model);
-			renderCube();
+			if (editLights[i].getIsShadowRender() == false)
+				continue;
+
+			editLights[i].renderShadowMap(editProxies);
 		}
-		glCullFace(GL_BACK);
 	}
 	// Shadow Mapping Pass
 
@@ -329,19 +303,17 @@ void CGProj::DeferredRenderer::display(int width, int height)
 			{
 			case EDIT_DIRECTION_LIGHT:
 			{
-				editLights[i].setLightPropertyOnShader(num_dir_light++, camera.Position);
-
-				Deferred_Second_Shader->use();
-				Deferred_Second_Shader->setMat4("dirLightSpace[" + std::to_string(0) + "]", lightSpaceMatrix);
-				glActiveTexture(GL_TEXTURE5);
-				glBindTexture(GL_TEXTURE_2D, depthMap);
+				editLights[i].setLightPropertyOnShader(num_dir_light++, num_dir_shadow,camera.Position);
+				if (editLights[i].getIsShadowRender()) ++num_dir_shadow;
 				break;
 			}
 			case EDIT_POINT_LIGHT:
-				editLights[i].setLightPropertyOnShader(num_point_light++, camera.Position);
+				editLights[i].setLightPropertyOnShader(num_point_light++, num_point_shadow, camera.Position);
+				if (editLights[i].getIsShadowRender()) ++num_point_shadow;
 				break;
 			case EDIT_SPOT_LIGHT:
-				editLights[i].setLightPropertyOnShader(num_spot_light++, camera.Position);
+				editLights[i].setLightPropertyOnShader(num_spot_light++, num_spot_shadow, camera.Position);
+				if (editLights[i].getIsShadowRender()) ++num_spot_shadow;
 				break;
 			}
 		}
@@ -365,10 +337,6 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
 		glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		if (lightDraw)
-			for (unsigned int i = 0; i < editLights.size(); ++i)
-				editLights[i].forwardRender(view, projection);
 
 		// Broad Phase Debug Rendering
 		if (BroadDebug)
@@ -396,6 +364,10 @@ void CGProj::DeferredRenderer::display(int width, int height)
 			gizmoTest.renderGizmo(view, projection);
 			gizmoTest.renderGizmoBox(view, projection);
 		}
+
+		if (lightDraw)
+			for (unsigned int i = 0; i < editLights.size(); ++i)
+				editLights[i].forwardRender(view, projection);
 	}
 	// Debug Drawing and UI Render like forward processing
 }

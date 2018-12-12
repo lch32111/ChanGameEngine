@@ -30,6 +30,8 @@ namespace CGProj
 			m_shaders[SHADER_WIRE_RENDER] = Shader("ShaderFolder/wireRender.vs", "ShaderFolder/wireRender.fs");
 			m_shaders[SHADER_DIR_VISUALIZER] = Shader("ShaderFolder/CGDirVisualizer.vs", "ShaderFolder/CGDirVisualizer.fs");
 			m_shaders[SHADER_SPOT_VISUALIZER] = Shader("ShaderFolder/CGSpotVisualizer.vs", "ShaderFolder/CGSpotVisualizer.fs");
+			m_shaders[SHADER_SHADOW_MAP] = Shader("ShaderFolder/CGDepthMap.vs", "ShaderFolder/CGDepthMap.fs");
+			m_shaders[SHADER_SHADOW_MAP_DEBUG_RENDER] = Shader("ShaderFolder/CGDepthMapDebugRender.vs", "ShaderFolder/CGDepthMapDebugRender.fs");
 
 			// TODO: make texture class for on-demand process. TextureFromFile() is just loading the image...
 			m_NoGammaTexture[TEXTURE_CONTAINER_DIFFUSE] = TextureFromFile("ImageFolder/container2.png", false);

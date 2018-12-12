@@ -103,21 +103,21 @@ namespace CGProj
 
 		std::vector<CGEditProxyObject> editProxies;
 		std::vector<CGEditLightObject> editLights;
-		int num_dir_light = 0;
-		int num_point_light = 0;
-		int num_spot_light = 0;
+		unsigned num_dir_light = 0;
+		unsigned num_dir_shadow = 0;
+		
+		unsigned num_point_light = 0;
+		unsigned num_point_shadow = 0;
+
+		unsigned num_spot_light = 0;
+		unsigned num_spot_shadow = 0;
 
 		CGEditObject* pickedEditBox = nullptr;
 		CGGizmo gizmoTest;
 
 		CGAssetManager assetManager;
 
-		// Shadow Mapping test
-		unsigned int depthMapFBO, depthMap;
-		unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-		glm::mat4 lightView, lightProjection, lightSpaceMatrix;
-		Shader depthMapShader;
-
+		// Shadow Depth Map Debug Render
 	};
 }
 

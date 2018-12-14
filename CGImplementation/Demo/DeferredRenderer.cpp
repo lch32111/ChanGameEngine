@@ -160,13 +160,13 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	bRender.connectTree(dBroadPhase.getTree());
 	bRender.setColor(glm::vec3(1, 0, 0), glm::vec3(1, 1, 0));
 	bRender.setLineWidth(1.5f, 1.f);
-	lineRen = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
-	rayRen = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
-	orinentLineRen = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
+	lineRen.setShader(assetManager.getShader(SHADER_CG_LINE));
+	rayRen.setShader(assetManager.getShader(SHADER_CG_LINE));
+	orinentLineRen.setShader(assetManager.getShader(SHADER_CG_LINE));
 	// Debug Render Setting
 
 	// Gizmo Setting
-	gizmoTest.initGizmo();
+	gizmoTest.initGizmo(assetManager);
 	gizmoTest.setAxisWidth(5.0);
 	// Gizmo Setting
 }
@@ -330,7 +330,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 
 		// Broad Phase Debug Rendering
 		if (BroadDebug)
-			bRender.draw(wireShader, &projection, &view);
+			bRender.draw(assetManager.getShader(SHADER_WIRE_RENDER), &projection, &view);
 
 		if (clickDraw)
 		{

@@ -43,8 +43,9 @@ void CGProj::TryFirst::initGraphics()
 	bRender.setLineWidth(1.5f, 1.f);
 
 	bRayWrapper.broadPhase = &FirstBroadPhase;
-
-	lineRen = lineRenderer("ShaderFolder/lineShader.vs", "ShaderFolder/lineShader.gs", "ShaderFolder/lineShader.fs");
+	lineShader = Shader("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
+	lineShader.loadShader();
+	lineRen.setShader(&lineShader);
 }
 
 void CGProj::TryFirst::initImgui()
@@ -182,7 +183,8 @@ void CGProj::TryFirst::display(int width, int height)
 
 	// ray casting test render
 	for (unsigned i = 0; i < rayCollector.size(); ++i)
-		lineRen.renderline(view, projection, rayCollector[i].first, rayCollector[i].second, glm::vec3(1.0, .0, .0));
+		lineRen.insertLine(rayCollector[i].first, rayCollector[i].second);
+	lineRen.renderLine(view, projection);
 }
 
 void CGProj::TryFirst::key(GLFWwindow* app_window, float deltaTime)

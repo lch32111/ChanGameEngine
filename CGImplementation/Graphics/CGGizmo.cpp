@@ -8,9 +8,9 @@ CGProj::CGGizmo::CGGizmo()
 	updateAABBs();
 }
 
-void CGProj::CGGizmo::initGizmo()
+void CGProj::CGGizmo::initGizmo(CGAssetManager& am)
 {
-	m_lineRenderer = CGRenderLine("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
+	m_lineRenderer.setShader(am.getShader(SHADER_CG_LINE));
 }
 
 void CGProj::CGGizmo::renderGizmo(const glm::mat4& view, const glm::mat4& proj)

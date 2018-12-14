@@ -6,6 +6,7 @@
 #include <Graphics/chanQuatCamera.h>
 #include <Graphics/CGRenderLine.h>
 #include <Graphics/CGEditObject.h>
+#include <Graphics/CGAssetManager.h>
 
 namespace CGProj
 {
@@ -14,7 +15,7 @@ namespace CGProj
 	public:
 		CGGizmo();
 
-		void initGizmo();
+		void initGizmo(CGAssetManager& am);
 
 		void renderGizmo(const glm::mat4& view, const glm::mat4& proj);
 		void renderGizmoBox(const glm::mat4& view, const glm::mat4& proj);

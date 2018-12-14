@@ -7,6 +7,8 @@
 #include <Graphics/CGAssetManager.h>
 #include <Graphics/CGDefSecondUtil.h>
 
+#include <GPED/CGPhysicsUtil.h>
+
 // =================================================================
 /*** CG EDIT BOX    ***/
 CGProj::CGEditBox::CGEditBox()
@@ -867,6 +869,8 @@ CGProj::CGEditLightObject::CGEditLightObject(CGAssetManager& am)
 	m_spotVis.prepareData(am.getShader(SHADER_SPOT_VISUALIZER));
 	m_spotVis.setOuterConeInRadians(glm::acos(m_SpotOuterCutOff), m_AttnRadius);
 	m_spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_AttnRadius);
+
+	m_shadowVis.setShader(am.getShader(SHADER_CG_LINE));
 	// Light Init
 
 	// Shadow Map Initialization
@@ -882,7 +886,7 @@ CGProj::CGEditLightObject::CGEditLightObject(CGAssetManager& am)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float borderColor[] = { 1.f, 1.f, 1.f, 1.f };
+	float borderColor[] = { 0.f, 1.f, 1.f, 1.f };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
@@ -908,6 +912,8 @@ void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm:
 		m_DebugDepthMapShader->setBool("shadowProjection", m_shadowProjection);
 		m_DebugDepthMapShader->setFloat("near_plane", m_shadowNearPlane);
 		m_DebugDepthMapShader->setFloat("far_plane", m_shadowFarPlane);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_depthMapTexture);
 		renderScreenQuad();
 		return;
 	}
@@ -943,6 +949,27 @@ void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm:
 		}
 	}
 	// Light Range Render
+
+	// Shadow Frustum Render
+	if (m_isShadowFrustumRender)
+	{
+		switch (m_LightType)
+		{
+		case EDIT_DIRECTION_LIGHT:
+		{
+			m_shadowVis.render(view, proj,
+				m_lightPosition, m_lightDirection,
+				m_orthoLeft, m_orthoRight, m_orthoBottom, m_orthoTop,
+				m_shadowNearPlane, m_shadowFarPlane);
+			break;
+		}
+		case EDIT_POINT_LIGHT:
+			break;
+		case EDIT_SPOT_LIGHT:
+			break;
+		}
+	}
+	// Shadow Frustum Render
 }
 
 void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
@@ -1088,6 +1115,8 @@ void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
 	{
 		ImGui::Checkbox("ShadowMap Debug Render", &m_isShadowMapRender);
 		ImGui::Checkbox("Shadow Frustum Render", &m_isShadowFrustumRender);
+		ImGui::SameLine(); ShowHelpMarker("Shadow Frustum actually does not fit the actual frustum\nbecause the bias in shader is adjusting!");
+
 		ImGui::Checkbox("Shadow Projection", &m_shadowProjection);
 		ImGui::SameLine(); ShowHelpMarker("Check -> Perspective, NonCheck -> Orthographic");
 
@@ -1563,12 +1592,7 @@ void CGProj::CGEditLightObject::renderShadowMap(std::vector<CGEditProxyObject>& 
 	case EDIT_DIRECTION_LIGHT:
 	{
 		// Light Space Setting
-		m_shadowLightView = glm::lookAt
-		(
-			m_lightPosition + glm::vec3(0, 10, 0),
-			m_lightPosition + m_lightDirection,
-			glm::vec3(0, 1, 0)
-		);
+		m_shadowLightView = safeLookAt(m_lightPosition, m_lightPosition + m_lightDirection, glm::vec3(1.0));
 
 		if (m_shadowProjection)
 		{
@@ -1608,6 +1632,13 @@ void CGProj::CGEditLightObject::renderShadowMap(std::vector<CGEditProxyObject>& 
 			m_DepthMapShader->setMat4("model", model);
 			objects[i].renderPrimitive();
 		}
+
+		// Plane
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(0, -5, 0));
+		model = glm::scale(model, glm::vec3(25));
+		m_DepthMapShader->setMat4("model", model);
+		renderQuad();
 		glCullFace(GL_BACK);
 	}
 		break;

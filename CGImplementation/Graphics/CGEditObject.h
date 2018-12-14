@@ -8,6 +8,7 @@
 #include <Graphics/CGEditDirLightVisualizer.h>
 #include <Graphics/CGEditPointLightVisualizer.h>
 #include <Graphics/CGEditSpotLightVisualizer.h>
+#include <Graphics/CGShadowFrustumVisualizer.h>
 
 namespace CGProj
 {
@@ -337,6 +338,7 @@ namespace CGProj
 		CGEditDirLightVisualizer m_dirVis;
 		CGEditPointLightVisualizer m_pointVis;
 		CGEditSpotLightVisualizer m_spotVis;
+		CGShadowFrustumVisualizer m_shadowVis;
 
 		// Point and Spot Light(Flash Light)
 		glm::vec3 m_lightPosition;

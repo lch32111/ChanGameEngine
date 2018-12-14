@@ -168,9 +168,6 @@
     <ClCompile Include="GPED\GPED_ContactResolver.cpp">
       <Filter>GPED Source</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\chanRenderLine.cpp">
-      <Filter>Graphics Source</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\CGEditObject.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
@@ -190,6 +187,9 @@
       <Filter>Graphics Source</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\CGEditPointLightVisualizer.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\CGShadowFrustumVisualizer.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -314,9 +314,6 @@
     <ClInclude Include="GPED\CGPhysicsUtil.h">
       <Filter>GPED Header</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\chanRenderLine.h">
-      <Filter>Graphics Header</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\CGEditObject.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
@@ -345,6 +342,9 @@
       <Filter>Graphics Header</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\CGEditPointLightVisualizer.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGShadowFrustumVisualizer.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -377,15 +377,6 @@
       <Filter>ShaderFolder</Filter>
     </None>
     <None Include="ShaderFolder\wireRender.fs">
-      <Filter>ShaderFolder</Filter>
-    </None>
-    <None Include="ShaderFolder\lineShader.fs">
-      <Filter>ShaderFolder</Filter>
-    </None>
-    <None Include="ShaderFolder\lineShader.gs">
-      <Filter>ShaderFolder</Filter>
-    </None>
-    <None Include="ShaderFolder\lineShader.vs">
       <Filter>ShaderFolder</Filter>
     </None>
     <None Include="ShaderFolder\simpleColorRender.vs">

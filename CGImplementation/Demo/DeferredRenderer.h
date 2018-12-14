@@ -56,7 +56,6 @@ namespace CGProj
 		Shader* Deferred_First_Shader;
 		Shader* Deferred_Second_Shader;
 		Shader* Deferred_Post_Shader;
-		Shader* Simple_Shader;
 		Shader* wireShader;
 
 		unsigned int gFBO;

@@ -368,7 +368,7 @@ float ShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index)
 	vec4 fragPosLightSpace = dirLightSpace[index] * vec4(fragpos, 1.0);
 	
 	// perform perspective divide (range -1 ~ 1)
-	vec3 projCoords = vec3(fragPosLightSpace * (1.0 / fragPosLightSpace.w));
+	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
 	
 	// adjust the range from 0 ~ 1
 	projCoords = projCoords * 0.5 + 0.5;
@@ -376,8 +376,7 @@ float ShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index)
 	float closestDepth = texture(dirShadowMap[index], projCoords.xy).r;
 
 	float currentDepth = projCoords.z;
-
-	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.05);
 	float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
 	
 	return shadow;

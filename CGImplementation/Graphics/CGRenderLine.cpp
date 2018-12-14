@@ -2,12 +2,18 @@
 
 CGProj::CGRenderLine::CGRenderLine()
 {
+
 }
 
-CGProj::CGRenderLine::CGRenderLine(const GLchar * vertexFile, const GLchar * fragFile)
+CGProj::CGRenderLine::CGRenderLine(CGAssetManager & am)
 {
-	m_lineShader = Shader(vertexFile, fragFile);
-	m_lineShader.loadShader();
+	m_lineShader = am.getShader(SHADER_CG_LINE);
+	prepareData();
+}
+
+void CGProj::CGRenderLine::setShader(Shader * shader)
+{
+	m_lineShader = shader;
 	prepareData();
 }
 
@@ -28,9 +34,9 @@ void CGProj::CGRenderLine::renderLine(const glm::mat4 & view, const glm::mat4 & 
 {
 	if (m_count == 0) return;
 
-	m_lineShader.use();
-	m_lineShader.setMat4("view", view);
-	m_lineShader.setMat4("projection", proj);
+	m_lineShader->use();
+	m_lineShader->setMat4("view", view);
+	m_lineShader->setMat4("projection", proj);
 
 	glBindVertexArray(m_VAO);
 	// Vertex Buffer

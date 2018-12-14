@@ -205,6 +205,7 @@ namespace CGProj
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glBindVertexArray(0);
 	}
+
 	static inline void renderSphere()
 	{
 		static unsigned int sphereVAO = 0;

@@ -109,5 +109,4 @@ namespace CGProj
 		return result;
 	}
 }
-
 #endif

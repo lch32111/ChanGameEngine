@@ -1431,6 +1431,7 @@ void CGProj::CGEditLightObject::setLightPropertyOnShader(unsigned lightIndex, un
 	std::string sLightIndex = std::to_string(lightIndex);
 	std::string sShadowIndex = std::to_string(shadowIndex);
 
+	m_DefShader->use();
 	m_DefShader->setVec3("cameraPos", cameraPos);
 	switch (m_LightType)
 	{
@@ -1602,7 +1603,8 @@ void CGProj::CGEditLightObject::renderShadowMap(std::vector<CGEditProxyObject>& 
 	case EDIT_DIRECTION_LIGHT:
 	{
 		// Light Space Setting
-		m_shadowLightView = safeLookAt(m_lightPosition, 
+		m_shadowLightView = safeLookAt(
+			m_lightPosition, 
 			m_lightPosition + m_lightDirection, 
 			glm::vec3(0, 1, 0));
 
@@ -1635,7 +1637,7 @@ void CGProj::CGEditLightObject::renderShadowMap(std::vector<CGEditProxyObject>& 
 		glClear(GL_DEPTH_BUFFER_BIT);
 		
 
-		glCullFace(GL_FRONT);
+		// glCullFace(GL_FRONT);
 		// TODO : Do the Frustum Culling!
 		glm::mat4 model(1.0);
 		for (unsigned i = 0; i < objects.size(); ++i)
@@ -1646,14 +1648,14 @@ void CGProj::CGEditLightObject::renderShadowMap(std::vector<CGEditProxyObject>& 
 			m_DepthMapShader->setMat4("model", model);
 			objects[i].renderPrimitive();
 		}
-
+		// glCullFace(GL_BACK);
 		// Plane
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0, -5, 0));
 		model = glm::scale(model, glm::vec3(25));
 		m_DepthMapShader->setMat4("model", model);
 		renderQuad();
-		glCullFace(GL_BACK);
+		
 	}
 		break;
 	case EDIT_POINT_LIGHT:

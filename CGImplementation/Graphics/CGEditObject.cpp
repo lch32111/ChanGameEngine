@@ -886,7 +886,7 @@ CGProj::CGEditLightObject::CGEditLightObject(CGAssetManager& am)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float borderColor[] = { 0.f, 1.f, 1.f, 1.f };
+	float borderColor[] = { 1.f, 1.f, 1.f, 1.f };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
@@ -957,7 +957,13 @@ void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm:
 		{
 		case EDIT_DIRECTION_LIGHT:
 		{
-			m_shadowVis.render(view, proj,
+			if (m_shadowProjection)
+				m_shadowVis.render(view, proj,
+					m_lightPosition, m_lightDirection,
+					m_perFOV, m_perAspect,
+					m_shadowNearPlane, m_shadowFarPlane);
+			else
+				m_shadowVis.render(view, proj,
 				m_lightPosition, m_lightDirection,
 				m_orthoLeft, m_orthoRight, m_orthoBottom, m_orthoTop,
 				m_shadowNearPlane, m_shadowFarPlane);
@@ -1129,7 +1135,9 @@ void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
 		
 		if (m_shadowProjection)
 		{
-			ImGui::InputFloat("FOV", &m_perFOV);
+			float fovIndegree = m_perFOV * 180.f / glm::pi<float>();
+			ImGui::InputFloat("FOV In Degree", &fovIndegree);
+			m_perFOV = glm::radians(fovIndegree);
 			ImGui::InputFloat("Aspect", &m_perAspect);
 		}
 		else
@@ -1587,12 +1595,16 @@ bool CGProj::CGEditLightObject::getShadowProjection()
 
 void CGProj::CGEditLightObject::renderShadowMap(std::vector<CGEditProxyObject>& objects)
 {
+	m_DepthMapShader->use();
+	
 	switch (m_LightType)
 	{
 	case EDIT_DIRECTION_LIGHT:
 	{
 		// Light Space Setting
-		m_shadowLightView = safeLookAt(m_lightPosition, m_lightPosition + m_lightDirection, glm::vec3(1.0));
+		m_shadowLightView = safeLookAt(m_lightPosition, 
+			m_lightPosition + m_lightDirection, 
+			glm::vec3(0, 1, 0));
 
 		if (m_shadowProjection)
 		{
@@ -1601,6 +1613,7 @@ void CGProj::CGEditLightObject::renderShadowMap(std::vector<CGEditProxyObject>& 
 				m_perFOV, m_perAspect,
 				m_shadowNearPlane, m_shadowFarPlane
 			);
+			m_DepthMapShader->setBool("shadowProjection", true);
 		}
 		else
 		{
@@ -1609,17 +1622,18 @@ void CGProj::CGEditLightObject::renderShadowMap(std::vector<CGEditProxyObject>& 
 				m_orthoLeft, m_orthoRight, m_orthoBottom, m_orthoTop,
 				m_shadowNearPlane, m_shadowFarPlane
 			);
+			m_DepthMapShader->setBool("shadowProjection", false);
 		}
 
 		m_shadowLightSpaceMatrix = m_shadowLightProjection * m_shadowLightView;
+		m_DepthMapShader->setMat4("lightSpaceMatrix", m_shadowLightSpaceMatrix);
 		// Light Space Setting
 
 		// Shadow Mapping Pass
 		glViewport(0, 0, m_shadowWidth, m_shadowHeight);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
-		m_DepthMapShader->use();
-		m_DepthMapShader->setMat4("lightSpaceMatrix", m_shadowLightSpaceMatrix);
+		
 
 		glCullFace(GL_FRONT);
 		// TODO : Do the Frustum Culling!

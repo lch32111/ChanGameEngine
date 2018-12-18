@@ -18,8 +18,9 @@ namespace CGProj
 		CGShadowFrustumVisualizer(CGAssetManager& am);
 
 		void setShader(Shader* shader);
-		void render(bool projectionType, const glm::mat4& lightSpcae, const glm::vec3& position,
-			const glm::mat4& view, const glm::mat4& proj);
+		void render(const glm::mat4& view, const glm::mat4& proj,
+			const glm::vec3 & position, const glm::vec3 & direction,
+			float fov, float aspect, float nearP, float farP);
 		void render(
 			const glm::mat4& view, const glm::mat4& proj,
 			const glm::vec3& position, const glm::vec3& direction,
@@ -28,7 +29,6 @@ namespace CGProj
 	private:
 		Shader* m_lineShader;
 		glm::vec4 m_FrustumColor = glm::vec4(1.0, 0.61, 0, 1.0);
-		glm::vec4 m_TestFrustumColor = glm::vec4(1.0, 0.0, 0, 1.0);
 
 		enum {e_maxVertices = 24};
 		glm::vec3 m_vertices[e_maxVertices];

@@ -28,6 +28,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	Deferred_Second_Shader->setInt("gAlbedoSpec", 2);
 	Deferred_Second_Shader->setInt("gEmissive", 3);
 	Deferred_Second_Shader->setInt("gBool", 4);
+	Deferred_Second_Shader->setFloat("shadowBias", 0);
 	for (unsigned i = 0; i < NR_DIR_SHADOWS; ++i)
 		Deferred_Second_Shader->setInt("dirShadowMap[" + std::to_string(i) + "]", NR_GBUFFER_TEXTURES + i);
 
@@ -50,7 +51,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	// Position Buffer
 	glGenTextures(1, &gPosition);
 	glBindTexture(GL_TEXTURE_2D, gPosition);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
@@ -201,6 +202,11 @@ void CGProj::DeferredRenderer::updateImgui()
 	ImGui::Checkbox("Hit Ray Render", &rayHitDraw); ImGui::SameLine();
 	if (ImGui::Button("Hit Ray Reset")) hitCollector.clear();
 	
+	if (ImGui::InputFloat("Shadow Bias", &shadowBias))
+	{
+		Deferred_Second_Shader->setFloat("shadowBias", shadowBias);
+	}
+
 	ImGui::End();
 
 	if (pickedEditBox)
@@ -310,6 +316,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		Deferred_Second_Shader->setInt("DIR_USED_NUM", num_dir_light);
 		Deferred_Second_Shader->setInt("POINT_USED_NUM", num_point_light);
 		Deferred_Second_Shader->setInt("SPOT_USED_NUM", num_spot_light);
+		Deferred_Second_Shader->setFloat("shadowBias", shadowBias);
 		num_dir_light = num_point_light = num_spot_light = 0;
 		num_dir_shadow = num_point_shadow = num_spot_shadow = 0;
 

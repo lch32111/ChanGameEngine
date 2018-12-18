@@ -383,7 +383,7 @@ namespace CGProj
 		float m_orthoTop = 10.f;
 
 		// In case of Perspective
-		float m_perFOV = 45.f;
+		float m_perFOV = glm::radians(45.f);
 		float m_perAspect = 4.f / 3.f;
 
 		float m_shadowNearPlane = 1.0f;

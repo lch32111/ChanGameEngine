@@ -88,6 +88,7 @@ uniform int SPOT_USED_NUM;
 uniform SpotLight spotLights[NR_SPOT_LIGHTS];
 
 uniform vec3 cameraPos;
+uniform float shadowBias;
 
 // function prototypes
 vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal);
@@ -372,12 +373,23 @@ float ShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index)
 	
 	// adjust the range from 0 ~ 1
 	projCoords = projCoords * 0.5 + 0.5;
-
+	
 	float closestDepth = texture(dirShadowMap[index], projCoords.xy).r;
 
 	float currentDepth = projCoords.z;
-	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.05);
-	float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
-	
+	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), shadowBias);
+
+	float shadow = 0.0;
+	vec2 texelSize = 1.0 / textureSize(dirShadowMap[index], 0);
+	for(int x = -1; x <=1; ++x)
+		for(int y = -1; y <= 1; ++y)
+	{
+		float pcfDepth = texture(dirShadowMap[index], projCoords.xy + vec2(x,y) * texelSize).r;
+		shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+	}
+	shadow /= 9.0;
+
+	if(projCoords.z > 1.0) shadow = 0.0;
+
 	return shadow;
 }

@@ -1,4 +1,5 @@
 #include "CGShadowFrustumVisualizer.h"
+#include <GPED/CGPhysicsUtil.h>
 
 CGProj::CGShadowFrustumVisualizer::CGShadowFrustumVisualizer()
 {
@@ -17,42 +18,92 @@ void CGProj::CGShadowFrustumVisualizer::setShader(Shader * shader)
 }
 
 void CGProj::CGShadowFrustumVisualizer::render(
-	bool projectionType, const glm::mat4 & lightSpcae, const glm::vec3& position,
-	const glm::mat4& view, const glm::mat4& proj)
+	const glm::mat4& view, const glm::mat4& proj,
+	const glm::vec3 & position, const glm::vec3 & direction,
+	float fov, float aspect, float nearP, float farP
+	)
 {
-	glm::vec3 vertices[2][2][2];
+	float tanHalfFov = std::tanf(0.5 * fov);
 
-	for (int z = 0; z < 2; ++z)
-	{
-		for (int y = 0; y < 2; ++y)
-		{
-			for (int x = 0; x < 2; ++x)
-			{
-				glm::vec4 locals(
-					x ? -1.0 : 1.0,
-					y ? -1.0 : 1.0,
-					z ? 0 : 1.0,
-					1.0);
+	glm::vec3 vertices[8];
 
-				vertices[x][y][z] = glm::vec3(lightSpcae * locals);
-			}
-		}
-	}
+	// Near Plane
+	float nearHeight = tanHalfFov * nearP * 2;
+	float nearWidth = nearHeight * aspect;
 
-	insertLine(vertices[0][0][0], vertices[0][0][1], m_FrustumColor);
-	insertLine(vertices[1][0][0], vertices[1][0][1], m_FrustumColor);
-	insertLine(vertices[0][1][0], vertices[0][1][1], m_FrustumColor);
-	insertLine(vertices[1][1][0], vertices[1][1][1], m_FrustumColor);
+	// Near Left Bottom
+	vertices[0].x = nearWidth * -0.5f;
+	vertices[0].y = nearHeight * -0.5f;
+ 	vertices[0].z = -nearP;
 
-	insertLine(vertices[0][0][0], vertices[0][1][0], m_FrustumColor);
-	insertLine(vertices[1][0][0], vertices[1][1][0], m_FrustumColor);
-	insertLine(vertices[0][0][1], vertices[0][1][1], m_FrustumColor);
-	insertLine(vertices[1][0][1], vertices[1][1][1], m_FrustumColor);
+	// Near Right Bottom
+	vertices[1].x = nearWidth * 0.5f;
+	vertices[1].y = nearHeight * -0.5f;
+	vertices[1].z = -nearP;
 
-	insertLine(vertices[0][0][0], vertices[1][0][0], m_FrustumColor);
-	insertLine(vertices[0][1][0], vertices[1][1][0], m_FrustumColor);
-	insertLine(vertices[0][0][1], vertices[1][0][1], m_FrustumColor);
-	insertLine(vertices[0][1][1], vertices[1][1][1], m_FrustumColor);
+	// Near Left Top
+	vertices[2].x = nearWidth * -0.5f;
+	vertices[2].y = nearHeight * 0.5f;
+	vertices[2].z = -nearP;
+
+	// Near Right Top
+	vertices[3].x = nearWidth * 0.5f;
+	vertices[3].y = nearHeight * 0.5f;
+	vertices[3].z = -nearP;
+
+	// Far Plane
+	float farHeight = tanHalfFov * farP * 2;
+	float farWidth = farHeight * aspect;
+
+	// Far Left Bottom
+	vertices[4].x = farWidth * -0.5f;
+	vertices[4].y = farHeight * -0.5f;
+	vertices[4].z = -farP;
+
+	// Far Right Bottom
+	vertices[5].x = farWidth * 0.5f;
+	vertices[5].y = farHeight * -0.5f;
+	vertices[5].z = -farP;
+
+	// Far Left Top
+	vertices[6].x = farWidth * -0.5f;
+	vertices[6].y = farHeight * 0.5f;
+	vertices[6].z = -farP;
+
+	// Far Right Top
+	vertices[7].x = farWidth * 0.5f;
+	vertices[7].y = farHeight * 0.5f;
+	vertices[7].z = -farP;
+
+	glm::mat4 model(1.0);
+
+	// Rotation and Translation
+	glm::vec3 zaxis(glm::normalize(-direction));
+	glm::vec3 xaxis(safeNormalize(glm::cross(glm::vec3(0, 1, 0), zaxis)));
+	glm::vec3 yaxis(glm::cross(zaxis, xaxis));
+	model[0][0] = xaxis.x, model[0][1] = xaxis.y, model[0][2] = xaxis.z;
+	model[1][0] = yaxis.x, model[1][1] = yaxis.y, model[1][2] = yaxis.z;
+	model[2][0] = zaxis.x, model[2][1] = zaxis.y, model[2][2] = zaxis.z;
+	model[3][0] = position.x, model[3][1] = position.y, model[3][2] = position.z;
+
+	// Transform
+	for (int i = 0; i < 8; ++i) vertices[i] = model * glm::vec4(vertices[i], 1.0);
+
+	// Draw Line
+	insertLine(vertices[0], vertices[1], m_FrustumColor);
+	insertLine(vertices[2], vertices[3], m_FrustumColor);
+	insertLine(vertices[4], vertices[5], m_FrustumColor);
+	insertLine(vertices[6], vertices[7], m_FrustumColor);
+
+	insertLine(vertices[0], vertices[4], m_FrustumColor);
+	insertLine(vertices[1], vertices[5], m_FrustumColor);
+	insertLine(vertices[2], vertices[6], m_FrustumColor);
+	insertLine(vertices[3], vertices[7], m_FrustumColor);
+
+	insertLine(vertices[0], vertices[2], m_FrustumColor);
+	insertLine(vertices[1], vertices[3], m_FrustumColor);
+	insertLine(vertices[4], vertices[6], m_FrustumColor);
+	insertLine(vertices[5], vertices[7], m_FrustumColor);
 
 	renderLine(view, proj);
 }
@@ -65,48 +116,74 @@ void CGProj::CGShadowFrustumVisualizer::render(
 	glm::vec3 vertices[8];
 
 	// Near Left Bottom
-	vertices[0] = glm::vec3(l, b, -nearP);
+	vertices[0].x = l;
+	vertices[0].y = b;
+	vertices[0].z = -nearP;
 
 	// Near Right Bottom
-	vertices[1] = glm::vec3(r, b, -nearP);
+	vertices[1].x = r;
+	vertices[1].y = b;
+	vertices[1].z = -nearP;
 
 	// Near Left Top
-	vertices[2] = glm::vec3(l, t, -nearP);
+	vertices[2].x = l;
+	vertices[2].y = t;
+	vertices[2].z = -nearP;
 
 	// Near Right Top
-	vertices[3] = glm::vec3(r, t, -nearP);
+	vertices[3].x = r;
+	vertices[3].y = t;
+	vertices[3].z = -nearP;
 
 	// Far Left Bottom
-	vertices[4] = glm::vec3(l, b,  -farP);
+	vertices[4].x = l;
+	vertices[4].y = b;
+	vertices[4].z = -farP;
 
 	// Far Right Bottom
-	vertices[5] = glm::vec3(r, b, -farP);
+	vertices[5].x = r;
+	vertices[5].y = b;
+	vertices[5].z = -farP;
 
 	// Far Left Top
-	vertices[6] = glm::vec3(l, t, -farP);
+	vertices[6].x = l;
+	vertices[6].y = t;
+	vertices[6].z = -farP;
 
 	// Far Right Top
-	vertices[7] = glm::vec3(r, t, -farP);
+	vertices[7].x = r;
+	vertices[7].y = t;
+	vertices[7].z = -farP;
 
-	glm::mat4 model = glm::mat4_cast(glm::quat(glm::vec3(0, 0, -1), direction));
-	model[3] = glm::vec4(position, 1.0);
+	glm::mat4 model(1.0);
 
+	// Rotation and Translation
+	glm::vec3 zaxis(glm::normalize(-direction));
+	glm::vec3 xaxis(safeNormalize(glm::cross(glm::vec3(0, 1, 0), zaxis)));
+	glm::vec3 yaxis(glm::cross(zaxis, xaxis));
+	model[0][0] = xaxis.x, model[0][1] = xaxis.y, model[0][2] = xaxis.z;
+	model[1][0] = yaxis.x, model[1][1] = yaxis.y, model[1][2] = yaxis.z;
+	model[2][0] = zaxis.x, model[2][1] = zaxis.y, model[2][2] = zaxis.z;
+	model[3][0] = position.x, model[3][1] = position.y, model[3][2] = position.z;
+
+	// Transform
 	for (int i = 0; i < 8; ++i) vertices[i] = model * glm::vec4(vertices[i], 1.0);
 
-	insertLine(vertices[0], vertices[1], m_TestFrustumColor);
-	insertLine(vertices[2], vertices[3], m_TestFrustumColor);
-	insertLine(vertices[4], vertices[5], m_TestFrustumColor);
-	insertLine(vertices[6], vertices[7], m_TestFrustumColor);
+	// Draw Line
+	insertLine(vertices[0], vertices[1], m_FrustumColor);
+	insertLine(vertices[2], vertices[3], m_FrustumColor);
+	insertLine(vertices[4], vertices[5], m_FrustumColor);
+	insertLine(vertices[6], vertices[7], m_FrustumColor);
 
-	insertLine(vertices[0], vertices[4], m_TestFrustumColor);
-	insertLine(vertices[1], vertices[5], m_TestFrustumColor);
-	insertLine(vertices[2], vertices[6], m_TestFrustumColor);
-	insertLine(vertices[3], vertices[7], m_TestFrustumColor);
+	insertLine(vertices[0], vertices[4], m_FrustumColor);
+	insertLine(vertices[1], vertices[5], m_FrustumColor);
+	insertLine(vertices[2], vertices[6], m_FrustumColor);
+	insertLine(vertices[3], vertices[7], m_FrustumColor);
 
-	insertLine(vertices[0], vertices[2], m_TestFrustumColor);
-	insertLine(vertices[1], vertices[3], m_TestFrustumColor);
-	insertLine(vertices[4], vertices[6], m_TestFrustumColor);
-	insertLine(vertices[5], vertices[7], m_TestFrustumColor);
+	insertLine(vertices[0], vertices[2], m_FrustumColor);
+	insertLine(vertices[1], vertices[3], m_FrustumColor);
+	insertLine(vertices[4], vertices[6], m_FrustumColor);
+	insertLine(vertices[5], vertices[7], m_FrustumColor);
 
 	renderLine(view, proj);
 }

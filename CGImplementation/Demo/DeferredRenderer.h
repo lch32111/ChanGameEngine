@@ -116,8 +116,9 @@ namespace CGProj
 
 		CGAssetManager assetManager;
 
-		// Shadow Depth Map Debug Render
+		float shadowBias = 0.005;
 	};
+
 }
 
 

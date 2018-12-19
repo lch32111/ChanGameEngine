@@ -189,7 +189,25 @@
     <ClCompile Include="Graphics\CGEditPointLightVisualizer.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\CGShadowFrustumVisualizer.cpp">
+    <ClCompile Include="Graphics\CGEditDirLight.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\CGEditPointLight.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\CGEditSpotLight.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\CGDirShadowFrustumVisualizer.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\CGEditPrimitive.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\CGEditProxyObject.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\CGEditLightObject.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -344,7 +362,28 @@
     <ClInclude Include="Graphics\CGEditPointLightVisualizer.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\CGShadowFrustumVisualizer.h">
+    <ClInclude Include="Graphics\CGEditDirLight.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGEditPointLight.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGEditSpotLight.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGDirShadowFrustumVisualizer.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGEditLightCommonFactor.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGEditPrimitive.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGEditProxyObject.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGEditLightObject.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -397,28 +436,28 @@
     <None Include="ShaderFolder\CGSpotVisualizer.fs">
       <Filter>ShaderFolder</Filter>
     </None>
-    <None Include="ShaderFolder\CGDepthMap.vs">
-      <Filter>ShaderFolder</Filter>
-    </None>
-    <None Include="ShaderFolder\CGDepthMap.fs">
-      <Filter>ShaderFolder</Filter>
-    </None>
     <None Include="ShaderFolder\CGDirVisualizer.vs">
       <Filter>ShaderFolder</Filter>
     </None>
     <None Include="ShaderFolder\CGDirVisualizer.fs">
       <Filter>ShaderFolder</Filter>
     </None>
-    <None Include="ShaderFolder\CGDepthMapDebugRender.vs">
-      <Filter>ShaderFolder</Filter>
-    </None>
-    <None Include="ShaderFolder\CGDepthMapDebugRender.fs">
-      <Filter>ShaderFolder</Filter>
-    </None>
     <None Include="ShaderFolder\CGPointVisualizer.vs">
       <Filter>ShaderFolder</Filter>
     </None>
     <None Include="ShaderFolder\CGPointVisualizer.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGDirDepthMap.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGDirDepthMap.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGDirDepthMapDebugRender.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGDirDepthMapDebugRender.vs">
       <Filter>ShaderFolder</Filter>
     </None>
   </ItemGroup>

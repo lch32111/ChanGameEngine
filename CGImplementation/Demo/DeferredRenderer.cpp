@@ -33,13 +33,13 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 		Deferred_Second_Shader->setInt("dirShadowMap[" + std::to_string(i) + "]", NR_GBUFFER_TEXTURES + i);
 
 	// Shadow shader setting
-	Shader* depthMapShader = assetManager.getShader(SHADER_SHADOW_MAP);
-	Shader* depthMapDebugShader = assetManager.getShader(SHADER_SHADOW_MAP_DEBUG_RENDER);
-	depthMapDebugShader->use();
-	depthMapDebugShader->setInt("depthMap", 0);
-	depthMapDebugShader->setBool("shadowProjection", false); // Orthographic
-	depthMapDebugShader->setFloat("near_plane", 1.f);
-	depthMapDebugShader->setFloat("far_plane", 7.5f);
+	Shader* DirdepthMapShader = assetManager.getShader(SHADER_DIR_SHADOW_MAP);
+	Shader* DirdepthMapDebugShader = assetManager.getShader(SHADER_DIR_SHADOW_MAP_DEBUG_RENDER);
+	DirdepthMapDebugShader->use();
+	DirdepthMapDebugShader->setInt("depthMap", 0);
+	DirdepthMapDebugShader->setBool("shadowProjection", false); // Orthographic
+	DirdepthMapDebugShader->setFloat("near_plane", 1.f);
+	DirdepthMapDebugShader->setFloat("far_plane", 7.5f);
 	// Shadow shader setting
 
 	// Shader Setup
@@ -319,7 +319,6 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		Deferred_Second_Shader->setFloat("shadowBias", shadowBias);
 		num_dir_light = num_point_light = num_spot_light = 0;
 		num_dir_shadow = num_point_shadow = num_spot_shadow = 0;
-
 
 		renderScreenQuad();
 	}

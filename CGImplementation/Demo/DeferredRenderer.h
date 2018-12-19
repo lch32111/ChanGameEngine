@@ -10,6 +10,8 @@
 #include <Graphics/CGEditObject.h>
 #include <Graphics/CGGizmo.h>
 #include <Graphics/CGAssetManager.h>
+#include <Graphics/CGEditProxyObject.h>
+#include <Graphics/CGEditLightObject.h>
 
 
 #include <GPED/CGBroadPhase.h>
@@ -102,6 +104,7 @@ namespace CGProj
 
 		std::vector<CGEditProxyObject> editProxies;
 		std::vector<CGEditLightObject> editLights;
+
 		unsigned num_dir_light = 0;
 		unsigned num_dir_shadow = 0;
 		

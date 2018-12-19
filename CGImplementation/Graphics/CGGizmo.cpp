@@ -1,5 +1,8 @@
-#include "CGGizmo.h"
+#include <Graphics/CGGizmo.h>
+
 #include <Graphics/GLPrimitiveUtil.h>
+#include <Graphics/CGEditProxyObject.h>
+#include <Graphics/CGEditLightObject.h>
 
 CGProj::CGGizmo::CGGizmo()
 {

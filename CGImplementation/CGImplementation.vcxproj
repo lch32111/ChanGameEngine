@@ -152,13 +152,19 @@
     <ClCompile Include="GPED\PS_AmmoRound.cpp" />
     <ClCompile Include="GPED\PS_Box.cpp" />
     <ClCompile Include="Graphics\CGAssetManager.cpp" />
+    <ClCompile Include="Graphics\CGDirShadowFrustumVisualizer.cpp" />
+    <ClCompile Include="Graphics\CGEditDirLight.cpp" />
     <ClCompile Include="Graphics\CGEditDirLightVisualizer.cpp" />
+    <ClCompile Include="Graphics\CGEditLightObject.cpp" />
     <ClCompile Include="Graphics\CGEditObject.cpp" />
+    <ClCompile Include="Graphics\CGEditPointLight.cpp" />
     <ClCompile Include="Graphics\CGEditPointLightVisualizer.cpp" />
+    <ClCompile Include="Graphics\CGEditPrimitive.cpp" />
+    <ClCompile Include="Graphics\CGEditProxyObject.cpp" />
+    <ClCompile Include="Graphics\CGEditSpotLight.cpp" />
     <ClCompile Include="Graphics\CGEditSpotLightVisualizer.cpp" />
     <ClCompile Include="Graphics\CGGizmo.cpp" />
     <ClCompile Include="Graphics\CGRenderLine.cpp" />
-    <ClCompile Include="Graphics\CGShadowFrustumVisualizer.cpp" />
     <ClCompile Include="Graphics\chanEulerCamera.cpp" />
     <ClCompile Include="Graphics\chanQuatCamera.cpp" />
     <ClCompile Include="Graphics\GLTextureUtility.cpp" />
@@ -201,13 +207,20 @@
     <ClInclude Include="Graphics\CGAssetManager.h" />
     <ClInclude Include="Graphics\CGAssetUtil.h" />
     <ClInclude Include="Graphics\CGDefSecondUtil.h" />
+    <ClInclude Include="Graphics\CGDirShadowFrustumVisualizer.h" />
+    <ClInclude Include="Graphics\CGEditDirLight.h" />
     <ClInclude Include="Graphics\CGEditDirLightVisualizer.h" />
+    <ClInclude Include="Graphics\CGEditLightCommonFactor.h" />
+    <ClInclude Include="Graphics\CGEditLightObject.h" />
     <ClInclude Include="Graphics\CGEditObject.h" />
+    <ClInclude Include="Graphics\CGEditPointLight.h" />
     <ClInclude Include="Graphics\CGEditPointLightVisualizer.h" />
+    <ClInclude Include="Graphics\CGEditPrimitive.h" />
+    <ClInclude Include="Graphics\CGEditProxyObject.h" />
+    <ClInclude Include="Graphics\CGEditSpotLight.h" />
     <ClInclude Include="Graphics\CGEditSpotLightVisualizer.h" />
     <ClInclude Include="Graphics\CGGizmo.h" />
     <ClInclude Include="Graphics\CGRenderLine.h" />
-    <ClInclude Include="Graphics\CGShadowFrustumVisualizer.h" />
     <ClInclude Include="Graphics\chanEulerCamera.h" />
     <ClInclude Include="Graphics\chanQuatCamera.h" />
     <ClInclude Include="Graphics\GLPrimitiveUtil.h" />
@@ -225,10 +238,10 @@
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ShaderFolder\CGDepthMap.fs" />
-    <None Include="ShaderFolder\CGDepthMap.vs" />
-    <None Include="ShaderFolder\CGDepthMapDebugRender.fs" />
-    <None Include="ShaderFolder\CGDepthMapDebugRender.vs" />
+    <None Include="ShaderFolder\CGDirDepthMap.fs" />
+    <None Include="ShaderFolder\CGDirDepthMap.vs" />
+    <None Include="ShaderFolder\CGDirDepthMapDebugRender.fs" />
+    <None Include="ShaderFolder\CGDirDepthMapDebugRender.vs" />
     <None Include="ShaderFolder\CGDirVisualizer.fs" />
     <None Include="ShaderFolder\CGDirVisualizer.vs" />
     <None Include="ShaderFolder\CGLineShader.fs" />

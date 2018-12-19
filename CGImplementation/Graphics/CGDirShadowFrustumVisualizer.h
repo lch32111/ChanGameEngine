@@ -11,11 +11,11 @@
 
 namespace CGProj
 {
-	class CGShadowFrustumVisualizer
+	class CGDirShadowFrustumVisualizer
 	{
 	public:
-		CGShadowFrustumVisualizer();
-		CGShadowFrustumVisualizer(CGAssetManager& am);
+		CGDirShadowFrustumVisualizer();
+		CGDirShadowFrustumVisualizer(CGAssetManager& am);
 
 		void setShader(Shader* shader);
 		void render(const glm::mat4& view, const glm::mat4& proj,

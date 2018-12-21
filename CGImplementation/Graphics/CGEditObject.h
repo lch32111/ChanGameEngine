@@ -64,13 +64,13 @@ namespace CGProj
 		EditPrimitiveType m_PrimitiveType;
 		CGEditBox m_EditBox;
 		CGEditSpere m_EditSphere;
-		bool m_EditPrimitiveDraw = false;
+		bool m_EditPrimitiveDraw;
 
-		int m_BroadPhaseId = Node_Null;
+		int m_BroadPhaseId;
 		CGBroadPhase* m_BroadPhase;
 		void updateBroadPhaseProxy();
 
-		Shader* m_DefShader = nullptr;
+		Shader* m_DefShader;
 		void renderPrimitive();
 
 		// Box Specific Method

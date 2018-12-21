@@ -6,6 +6,13 @@
 /*** CG EDIT Object  ***/
 CGProj::CGEditObject::CGEditObject()
 {
+	m_EditPrimitiveDraw = false;
+
+	m_BroadPhaseId = Node_Null;
+
+	m_BroadPhase = nullptr;
+	m_DefShader = nullptr;
+
 	setObjectType(EDIT_OBJECT_PROXY);
 	setEditShape(EDIT_PRIMITIVE_AABB);
 }

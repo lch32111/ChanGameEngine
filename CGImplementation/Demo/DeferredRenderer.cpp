@@ -128,8 +128,9 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	}
 
 	GPED::Random random(331);
-	editLights.reserve(400);
-	editLights.push_back(CGEditLightObject(assetManager));
+	editLights.reserve(400); // prevent the memory address of editLights from not changing because of dBroadPhase userProxy pointer!
+	editLights.push_back(CGEditLightObject());
+	editLights[0].initialize(assetManager);
 	editLights[0].setLightType(EDIT_DIRECTION_LIGHT);
 	editLights[0].setScale(0.3);
 	editLights[0].connectBroadPhase(&dBroadPhase);
@@ -142,7 +143,8 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	// Point Light
 	for (unsigned i = 1; i < 11; ++i)
 	{
-		editLights.push_back(CGEditLightObject(assetManager));
+		editLights.push_back(CGEditLightObject());
+		editLights[i].initialize(assetManager);
 		editLights[i].setLightType(EDIT_POINT_LIGHT);
 		editLights[i].setScale(0.3);
 		editLights[i].connectBroadPhase(&dBroadPhase);

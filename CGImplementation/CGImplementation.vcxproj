@@ -219,6 +219,7 @@
     <ClInclude Include="Graphics\CGEditProxyObject.h" />
     <ClInclude Include="Graphics\CGEditSpotLight.h" />
     <ClInclude Include="Graphics\CGEditSpotLightVisualizer.h" />
+    <ClInclude Include="Graphics\CGFrustum.h" />
     <ClInclude Include="Graphics\CGGizmo.h" />
     <ClInclude Include="Graphics\CGRenderLine.h" />
     <ClInclude Include="Graphics\chanEulerCamera.h" />

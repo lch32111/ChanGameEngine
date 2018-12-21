@@ -100,8 +100,6 @@ namespace CGProj
 		void setIsShadowRender(bool shadow);
 		bool getIsShadowRender();
 		/*** Shadow Method ***/
-
-		CGEditLightCommonFactor m_CommonlightFactors;
 	private:
 		Shader* m_forwardShader;
 		EditLightType m_LightType;
@@ -117,7 +115,7 @@ namespace CGProj
 		CGEditSpotLightVisualizer m_spotVis;
 
 		/*** Light Common Properties ***/
-		
+		CGEditLightCommonFactor m_CommonlightFactors;
 		void updateRadius();
 		/*** Light Common Properties ***/
 	};

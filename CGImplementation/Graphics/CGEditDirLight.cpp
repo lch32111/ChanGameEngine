@@ -204,6 +204,35 @@ void CGProj::CGEditDirLight::renderShadowMap(std::vector<CGEditProxyObject>& obj
 	renderQuad();
 }
 
+bool CGProj::CGEditDirLight::getShadowProjection()
+{
+	return m_shadowProjection;
+}
+
+CGProj::CGOrthoFrustum CGProj::CGEditDirLight::getOrthoFrustum()
+{
+	CGOrthoFrustum f;
+	f.left = m_orthoLeft;
+	f.right = m_orthoRight;
+	f.bottom = m_orthoBottom;
+	f.top = m_orthoTop;
+	f.nearP = m_shadowNearPlane;
+	f.farP = m_shadowFarPlane;
+
+	return f;
+}
+
+CGProj::CGPerFrustum CGProj::CGEditDirLight::getPerFrustum()
+{
+	CGPerFrustum f;
+	f.fov = m_perFOV;
+	f.aspect = m_perAspect;
+	f.nearP = m_shadowNearPlane;
+	f.farP = m_shadowFarPlane;
+
+	return f;
+}
+
 void CGProj::CGEditDirLight::setShadowWidthHeight(unsigned w, unsigned h)
 {
 	m_shadowWidth = w;

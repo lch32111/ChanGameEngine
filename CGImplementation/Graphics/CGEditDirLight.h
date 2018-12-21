@@ -6,6 +6,7 @@
 #include <Graphics/CGAssetManager.h>
 #include <Graphics/CGEditLightCommonFactor.h>
 #include <Graphics/CGEditProxyObject.h>
+#include <Graphics/CGFrustum.h>
 
 namespace CGProj
 {
@@ -39,17 +40,24 @@ namespace CGProj
 			const unsigned shadowIndex);
 
 		void renderShadowMap(std::vector<CGEditProxyObject>& objects);
+
+		bool getShadowProjection();
+		CGOrthoFrustum getOrthoFrustum();
+		CGPerFrustum getPerFrustum();
 		// Methods to use In CGEditLightObjects
+	private:
+		// Light Common Factor
+		CGEditLightCommonFactor* m_lightFactors;
 
 		/*** Shader Properties ***/
 		Shader* m_DepthMapShader;
 		Shader* m_DebugDepthMapShader;
-		
+
 		unsigned int m_depthMapFBO, m_depthMapTexture;
 		unsigned int m_shadowWidth, m_shadowHeight;
 
 		bool m_shadowProjection; // true : perspective, false orthogonal
-		
+
 		// In case of Orthographic
 		float m_orthoLeft;
 		float m_orthoRight;
@@ -68,11 +76,7 @@ namespace CGProj
 		glm::mat4 m_shadowLightSpaceMatrix;
 		/*** Shader Properties ***/
 
-	private:
 		void setShadowWidthHeight(unsigned w, unsigned h);
-
-		// Light Common Factor
-		CGEditLightCommonFactor* m_lightFactors;
 	};
 }
 

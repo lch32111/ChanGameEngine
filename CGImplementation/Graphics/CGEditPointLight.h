@@ -26,6 +26,8 @@ namespace CGProj
 
 		void initialize(CGAssetManager& am, CGEditLightCommonFactor* factor);
 
+		void debugDepthMapRender();
+
 		void UIrenderForCommon();
 		void UIrenderForShadow();
 
@@ -34,9 +36,14 @@ namespace CGProj
 			const std::string& sLightIndex,
 			const std::string& sShadowIndex,
 			const unsigned shadowIndex);
+
+		void renderShadowMap(std::vector<CGEditProxyObject>& objects);
 	private:
 		CGEditLightCommonFactor* m_lightFactors;
 		void updateRadius();
+
+		unsigned m_depthMapFBO, m_depthCubemap;
+		unsigned m_shadowWidth, m_shadowHeight;
 	};
 }
 

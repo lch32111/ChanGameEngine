@@ -128,17 +128,33 @@ void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm:
 		{
 		case EDIT_DIRECTION_LIGHT:
 		{
-			if (m_dirLight.m_shadowProjection)
-				m_dirShadowVis.render(view, proj,
+			if (m_dirLight.getShadowProjection())
+			{
+				// Perspective Frustum
+				CGPerFrustum f = m_dirLight.getPerFrustum();
+
+				m_dirShadowVis.render
+				(
+					view, proj,
 					m_CommonlightFactors.lightPosition, m_CommonlightFactors.lightDirection,
-					m_dirLight.m_perFOV, m_dirLight.m_perAspect,
-					m_dirLight.m_shadowNearPlane, m_dirLight.m_shadowFarPlane);
+					f.fov, f.aspect,
+					f.nearP, f.farP
+				);
+			}
 			else
-				m_dirShadowVis.render(view, proj,
+			{
+				// Orthographic Frustum
+				CGOrthoFrustum f = m_dirLight.getOrthoFrustum();
+
+				m_dirShadowVis.render
+				(
+					view, proj,
 					m_CommonlightFactors.lightPosition, m_CommonlightFactors.lightDirection,
-					m_dirLight.m_orthoLeft, m_dirLight.m_orthoRight,
-					m_dirLight.m_orthoBottom, m_dirLight.m_orthoTop,
-					m_dirLight.m_shadowNearPlane, m_dirLight.m_shadowFarPlane);
+					f.left, f.right,
+					f.bottom, f.top,
+					f.nearP, f.farP
+				);
+			}
 			break;
 		}
 		case EDIT_POINT_LIGHT:

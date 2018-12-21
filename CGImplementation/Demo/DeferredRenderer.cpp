@@ -31,6 +31,8 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	Deferred_Second_Shader->setFloat("shadowBias", 0);
 	for (unsigned i = 0; i < NR_DIR_SHADOWS; ++i)
 		Deferred_Second_Shader->setInt("dirShadowMap[" + std::to_string(i) + "]", NR_GBUFFER_TEXTURES + i);
+	for (unsigned i = 0; i < NR_POINT_SHADOWS; ++i)
+		Deferred_Second_Shader->setInt("pointShadowMap[" + std::to_string(i) + "]", NR_GBUFFER_TEXTURES + NR_DIR_SHADOWS + i);
 
 	// Shadow shader setting
 	Shader* DirdepthMapShader = assetManager.getShader(SHADER_DIR_SHADOW_MAP);
@@ -40,6 +42,10 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	DirdepthMapDebugShader->setBool("shadowProjection", false); // Orthographic
 	DirdepthMapDebugShader->setFloat("near_plane", 1.f);
 	DirdepthMapDebugShader->setFloat("far_plane", 7.5f);
+
+	Shader* PointdepthMapDebugShader = assetManager.getShader(SHADER_POINT_SHADOW_MAP_DEBUG_RENDER);
+	PointdepthMapDebugShader->use();
+	PointdepthMapDebugShader->setInt("depthMap", 0);
 	// Shadow shader setting
 
 	// Shader Setup
@@ -141,7 +147,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	editLights[0].setSpecularColor(glm::vec3(0.5));
 
 	// Point Light
-	for (unsigned i = 1; i < 11; ++i)
+	for (unsigned i = 1; i < 0; ++i)
 	{
 		editLights.push_back(CGEditLightObject());
 		editLights[i].initialize(assetManager);

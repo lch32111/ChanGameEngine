@@ -53,6 +53,7 @@ void CGProj::CGEditLightObject::initialize(CGAssetManager & am)
 
 	m_pointVis.prepareData(am.getShader(SHADER_POINT_VISUALIZER));
 
+	m_pointShadowVis.setShader(am.getShader(SHADER_SIMPLE_COLOR_RENDER));
 	// Point Light Init
 
 	// Spot Light Init
@@ -81,6 +82,7 @@ void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm:
 			break;
 		}
 		case EDIT_POINT_LIGHT:
+			m_pointLight.debugDepthMapRender(view, proj);
 			break;
 		case EDIT_SPOT_LIGHT:
 			break;
@@ -158,6 +160,9 @@ void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm:
 			break;
 		}
 		case EDIT_POINT_LIGHT:
+			m_pointShadowVis.render(view, proj,
+				m_CommonlightFactors.lightPosition,
+				m_pointLight.getShadowFarPlane(), m_pointLight.getShadowNearPlane());
 			break;
 		case EDIT_SPOT_LIGHT:
 			break;
@@ -554,6 +559,7 @@ void CGProj::CGEditLightObject::renderShadowMap(std::vector<CGEditProxyObject>& 
 		m_dirLight.renderShadowMap(objects);
 		break;
 	case EDIT_POINT_LIGHT:
+		m_pointLight.renderShadowMap(objects);
 		break;
 	case EDIT_SPOT_LIGHT:
 		break;

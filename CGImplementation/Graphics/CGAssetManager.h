@@ -16,6 +16,8 @@ namespace CGProj
 	public:
 		Shader* getShader(CG_SHADER_ENUM _shaderEnum);
 		Shader getShader(CG_SHADER_ENUM _shaderEnum, char); // add a char parameter to distinguish pointer-return type
+		Shader* getGeoShader(CG_GEO_SHADER_ENUM _shaderEnum);
+		Shader getGeoShader(CG_GEO_SHADER_ENUM _shaderEnum, char);
 
 		unsigned getTexture(CG_TEXTURE_ENUM _textureEnum, bool gamma);
 
@@ -33,6 +35,9 @@ namespace CGProj
 			m_shaders[SHADER_SPOT_VISUALIZER] = Shader("ShaderFolder/CGSpotVisualizer.vs", "ShaderFolder/CGSpotVisualizer.fs");
 			m_shaders[SHADER_DIR_SHADOW_MAP] = Shader("ShaderFolder/CGDirDepthMap.vs", "ShaderFolder/CGDirDepthMap.fs");
 			m_shaders[SHADER_DIR_SHADOW_MAP_DEBUG_RENDER] = Shader("ShaderFolder/CGDirDepthMapDebugRender.vs", "ShaderFolder/CGDirDepthMapDebugRender.fs");
+			m_shaders[SHADER_POINT_SHADOW_MAP_DEBUG_RENDER] = Shader("ShaderFolder/CGPointDepthMapDebugRender.vs", "ShaderFolder/CGPointDepthMapDebugRender.fs");
+
+			m_geoShaders[SHADER_GEO_POINT_SHADOW_MAP] = Shader("ShaderFolder/CGPointDepthMap.vs", "ShaderFolder/CGPointDepthMap.gs", "ShaderFolder/CGPointDepthMap.fs");
 
 			// TODO: make texture class for on-demand process. TextureFromFile() is just loading the image...
 			m_NoGammaTexture[TEXTURE_CONTAINER_DIFFUSE] = TextureFromFile("ImageFolder/container2.png", false);
@@ -64,6 +69,7 @@ namespace CGProj
 		}
 	private:
 		Shader m_shaders[NUM_CG_SHADER_ENUM];
+		Shader m_geoShaders[NUM_CG_GEO_SHADER_ENUM];
 
 		unsigned m_NoGammaTexture[NUM_CG_TEXTURE_ENUM];
 		unsigned m_GammaTextures[NUM_CG_TEXTURE_ENUM];

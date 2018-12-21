@@ -4,6 +4,7 @@
 
 #include <Graphics/Shader.h>
 #include <Graphics/CGAssetManager.h>
+#include <Graphics/CGEditProxyObject.h>
 #include <Graphics/CGEditLightCommonFactor.h>
 
 namespace CGProj
@@ -26,7 +27,7 @@ namespace CGProj
 
 		void initialize(CGAssetManager& am, CGEditLightCommonFactor* factor);
 
-		void debugDepthMapRender();
+		void debugDepthMapRender(const glm::mat4& view, const glm::mat4& proj);
 
 		void UIrenderForCommon();
 		void UIrenderForShadow();
@@ -38,12 +39,28 @@ namespace CGProj
 			const unsigned shadowIndex);
 
 		void renderShadowMap(std::vector<CGEditProxyObject>& objects);
+
+		float getShadowFarPlane();
+		float getShadowNearPlane();
 	private:
 		CGEditLightCommonFactor* m_lightFactors;
 		void updateRadius();
 
+		/*** Shadow Properties ***/
+		Shader* m_DepthMapShader;
+		Shader* m_DebugDepthMapShader;
+
 		unsigned m_depthMapFBO, m_depthCubemap;
 		unsigned m_shadowWidth, m_shadowHeight;
+
+		float m_perFOV;
+		float m_perAspect;
+		float m_shadowNearPlane;
+		float m_shadowFarPlane;
+
+		glm::mat4 m_shadowTransforms[6];
+		glm::mat4 m_shadowLightProjection;
+		/*** Shadow Properties ***/
 	};
 }
 

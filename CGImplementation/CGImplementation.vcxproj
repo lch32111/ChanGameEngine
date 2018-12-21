@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{792F3151-E667-41A8-A222-CF178CF2FC13}</ProjectGuid>
     <RootNamespace>CGImplementation</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -164,6 +164,7 @@
     <ClCompile Include="Graphics\CGEditSpotLight.cpp" />
     <ClCompile Include="Graphics\CGEditSpotLightVisualizer.cpp" />
     <ClCompile Include="Graphics\CGGizmo.cpp" />
+    <ClCompile Include="Graphics\CGPointShadowFrustumVisualizer.cpp" />
     <ClCompile Include="Graphics\CGRenderLine.cpp" />
     <ClCompile Include="Graphics\chanEulerCamera.cpp" />
     <ClCompile Include="Graphics\chanQuatCamera.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="Graphics\CGEditSpotLightVisualizer.h" />
     <ClInclude Include="Graphics\CGFrustum.h" />
     <ClInclude Include="Graphics\CGGizmo.h" />
+    <ClInclude Include="Graphics\CGPointShadowFrustumVisualizer.h" />
     <ClInclude Include="Graphics\CGRenderLine.h" />
     <ClInclude Include="Graphics\chanEulerCamera.h" />
     <ClInclude Include="Graphics\chanQuatCamera.h" />
@@ -247,6 +249,11 @@
     <None Include="ShaderFolder\CGDirVisualizer.vs" />
     <None Include="ShaderFolder\CGLineShader.fs" />
     <None Include="ShaderFolder\CGLineShader.vs" />
+    <None Include="ShaderFolder\CGPointDepthMap.fs" />
+    <None Include="ShaderFolder\CGPointDepthMap.gs" />
+    <None Include="ShaderFolder\CGPointDepthMap.vs" />
+    <None Include="ShaderFolder\CGPointDepthMapDebugRender.fs" />
+    <None Include="ShaderFolder\CGPointDepthMapDebugRender.vs" />
     <None Include="ShaderFolder\CGPointVisualizer.fs" />
     <None Include="ShaderFolder\CGPointVisualizer.vs" />
     <None Include="ShaderFolder\CGSpotVisualizer.fs" />

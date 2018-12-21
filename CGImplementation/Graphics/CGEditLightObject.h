@@ -13,6 +13,7 @@
 
 #include <Graphics/CGEditPointLight.h>
 #include <Graphics/CGEditPointLightVisualizer.h>
+#include <Graphics/CGPointShadowFrustumVisualizer.h>
 
 #include <Graphics/CGEditSpotLight.h>
 #include <Graphics/CGEditSpotLightVisualizer.h>
@@ -110,6 +111,7 @@ namespace CGProj
 
 		CGEditPointLight m_pointLight;
 		CGEditPointLightVisualizer m_pointVis;
+		CGPointShadowFrustumVisualizer m_pointShadowVis;
 
 		CGEditSpotLight m_spotLight;
 		CGEditSpotLightVisualizer m_spotVis;

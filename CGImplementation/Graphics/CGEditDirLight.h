@@ -49,7 +49,7 @@ namespace CGProj
 		// Light Common Factor
 		CGEditLightCommonFactor* m_lightFactors;
 
-		/*** Shader Properties ***/
+		/*** Shadow Properties ***/
 		Shader* m_DepthMapShader;
 		Shader* m_DebugDepthMapShader;
 
@@ -74,7 +74,7 @@ namespace CGProj
 		glm::mat4 m_shadowLightView;
 		glm::mat4 m_shadowLightProjection;
 		glm::mat4 m_shadowLightSpaceMatrix;
-		/*** Shader Properties ***/
+		/*** Shadow Properties ***/
 
 		void setShadowWidthHeight(unsigned w, unsigned h);
 	};

@@ -69,7 +69,7 @@ struct SpotLight {
 #define NR_DIR_SHADOWS 3
 
 #define NR_POINT_LIGHTS 10
-#define NR_POINT_SHADOWS 0
+#define NR_POINT_SHADOWS 3
 
 #define NR_SPOT_LIGHTS 10
 #define NR_SPOT_SHADOWS 0
@@ -83,6 +83,8 @@ uniform mat4 dirLightSpace[NR_DIR_SHADOWS];
 
 uniform int POINT_USED_NUM;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
+uniform samplerCube pointShadowMap[NR_POINT_SHADOWS];
+uniform float pointFarPlane[NR_POINT_SHADOWS];
 
 uniform int SPOT_USED_NUM;
 uniform SpotLight spotLights[NR_SPOT_LIGHTS];
@@ -97,7 +99,8 @@ vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess,
 vec3 CalcCMDirLight(DirLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal);
 vec3 CalcCMPointLight(PointLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal);
 vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal);
-float ShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index);
+float DirShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index);
+float PointShadowCalculation(vec3 fragpos, vec3 lightpos, int index);
 
 void main()
 {
@@ -181,7 +184,7 @@ vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, v
 	// Calculate Shadow
     float shadow = 0.f;
     if(light.ShadowIndex != SHADOW_INDEX_NONE)
-	    shadow = ShadowCalculation(normal, lightDir, fragpos, light.ShadowIndex);
+	    shadow = DirShadowCalculation(normal, lightDir, fragpos, light.ShadowIndex);
 
     return (ambient + (1.0 - shadow) * (diffuse + specular));
 }
@@ -218,8 +221,12 @@ vec3 CalcLMPointLight(PointLight light, vec3 albedo, float spclr, float shinines
 	ambient *= attenuation;
 	diffuse *= attenuation;
 	specular *= attenuation;
-	
-	return (ambient + diffuse + specular);
+
+    float shadow = 0.0;
+    if(light.ShadowIndex != SHADOW_INDEX_NONE)
+	    shadow = PointShadowCalculation(fragpos, light.Position, light.ShadowIndex);
+
+    return (ambient + (1.0 - shadow) * (diffuse + specular));
 }
 
 vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal)
@@ -363,7 +370,7 @@ vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float
 	return  (ambient + diffuse + specular);
 }
 
-float ShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index)
+float DirShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index)
 {
 	// transform world into lightspace
 	vec4 fragPosLightSpace = dirLightSpace[index] * vec4(fragpos, 1.0);
@@ -393,4 +400,22 @@ float ShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index)
 
 	if(projCoords.z > 1.0) shadow = 0.0;
 	return shadow;
+}
+
+float PointShadowCalculation(vec3 fragpos, vec3 lightpos, int index)
+{
+    // get vector between fragment position and light position
+    vec3 fragLight = fragpos - lightpos;
+    
+    float closestDepth = texture(pointShadowMap[index], fragLight).r;
+
+    // Re-transform back to original value
+    closestDepth *= pointFarPlane[index];
+
+    float currentDepth = length(fragLight);
+
+    float bias = 0.05;
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+
+    return shadow;
 }

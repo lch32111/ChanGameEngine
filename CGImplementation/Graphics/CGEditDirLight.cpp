@@ -186,7 +186,7 @@ void CGProj::CGEditDirLight::renderShadowMap(std::vector<CGEditProxyObject>& obj
 
 	// glCullFace(GL_FRONT);
 	// TODO : Do the Frustum Culling!
-	glm::mat4 model(1.0);
+	glm::mat4 model;
 	for (unsigned i = 0; i < objects.size(); ++i)
 	{
 		model = glm::mat4(1.0);

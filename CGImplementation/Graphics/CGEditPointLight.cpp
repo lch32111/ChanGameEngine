@@ -4,18 +4,32 @@
 #include <Imgui/CGimguiUtil.h>
 
 #include <Graphics/CGDefSecondUtil.h>
+#include <Graphics/GLPrimitiveUtil.h>
 
 CGProj::CGEditPointLight::CGEditPointLight()
 {
 	m_lightFactors = nullptr;
 	
+	m_DepthMapShader = nullptr;
+	m_DebugDepthMapShader = nullptr;
+
 	m_depthMapFBO = m_depthCubemap = 0;
 	m_shadowWidth = m_shadowHeight = 1024;
+
+	m_perFOV = glm::radians(90.f);
+	m_perAspect = (float)m_shadowWidth / (float)m_shadowHeight;
+	m_shadowNearPlane = 1.0f;
+	m_shadowFarPlane = 25.0f;
+	
 }
 
 void CGProj::CGEditPointLight::initialize(CGAssetManager & am, CGEditLightCommonFactor * factor)
 {
 	m_lightFactors = factor;
+
+	m_DepthMapShader = am.getGeoShader(SHADER_GEO_POINT_SHADOW_MAP);
+	m_DebugDepthMapShader = am.getShader(SHADER_POINT_SHADOW_MAP_DEBUG_RENDER);
+	// m_DebugDepthMapShader = am.getShader(SHADER_DEBUG_POINT~~)
 
 	// Shadow Map Initialization
 	glGenFramebuffers(1, &m_depthMapFBO);
@@ -42,6 +56,23 @@ void CGProj::CGEditPointLight::initialize(CGAssetManager & am, CGEditLightCommon
 	// Shadow Map Initialization
 }
 
+void CGProj::CGEditPointLight::debugDepthMapRender(const glm::mat4& view, const glm::mat4& proj)
+{
+	// Refer to CGPointDepthMapDebugRender Shader
+	m_DebugDepthMapShader->use();
+	m_DebugDepthMapShader->setMat4("view", view);
+	m_DebugDepthMapShader->setMat4("projection", proj);
+
+	glm::mat4 model(1.0);
+	model = glm::translate(model, m_lightFactors->lightPosition);
+	model = glm::scale(model, glm::vec3(2.0));
+	m_DebugDepthMapShader->setMat4("model", model);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_depthCubemap);
+	renderCube();
+}
+
 void CGProj::CGEditPointLight::UIrenderForCommon()
 {
 	ImGui::PushItemWidth(50);
@@ -56,6 +87,8 @@ void CGProj::CGEditPointLight::UIrenderForCommon()
 
 void CGProj::CGEditPointLight::UIrenderForShadow()
 {
+	ImGui::InputFloat("Shadow Near Plane", &m_shadowNearPlane);
+	ImGui::InputFloat("Shadow Far Plane", &m_shadowFarPlane);
 }
 
 void CGProj::CGEditPointLight::setLightPropertyOnShader(Shader * shader, 
@@ -71,11 +104,76 @@ void CGProj::CGEditPointLight::setLightPropertyOnShader(Shader * shader,
 	shader->setVec3("pointLights[" + sLightIndex + "].Ambient", m_lightFactors->lightAmbient);
 	shader->setVec3("pointLights[" + sLightIndex + "].Diffuse", m_lightFactors->lightDiffuse);
 	shader->setVec3("pointLights[" + sLightIndex + "].Specular", m_lightFactors->lightSpecular);
+	shader->setInt("pointLights[" + sLightIndex + "].ShadowIndex", SHADOW_INDEX_NONE);
 
 	if (m_lightFactors->isShadow && shadowIndex < NR_POINT_SHADOWS)
 	{
-		// TODO : Do the point light shadow!
+		shader->setInt("pointLights[" + sLightIndex + "].ShadowIndex", shadowIndex);
+		shader->setFloat("pointFarPlane[" + sShadowIndex + "]", m_shadowFarPlane);
+
+		glActiveTexture(GL_TEXTURE0 + NR_GBUFFER_TEXTURES + NR_DIR_SHADOWS + shadowIndex);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, m_depthCubemap);
 	}
+}
+
+void CGProj::CGEditPointLight::renderShadowMap(std::vector<CGEditProxyObject>& objects)
+{
+	// Refer to CGPointDepthMap Shader!
+	m_DepthMapShader->use();
+
+	// Light Space Setting
+	m_shadowLightProjection = glm::perspective(m_perFOV, m_perAspect, m_shadowNearPlane, m_shadowFarPlane);
+	m_shadowTransforms[0] = m_shadowLightProjection * glm::lookAt(m_lightFactors->lightPosition, m_lightFactors->lightPosition + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+	m_shadowTransforms[1] = m_shadowLightProjection * glm::lookAt(m_lightFactors->lightPosition, m_lightFactors->lightPosition + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+	m_shadowTransforms[2] = m_shadowLightProjection * glm::lookAt(m_lightFactors->lightPosition, m_lightFactors->lightPosition + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+	m_shadowTransforms[3] = m_shadowLightProjection * glm::lookAt(m_lightFactors->lightPosition, m_lightFactors->lightPosition + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+	m_shadowTransforms[4] = m_shadowLightProjection * glm::lookAt(m_lightFactors->lightPosition, m_lightFactors->lightPosition + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
+	m_shadowTransforms[5] = m_shadowLightProjection * glm::lookAt(m_lightFactors->lightPosition, m_lightFactors->lightPosition + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+	
+	// Geometry Shader Setting
+	m_DepthMapShader->setMat4("shadowTransforms[0]", m_shadowTransforms[0]);
+	m_DepthMapShader->setMat4("shadowTransforms[1]", m_shadowTransforms[1]);
+	m_DepthMapShader->setMat4("shadowTransforms[2]", m_shadowTransforms[2]);
+	m_DepthMapShader->setMat4("shadowTransforms[3]", m_shadowTransforms[3]);
+	m_DepthMapShader->setMat4("shadowTransforms[4]", m_shadowTransforms[4]);
+	m_DepthMapShader->setMat4("shadowTransforms[5]", m_shadowTransforms[5]);
+
+	// Fragment Shader Setting
+	m_DepthMapShader->setVec3("lightPos", m_lightFactors->lightPosition);
+	m_DepthMapShader->setFloat("far_plane", m_shadowFarPlane);
+
+	// Vertex Shader and then Draw!
+	glViewport(0, 0, m_shadowWidth, m_shadowHeight);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	// TODO : Dothe Frustum Culling
+	glm::mat4 model;
+	for (unsigned i = 0; i < objects.size(); ++i)
+	{
+		model = glm::mat4(1.0);
+		model = glm::translate(model, objects[i].getPosition());
+		model = glm::scale(model, objects[i].getScale());
+		m_DepthMapShader->setMat4("model", model);
+		objects[i].renderPrimitive();
+	}
+
+	// Plane
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(0, -5, 0));
+	model = glm::scale(model, glm::vec3(25));
+	m_DepthMapShader->setMat4("model", model);
+	renderQuad();
+}
+
+float CGProj::CGEditPointLight::getShadowFarPlane()
+{
+	return m_shadowFarPlane;
+}
+
+float CGProj::CGEditPointLight::getShadowNearPlane()
+{
+	return m_shadowNearPlane;
 }
 
 void CGProj::CGEditPointLight::updateRadius()

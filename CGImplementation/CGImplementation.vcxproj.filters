@@ -210,6 +210,9 @@
     <ClCompile Include="Graphics\CGEditLightObject.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\CGPointShadowFrustumVisualizer.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -389,6 +392,9 @@
     <ClInclude Include="Graphics\CGFrustum.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\CGPointShadowFrustumVisualizer.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderFolder\DeferredFirst.fs">
@@ -461,6 +467,21 @@
       <Filter>ShaderFolder</Filter>
     </None>
     <None Include="ShaderFolder\CGDirDepthMapDebugRender.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGPointDepthMap.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGPointDepthMap.gs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGPointDepthMap.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGPointDepthMapDebugRender.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGPointDepthMapDebugRender.fs">
       <Filter>ShaderFolder</Filter>
     </None>
   </ItemGroup>

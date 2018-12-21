@@ -57,10 +57,13 @@ namespace CGProj
 		float m_perAspect;
 		float m_shadowNearPlane;
 		float m_shadowFarPlane;
+		float m_shadowBias;
 
 		glm::mat4 m_shadowTransforms[6];
 		glm::mat4 m_shadowLightProjection;
 		/*** Shadow Properties ***/
+
+		void setShadowWidthHeight(unsigned w, unsigned h);
 	};
 }
 

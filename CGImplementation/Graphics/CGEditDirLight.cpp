@@ -24,6 +24,8 @@ CGProj::CGEditDirLight::CGEditDirLight()
 	m_depthMapFBO = m_depthMapTexture = 0;
 	m_shadowWidth = m_shadowHeight = 1024;
 
+	m_shadowBias = 0.05;
+
 	m_shadowProjection = false; // Orthographic Projection
 
 	m_orthoLeft = -10.f;
@@ -122,6 +124,7 @@ void CGProj::CGEditDirLight::UIrenderForShadow()
 
 	ImGui::InputFloat("shadow near plane", &m_shadowNearPlane);
 	ImGui::InputFloat("shadow far plane", &m_shadowFarPlane);
+	ImGui::InputFloat("shadow bias", &m_shadowBias);
 }
 
 void CGProj::CGEditDirLight::setLightPropertyOnShader(Shader* shader, 
@@ -139,6 +142,7 @@ void CGProj::CGEditDirLight::setLightPropertyOnShader(Shader* shader,
 	{
 		shader->setInt("dirLights[" + sLightIndex + "].ShadowIndex", shadowIndex);
 		shader->setMat4("dirLightSpace[" + sShadowIndex + "]", m_shadowLightSpaceMatrix);
+		shader->setFloat("dirBias[" + sShadowIndex + "]", m_shadowBias);
 
 		glActiveTexture(GL_TEXTURE0 + NR_GBUFFER_TEXTURES + shadowIndex);
 		glBindTexture(GL_TEXTURE_2D, m_depthMapTexture);

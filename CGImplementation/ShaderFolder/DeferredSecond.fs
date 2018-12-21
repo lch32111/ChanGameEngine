@@ -80,17 +80,18 @@ uniform int DIR_USED_NUM;
 uniform DirLight dirLights[NR_DIR_LIGHTS];
 uniform sampler2D dirShadowMap[NR_DIR_SHADOWS];
 uniform mat4 dirLightSpace[NR_DIR_SHADOWS];
+uniform float dirBias[NR_DIR_SHADOWS];
 
 uniform int POINT_USED_NUM;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform samplerCube pointShadowMap[NR_POINT_SHADOWS];
 uniform float pointFarPlane[NR_POINT_SHADOWS];
+uniform float pointBias[NR_POINT_SHADOWS];
 
 uniform int SPOT_USED_NUM;
 uniform SpotLight spotLights[NR_SPOT_LIGHTS];
 
 uniform vec3 cameraPos;
-uniform float shadowBias;
 
 // function prototypes
 vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal);
@@ -384,7 +385,7 @@ float DirShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index)
 	float closestDepth = texture(dirShadowMap[index], projCoords.xy).r;
 
 	float currentDepth = projCoords.z;
-	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), shadowBias);
+	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), dirBias[index]);
 
 	float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(dirShadowMap[index], 0);
@@ -402,20 +403,35 @@ float DirShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index)
 	return shadow;
 }
 
+vec3 sampleOffsetDirections[20] = vec3[]
+(
+   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+);
+
 float PointShadowCalculation(vec3 fragpos, vec3 lightpos, int index)
 {
     // get vector between fragment position and light position
     vec3 fragLight = fragpos - lightpos;
-    
-    float closestDepth = texture(pointShadowMap[index], fragLight).r;
-
-    // Re-transform back to original value
-    closestDepth *= pointFarPlane[index];
-
     float currentDepth = length(fragLight);
+	float viewDistance = length(cameraPos - fragpos);
+	int samples = 20;
+	float bias = pointBias[index];
+	float diskRadius = (1.0 + viewDistance / pointFarPlane[index]) / 25.0;
+	float shadow = 0.0;
 
-    float bias = 0.05;
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+	// PCF
+	for(int i = 0; i < samples; ++i)
+	{
+		float closestDepth = texture(pointShadowMap[index], fragLight + sampleOffsetDirections[i] * diskRadius).r;
+		closestDepth *= pointFarPlane[index]; // Undo Mapping [0;1]
+		if(currentDepth - bias > closestDepth)
+			shadow += 1.0;
+	}
+	shadow /= float(samples);
 
     return shadow;
 }

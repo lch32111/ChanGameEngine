@@ -20,7 +20,7 @@ CGProj::CGEditPointLight::CGEditPointLight()
 	m_perAspect = (float)m_shadowWidth / (float)m_shadowHeight;
 	m_shadowNearPlane = 1.0f;
 	m_shadowFarPlane = 25.0f;
-	
+	m_shadowBias = 0.02;
 }
 
 void CGProj::CGEditPointLight::initialize(CGAssetManager & am, CGEditLightCommonFactor * factor)
@@ -87,8 +87,15 @@ void CGProj::CGEditPointLight::UIrenderForCommon()
 
 void CGProj::CGEditPointLight::UIrenderForShadow()
 {
+	int wharr[2] = { m_shadowWidth, m_shadowHeight };
+	if (ImGui::InputInt2("shadow width & height", wharr))
+	{
+		setShadowWidthHeight(wharr[0], wharr[1]);
+	}
+
 	ImGui::InputFloat("Shadow Near Plane", &m_shadowNearPlane);
 	ImGui::InputFloat("Shadow Far Plane", &m_shadowFarPlane);
+	ImGui::InputFloat("Shadow Bias", &m_shadowBias);
 }
 
 void CGProj::CGEditPointLight::setLightPropertyOnShader(Shader * shader, 
@@ -110,6 +117,7 @@ void CGProj::CGEditPointLight::setLightPropertyOnShader(Shader * shader,
 	{
 		shader->setInt("pointLights[" + sLightIndex + "].ShadowIndex", shadowIndex);
 		shader->setFloat("pointFarPlane[" + sShadowIndex + "]", m_shadowFarPlane);
+		shader->setFloat("pointBias[" + sShadowIndex + "]", m_shadowBias);
 
 		glActiveTexture(GL_TEXTURE0 + NR_GBUFFER_TEXTURES + NR_DIR_SHADOWS + shadowIndex);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, m_depthCubemap);
@@ -193,4 +201,22 @@ void CGProj::CGEditPointLight::updateRadius()
 			)
 		/
 		(2 * m_lightFactors->AttnQuadratic);
+}
+
+void CGProj::CGEditPointLight::setShadowWidthHeight(unsigned w, unsigned h)
+{
+	m_shadowWidth = w;
+	m_shadowHeight = h;
+
+	// Set the texture setting again
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_depthCubemap);
+	for (unsigned i = 0; i < 6; ++i)
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT,
+			m_shadowWidth, m_shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_depthCubemap, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		assert(0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

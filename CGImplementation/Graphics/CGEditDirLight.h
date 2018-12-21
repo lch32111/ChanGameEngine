@@ -55,6 +55,7 @@ namespace CGProj
 
 		unsigned int m_depthMapFBO, m_depthMapTexture;
 		unsigned int m_shadowWidth, m_shadowHeight;
+		float m_shadowBias;
 
 		bool m_shadowProjection; // true : perspective, false orthogonal
 

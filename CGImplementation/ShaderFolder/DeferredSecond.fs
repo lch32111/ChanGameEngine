@@ -65,14 +65,14 @@ struct SpotLight {
 };
 
 // Limit of the array size for each kind of light
-#define NR_DIR_LIGHTS 15
-#define NR_DIR_SHADOWS 3
+#define NR_DIR_LIGHTS 3
+#define NR_DIR_SHADOWS 2
 
-#define NR_POINT_LIGHTS 10
-#define NR_POINT_SHADOWS 3
+#define NR_POINT_LIGHTS 15
+#define NR_POINT_SHADOWS 4
 
 #define NR_SPOT_LIGHTS 10
-#define NR_SPOT_SHADOWS 0
+#define NR_SPOT_SHADOWS 4
 
 #define SHADOW_INDEX_NONE -1
 
@@ -90,6 +90,9 @@ uniform float pointBias[NR_POINT_SHADOWS];
 
 uniform int SPOT_USED_NUM;
 uniform SpotLight spotLights[NR_SPOT_LIGHTS];
+uniform sampler2D spotShadowMap[NR_SPOT_SHADOWS];
+uniform mat4 spotLightSpace[NR_SPOT_SHADOWS];
+uniform float spotBias[NR_SPOT_SHADOWS];
 
 uniform vec3 cameraPos;
 
@@ -102,6 +105,7 @@ vec3 CalcCMPointLight(PointLight light, vec3 ambnt, vec3 albedo, vec3 spclr, flo
 vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal);
 float DirShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index);
 float PointShadowCalculation(vec3 fragpos, vec3 lightpos, int index);
+float SpotShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index);
 
 void main()
 {
@@ -249,9 +253,7 @@ vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess,
 	// specular shading
 	vec3 viewDir = normalize(cameraPos - fragpos);
 	vec3 halfwayDir = normalize(lightDir + viewDir);
-	vec3 reflectDir = reflect(-lightDir, normal);
-	// float spec = pow(max(dot(normal, halfwayDir), 0.0), shininess);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+	float spec = pow(max(dot(normal, halfwayDir), 0.0), shininess);
 
 	// attenuation
 	float attenuation = 1.0 / (light.Constant + light.Linear * dist + light.Quadratic * dist * dist);
@@ -270,7 +272,11 @@ vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess,
 	diffuse *= attenuation * spot_intensity;
 	specular *= attenuation * spot_intensity;
 
-	return  (ambient + diffuse + specular);
+    float shadow = 0.0;
+    if(light.ShadowIndex != SHADOW_INDEX_NONE)
+        shadow = SpotShadowCalculation(normal, lightDir, fragpos, light.ShadowIndex);
+
+	return  (ambient + (1.0 - shadow) * (diffuse + specular));
 }
 
 vec3 CalcCMDirLight(DirLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal)
@@ -382,8 +388,6 @@ float DirShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index)
 	// adjust the range from 0 ~ 1
 	projCoords = projCoords * 0.5 + 0.5;
 	
-	float closestDepth = texture(dirShadowMap[index], projCoords.xy).r;
-
 	float currentDepth = projCoords.z;
 	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), dirBias[index]);
 
@@ -434,4 +438,33 @@ float PointShadowCalculation(vec3 fragpos, vec3 lightpos, int index)
 	shadow /= float(samples);
 
     return shadow;
+}
+
+float SpotShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index)
+{
+    vec4 fragPosLightSpace = spotLightSpace[index] * vec4(fragpos, 1.0);
+
+    // perform perspective divide (range -1 ~ 1)
+	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+	
+	// adjust the range from 0 ~ 1
+	projCoords = projCoords * 0.5 + 0.5;
+	
+	float currentDepth = projCoords.z;
+	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), spotBias[index]);
+
+	float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(spotShadowMap[index], 0);
+
+    // Percentage-Closer Filtering
+	for(int x = -1; x <=1; ++x)
+      for(int y = -1; y <= 1; ++y)
+	{
+		float pcfDepth = texture(spotShadowMap[index], projCoords.xy + vec2(x,y) * texelSize).r;
+		shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+	}
+	shadow /= 9.0;
+
+	if(projCoords.z > 1.0) shadow = 0.0;
+	return shadow;
 }

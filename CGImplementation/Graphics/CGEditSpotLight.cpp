@@ -5,18 +5,78 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <Graphics/CGDefSecondUtil.h>
+#include <Graphics/GLPrimitiveUtil.h>
+
+#include <GPED/CGPhysicsUtil.h>
 
 CGProj::CGEditSpotLight::CGEditSpotLight()
 {
 	m_lightFactors = nullptr;
 
-	m_SpotInnerCutOff = glm::radians(12.5f);
-	m_SpotOuterCutOff = glm::radians(17.5f);
+	m_SpotInnerCutOff = glm::cos(glm::radians(12.5f));
+	m_SpotOuterCutOff = glm::cos(glm::radians(17.5f));
+
+	m_DepthMapShader = nullptr;
+	m_DebugDepthMapShader = nullptr;
+
+	m_depthMapFBO = m_depthMapTexture = 0;
+	m_shadowWidth = m_shadowHeight = 1024;
+	m_shadowBias = 0.05;
+
+	m_perFOV = glm::radians(17.5f * 2); // same as the degreeof spot outer cutoff
+	m_perAspect = (float)m_shadowWidth / (float)m_shadowHeight;
+
+	m_shadowNearPlane = 1.0;
+	m_shadowFarPlane = 7.5;
+
+	m_shadowLightView = glm::mat4(1.0);
+	m_shadowLightProjection = glm::mat4(1.0);
+	m_shadowLightSpaceMatrix = glm::mat4(1.0);
 }
 
 void CGProj::CGEditSpotLight::initialize(CGAssetManager & am, CGEditLightCommonFactor * factor)
 {
 	m_lightFactors = factor;
+
+	// Shadow Map initialization
+	m_DepthMapShader = am.getShader(SHADER_SPOT_SHADOW_MAP);
+	m_DebugDepthMapShader = am.getShader(SHADER_SPOT_SHADOW_MAP_DEBUG_RENDER);
+
+	glGenFramebuffers(1, &m_depthMapFBO);
+
+	glGenTextures(1, &m_depthMapTexture);
+	glBindTexture(GL_TEXTURE_2D, m_depthMapTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_shadowWidth, m_shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthMapTexture, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		assert(0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void CGProj::CGEditSpotLight::debugDepthMapRender(const glm::mat4 & view, const glm::mat4 & proj)
+{
+	m_DebugDepthMapShader->use();
+	m_DebugDepthMapShader->setMat4("view", view);
+	m_DebugDepthMapShader->setMat4("projection", proj);
+	m_DebugDepthMapShader->setFloat("near_plane", m_shadowNearPlane);
+	m_DebugDepthMapShader->setFloat("far_plane", m_shadowFarPlane);
+
+	glm::mat4 model(1.0);
+	model = glm::translate(model, m_lightFactors->lightPosition);
+	model = glm::scale(model, glm::vec3(2.0));
+	m_DebugDepthMapShader->setMat4("model", model);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_depthMapTexture);
+	renderCube();
 }
 
 void CGProj::CGEditSpotLight::UIrenderForCommon(CGEditSpotLightVisualizer& spotVis)
@@ -39,6 +99,7 @@ void CGProj::CGEditSpotLight::UIrenderForCommon(CGEditSpotLightVisualizer& spotV
 	if (ImGui::SliderFloat("Out", &outer_Indegree, inner_Indegree, 45, "Outer Cutoff In Degree : %.2f"))
 	{
 		setOuterCutOffInDegree(outer_Indegree);
+		m_perFOV = glm::radians(outer_Indegree * 2);
 		spotVis.setOuterConeInRadians(glm::acos(m_SpotOuterCutOff), m_lightFactors->AttnRadius);
 	}
 
@@ -70,6 +131,15 @@ void CGProj::CGEditSpotLight::UIrenderForCommon(CGEditSpotLightVisualizer& spotV
 
 void CGProj::CGEditSpotLight::UIrenderForShadow()
 {
+	int wharr[2] = { m_shadowWidth, m_shadowHeight };
+	if (ImGui::InputInt2("shadow width & height", wharr))
+	{
+		setShadowWidthHeight(wharr[0], wharr[1]);
+	}
+
+	ImGui::InputFloat("shadow near plane", &m_shadowNearPlane);
+	ImGui::InputFloat("shadow far plane", &m_shadowFarPlane);
+	ImGui::InputFloat("shadow bias", &m_shadowBias);
 }
 
 void CGProj::CGEditSpotLight::setLightPropertyOnShader(Shader * shader, const std::string & sLightIndex, const std::string & sShadowIndex, const unsigned shadowIndex)
@@ -88,11 +158,59 @@ void CGProj::CGEditSpotLight::setLightPropertyOnShader(Shader * shader, const st
 	shader->setVec3("spotLights[" + sLightIndex + "].Ambient", m_lightFactors->lightAmbient);
 	shader->setVec3("spotLights[" + sLightIndex + "].Diffuse", m_lightFactors->lightDiffuse);
 	shader->setVec3("spotLights[" + sLightIndex + "].Specular", m_lightFactors->lightSpecular);
+	shader->setInt("spotLights[" + sLightIndex + "].ShadowIndex", SHADOW_INDEX_NONE);
 
 	if (m_lightFactors->isShadow && shadowIndex < NR_SPOT_SHADOWS)
 	{
-		// TODO: DO the spot light shadow!
+		shader->setInt("spotLights[" + sLightIndex + "].ShadowIndex", shadowIndex);
+		shader->setMat4("spotLightSpace[" + sShadowIndex + "]", m_shadowLightSpaceMatrix);
+		shader->setFloat("spotBias[" + sShadowIndex + "]", m_shadowBias);
+
+		glActiveTexture(GL_TEXTURE0 + NR_GBUFFER_TEXTURES + NR_DIR_SHADOWS + NR_POINT_SHADOWS + shadowIndex);
+		glBindTexture(GL_TEXTURE_2D, m_depthMapTexture);
 	}
+}
+
+void CGProj::CGEditSpotLight::renderShadowMap(std::vector<CGEditProxyObject>& objects)
+{
+	m_DepthMapShader->use();
+
+	// Light Space Setting
+	m_shadowLightView = safeLookAt(
+		m_lightFactors->lightPosition,
+		m_lightFactors->lightPosition + m_lightFactors->lightDirection,
+		glm::vec3(0, 1, 0)
+	);
+
+	m_shadowLightProjection = glm::perspective(m_perFOV, m_perAspect, m_shadowNearPlane, m_shadowFarPlane);
+
+	m_shadowLightSpaceMatrix = m_shadowLightProjection * m_shadowLightView;
+
+	m_DepthMapShader->setMat4("lightSpaceMatrix", m_shadowLightSpaceMatrix);
+	// Light Space Setting
+
+	// Shadow Mapping Pass
+	glViewport(0, 0, m_shadowWidth, m_shadowHeight);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	glm::mat4 model;
+	for (unsigned i = 0; i < objects.size(); ++i)
+	{
+		model = glm::mat4(1.0);
+		model = glm::translate(model, objects[i].getPosition());
+		model = glm::scale(model, objects[i].getScale());
+		m_DepthMapShader->setMat4("model", model);
+		objects[i].renderPrimitive();
+	}
+
+	// Plane
+	model = glm::mat4(1.0);
+	model = glm::translate(model, glm::vec3(0, -5, 0));
+	model = glm::scale(model, glm::vec3(25));
+	m_DepthMapShader->setMat4("model", model);
+	renderQuad();
+	// Shadow Mapping Pass
 }
 
 void CGProj::CGEditSpotLight::setInnerCutOffInDegree(const float degree)
@@ -126,6 +244,17 @@ float CGProj::CGEditSpotLight::getOuterCutOff()
 	return m_SpotOuterCutOff;
 }
 
+CGProj::CGPerFrustum CGProj::CGEditSpotLight::getPerFrustum()
+{
+	CGPerFrustum f;
+	f.fov = m_perFOV;
+	f.aspect = m_perAspect;
+	f.nearP = m_shadowNearPlane;
+	f.farP = m_shadowFarPlane;
+
+	return f;
+}
+
 void CGProj::CGEditSpotLight::updateRadius()
 {
 	// the diffuse color of light is used for the max component of light
@@ -143,4 +272,21 @@ void CGProj::CGEditSpotLight::updateRadius()
 			)
 		/
 		(2 * m_lightFactors->AttnQuadratic);
+}
+
+void CGProj::CGEditSpotLight::setShadowWidthHeight(unsigned w, unsigned h)
+{
+	m_shadowWidth = w;
+	m_shadowHeight = h;
+	m_perAspect = (float)m_shadowWidth / (float)m_shadowHeight;
+
+	// Set the texture setting again
+	glBindTexture(GL_TEXTURE_2D, m_depthMapTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_shadowWidth, m_shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthMapTexture, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		assert(0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

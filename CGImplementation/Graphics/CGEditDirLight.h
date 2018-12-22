@@ -28,7 +28,7 @@ namespace CGProj
 		void initialize(CGAssetManager& am, CGEditLightCommonFactor* factor);
 		
 		// Methods to use In CGEditLightObjects
-		void debugDepthMapRender();
+		void debugDepthMapRender(const glm::mat4& view, const glm::mat4& proj);
 
 		void UIrenderForCommon();
 		void UIrenderForShadow();

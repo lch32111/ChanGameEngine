@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{792F3151-E667-41A8-A222-CF178CF2FC13}</ProjectGuid>
     <RootNamespace>CGImplementation</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -166,6 +166,7 @@
     <ClCompile Include="Graphics\CGGizmo.cpp" />
     <ClCompile Include="Graphics\CGPointShadowFrustumVisualizer.cpp" />
     <ClCompile Include="Graphics\CGRenderLine.cpp" />
+    <ClCompile Include="Graphics\CGSpotShadowFrustumVisualizer.cpp" />
     <ClCompile Include="Graphics\chanEulerCamera.cpp" />
     <ClCompile Include="Graphics\chanQuatCamera.cpp" />
     <ClCompile Include="Graphics\GLTextureUtility.cpp" />
@@ -224,6 +225,7 @@
     <ClInclude Include="Graphics\CGGizmo.h" />
     <ClInclude Include="Graphics\CGPointShadowFrustumVisualizer.h" />
     <ClInclude Include="Graphics\CGRenderLine.h" />
+    <ClInclude Include="Graphics\CGSpotShadowFrustumVisualizer.h" />
     <ClInclude Include="Graphics\chanEulerCamera.h" />
     <ClInclude Include="Graphics\chanQuatCamera.h" />
     <ClInclude Include="Graphics\GLPrimitiveUtil.h" />
@@ -256,6 +258,10 @@
     <None Include="ShaderFolder\CGPointDepthMapDebugRender.vs" />
     <None Include="ShaderFolder\CGPointVisualizer.fs" />
     <None Include="ShaderFolder\CGPointVisualizer.vs" />
+    <None Include="ShaderFolder\CGSpotDepthMap.fs" />
+    <None Include="ShaderFolder\CGSpotDepthMap.vs" />
+    <None Include="ShaderFolder\CGSpotDepthMapDebugRender.fs" />
+    <None Include="ShaderFolder\CGSpotDepthMapDebugRender.vs" />
     <None Include="ShaderFolder\CGSpotVisualizer.fs" />
     <None Include="ShaderFolder\CGSpotVisualizer.vs" />
     <None Include="ShaderFolder\DeferredFirst.fs" />

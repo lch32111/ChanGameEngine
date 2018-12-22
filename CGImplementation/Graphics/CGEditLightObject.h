@@ -17,6 +17,7 @@
 
 #include <Graphics/CGEditSpotLight.h>
 #include <Graphics/CGEditSpotLightVisualizer.h>
+#include <Graphics/CGSpotShadowFrustumVisualizer.h>
 
 namespace CGProj
 {
@@ -115,6 +116,7 @@ namespace CGProj
 
 		CGEditSpotLight m_spotLight;
 		CGEditSpotLightVisualizer m_spotVis;
+		CGSpotShadowFrustumVisualizer m_spotShadowVis;
 
 		/*** Light Common Properties ***/
 		CGEditLightCommonFactor m_CommonlightFactors;

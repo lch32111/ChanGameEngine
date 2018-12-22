@@ -33,19 +33,22 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 		Deferred_Second_Shader->setInt("dirShadowMap[" + std::to_string(i) + "]", NR_GBUFFER_TEXTURES + i);
 	for (unsigned i = 0; i < NR_POINT_SHADOWS; ++i)
 		Deferred_Second_Shader->setInt("pointShadowMap[" + std::to_string(i) + "]", NR_GBUFFER_TEXTURES + NR_DIR_SHADOWS + i);
+	for (unsigned i = 0; i < NR_SPOT_SHADOWS; ++i)
+		Deferred_Second_Shader->setInt("spotShadowMap[" + std::to_string(i) + "]", NR_GBUFFER_TEXTURES + NR_DIR_SHADOWS + NR_POINT_SHADOWS + i);
 
 	// Shadow shader setting
 	Shader* DirdepthMapShader = assetManager.getShader(SHADER_DIR_SHADOW_MAP);
 	Shader* DirdepthMapDebugShader = assetManager.getShader(SHADER_DIR_SHADOW_MAP_DEBUG_RENDER);
 	DirdepthMapDebugShader->use();
 	DirdepthMapDebugShader->setInt("depthMap", 0);
-	DirdepthMapDebugShader->setBool("shadowProjection", false); // Orthographic
-	DirdepthMapDebugShader->setFloat("near_plane", 1.f);
-	DirdepthMapDebugShader->setFloat("far_plane", 7.5f);
 
 	Shader* PointdepthMapDebugShader = assetManager.getShader(SHADER_POINT_SHADOW_MAP_DEBUG_RENDER);
 	PointdepthMapDebugShader->use();
 	PointdepthMapDebugShader->setInt("depthMap", 0);
+
+	Shader* SpotdepthMapDebugShader = assetManager.getShader(SHADER_SPOT_SHADOW_MAP_DEBUG_RENDER);
+	SpotdepthMapDebugShader->use();
+	SpotdepthMapDebugShader->setInt("depthMap", 0);
 	// Shadow shader setting
 
 	// Shader Setup

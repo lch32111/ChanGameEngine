@@ -34,7 +34,7 @@ CGProj::CGEditDirLight::CGEditDirLight()
 	m_orthoTop = 10.f;
 
 	m_perFOV = glm::radians(45.f);
-	m_perAspect = 4.f / 3.f;
+	m_perAspect = (float)m_shadowWidth / (float)m_shadowHeight;
 
 	m_shadowNearPlane = 1.f;
 	m_shadowFarPlane = 7.5f;
@@ -76,15 +76,23 @@ void CGProj::CGEditDirLight::initialize(CGAssetManager & am, CGEditLightCommonFa
 	// Shadow Map Initialization
 }
 
-void CGProj::CGEditDirLight::debugDepthMapRender()
+void CGProj::CGEditDirLight::debugDepthMapRender(const glm::mat4& view, const glm::mat4& proj)
 {
 	m_DebugDepthMapShader->use();
+	m_DebugDepthMapShader->setMat4("view", view);
+	m_DebugDepthMapShader->setMat4("projection", proj);
 	m_DebugDepthMapShader->setBool("shadowProjection", m_shadowProjection);
 	m_DebugDepthMapShader->setFloat("near_plane", m_shadowNearPlane);
 	m_DebugDepthMapShader->setFloat("far_plane", m_shadowFarPlane);
+
+	glm::mat4 model(1.0);
+	model = glm::translate(model, m_lightFactors->lightPosition);
+	model = glm::scale(model, glm::vec3(2.0));
+	m_DebugDepthMapShader->setMat4("model", model);
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_depthMapTexture);
-	renderScreenQuad();
+	renderCube();
 }
 
 void CGProj::CGEditDirLight::UIrenderForCommon()
@@ -188,7 +196,6 @@ void CGProj::CGEditDirLight::renderShadowMap(std::vector<CGEditProxyObject>& obj
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 
-	// glCullFace(GL_FRONT);
 	// TODO : Do the Frustum Culling!
 	glm::mat4 model;
 	for (unsigned i = 0; i < objects.size(); ++i)
@@ -199,7 +206,7 @@ void CGProj::CGEditDirLight::renderShadowMap(std::vector<CGEditProxyObject>& obj
 		m_DepthMapShader->setMat4("model", model);
 		objects[i].renderPrimitive();
 	}
-	// glCullFace(GL_BACK);
+	
 	// Plane
 	model = glm::mat4(1.0);
 	model = glm::translate(model, glm::vec3(0, -5, 0));

@@ -6,6 +6,8 @@
 #include <Graphics/CGAssetManager.h>
 #include <Graphics/CGEditLightCommonFactor.h>
 #include <Graphics/CGEditSpotLightVisualizer.h>
+#include <Graphics/CGEditProxyObject.h>
+#include <Graphics/CGFrustum.h>
 
 namespace CGProj
 {
@@ -27,6 +29,8 @@ namespace CGProj
 
 		void initialize(CGAssetManager& am, CGEditLightCommonFactor* factor);
 
+		void debugDepthMapRender(const glm::mat4& view, const glm::mat4& proj);
+
 		void UIrenderForCommon(CGEditSpotLightVisualizer& spotVis);
 		void UIrenderForShadow();
 		
@@ -36,6 +40,8 @@ namespace CGProj
 			const std::string& sShadowIndex,
 			const unsigned shadowIndex);
 
+		void renderShadowMap(std::vector<CGEditProxyObject>& objects);
+
 		void setInnerCutOffInDegree(const float degree);
 		void setInnerCutoffInRadian(const float radian);
 		float getInnerCutOff();
@@ -43,15 +49,37 @@ namespace CGProj
 		void setOuterCutOffInDegree(const float degree);
 		void setOuterCutOffInRadian(const float radian);
 		float getOuterCutOff();
+
+		CGPerFrustum getPerFrustum();
 	private:
 		CGEditLightCommonFactor* m_lightFactors;
+		void updateRadius();
 
 		// Spot Light Factors
 		// Notice the Cutoff value is the cos value with radians measure.
 		float m_SpotInnerCutOff;
 		float m_SpotOuterCutOff;
 
-		void updateRadius();
+		/*** Shadow Properties ***/
+		Shader* m_DepthMapShader;
+		Shader* m_DebugDepthMapShader;
+
+		unsigned int m_depthMapFBO, m_depthMapTexture;
+		unsigned int m_shadowWidth, m_shadowHeight;
+		float m_shadowBias;
+
+		float m_perFOV;
+		float m_perAspect;
+
+		float m_shadowNearPlane;
+		float m_shadowFarPlane;
+
+		glm::mat4 m_shadowLightView;
+		glm::mat4 m_shadowLightProjection;
+		glm::mat4 m_shadowLightSpaceMatrix;
+		/*** Shadow Properties ***/
+
+		void setShadowWidthHeight(unsigned w, unsigned h);
 	};
 }
 

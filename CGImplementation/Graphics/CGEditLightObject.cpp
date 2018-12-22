@@ -62,6 +62,8 @@ void CGProj::CGEditLightObject::initialize(CGAssetManager & am)
 	m_spotVis.prepareData(am.getShader(SHADER_SPOT_VISUALIZER));
 	m_spotVis.setOuterConeInRadians(glm::acos(m_spotLight.getOuterCutOff()), m_CommonlightFactors.AttnRadius);
 	m_spotVis.setInnerConeInRadians(glm::acos(m_spotLight.getInnerCutOff()), m_CommonlightFactors.AttnRadius);
+
+	m_spotShadowVis.setShader(am.getShader(SHADER_CG_LINE));
 	// Spot Light Init
 }
 
@@ -72,25 +74,6 @@ void CGProj::CGEditLightObject::setForwardShader(Shader * shader)
 
 void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm::mat4 & proj)
 {
-	if (m_CommonlightFactors.isShadowMapRender)
-	{
-		switch (m_LightType)
-		{
-		case EDIT_DIRECTION_LIGHT:
-		{
-			m_dirLight.debugDepthMapRender();
-			break;
-		}
-		case EDIT_POINT_LIGHT:
-			m_pointLight.debugDepthMapRender(view, proj);
-			break;
-		case EDIT_SPOT_LIGHT:
-			break;
-		}
-
-		return;
-	}
-
 	// Refer to the simpleColorRender Shader!
 	// Edit Object Render
 	glm::mat4 model(1.0);
@@ -165,10 +148,31 @@ void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm:
 				m_pointLight.getShadowFarPlane(), m_pointLight.getShadowNearPlane());
 			break;
 		case EDIT_SPOT_LIGHT:
+			CGPerFrustum f = m_spotLight.getPerFrustum();
+
+			m_spotShadowVis.render(view, proj,
+				m_CommonlightFactors.lightPosition, m_CommonlightFactors.lightDirection,
+				f.fov, f.aspect, f.nearP, f.farP);
 			break;
 		}
 	}
 	// Shadow Frustum Render
+
+	if (m_CommonlightFactors.isShadowMapRender)
+	{
+		switch (m_LightType)
+		{
+		case EDIT_DIRECTION_LIGHT:
+			m_dirLight.debugDepthMapRender(view, proj);
+			break;
+		case EDIT_POINT_LIGHT:
+			m_pointLight.debugDepthMapRender(view, proj);
+			break;
+		case EDIT_SPOT_LIGHT:
+			m_spotLight.debugDepthMapRender(view, proj);
+			break;
+		}
+	}
 }
 
 void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)

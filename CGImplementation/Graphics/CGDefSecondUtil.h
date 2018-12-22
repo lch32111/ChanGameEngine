@@ -11,14 +11,14 @@
 #define NR_GBUFFER_TEXTURES 5
 
  // Limit of the array size for each kind of light
-#define NR_DIR_LIGHTS 15
-#define NR_DIR_SHADOWS 3
+#define NR_DIR_LIGHTS 3
+#define NR_DIR_SHADOWS 2
 
-#define NR_POINT_LIGHTS 10
-#define NR_POINT_SHADOWS 3
+#define NR_POINT_LIGHTS 15
+#define NR_POINT_SHADOWS 4
 
 #define NR_SPOT_LIGHTS 10
-#define NR_SPOT_SHADOWS 0
+#define NR_SPOT_SHADOWS 4
 
 #define SHADOW_INDEX_NONE -1
 

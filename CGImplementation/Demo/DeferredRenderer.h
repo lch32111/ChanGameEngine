@@ -10,6 +10,8 @@
 #include <Graphics/CGEditObject.h>
 #include <Graphics/CGGizmo.h>
 #include <Graphics/CGAssetManager.h>
+#include <Graphics/CGEditProxyObject.h>
+#include <Graphics/CGEditLightObject.h>
 
 
 #include <GPED/CGBroadPhase.h>
@@ -56,7 +58,6 @@ namespace CGProj
 		Shader* Deferred_First_Shader;
 		Shader* Deferred_Second_Shader;
 		Shader* Deferred_Post_Shader;
-		Shader* Simple_Shader;
 		Shader* wireShader;
 
 		unsigned int gFBO;
@@ -103,15 +104,24 @@ namespace CGProj
 
 		std::vector<CGEditProxyObject> editProxies;
 		std::vector<CGEditLightObject> editLights;
-		int num_dir_light = 0;
-		int num_point_light = 0;
-		int num_spot_light = 0;
+
+		unsigned num_dir_light = 0;
+		unsigned num_dir_shadow = 0;
+		
+		unsigned num_point_light = 0;
+		unsigned num_point_shadow = 0;
+
+		unsigned num_spot_light = 0;
+		unsigned num_spot_shadow = 0;
 
 		CGEditObject* pickedEditBox = nullptr;
 		CGGizmo gizmoTest;
 
 		CGAssetManager assetManager;
+
+		float shadowBias = 0.005;
 	};
+
 }
 
 

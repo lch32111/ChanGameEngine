@@ -115,65 +115,30 @@ void CGProj::CGEditSpotLightVisualizer::setOuterConeInRadians(float outer_radian
 void CGProj::CGEditSpotLightVisualizer::render(const glm::mat4& view, const glm::mat4& proj, 
 	const glm::vec3& position, const glm::vec3& direction)
 {
-
 	glm::mat4 mvpMatrix = glm::mat4_cast(glm::quat(m_localDirection, direction)); // rotation
 	mvpMatrix[3] = glm::vec4(position, 1); // translate
 	mvpMatrix = proj * view * mvpMatrix;
 
 	// Outer Cone First
-	glUseProgram(m_shaderID);
-	glUniformMatrix4fv(glGetUniformLocation(m_shaderID, "mvpMatrix"), 1, GL_FALSE, &mvpMatrix[0][0]);
+	m_shader->use();
+	m_shader->setMat4("mvpMatrix", mvpMatrix);
 	
 	glBindVertexArray(m_VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 
 	// Outer Cone
-	glUniform3fv(glGetUniformLocation(m_shaderID, "Color"), 1, &m_OuterColor[0]);
+	m_shader->setVec3("Color", m_OuterColor);
 	glMultiDrawArrays(GL_LINE_STRIP, cutArray, cutNumArray, 2);
 
 	// Inner Cone
-	glUniform3fv(glGetUniformLocation(m_shaderID, "Color"), 1, &m_InnerColor[0]);
+	m_shader->setVec3("Color", m_InnerColor);
 	glMultiDrawArrays(GL_LINE_STRIP, cutArray + 2, cutNumArray + 2, 2);
 
 	glBindVertexArray(0);
 }
 
-void CGProj::CGEditSpotLightVisualizer::prepareData()
+void CGProj::CGEditSpotLightVisualizer::prepareData(Shader* shader)
 {
-	const char* t_vs = "#version 330 core\n" 
-	"layout(location = 0) in vec3 aPos;\n"
-	"layout(location = 1) in vec3 aNormal;\n"
-	"layout(location = 2) in vec2 aTexCoords;\n"
-	"uniform mat4 mvpMatrix;\n"
-	"void main()\n"
-	"{\n"
-		"gl_Position = mvpMatrix  * vec4(aPos, 1.0);\n"
-	"}";
-
-	const char* t_fs = 
-		"#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"uniform vec3 Color;\n"
-		"void main()\n"
-		"{\n"
-		"FragColor = vec4(Color, 1.0);\n"
-		"}";
-
-	unsigned vertex = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertex, 1, &t_vs, NULL);
-	glCompileShader(vertex);
-
-	unsigned fragment = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragment, 1, &t_fs, NULL);
-	glCompileShader(fragment);
-
-	// shader Program
-	m_shaderID = glCreateProgram();
-	glAttachShader(m_shaderID, vertex);
-	glAttachShader(m_shaderID, fragment);
-	glLinkProgram(m_shaderID);
-	glDeleteShader(vertex);
-	glDeleteShader(fragment);
+	m_shader = shader;
 
 	glGenVertexArrays(1, &m_VAO);
 	glGenBuffers(1, &m_VBO);

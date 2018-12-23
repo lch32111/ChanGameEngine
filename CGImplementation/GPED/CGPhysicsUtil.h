@@ -85,6 +85,28 @@ namespace CGProj
 
 		return aabb;
 	}
-}
 
+	static glm::mat4 safeLookAt(const glm::vec3& pos, const glm::vec3& eye, const glm::vec3& up)
+	{
+		glm::mat4 result(1.0);
+
+		glm::vec3 zaxis(glm::normalize(pos - eye));
+		glm::vec3 xaxis(safeNormalize(glm::cross(glm::vec3(0, 1, 0), zaxis)));
+		glm::vec3 yaxis(glm::cross(zaxis, xaxis));
+		result[0][0] = xaxis.x;
+		result[1][0] = xaxis.y;
+		result[2][0] = xaxis.z;
+		result[0][1] = yaxis.x;
+		result[1][1] = yaxis.y;
+		result[2][1] = yaxis.z;
+		result[0][2] = zaxis.x;
+		result[1][2] = zaxis.y;
+		result[2][2] = zaxis.z;
+		result[3][0] = -glm::dot(xaxis, pos);
+		result[3][1] = -glm::dot(yaxis, pos);
+		result[3][2] = -glm::dot(zaxis, pos);
+
+		return result;
+	}
+}
 #endif

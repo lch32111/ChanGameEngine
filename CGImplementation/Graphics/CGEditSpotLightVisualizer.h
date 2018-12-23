@@ -5,13 +5,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <Graphics/Shader.h>
 
 namespace CGProj
 {
 	class CGEditSpotLightVisualizer
 	{
 	public:
-		void prepareData();
+		void prepareData(Shader* shader);
 		void setInnerConeInRadians(float inner_radian, float radius);
 		void setOuterConeInRadians(float outer_radian, float radius);
 		void render(const glm::mat4& view, const glm::mat4& proj,
@@ -27,7 +28,7 @@ namespace CGProj
 		enum {e_maxVertices = 2 * 512};
 		glm::vec3 m_vertices[e_maxVertices];
 
-		unsigned m_shaderID;
+		Shader* m_shader;
 		unsigned m_VAO;
 		unsigned m_VBO;
 

@@ -28,6 +28,34 @@ Shader CGProj::CGAssetManager::getShader(CG_SHADER_ENUM _shaderEnum, char none =
 	return m_shaders[_shaderEnum];
 }
 
+Shader * CGProj::CGAssetManager::getGeoShader(CG_GEO_SHADER_ENUM _shaderEnum)
+{
+	if (m_geoShaders[_shaderEnum].isloadad == false)
+	{
+		if (m_geoShaders[_shaderEnum].loadShaderWithGeo() == false)
+		{
+			std::cout << "CG_ASSET_MANAGER::GETGEOSHADER::The number of Shader Enum : " << _shaderEnum << '\n';
+			return nullptr;
+		}
+	}
+
+	return &m_geoShaders[_shaderEnum];
+}
+
+Shader CGProj::CGAssetManager::getGeoShader(CG_GEO_SHADER_ENUM _shaderEnum, char none = 0)
+{
+	if (m_geoShaders[_shaderEnum].isloadad == false)
+	{
+		if (m_geoShaders[_shaderEnum].loadShaderWithGeo() == false)
+		{
+			std::cout << "CG_ASSET_MANAGER::GETGEOSHADER::The number of Shader Enum : " << _shaderEnum << '\n';
+			return Shader();
+		}
+	}
+
+	return m_geoShaders[_shaderEnum];
+}
+
 unsigned CGProj::CGAssetManager::getTexture(CG_TEXTURE_ENUM _textureEnum, bool gamma)
 {
 	// TODO: make texture class for on-demand process. TextureFromFile() is just loading the image...

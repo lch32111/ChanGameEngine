@@ -6,7 +6,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Shader.h"
+#include <Graphics/Shader.h>
+#include <Graphics/CGAssetManager.h>
 
 namespace CGProj
 {
@@ -14,13 +15,13 @@ namespace CGProj
 	{
 	public:
 		CGRenderLine();
-		CGRenderLine(const GLchar* vertexFile, const GLchar* fragFile);
-
+		CGRenderLine(CGAssetManager& am);
+		void setShader(Shader* shader);
 		void insertLine(const glm::vec3& From, const glm::vec3& To,
 			const glm::vec4& Color = glm::vec4(1.0));
-		void renderLine(const glm::mat4& view, const glm::mat4& proj, const float lineWidth);
+		void renderLine(const glm::mat4& view, const glm::mat4& proj, const float lineWidth = 1.f);
 	private:
-		Shader m_lineShader;
+		Shader* m_lineShader;
 
 		enum {e_maxVertices = 2 * 512};
 		glm::vec3 m_vertices[e_maxVertices];

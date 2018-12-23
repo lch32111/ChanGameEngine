@@ -79,7 +79,8 @@ namespace CGProj
 		glm::mat4 m_shadowLightSpaceMatrix;
 		/*** Shadow Properties ***/
 
-		void setShadowWidthHeight(unsigned w, unsigned h);
+		void setShadowWidthHeight(unsigned h);
+		void setShadowFarPlane(float farP);
 	};
 }
 

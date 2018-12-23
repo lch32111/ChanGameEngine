@@ -26,11 +26,11 @@ void CGProj::CGEditLightObject::initialize(CGAssetManager & am)
 	setAmbientColor(glm::vec3(0.1));
 	setDiffuseColor(glm::vec3(0.2));
 	setSpecularColor(glm::vec3(1.0));
-
+	m_CommonlightFactors.lightIntensity = 1.f;
 	m_CommonlightFactors.isRangeRender = false;
-	m_CommonlightFactors.AttnConstant = 1.0;
-	m_CommonlightFactors.AttnLinear = 0.7;
-	m_CommonlightFactors.AttnQuadratic = 1.0;
+	m_CommonlightFactors.AttnConstant = 1.f;
+	m_CommonlightFactors.AttnLinear = 0.7f;
+	m_CommonlightFactors.AttnQuadratic = 1.f;
 	updateRadius();
 
 	m_CommonlightFactors.isShadow = false;
@@ -248,6 +248,8 @@ void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
 	temp[0] = m_CommonlightFactors.lightSpecular.x, temp[1] = m_CommonlightFactors.lightSpecular.y, temp[2] = m_CommonlightFactors.lightSpecular.z;
 	ImGui::ColorEdit3("specular", temp);
 	m_CommonlightFactors.lightSpecular = { temp[0], temp[1], temp[2] };
+
+	ImGui::InputFloat("Light Intensity", &m_CommonlightFactors.lightIntensity);
 
 	// Shadow
 	ImGui::Checkbox("Shadow Cast", &m_CommonlightFactors.isShadow);
@@ -566,6 +568,7 @@ void CGProj::CGEditLightObject::renderShadowMap(std::vector<CGEditProxyObject>& 
 		m_pointLight.renderShadowMap(objects);
 		break;
 	case EDIT_SPOT_LIGHT:
+		m_spotLight.renderShadowMap(objects);
 		break;
 	}
 }

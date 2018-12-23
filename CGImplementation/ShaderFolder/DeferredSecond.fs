@@ -21,6 +21,7 @@ struct DirLight
     vec3 Ambient;
     vec3 Diffuse;
     vec3 Specular;
+	float Intensity;
 
     int ShadowIndex;
 };
@@ -38,6 +39,7 @@ struct PointLight {
     vec3 Ambient;
     vec3 Diffuse;
     vec3 Specular;
+	float Intensity;
 
     int ShadowIndex;
 };
@@ -55,6 +57,7 @@ struct SpotLight {
     float Linear;
     float Quadratic;
     float Radius;
+	float Intensity;
   
     // Light Color
     vec3 Ambient;
@@ -105,7 +108,7 @@ vec3 CalcCMPointLight(PointLight light, vec3 ambnt, vec3 albedo, vec3 spclr, flo
 vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal);
 float DirShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index);
 float PointShadowCalculation(vec3 fragpos, vec3 lightpos, int index);
-float SpotShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index);
+float SpotShadowCalculation(vec3 fragpos, int index);
 
 void main()
 {
@@ -191,7 +194,7 @@ vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, v
     if(light.ShadowIndex != SHADOW_INDEX_NONE)
 	    shadow = DirShadowCalculation(normal, lightDir, fragpos, light.ShadowIndex);
 
-    return (ambient + (1.0 - shadow) * (diffuse + specular));
+    return (ambient + (1.0 - shadow) * (diffuse + specular)) * light.Intensity;
 }
 
 vec3 CalcLMPointLight(PointLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal)
@@ -231,7 +234,7 @@ vec3 CalcLMPointLight(PointLight light, vec3 albedo, float spclr, float shinines
     if(light.ShadowIndex != SHADOW_INDEX_NONE)
 	    shadow = PointShadowCalculation(fragpos, light.Position, light.ShadowIndex);
 
-    return (ambient + (1.0 - shadow) * (diffuse + specular));
+    return (ambient + (1.0 - shadow) * (diffuse + specular)) * light.Intensity;
 }
 
 vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal)
@@ -274,9 +277,9 @@ vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess,
 
     float shadow = 0.0;
     if(light.ShadowIndex != SHADOW_INDEX_NONE)
-        shadow = SpotShadowCalculation(normal, lightDir, fragpos, light.ShadowIndex);
+        shadow = SpotShadowCalculation(fragpos, light.ShadowIndex);
 
-	return  (ambient + (1.0 - shadow) * (diffuse + specular));
+	return  (ambient + (1.0 - shadow) * (diffuse + specular)) * light.Intensity;
 }
 
 vec3 CalcCMDirLight(DirLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal)
@@ -297,7 +300,13 @@ vec3 CalcCMDirLight(DirLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float s
     vec3 ambient = light.Ambient * ambnt;
     vec3 diffuse = light.Diffuse * diff * albedo;
     vec3 specular = light.Specular * spec * spclr;
-    return (ambient + diffuse + specular);
+
+	// Calculate Shadow
+    float shadow = 0.f;
+    if(light.ShadowIndex != SHADOW_INDEX_NONE)
+	    shadow = DirShadowCalculation(normal, lightDir, fragpos, light.ShadowIndex);
+
+    return (ambient + (1.0 - shadow) * (diffuse + specular)) * light.Intensity;
 }
 
 vec3 CalcCMPointLight(PointLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal)
@@ -333,7 +342,11 @@ vec3 CalcCMPointLight(PointLight light, vec3 ambnt, vec3 albedo, vec3 spclr, flo
 	diffuse *= attenuation;
 	specular *= attenuation;
 	
-	return (ambient + diffuse + specular);
+    float shadow = 0.0;
+    if(light.ShadowIndex != SHADOW_INDEX_NONE)
+	    shadow = PointShadowCalculation(fragpos, light.Position, light.ShadowIndex);
+
+    return (ambient + (1.0 - shadow) * (diffuse + specular)) * light.Intensity;
 }
 
 vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal)
@@ -374,7 +387,11 @@ vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float
 	diffuse *= attenuation * spot_intensity;
 	specular *= attenuation * spot_intensity;
 
-	return  (ambient + diffuse + specular);
+    float shadow = 0.0;
+    if(light.ShadowIndex != SHADOW_INDEX_NONE)
+        shadow = SpotShadowCalculation(fragpos, light.ShadowIndex);
+
+	return  (ambient + (1.0 - shadow) * (diffuse + specular)) * light.Intensity;
 }
 
 float DirShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index)
@@ -440,7 +457,7 @@ float PointShadowCalculation(vec3 fragpos, vec3 lightpos, int index)
     return shadow;
 }
 
-float SpotShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index)
+float SpotShadowCalculation(vec3 fragpos, int index)
 {
     vec4 fragPosLightSpace = spotLightSpace[index] * vec4(fragpos, 1.0);
 
@@ -451,7 +468,7 @@ float SpotShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index)
 	projCoords = projCoords * 0.5 + 0.5;
 	
 	float currentDepth = projCoords.z;
-	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), spotBias[index]);
+	float bias = spotBias[index];
 
 	float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(spotShadowMap[index], 0);

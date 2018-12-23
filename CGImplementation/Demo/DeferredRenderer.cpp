@@ -150,7 +150,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	editLights[0].setSpecularColor(glm::vec3(0.5));
 
 	// Point Light
-	for (unsigned i = 1; i < 0; ++i)
+	for (unsigned i = 1; i < 5; ++i)
 	{
 		editLights.push_back(CGEditLightObject());
 		editLights[i].initialize(assetManager);

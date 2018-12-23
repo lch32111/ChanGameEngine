@@ -21,7 +21,7 @@ CGProj::CGEditSpotLight::CGEditSpotLight()
 
 	m_depthMapFBO = m_depthMapTexture = 0;
 	m_shadowWidth = m_shadowHeight = 1024;
-	m_shadowBias = 0.05;
+	m_shadowBias = 0.005;
 
 	m_perFOV = glm::radians(17.5f * 2); // same as the degreeof spot outer cutoff
 	m_perAspect = (float)m_shadowWidth / (float)m_shadowHeight;
@@ -37,6 +37,7 @@ CGProj::CGEditSpotLight::CGEditSpotLight()
 void CGProj::CGEditSpotLight::initialize(CGAssetManager & am, CGEditLightCommonFactor * factor)
 {
 	m_lightFactors = factor;
+	setShadowFarPlane(m_lightFactors->AttnRadius);
 
 	// Shadow Map initialization
 	m_DepthMapShader = am.getShader(SHADER_SPOT_SHADOW_MAP);
@@ -96,7 +97,7 @@ void CGProj::CGEditSpotLight::UIrenderForCommon(CGEditSpotLightVisualizer& spotV
 		spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_lightFactors->AttnRadius);
 
 	}
-	if (ImGui::SliderFloat("Out", &outer_Indegree, inner_Indegree, 45, "Outer Cutoff In Degree : %.2f"))
+	if (ImGui::SliderFloat("Out", &outer_Indegree, inner_Indegree, 90, "Outer Cutoff In Degree : %.2f"))
 	{
 		setOuterCutOffInDegree(outer_Indegree);
 		m_perFOV = glm::radians(outer_Indegree * 2);
@@ -109,6 +110,7 @@ void CGProj::CGEditSpotLight::UIrenderForCommon(CGEditSpotLightVisualizer& spotV
 	{
 		spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_lightFactors->AttnRadius);
 		spotVis.setOuterConeInRadians(glm::acos(m_SpotOuterCutOff), m_lightFactors->AttnRadius);
+		setShadowFarPlane(m_lightFactors->AttnRadius);
 	}
 	ImGui::SameLine();
 	ShowHelpMarker("If you control the attn parameters,\nthe light radius will be set automatically.\nHowever, If you want to set the radius manually,\nyou can set it manually");
@@ -120,22 +122,22 @@ void CGProj::CGEditSpotLight::UIrenderForCommon(CGEditSpotLightVisualizer& spotV
 		spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_lightFactors->AttnRadius);
 		spotVis.setOuterConeInRadians(glm::acos(m_SpotOuterCutOff), m_lightFactors->AttnRadius);
 		updateRadius();
+		setShadowFarPlane(m_lightFactors->AttnRadius);
 	}
 	if (ImGui::SliderFloat("quadratic", &m_lightFactors->AttnQuadratic, 0.000001, 1.0, "Attn Quadratic : %f"))
 	{
 		spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_lightFactors->AttnRadius);
 		spotVis.setOuterConeInRadians(glm::acos(m_SpotOuterCutOff), m_lightFactors->AttnRadius);
 		updateRadius();
+		setShadowFarPlane(m_lightFactors->AttnRadius);
 	}
 }
 
 void CGProj::CGEditSpotLight::UIrenderForShadow()
 {
-	int wharr[2] = { m_shadowWidth, m_shadowHeight };
-	if (ImGui::InputInt2("shadow width & height", wharr))
-	{
-		setShadowWidthHeight(wharr[0], wharr[1]);
-	}
+	int wharr = m_shadowWidth;
+	if (ImGui::InputInt("shadow width & height", &wharr))
+		setShadowWidthHeight(wharr);
 
 	ImGui::InputFloat("shadow near plane", &m_shadowNearPlane);
 	ImGui::InputFloat("shadow far plane", &m_shadowFarPlane);
@@ -158,6 +160,7 @@ void CGProj::CGEditSpotLight::setLightPropertyOnShader(Shader * shader, const st
 	shader->setVec3("spotLights[" + sLightIndex + "].Ambient", m_lightFactors->lightAmbient);
 	shader->setVec3("spotLights[" + sLightIndex + "].Diffuse", m_lightFactors->lightDiffuse);
 	shader->setVec3("spotLights[" + sLightIndex + "].Specular", m_lightFactors->lightSpecular);
+	shader->setFloat("spotLights[" + sLightIndex + "].Intensity", m_lightFactors->lightIntensity);
 	shader->setInt("spotLights[" + sLightIndex + "].ShadowIndex", SHADOW_INDEX_NONE);
 
 	if (m_lightFactors->isShadow && shadowIndex < NR_SPOT_SHADOWS)
@@ -274,10 +277,10 @@ void CGProj::CGEditSpotLight::updateRadius()
 		(2 * m_lightFactors->AttnQuadratic);
 }
 
-void CGProj::CGEditSpotLight::setShadowWidthHeight(unsigned w, unsigned h)
+void CGProj::CGEditSpotLight::setShadowWidthHeight(unsigned wh)
 {
-	m_shadowWidth = w;
-	m_shadowHeight = h;
+	m_shadowWidth = wh;
+	m_shadowHeight = wh;
 	m_perAspect = (float)m_shadowWidth / (float)m_shadowHeight;
 
 	// Set the texture setting again
@@ -289,4 +292,9 @@ void CGProj::CGEditSpotLight::setShadowWidthHeight(unsigned w, unsigned h)
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		assert(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void CGProj::CGEditSpotLight::setShadowFarPlane(float farP)
+{
+	m_shadowFarPlane = farP;
 }

@@ -23,6 +23,7 @@ namespace CGProj
 		glm::vec3 lightAmbient;
 		glm::vec3 lightDiffuse;
 		glm::vec3 lightSpecular;
+		float lightIntensity;
 
 		// Attenuation except Dir Light
 		bool isRangeRender;

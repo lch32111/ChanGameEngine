@@ -24,7 +24,7 @@ CGProj::CGEditDirLight::CGEditDirLight()
 	m_depthMapFBO = m_depthMapTexture = 0;
 	m_shadowWidth = m_shadowHeight = 1024;
 
-	m_shadowBias = 0.05;
+	m_shadowBias = 0.005;
 
 	m_shadowProjection = false; // Orthographic Projection
 
@@ -143,6 +143,7 @@ void CGProj::CGEditDirLight::setLightPropertyOnShader(Shader* shader,
 	shader->setVec3("dirLights[" + sLightIndex + "].Ambient", m_lightFactors->lightAmbient);
 	shader->setVec3("dirLights[" + sLightIndex + "].Diffuse", m_lightFactors->lightDiffuse);
 	shader->setVec3("dirLights[" + sLightIndex + "].Specular", m_lightFactors->lightSpecular);
+	shader->setFloat("dirLights[" + sLightIndex + "].Intensity", m_lightFactors->lightIntensity);
 	shader->setInt("dirLights[" + sLightIndex + "].ShadowIndex", SHADOW_INDEX_NONE);
 
 	// NR_DIR_SHADOW is limitation of shadow mapping texture

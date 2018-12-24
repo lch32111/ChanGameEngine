@@ -127,6 +127,7 @@
   <ItemGroup>
     <ClCompile Include="CG_Application.cpp" />
     <ClCompile Include="Demo\DeferredRenderer.cpp" />
+    <ClCompile Include="Demo\SimpleTerrainDemo.cpp" />
     <ClCompile Include="Demo\TryFirst.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="GPED\CGBroadPhase.cpp" />
@@ -178,10 +179,12 @@
     <ClCompile Include="Imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="Imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Terrain\CGTerrain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h" />
     <ClInclude Include="Demo\DeferredRenderer.h" />
+    <ClInclude Include="Demo\SimpleTerrainDemo.h" />
     <ClInclude Include="Demo\TryFirst.h" />
     <ClInclude Include="GPED\CGBroadPhase.h" />
     <ClInclude Include="GPED\CGContactManager.h" />
@@ -241,6 +244,7 @@
     <ClInclude Include="Imgui\imstb_textedit.h" />
     <ClInclude Include="Imgui\imstb_truetype.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="Terrain\CGTerrain.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderFolder\CGDirDepthMap.fs" />

@@ -326,6 +326,7 @@ void CGProj::TerrainDemo::update(float deltaTime, float lastFrame)
 {
 	test3.key(app_window, deltaTime);
 	test3.updateImgui();
+	test3.updateSimulation(deltaTime, lastFrame);
 }
 
 void CGProj::TerrainDemo::display()

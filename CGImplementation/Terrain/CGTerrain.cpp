@@ -132,6 +132,7 @@ void CGProj::CGTerrain::initialize(CGAssetManager & am)
 	delete[] indices;
 
 	m_lineShader = am.getShader(SHADER_CG_LINE);
+	
 }
 
 void CGProj::CGTerrain::render(const glm::mat4 & view, const glm::mat4 & proj)

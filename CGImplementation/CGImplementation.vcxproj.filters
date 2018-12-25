@@ -58,8 +58,11 @@
     <Filter Include="Demo\Terrain Demo">
       <UniqueIdentifier>{4d40ea3e-cb8a-4413-82b6-7f6f55053aff}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Terrain">
+    <Filter Include="Terrain Header">
       <UniqueIdentifier>{3fb7136c-72b6-4903-91d5-ecd881d37247}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Terrain Source">
+      <UniqueIdentifier>{18f226a6-4edc-46f0-8efe-bc8d7a495248}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -222,11 +225,11 @@
     <ClCompile Include="Graphics\CGSpotShadowFrustumVisualizer.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
-    <ClCompile Include="Terrain\CGTerrain.cpp">
-      <Filter>Terrain</Filter>
-    </ClCompile>
     <ClCompile Include="Demo\SimpleTerrainDemo.cpp">
       <Filter>Demo\Terrain Demo</Filter>
+    </ClCompile>
+    <ClCompile Include="Terrain\CGTerrain.cpp">
+      <Filter>Terrain Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -414,10 +417,16 @@
       <Filter>Graphics Header</Filter>
     </ClInclude>
     <ClInclude Include="Terrain\CGTerrain.h">
-      <Filter>Terrain</Filter>
+      <Filter>Terrain Header</Filter>
     </ClInclude>
     <ClInclude Include="Demo\SimpleTerrainDemo.h">
       <Filter>Demo\Terrain Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain\CGValueNoise1D.h">
+      <Filter>Terrain Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain\CGTerrainUtil.h">
+      <Filter>Terrain Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

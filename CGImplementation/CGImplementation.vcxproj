@@ -245,6 +245,8 @@
     <ClInclude Include="Imgui\imstb_truetype.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Terrain\CGTerrain.h" />
+    <ClInclude Include="Terrain\CGTerrainUtil.h" />
+    <ClInclude Include="Terrain\CGValueNoise1D.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderFolder\CGDirDepthMap.fs" />

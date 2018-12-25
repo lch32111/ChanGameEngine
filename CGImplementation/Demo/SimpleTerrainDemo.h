@@ -7,6 +7,7 @@
 #include <Graphics/CGAssetManager.h>
 
 #include <Terrain/CGTerrain.h>
+#include <Terrain/CGValueNoise1D.h>
 
 
 namespace CGProj
@@ -43,6 +44,10 @@ namespace CGProj
 		CGAssetManager assetManager;
 
 		CGTerrain myTerrain;
+
+		CGValueNoise1D testNoise;
+		float cameraAccum = 0;
+
 	};
 }
 #endif

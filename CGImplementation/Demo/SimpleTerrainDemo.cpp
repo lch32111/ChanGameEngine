@@ -7,6 +7,7 @@ void CGProj::SimpleTerrainDemo::initGraphics(int width, int height)
 	assetManager.assetInit();
 	camera.Position = glm::vec3(10, 10, 10);
 	myTerrain.initialize(assetManager);
+	testNoise.initialize();
 }
 
 void CGProj::SimpleTerrainDemo::initImgui()
@@ -16,6 +17,7 @@ void CGProj::SimpleTerrainDemo::initImgui()
 void CGProj::SimpleTerrainDemo::deinit()
 {
 	myTerrain.destroy();
+	testNoise.destroy();
 }
 
 void CGProj::SimpleTerrainDemo::updateImgui()
@@ -32,7 +34,10 @@ void CGProj::SimpleTerrainDemo::updateImgui()
 
 void CGProj::SimpleTerrainDemo::updateSimulation(float deltaTime, float lastFrame)
 {
+	cameraAccum += deltaTime;
+	camera.Position.y = (testNoise.eval(cameraAccum) * 2  - 1) * 3 + 3;
 
+	if (cameraAccum > 1000) cameraAccum = 0.f;
 }
 
 void CGProj::SimpleTerrainDemo::display(int width, int height)

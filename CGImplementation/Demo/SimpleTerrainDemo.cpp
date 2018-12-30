@@ -5,9 +5,8 @@
 void CGProj::SimpleTerrainDemo::initGraphics(int width, int height)
 {
 	assetManager.assetInit();
-	camera.Position = glm::vec3(10, 10, 10);
+	camera.Position = glm::vec3(0, 0, 0);
 	myTerrain.initialize(assetManager);
-	testNoise.initialize();
 }
 
 void CGProj::SimpleTerrainDemo::initImgui()
@@ -17,7 +16,6 @@ void CGProj::SimpleTerrainDemo::initImgui()
 void CGProj::SimpleTerrainDemo::deinit()
 {
 	myTerrain.destroy();
-	testNoise.destroy();
 }
 
 void CGProj::SimpleTerrainDemo::updateImgui()
@@ -28,22 +26,26 @@ void CGProj::SimpleTerrainDemo::updateImgui()
 
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Camera Position %.1f %.1f %.1f", camera.Position.x, camera.Position.y, camera.Position.z);
+	ImGui::Checkbox("Wire Mode", &wireDraw);
+
+	
 
 	ImGui::End();
 }
 
 void CGProj::SimpleTerrainDemo::updateSimulation(float deltaTime, float lastFrame)
 {
-	cameraAccum += deltaTime;
-	camera.Position.y = (testNoise.eval(cameraAccum) * 2  - 1) * 3 + 3;
 
-	if (cameraAccum > 1000) cameraAccum = 0.f;
 }
 
 void CGProj::SimpleTerrainDemo::display(int width, int height)
 {
 	glm::mat4 view = camera.GetViewMatrix();
 	glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 1000.f);
+
+
+	if(wireDraw) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	myTerrain.render(view, projection);
 }

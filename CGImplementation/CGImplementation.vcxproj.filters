@@ -428,6 +428,9 @@
     <ClInclude Include="Terrain\CGTerrainUtil.h">
       <Filter>Terrain Header</Filter>
     </ClInclude>
+    <ClInclude Include="Terrain\CGPerlinNoise.h">
+      <Filter>Terrain Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderFolder\DeferredFirst.fs">
@@ -527,6 +530,12 @@
       <Filter>ShaderFolder</Filter>
     </None>
     <None Include="ShaderFolder\CGSpotDepthMapDebugRender.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGSimpleTerrain.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGSimpleTerrain.fs">
       <Filter>ShaderFolder</Filter>
     </None>
   </ItemGroup>

@@ -41,13 +41,11 @@ namespace CGProj
 		bool GameControl = true;
 		bool mouseClick = false;
 
+		bool wireDraw = false;
+
 		CGAssetManager assetManager;
-
+		
 		CGTerrain myTerrain;
-
-		CGValueNoise1D testNoise;
-		float cameraAccum = 0;
-
 	};
 }
 #endif

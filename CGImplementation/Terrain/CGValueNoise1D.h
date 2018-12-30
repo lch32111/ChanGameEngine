@@ -44,23 +44,6 @@ namespace CGProj
 	private:
 		unsigned kMaxVertices;
 		float* r;
-
-		float consineRemap(const float& a, const float& b, const float& t)
-		{
-			assert(t >= 0 && t <= 1);
-			float tRemapCosine = (1 - std::cosf(t * glm::pi<float>())) * 0.5f;
-			return lerp(a, b, tRemapCosine);
-		}
-
-		float smoothstepRemap(const float& a, const float& b, const float& t)
-		{
-			// float tRemapSmoothstep = t * t * (3 - 2 * t);
-
-			// Ken Perlin ver.
-			float t3 = std::powf(t, 3);
-			float tRemapSmoothstep = 6 * t3 * t * t - 15.f * t3 * t + 10 * t3;
-			return lerp(a, b, tRemapSmoothstep);
-		}
 	};
 }
 

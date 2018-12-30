@@ -3,6 +3,7 @@
 #define __CG_TERRAIN_H__
 
 #include <Graphics/CGAssetManager.h>
+#include <Terrain/CGPerlinNoise.h>
 
 namespace CGProj
 {
@@ -16,15 +17,17 @@ namespace CGProj
 		
 		void destroy();
 	private:
-		unsigned m_terrainWidth, m_terrainHeight;
-		unsigned m_vertexCount;
-		unsigned m_indexCount;
+		unsigned m_terrainWidth, m_terrainHeight, m_terrainDepth;
+		unsigned m_terrainSubWidth, m_terrainSubDepth;
+		
+		unsigned m_gridVertexCount;
+		unsigned m_indicesCount;
 
 		unsigned m_VAO;
-		unsigned m_VBO;
+		unsigned m_VBO[3];
 		unsigned m_EBO;
 
-		Shader* m_lineShader;
+		Shader* m_terrainShader;
 	};
 }
 

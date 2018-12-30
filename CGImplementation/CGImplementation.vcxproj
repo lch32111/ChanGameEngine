@@ -244,6 +244,7 @@
     <ClInclude Include="Imgui\imstb_textedit.h" />
     <ClInclude Include="Imgui\imstb_truetype.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="Terrain\CGPerlinNoise.h" />
     <ClInclude Include="Terrain\CGTerrain.h" />
     <ClInclude Include="Terrain\CGTerrainUtil.h" />
     <ClInclude Include="Terrain\CGValueNoise1D.h" />
@@ -264,6 +265,8 @@
     <None Include="ShaderFolder\CGPointDepthMapDebugRender.vs" />
     <None Include="ShaderFolder\CGPointVisualizer.fs" />
     <None Include="ShaderFolder\CGPointVisualizer.vs" />
+    <None Include="ShaderFolder\CGSimpleTerrain.fs" />
+    <None Include="ShaderFolder\CGSimpleTerrain.vs" />
     <None Include="ShaderFolder\CGSpotDepthMap.fs" />
     <None Include="ShaderFolder\CGSpotDepthMap.vs" />
     <None Include="ShaderFolder\CGSpotDepthMapDebugRender.fs" />

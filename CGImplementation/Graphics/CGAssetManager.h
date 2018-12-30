@@ -38,6 +38,7 @@ namespace CGProj
 			m_shaders[SHADER_POINT_SHADOW_MAP_DEBUG_RENDER] = Shader("ShaderFolder/CGPointDepthMapDebugRender.vs", "ShaderFolder/CGPointDepthMapDebugRender.fs");
 			m_shaders[SHADER_SPOT_SHADOW_MAP] = Shader("ShaderFolder/CGSpotDepthMap.vs", "ShaderFolder/CGSpotDepthMap.fs");
 			m_shaders[SHADER_SPOT_SHADOW_MAP_DEBUG_RENDER] = Shader("ShaderFolder/CGSpotDepthMapDebugRender.vs", "ShaderFolder/CGSpotDepthMapDebugRender.fs");
+			m_shaders[SHADER_SIMPLE_TERRAIN] = Shader("ShaderFolder/CGSimpleTerrain.vs", "ShaderFolder/CGSimpleTerrain.fs");
 
 			m_geoShaders[SHADER_GEO_POINT_SHADOW_MAP] = Shader("ShaderFolder/CGPointDepthMap.vs", "ShaderFolder/CGPointDepthMap.gs", "ShaderFolder/CGPointDepthMap.fs");
 

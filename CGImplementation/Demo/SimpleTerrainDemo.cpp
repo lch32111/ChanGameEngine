@@ -6,7 +6,7 @@ void CGProj::SimpleTerrainDemo::initGraphics(int width, int height)
 {
 	assetManager.assetInit();
 	camera.Position = glm::vec3(0, 0, 0);
-	myTerrain.initialize(assetManager);
+	myTerrain.initializeWithGenerator(assetManager);
 }
 
 void CGProj::SimpleTerrainDemo::initImgui()
@@ -47,7 +47,7 @@ void CGProj::SimpleTerrainDemo::display(int width, int height)
 	if(wireDraw) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	myTerrain.render(view, projection);
+	myTerrain.render(view, projection, camera.Position);
 }
 
 void CGProj::SimpleTerrainDemo::key(GLFWwindow * app_window, float deltaTime)

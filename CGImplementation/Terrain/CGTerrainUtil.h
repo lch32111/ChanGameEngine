@@ -28,17 +28,12 @@ namespace CGProj
 		return lerp(a, b, tRemapCosine);
 	}
 
-	inline float smoothStep(const float& t)
-	{
-		// basic smoothstep
-		return t * t * (3 - 2 * t);
+	// basic smoothstep
+	inline float smoothStep(const float& t)	{ return t * t * (3 - 2 * t); }
+	inline float smoothstepDeriv(const float& t) { return t * (6 - 6 * t); }
 
-		/*
-		// Ken Perlin SmoothStep
-		float t3 = std::powf(t, 3);
-		return 6 * t3 * t * t - 15.f * t3 * t + 10 * t3;
-		*/
-	}
+	inline float quintic(const float& t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+	inline float quinticDeriv(const float& t) { return 30 * t * t * (t * (t - 2) + 1); }
 }
 
 #endif

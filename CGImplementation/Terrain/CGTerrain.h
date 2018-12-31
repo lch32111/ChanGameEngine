@@ -12,8 +12,9 @@ namespace CGProj
 	public:
 		CGTerrain();
 		
-		void initialize(CGAssetManager& am);
-		void render(const glm::mat4& view, const glm::mat4& proj);
+		void initializeWithImage(CGAssetManager& am);
+		void initializeWithGenerator(CGAssetManager& am);
+		void render(const glm::mat4& view, const glm::mat4& proj, const glm::vec3& campos);
 		
 		void destroy();
 	private:

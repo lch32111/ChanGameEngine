@@ -4,6 +4,8 @@
 
 #include <Graphics/CGAssetManager.h>
 #include <Terrain/CGPerlinNoise.h>
+#include <Graphics/CGSizableRenderLine.h>
+#include <Graphics/CGRenderLine.h>
 
 namespace CGProj
 {
@@ -29,6 +31,8 @@ namespace CGProj
 		unsigned m_EBO;
 
 		Shader* m_terrainShader;
+
+		unsigned m_testTexture;
 	};
 }
 

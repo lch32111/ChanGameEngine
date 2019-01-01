@@ -167,6 +167,7 @@
     <ClCompile Include="Graphics\CGGizmo.cpp" />
     <ClCompile Include="Graphics\CGPointShadowFrustumVisualizer.cpp" />
     <ClCompile Include="Graphics\CGRenderLine.cpp" />
+    <ClCompile Include="Graphics\CGSizableRenderLine.cpp" />
     <ClCompile Include="Graphics\CGSpotShadowFrustumVisualizer.cpp" />
     <ClCompile Include="Graphics\chanEulerCamera.cpp" />
     <ClCompile Include="Graphics\chanQuatCamera.cpp" />
@@ -228,6 +229,7 @@
     <ClInclude Include="Graphics\CGGizmo.h" />
     <ClInclude Include="Graphics\CGPointShadowFrustumVisualizer.h" />
     <ClInclude Include="Graphics\CGRenderLine.h" />
+    <ClInclude Include="Graphics\CGSizableRenderLine.h" />
     <ClInclude Include="Graphics\CGSpotShadowFrustumVisualizer.h" />
     <ClInclude Include="Graphics\chanEulerCamera.h" />
     <ClInclude Include="Graphics\chanQuatCamera.h" />

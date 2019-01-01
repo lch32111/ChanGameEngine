@@ -6,7 +6,8 @@ void CGProj::SimpleTerrainDemo::initGraphics(int width, int height)
 {
 	assetManager.assetInit();
 	camera.Position = glm::vec3(0, 0, 0);
-	myTerrain.initializeWithGenerator(assetManager);
+	myTerrain.initializeWithImage(assetManager);
+	// myTerrain.initializeWithGenerator(assetManager);
 }
 
 void CGProj::SimpleTerrainDemo::initImgui()

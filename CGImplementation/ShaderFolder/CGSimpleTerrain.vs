@@ -10,7 +10,6 @@ uniform mat4 mvpMatrix;
 out vec3 fragPos;
 out vec3 normal;
 out vec2 TexCoords;
-out float ypos;
 
 void main()
 {
@@ -18,5 +17,4 @@ void main()
 	fragPos = aPos;
 	normal = aNormal;
 	TexCoords = aTexCoords;
-	ypos = aPos.y;
 }

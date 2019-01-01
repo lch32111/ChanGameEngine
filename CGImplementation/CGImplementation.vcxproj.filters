@@ -231,6 +231,9 @@
     <ClCompile Include="Terrain\CGTerrain.cpp">
       <Filter>Terrain Source</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\CGSizableRenderLine.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -430,6 +433,9 @@
     </ClInclude>
     <ClInclude Include="Terrain\CGPerlinNoise.h">
       <Filter>Terrain Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGSizableRenderLine.h">
+      <Filter>Graphics Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

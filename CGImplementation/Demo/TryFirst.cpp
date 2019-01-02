@@ -26,7 +26,6 @@ void CGProj::TryFirst::initGraphics()
 	// cManager = GPED::ContactManager(200);
 
 	// Initialise the box
-	GPED::real z = 20.0f;
 	GPED::Random ranGen(334455);
 	for (Box *box = boxData; box < boxData + boxes; box++)
 	{

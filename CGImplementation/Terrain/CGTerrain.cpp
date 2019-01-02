@@ -11,8 +11,62 @@ CGProj::CGTerrain::CGTerrain()
 	m_indicesCount((m_terrainSubWidth + 1) * 2 * m_terrainSubDepth + (m_terrainSubWidth - 1) * 2),
 	m_VAO(0), m_VBO{ 0, 0, 0 }, m_EBO(0)
 {
-	// The comments for the last term of the indicesCount variable
-	// the last term with plus is for the degenerate case of triangle_strip
+	// This is the comment for the last term of the indicesCount variable!
+	// the last term is for the degenerate case of triangle_strip
+}
+
+void CGProj::CGTerrain::initialize(bool imageOrGenerator, CGAssetManager& am)
+{
+	// Graphics Init
+	imageOrGenerator ? initializeWithImage(am) : initializeWithGenerator(am);
+
+	// Physics Init
+	initializePhysics();
+}
+
+void CGProj::CGTerrain::destroy()
+{
+	glDeleteVertexArrays(1, &m_VAO);
+	glDeleteBuffers(3, m_VBO);
+	glDeleteBuffers(1, &m_EBO);
+
+	delete[] m_HeightData;
+}
+
+
+void CGProj::CGTerrain::render(const glm::mat4 & view, const glm::mat4 & proj, const glm::vec3& campos)
+{
+	glm::mat4 model(1.0);
+	m_terrainShader->use();
+	m_terrainShader->setMat4("mvpMatrix", proj * view * model);
+	m_terrainShader->setVec3("cameraPos", campos);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_testTexture);
+
+	glBindVertexArray(m_VAO);
+	glDrawElements(GL_TRIANGLE_STRIP, m_indicesCount, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
+
+unsigned CGProj::CGTerrain::getProxyId()
+{
+	return m_proxyId;
+}
+
+void CGProj::CGTerrain::setProxyId(unsigned id)
+{
+	m_proxyId = id;
+}
+
+GPED::c3AABB CGProj::CGTerrain::getAABB()
+{
+	return m_localAABB;
+}
+
+void CGProj::CGTerrain::getAABB(GPED::c3AABB & out)
+{
+	out = m_localAABB;
 }
 
 void CGProj::CGTerrain::initializeWithImage(CGAssetManager & am)
@@ -26,6 +80,7 @@ void CGProj::CGTerrain::initializeWithImage(CGAssetManager & am)
 	unsigned char* data = stbi_load("ImageFolder/perlinTest.png", &textureX, &textureY, &textureChannel, 0);
 
 	glm::vec3* vertices = new glm::vec3[m_gridVertexCount];
+	m_HeightData = new float[m_gridVertexCount];
 	glm::vec3* normals = new glm::vec3[m_gridVertexCount];
 	glm::vec2* textures = new glm::vec2[m_gridVertexCount];
 	unsigned* indices = new unsigned[m_indicesCount];
@@ -42,21 +97,22 @@ void CGProj::CGTerrain::initializeWithImage(CGAssetManager & am)
 		{
 			unsigned Index = i + (m_terrainSubWidth + 1) * j;
 
-			vertices[Index] = 
+			vertices[Index] =
 				glm::vec3
 				(
 					m_terrainWidth * (i * invSubWidth - 0.5f),
 					0,
 					m_terrainDepth * (j * invSubDepth - 0.5f)
 				);
-			
+
 			unsigned color = data[(i * pixelWidth + j * pixelHeight * textureX) * textureChannel];
 			float height = ((color / 255.f) - 0.5f) * m_terrainHeight;
 			vertices[Index].y = height;
+			m_HeightData[Index] = height;
 			textures[Index] = glm::vec2(i * invSubWidth, j * invSubDepth);
 		}
 	}
-	
+
 	// Normals
 	for (unsigned j = 0; j <= m_terrainSubDepth; ++j)
 	{
@@ -73,7 +129,7 @@ void CGProj::CGTerrain::initializeWithImage(CGAssetManager & am)
 			float centerV = vertices[centerIndex].y;
 			float rightV = vertices[rightIndex].y;
 			float downV = vertices[downIndex].y;
-			
+
 			// calculate the normal using the gradient vector of partial derivative math
 			normals[centerIndex] = glm::normalize(glm::vec3((rightV - centerV) *  -1.f, 1.f, (downV - centerV) * -1.f));
 		}
@@ -96,7 +152,7 @@ void CGProj::CGTerrain::initializeWithImage(CGAssetManager & am)
 			}
 		}
 	}
-	
+
 	// Tell the OpenGL
 	glGenVertexArrays(1, &m_VAO);
 	glGenBuffers(3, m_VBO);
@@ -120,7 +176,7 @@ void CGProj::CGTerrain::initializeWithImage(CGAssetManager & am)
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * m_indicesCount, &indices[0], GL_STATIC_DRAW);
-	
+
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -137,6 +193,7 @@ void CGProj::CGTerrain::initializeWithGenerator(CGAssetManager & am)
 	m_terrainShader = am.getShader(SHADER_SIMPLE_TERRAIN);
 
 	glm::vec3* vertices = new glm::vec3[m_gridVertexCount];
+	m_HeightData = new float[m_gridVertexCount];
 	glm::vec3* normals = new glm::vec3[m_gridVertexCount];
 	glm::vec2* textures = new glm::vec2[m_gridVertexCount];
 	unsigned* indices = new unsigned[m_indicesCount];
@@ -164,7 +221,9 @@ void CGProj::CGTerrain::initializeWithGenerator(CGAssetManager & am)
 			glm::vec3 p = vertices[Index];
 			p *= 0.24;
 			float perlinHeight = (perlin.eval(p, derivs) + 1.f) * 0.5f;
-			vertices[Index].y = (perlinHeight - 0.5f) * m_terrainHeight;
+			perlinHeight = (perlinHeight - 0.5f) * m_terrainHeight;
+			vertices[Index].y = perlinHeight;
+			m_HeightData[Index] = perlinHeight;
 
 			// Analytical normal from partial derivative
 			normals[Index] = glm::normalize(glm::vec3(-derivs.x, 1.f, -derivs.z));
@@ -224,24 +283,28 @@ void CGProj::CGTerrain::initializeWithGenerator(CGAssetManager & am)
 	delete[] vertices;
 }
 
-void CGProj::CGTerrain::render(const glm::mat4 & view, const glm::mat4 & proj, const glm::vec3& campos)
+void CGProj::CGTerrain::initializePhysics()
 {
-	glm::mat4 model(1.0);
-	m_terrainShader->use();
-	m_terrainShader->setMat4("mvpMatrix", proj * view * model);
-	m_terrainShader->setVec3("cameraPos", campos);
+	m_localAABB.min = glm::vec3(m_terrainWidth * -0.5, 0, m_terrainDepth * -0.5);
+	m_localAABB.max = m_localAABB.min * -1.f;
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_testTexture);
+	// Find min/max height to make fitAABB of the terrain
+	float minHeight = FLT_MAX;
+	float maxHeight = -FLT_MAX;
+	for (unsigned i = 0; i < m_gridVertexCount; ++i)
+	{
+		float height = m_HeightData[i];
 
-	glBindVertexArray(m_VAO);
-	glDrawElements(GL_TRIANGLE_STRIP, m_indicesCount, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
+		if (minHeight > height) minHeight = height;
+		if (maxHeight < height) maxHeight = height;
+	}
+
+	m_localAABB.min.y = minHeight;
+	m_localAABB.max.y = maxHeight;
+	// Find min/max height to make fitAABB of the terrain
 }
 
-void CGProj::CGTerrain::destroy()
+float CGProj::CGTerrain::getHeight(unsigned x, unsigned z)
 {
-	glDeleteVertexArrays(1, &m_VAO);
-	glDeleteBuffers(3, m_VBO);
-	glDeleteBuffers(1, &m_EBO);
+	return m_HeightData[x + (m_terrainSubWidth + 1) * z];
 }

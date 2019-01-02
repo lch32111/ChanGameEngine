@@ -21,7 +21,8 @@ namespace GPED
 		{
 			UNDECLARED = 0,
 			primitive_sphere,
-			primitive_box
+			primitive_box,
+			primitive_mesh
 		};
 		primitiveType m_primitiveType;
 
@@ -180,6 +181,15 @@ namespace GPED
 		}
 	};
 
+	class CollisionMesh : public CollisionPrimitive
+	{
+	public:
+		CollisionMesh()
+		{
+			CollisionPrimitive::m_primitiveType = primitive_mesh;
+		}
+	};
+
 	/**
 	* A wrapper class that holds fast intersection tests. These
 	* can be used to drive the coarse collisiondetection system or
@@ -224,6 +234,8 @@ namespace GPED
 		);
 	};
 
+	// Legacy structure for collision data. 
+	// Now Collision Manager is replacing the role of this class
 	/**
 	 * A helper structure that contains information for the detector to use
 	 * in building its contact data.

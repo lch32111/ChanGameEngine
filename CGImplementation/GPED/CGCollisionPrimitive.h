@@ -10,6 +10,14 @@ namespace CGProj
 	class CGCollisionEarlyExit;
 	class CGCollisionNarrow;
 
+	enum CollisionPrimitiveType
+	{
+		COLLISION_PRIMITIVE_UNDECLARED = 0,
+		COLLISION_PRIMITIVE_SPHERE,
+		COLLISION_PRIMITIVE_OBB,
+		COLLISION_PRIMITIVE_MESH
+	};
+
 	/**
 	* Represents a primitive to detect collisions against.
 	*/
@@ -26,14 +34,7 @@ namespace CGProj
 	public:
 		CGCollisionPrimitive();
 
-		enum primitiveType
-		{
-			UNDECLARED = 0,
-			primitive_sphere,
-			primitive_box,
-			primitive_mesh
-		};
-		primitiveType m_primitiveType;
+		CollisionPrimitiveType m_primitiveType;
 
 		/**
 		 * The rigid body that is represented by this primitive.

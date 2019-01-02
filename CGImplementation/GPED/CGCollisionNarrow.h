@@ -22,13 +22,6 @@ namespace CGProj
 	class CGCollisionNarrow
 	{
 	public:
-		static unsigned NarrowCollisionCallback
-		(
-			const CGCollisionPrimitive* a,
-			const CGCollisionPrimitive* b,
-			CGContactManager* data
-		);
-
 		static unsigned RayCollisionCallback
 		(
 			GPED::c3RayOutput& output,

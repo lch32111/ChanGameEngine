@@ -2,5 +2,5 @@
 
 CGProj::CollisionMesh::CollisionMesh()
 {
-	CGCollisionPrimitive::m_primitiveType = primitive_mesh;
+	CGCollisionPrimitive::m_primitiveType = COLLISION_PRIMITIVE_MESH;
 }

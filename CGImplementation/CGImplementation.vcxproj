@@ -193,6 +193,7 @@
     <ClInclude Include="Demo\SimpleTerrainDemo.h" />
     <ClInclude Include="Demo\TryFirst.h" />
     <ClInclude Include="GPED\CGBroadPhase.h" />
+    <ClInclude Include="GPED\CGCollisionAlgorithm.h" />
     <ClInclude Include="GPED\CGCollisionEarlyExit.h" />
     <ClInclude Include="GPED\CGCollisionMesh.h" />
     <ClInclude Include="GPED\CGCollisionNarrow.h" />

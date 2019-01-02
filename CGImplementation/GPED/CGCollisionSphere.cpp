@@ -2,7 +2,7 @@
 
 CGProj::CGCollisionSphere::CGCollisionSphere()
 {
-	CGCollisionPrimitive::m_primitiveType = primitive_sphere;
+	CGCollisionPrimitive::m_primitiveType = COLLISION_PRIMITIVE_SPHERE;
 	radius = GPED::real(0.0);
 }
 

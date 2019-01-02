@@ -406,7 +406,7 @@ void CGProj::TryFirst::generateContacts(CGContactManager& cData)
 	// std::cout << t_pair.size() << '\n';
 	for (int i = 0; i < t_pair.size(); ++i)
 	{
-		CGCollisionNarrow::NarrowCollisionCallback(t_pair[i].first, t_pair[i].second, &cData);
+		cAlgo.findNarrowAlgorithmAndProcess(t_pair[i].first, t_pair[i].second, &cData);
 	}
 
 	for (int i = 0; i < boxes; ++i)

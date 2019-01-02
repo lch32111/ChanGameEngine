@@ -2,7 +2,7 @@
 
 CGProj::CGCollisionOBB::CGCollisionOBB()
 {
-	CGCollisionPrimitive::m_primitiveType = primitive_box;
+	CGCollisionPrimitive::m_primitiveType = COLLISION_PRIMITIVE_OBB;
 }
 
 GPED::c3AABB CGProj::CGCollisionOBB::makeAABB() const

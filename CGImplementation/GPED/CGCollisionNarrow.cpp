@@ -2,59 +2,21 @@
 #include <GPED/CGCollisionEarlyExit.h>
 #include <GPED/CGCollisionUtil.h>
 
-unsigned CGProj::CGCollisionNarrow::NarrowCollisionCallback
-(const CGCollisionPrimitive * a, const CGCollisionPrimitive * b, CGContactManager * data)
-{
-	int aKey = 0;
-	switch (a->m_primitiveType)
-	{
-	case CGCollisionPrimitive::primitiveType::primitive_sphere:
-		aKey = 0;
-		break;
-	case CGCollisionPrimitive::primitiveType::primitive_box:
-		aKey = 1;
-		break;
-	default:
-		assert(0);
-	}
-
-	int bKey = 0;
-	switch (b->m_primitiveType)
-	{
-	case CGCollisionPrimitive::primitiveType::primitive_sphere:
-		bKey = 0;
-		break;
-	case CGCollisionPrimitive::primitiveType::primitive_box:
-		bKey = 1;
-		break;
-	}
-
-	if (aKey & bKey) return OBBAndOBB(*(CGCollisionOBB*)a, *(CGCollisionOBB*)b, data);
-	if (!aKey & !bKey) return sphereAndSphere(*(CGCollisionSphere*)a, *(CGCollisionSphere*)b, data);
-	if (aKey) return OBBAndSphere(*(CGCollisionOBB*)a, *(CGCollisionSphere*)b, data);
-	else return OBBAndSphere(*(CGCollisionOBB*)b, *(CGCollisionSphere*)a, data);
-}
-
 unsigned CGProj::CGCollisionNarrow::RayCollisionCallback(
 	GPED::c3RayOutput & output, const GPED::c3RayInput & input, const CGCollisionPrimitive * primitive)
 {
 	assert(primitive);
 
-	int key = 0;
 	switch (primitive->m_primitiveType)
 	{
-	case CGCollisionPrimitive::primitiveType::primitive_sphere:
-		key = 0;
-		break;
-	case CGCollisionPrimitive::primitiveType::primitive_box:
-		key = 1;
-		break;
+	case CollisionPrimitiveType::COLLISION_PRIMITIVE_SPHERE:
+		return rayAndSphere(output, input, *(CGCollisionSphere*)primitive);
+		
+	case CollisionPrimitiveType::COLLISION_PRIMITIVE_OBB:
+		return rayAndOBB(output, input, *(CGCollisionOBB*)primitive);
 	default:
 		assert(0);
 	}
-
-	if (key) return rayAndOBB(output, input, *(CGCollisionOBB*)primitive);
-	else return rayAndSphere(output, input, *(CGCollisionSphere*)primitive);
 }
 
 unsigned CGProj::CGCollisionNarrow::sphereAndHalfSpace(

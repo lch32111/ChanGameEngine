@@ -1,7 +1,7 @@
 #include <GPED/CGCollisionPrimitive.h>
 
 CGProj::CGCollisionPrimitive::CGCollisionPrimitive()
-	: m_primitiveType(UNDECLARED),
+	: m_primitiveType(COLLISION_PRIMITIVE_UNDECLARED),
 	body(nullptr),
 	offset(glm::mat4(1.0))
 {

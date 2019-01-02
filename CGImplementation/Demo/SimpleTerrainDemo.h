@@ -11,6 +11,7 @@
 
 #include <GPED/CGBroadPhase.h>
 #include <GPED/CGCollisionPrimitive.h>
+#include <GPED/CGCollisionAlgorithm.h>
 #include <GPED/GPED_contacts.h>
 #include <GPED/CGContactManager.h>
 #include <GPED/GPED_ContactResolver.h>
@@ -74,6 +75,7 @@ namespace CGProj
 		// Broad Phase
 
 		// Narrow Phase
+		CGCollisionAlgorithm cAlgo;
 		GPED::ContactResolver resolver;
 		CGContactManager cManager;
 		// Narrow Phase

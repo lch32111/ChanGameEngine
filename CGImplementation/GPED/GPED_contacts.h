@@ -3,6 +3,9 @@
 
 #include <GPED/GPED_body.h>
 
+// Forward Declaration for accessing the Contact
+namespace CGProj { class CGContactManager; }
+
 namespace GPED
 {
 	/**
@@ -38,7 +41,7 @@ namespace GPED
 		 * set and effect the contact.
 		 */
 		friend class ContactResolver;
-		friend class ContactManager;
+		friend class CGProj::CGContactManager;
 
 	public:
 		/**
@@ -215,8 +218,6 @@ namespace GPED
 		// Holds pointers to the next contact that involves each rigid body
 		int nextObjects[2];
 	};
-
-
 
 
 

@@ -6,6 +6,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// Forward Declaration 
+namespace CGProj { class CGCollisionPrimitive; }
+
 namespace GPED
 {
 #if 1
@@ -167,8 +170,6 @@ namespace GPED
 			return result;
 		}
 	};
-
-	class CollisionPrimitive; // Forward Declaration
 	
 	struct c3RayInput
 	{
@@ -200,7 +201,7 @@ namespace GPED
 
 	/// The method to enable GPED Object to interact with CGBroadPhase 
 	/// which uses dynamicAABB tree
-	GPED::c3AABB convertFromCollisionPrimitive(const CollisionPrimitive& primitive);
+	GPED::c3AABB convertFromCollisionPrimitive(const CGProj::CGCollisionPrimitive& primitive);
 	GPED::c3AABB makeAABB(const glm::vec3& position, const glm::vec3& halfExtents); // from AABB
 	GPED::c3AABB makeAABB(const glm::mat3& orientation, const glm::vec3& position, const glm::vec3& halfExtents); // from OBB
 	GPED::c3AABB makeAABB(const glm::vec3& position, const GPED::real radius); // from Sphere

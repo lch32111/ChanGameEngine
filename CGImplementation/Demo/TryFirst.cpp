@@ -292,7 +292,7 @@ void CGProj::TryFirst::mouseButton(GLFWwindow* app_window,
 				{
 					if (userData)
 					{
-						GPED::CollisionPrimitive* cP = (GPED::CollisionPrimitive*)userData;
+						CGCollisionPrimitive* cP = (CGCollisionPrimitive*)userData;
 						glm::vec3 Position = cP->body->getPosition();
 						cP->body->setPosition(Position.x, 30, Position.z);
 						cP->body->setAwake();
@@ -383,13 +383,13 @@ void CGProj::TryFirst::broadPhase()
 }
 
 // narrow phase
-void CGProj::TryFirst::generateContacts(GPED::ContactManager& cData)
+void CGProj::TryFirst::generateContacts(CGContactManager& cData)
 {
-	GPED::CollisionPlane planeGround;
+	CGCollisionPlane planeGround;
 	planeGround.direction = glm::vec3(0, 1, 0);
 	planeGround.offset = 0;
 
-	GPED::CollisionPlane planeZWall;
+	CGCollisionPlane planeZWall;
 	planeZWall.direction = glm::vec3(0, 0, -1);
 	planeZWall.offset = -50;
 
@@ -401,19 +401,19 @@ void CGProj::TryFirst::generateContacts(GPED::ContactManager& cData)
 
 	// we will generate contacts from the pairs detected by broadphase
 	// In addition, we will generate contacts manually with planes
-	const std::vector<std::pair<GPED::CollisionPrimitive*, GPED::CollisionPrimitive*>>& t_pair
+	const std::vector<std::pair<CGCollisionPrimitive*, CGCollisionPrimitive*>>& t_pair
 		= firstResult.vPairs;
 	// std::cout << t_pair.size() << '\n';
 	for (int i = 0; i < t_pair.size(); ++i)
 	{
-		GPED::CollisionDetector::Collision(t_pair[i].first, t_pair[i].second, &cData);
+		CGCollisionNarrow::NarrowCollisionCallback(t_pair[i].first, t_pair[i].second, &cData);
 	}
 
 	for (int i = 0; i < boxes; ++i)
 	{
 		if (!boxData[i].body->getAwake()) continue;
-		GPED::CollisionDetector::boxAndHalfSpace(boxData[i], planeGround, &cData);
-		GPED::CollisionDetector::boxAndHalfSpace(boxData[i], planeZWall, &cData);
+		CGCollisionNarrow::OBBAndHalfSpace(boxData[i], planeGround, &cData);
+		CGCollisionNarrow::OBBAndHalfSpace(boxData[i], planeZWall, &cData);
 	}
 }
 

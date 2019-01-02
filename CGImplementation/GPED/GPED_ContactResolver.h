@@ -171,7 +171,7 @@ namespace GPED
 		 * @param duration The duration of the previous integration step.
 		 * This is used to compensate for forces applied.
 		 */
-		void resolveContacts(ContactManager* CM, real duration);
+		void resolveContacts(CGProj::CGContactManager* CM, real duration);
 
 	protected:
 		/**
@@ -179,19 +179,19 @@ namespace GPED
 		 * internal data is configured correctly and the correct set of bodies
 		 * is made alive.
 		 */
-		void prepareContacts(ContactManager* CM, real duration);
+		void prepareContacts(CGProj::CGContactManager* CM, real duration);
 
 		/**
 		 * Resolve the velocity issues with the given array of constraints,
 		 * using the given number of iterations.
 		 */
-		void adjustVelocities(ContactManager* CM, real duration);
+		void adjustVelocities(CGProj::CGContactManager* CM, real duration);
 
 		/**
 		 * Resolves the positional issues with the given array of constraints,
 		 * using the given number of iterations.
 		 */
-		void adjustPositions(ContactManager* CM, real duration);
+		void adjustPositions(CGProj::CGContactManager* CM, real duration);
 	};
 }
 

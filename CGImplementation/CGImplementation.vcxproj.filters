@@ -81,9 +81,6 @@
     <ClCompile Include="GPED\GPED_collide_coarse.cpp">
       <Filter>GPED Source</Filter>
     </ClCompile>
-    <ClCompile Include="GPED\GPED_collide_fine.cpp">
-      <Filter>GPED Source</Filter>
-    </ClCompile>
     <ClCompile Include="GPED\GPED_contacts.cpp">
       <Filter>GPED Source</Filter>
     </ClCompile>
@@ -234,6 +231,24 @@
     <ClCompile Include="Graphics\CGSizableRenderLine.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
+    <ClCompile Include="GPED\CGCollisionPrimitive.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\CGCollisionSphere.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\CGCollisionOBB.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\CGCollisionMesh.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\CGCollisionEarlyExit.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\CGCollisionNarrow.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -243,9 +258,6 @@
       <Filter>GPED Header</Filter>
     </ClInclude>
     <ClInclude Include="GPED\GPED_collide_coarse.h">
-      <Filter>GPED Header</Filter>
-    </ClInclude>
-    <ClInclude Include="GPED\GPED_collide_fine.h">
       <Filter>GPED Header</Filter>
     </ClInclude>
     <ClInclude Include="GPED\GPED_contacts.h">
@@ -436,6 +448,30 @@
     </ClInclude>
     <ClInclude Include="Graphics\CGSizableRenderLine.h">
       <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionPrimitive.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionSphere.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionOBB.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionMesh.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionEarlyExit.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionPlane.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionUtil.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionNarrow.h">
+      <Filter>GPED Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

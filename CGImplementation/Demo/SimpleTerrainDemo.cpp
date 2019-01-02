@@ -286,10 +286,10 @@ void CGProj::SimpleTerrainDemo::broadPhase()
 	SecondBroadPhase.UpdatePairs(&SecondResult);
 }
 
-void CGProj::SimpleTerrainDemo::generateContacts(GPED::ContactManager & cData)
+void CGProj::SimpleTerrainDemo::generateContacts(CGContactManager & cData)
 {
 	// Manual Plane
-	GPED::CollisionPlane planeGround;
+	CGCollisionPlane planeGround;
 	planeGround.direction = glm::vec3(0, 1, 0);
 	planeGround.offset = -5;
 
@@ -302,17 +302,17 @@ void CGProj::SimpleTerrainDemo::generateContacts(GPED::ContactManager & cData)
 
 	// we will generate contacts from the pairs detected by broadphase
 	// In addition, we will generate contacts manually with planes
-	const std::vector<std::pair<GPED::CollisionPrimitive*, GPED::CollisionPrimitive*>>& t_pair
+	const std::vector<std::pair<CGCollisionPrimitive*, CGCollisionPrimitive*>>& t_pair
 		= SecondResult.vPairs;
 	for (int i = 0; i < t_pair.size(); ++i)
 	{
-		GPED::CollisionDetector::Collision(t_pair[i].first, t_pair[i].second, &cData);
+		CGCollisionNarrow::NarrowCollisionCallback(t_pair[i].first, t_pair[i].second, &cData);
 	}
 
 	for (int i = 0; i < boxes; ++i)
 	{
 		if (!boxData[i].body->getAwake()) continue;
-		GPED::CollisionDetector::boxAndHalfSpace(boxData[i], planeGround, &cData);
+		CGCollisionNarrow::OBBAndHalfSpace(boxData[i], planeGround, &cData);
 	}
 }
 

@@ -10,7 +10,7 @@
 #include <Terrain/CGValueNoise1D.h>
 
 #include <GPED/CGBroadPhase.h>
-#include <GPED/GPED_collide_fine.h>
+#include <GPED/CGCollisionPrimitive.h>
 #include <GPED/GPED_contacts.h>
 #include <GPED/CGContactManager.h>
 #include <GPED/GPED_ContactResolver.h>
@@ -68,14 +68,14 @@ namespace CGProj
 
 		// Broad Phase
 		CGBroadPhase SecondBroadPhase;
-		BroadResultWrapper<GPED::CollisionPrimitive> SecondResult;
+		BroadResultWrapper<CGCollisionPrimitive> SecondResult;
 		BroadRendererWrapper bRender;
 		Shader* wireShader;
 		// Broad Phase
 
 		// Narrow Phase
 		GPED::ContactResolver resolver;
-		GPED::ContactManager cManager;
+		CGContactManager cManager;
 		// Narrow Phase
 
 		// Simulation Object;
@@ -90,7 +90,7 @@ namespace CGProj
 		void updateObjects(float duration, float lastFrame);
 		void SyncAndUpdate();
 		void broadPhase();
-		void generateContacts(GPED::ContactManager& cData);
+		void generateContacts(CGContactManager& cData);
 		// Simulation Logic
 
 		// Simulation Action

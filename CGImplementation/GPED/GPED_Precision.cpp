@@ -1,5 +1,5 @@
 #include "GPED_Precision.h"
-#include "GPED_collide_fine.h"
+#include <GPED/CGCollisionPrimitive.h>
 using namespace GPED;
 
 real GPED::sleepEpsilon = ((real)0.05);
@@ -185,7 +185,7 @@ bool GPED::rayaabbIntersection(GPED::c3RayOutput & output, const GPED::c3RayInpu
 	return true;
 }
 
-GPED::c3AABB GPED::convertFromCollisionPrimitive(const CollisionPrimitive & primitive)
+GPED::c3AABB GPED::convertFromCollisionPrimitive(const CGProj::CGCollisionPrimitive & primitive)
 {
 	return primitive.makeAABB();
 }

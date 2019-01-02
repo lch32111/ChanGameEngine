@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{792F3151-E667-41A8-A222-CF178CF2FC13}</ProjectGuid>
     <RootNamespace>CGImplementation</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -131,11 +131,16 @@
     <ClCompile Include="Demo\TryFirst.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="GPED\CGBroadPhase.cpp" />
+    <ClCompile Include="GPED\CGCollisionEarlyExit.cpp" />
+    <ClCompile Include="GPED\CGCollisionMesh.cpp" />
+    <ClCompile Include="GPED\CGCollisionNarrow.cpp" />
+    <ClCompile Include="GPED\CGCollisionOBB.cpp" />
+    <ClCompile Include="GPED\CGCollisionPrimitive.cpp" />
+    <ClCompile Include="GPED\CGCollisionSphere.cpp" />
     <ClCompile Include="GPED\CGContactManager.cpp" />
     <ClCompile Include="GPED\DynamicAABBTree.cpp" />
     <ClCompile Include="GPED\GPED_body.cpp" />
     <ClCompile Include="GPED\GPED_collide_coarse.cpp" />
-    <ClCompile Include="GPED\GPED_collide_fine.cpp" />
     <ClCompile Include="GPED\GPED_ContactResolver.cpp" />
     <ClCompile Include="GPED\GPED_contacts.cpp" />
     <ClCompile Include="GPED\GPED_fgen.cpp" />
@@ -188,12 +193,19 @@
     <ClInclude Include="Demo\SimpleTerrainDemo.h" />
     <ClInclude Include="Demo\TryFirst.h" />
     <ClInclude Include="GPED\CGBroadPhase.h" />
+    <ClInclude Include="GPED\CGCollisionEarlyExit.h" />
+    <ClInclude Include="GPED\CGCollisionMesh.h" />
+    <ClInclude Include="GPED\CGCollisionNarrow.h" />
+    <ClInclude Include="GPED\CGCollisionOBB.h" />
+    <ClInclude Include="GPED\CGCollisionPlane.h" />
+    <ClInclude Include="GPED\CGCollisionPrimitive.h" />
+    <ClInclude Include="GPED\CGCollisionSphere.h" />
+    <ClInclude Include="GPED\CGCollisionUtil.h" />
     <ClInclude Include="GPED\CGContactManager.h" />
     <ClInclude Include="GPED\CGPhysicsUtil.h" />
     <ClInclude Include="GPED\DynamicAABBTree.h" />
     <ClInclude Include="GPED\GPED_body.h" />
     <ClInclude Include="GPED\GPED_collide_coarse.h" />
-    <ClInclude Include="GPED\GPED_collide_fine.h" />
     <ClInclude Include="GPED\GPED_ContactResolver.h" />
     <ClInclude Include="GPED\GPED_contacts.h" />
     <ClInclude Include="GPED\GPED_fgen.h" />

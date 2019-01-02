@@ -11,7 +11,7 @@
 #include <GPED/GPED_contacts.h>
 #include <GPED/CGContactManager.h>
 #include <GPED/GPED_ContactResolver.h>
-#include <GPED/GPED_collide_fine.h>
+#include <GPED/CGCollisionPrimitive.h>
 #include <GPED/PS_AmmoRound.h>
 #include <GPED/PS_Box.h>
 #include <GPED/CGBroadPhase.h>
@@ -64,7 +64,7 @@ namespace CGProj
 
 		// Broad Phase
 		CGBroadPhase FirstBroadPhase;
-		BroadResultWrapper<GPED::CollisionPrimitive> firstResult;
+		BroadResultWrapper<CGCollisionPrimitive> firstResult;
 		BroadRendererWrapper bRender;
 		BroadRayCastWrapper bRayWrapper;
 		Shader lineShader;
@@ -75,7 +75,7 @@ namespace CGProj
 		
 		// Narrow Phase
 		GPED::ContactResolver resolver;
-		GPED::ContactManager cManager;
+		CGContactManager cManager;
 		// Narrow Phase
 
 		// Simulation Object
@@ -89,7 +89,7 @@ namespace CGProj
 		void updateObjects(float duration, float lastFrame);
 		void SyncAndUpdate();
 		void broadPhase();
-		void generateContacts(GPED::ContactManager& cData);
+		void generateContacts(CGContactManager& cData);
 		// Simulation Logic
 
 		// Miscellaneous

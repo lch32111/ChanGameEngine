@@ -1,7 +1,7 @@
 #ifndef __PS_AMMO_ROUND_H__
 #define __PS_AMMO_ROUND_H__
 
-#include <GPED/GPED_collide_fine.h>
+#include <GPED/CGCollisionSphere.h>
 #include <Graphics/chanQuatCamera.h>
 
 enum ShotType
@@ -13,7 +13,7 @@ enum ShotType
 	SHOT_LASER
 };
 
-class AmmoRound : public GPED::CollisionSphere
+class AmmoRound : public CGProj::CGCollisionSphere
 {
 public:
 	int proxyId;

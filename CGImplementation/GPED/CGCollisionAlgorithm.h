@@ -47,7 +47,7 @@ namespace CGProj
 		unsigned findNarrowAlgorithmAndProcess(const CGCollisionPrimitive* a, const CGCollisionPrimitive* b,
 			CGContactManager* data)
 		{
-			int key = m_NarrowAlgoMatrix[a->m_primitiveType][a->m_primitiveType];
+			int key = m_NarrowAlgoMatrix[a->m_primitiveType][b->m_primitiveType];
 
 			switch (key)
 			{

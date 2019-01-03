@@ -15,7 +15,7 @@ uniform sampler2D terrTex;
 void main()
 {
 	
-	vec3 color = vec3(0.7, 0.4, 0.0);
+	vec3 color = texture(terrTex, TexCoords).xyz;
 	vec3 lightDirection = normalize(vec3(-0.67, -0.7, 0.14) * -1.0);
 	vec3 viewDir = normalize(cameraPos - fragPos);
 	

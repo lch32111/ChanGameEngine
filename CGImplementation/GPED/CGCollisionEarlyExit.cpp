@@ -64,3 +64,8 @@ bool CGProj::CGCollisionEarlyExit::OBBAndHalfSpace(const CGCollisionOBB & box, c
 	// Check for the intersection
 	return real_abs(boxDistance) <= projectedRadius;
 }
+
+bool CGProj::CGCollisionEarlyExit::MeshAndAABB(const CGCollisionMesh & mesh, const GPED::c3AABB & aabb)
+{
+	return false;
+}

@@ -51,6 +51,12 @@ namespace CGProj
 			const CGCollisionOBB& box,
 			const CGCollisionPlane& plane
 		);
+
+		static bool MeshAndAABB
+		(
+			const CGCollisionMesh& mesh,
+			const GPED::c3AABB& aabb
+		);
 	};
 }
 

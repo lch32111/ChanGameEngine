@@ -6,6 +6,7 @@
 #include <GPED/CGCollisionPrimitive.h>
 #include <GPED/CGCollisionSphere.h>
 #include <GPED/CGCollisionOBB.h>
+#include <GPED/CGCollisionMesh.h>
 #include <GPED/CGCollisionPlane.h>
 
 
@@ -93,6 +94,27 @@ namespace CGProj
 			CGContactManager* data
 		);
 
+		static unsigned MeshAndSphere
+		(
+			const CGCollisionMesh& mesh,
+			const CGCollisionSphere& sphere,
+			CGContactManager* data
+		);
+
+		static unsigned MeshAndOBB
+		(
+			const CGCollisionMesh& mesh,
+			const CGCollisionOBB& box,
+			CGContactManager* data
+		);
+
+		static unsigned MeshandMesh
+		(
+			const CGCollisionMesh& meshA,
+			const CGCollisionMesh& meshB,
+			CGContactManager* data
+		);
+
 		static unsigned rayAndOBB
 		(
 			GPED::c3RayOutput& output,
@@ -106,6 +128,7 @@ namespace CGProj
 			const GPED::c3RayInput& input,
 			const CGCollisionSphere& sphere
 		);
+
 	};
 }
 

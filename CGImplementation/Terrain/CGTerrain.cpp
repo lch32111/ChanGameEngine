@@ -69,6 +69,11 @@ void CGProj::CGTerrain::getAABB(GPED::c3AABB & out)
 	out = m_localAABB;
 }
 
+CGProj::CGCollisionMesh * CGProj::CGTerrain::getCollisioPrimitivePtr()
+{
+	return &m_collisionPrimitive;
+}
+
 void CGProj::CGTerrain::initializeWithImage(CGAssetManager & am)
 {
 	m_terrainShader = am.getShader(SHADER_SIMPLE_TERRAIN);
@@ -302,6 +307,8 @@ void CGProj::CGTerrain::initializePhysics()
 	m_localAABB.min.y = minHeight;
 	m_localAABB.max.y = maxHeight;
 	// Find min/max height to make fitAABB of the terrain
+
+	
 }
 
 float CGProj::CGTerrain::getHeight(unsigned x, unsigned z)

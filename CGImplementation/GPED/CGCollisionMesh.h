@@ -6,10 +6,17 @@
 
 namespace CGProj
 {
-	class CollisionMesh : public CGCollisionPrimitive
+	class CGCollisionMesh : public CGCollisionPrimitive
 	{
 	public:
-		CollisionMesh();
+		CGCollisionMesh();
+
+		unsigned m_meshWidth;
+		unsigned m_meshDepth;
+		const float* m_heightData;
+		unsigned m_heightDataNumb;
+
+		void getQuantizedTriangles(const GPED::c3AABB& aabbFromDynamicObjects) const;
 	};
 }
 

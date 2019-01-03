@@ -9,6 +9,7 @@
 #include <Graphics/CGRenderLine.h>
 
 #include <GPED/GPED_Precision.h>
+#include <GPED/CGCollisionMesh.h>
 
 namespace CGProj
 {
@@ -30,6 +31,7 @@ namespace CGProj
 
 		GPED::c3AABB getAABB();
 		void getAABB(GPED::c3AABB& out);
+		CGCollisionMesh* getCollisioPrimitivePtr();
 	private:
 		// Common
 		unsigned m_terrainWidth, m_terrainHeight, m_terrainDepth;
@@ -57,6 +59,7 @@ namespace CGProj
 
 		unsigned m_proxyId;
 		GPED::c3AABB m_localAABB;
+		CGCollisionMesh m_collisionPrimitive;
 
 		float getHeight(unsigned x, unsigned z);
 	};

@@ -456,6 +456,25 @@ unsigned CGProj::CGCollisionNarrow::OBBAndSphere(
 	return 1;
 }
 
+unsigned CGProj::CGCollisionNarrow::MeshAndSphere(
+	const CGCollisionMesh & mesh, const CGCollisionSphere & sphere, CGContactManager * data)
+{
+	mesh.getQuantizedTriangles(sphere.makeAABB());
+	return 1;
+}
+
+unsigned CGProj::CGCollisionNarrow::MeshAndOBB(
+	const CGCollisionMesh & mesh, const CGCollisionOBB & box, CGContactManager * data)
+{
+	return 1;
+}
+
+unsigned CGProj::CGCollisionNarrow::MeshandMesh(
+	const CGCollisionMesh & meshA, const CGCollisionMesh & meshB, CGContactManager * data)
+{
+	return 1;
+}
+
 // Intersection between ray and OBB
 unsigned CGProj::CGCollisionNarrow::rayAndOBB(
 	GPED::c3RayOutput & output, const GPED::c3RayInput & input, const CGCollisionOBB & box)

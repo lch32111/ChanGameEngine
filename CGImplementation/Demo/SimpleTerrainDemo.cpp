@@ -10,7 +10,7 @@ void CGProj::SimpleTerrainDemo::initGraphics(int width, int height)
 	camera.Position = glm::vec3(0, 0, 0);
 	myTerrain.initialize(true, assetManager);
 	// myTerrain.initialize(false, assetManager);
-	myTerrain.setProxyId(SecondBroadPhase.CreateProxy(myTerrain.getAABB(), &myTerrain));
+	myTerrain.setProxyId(SecondBroadPhase.CreateProxy(myTerrain.getAABB(), myTerrain.getCollisioPrimitivePtr()));
 	// Physics Init
 
 

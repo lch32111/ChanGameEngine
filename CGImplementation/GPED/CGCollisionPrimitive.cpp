@@ -17,6 +17,11 @@ const glm::mat4& CGProj::CGCollisionPrimitive::getTransform() const
 	return transform;
 }
 
+GPED::c3AABB CGProj::CGCollisionPrimitive::makeAABB() const
+{
+	return GPED::c3AABB();
+}
+
 glm::vec3 CGProj::CGCollisionPrimitive::getAxis(unsigned index) const
 {
 	return transform[index];

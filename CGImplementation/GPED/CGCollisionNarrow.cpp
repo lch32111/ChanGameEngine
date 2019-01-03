@@ -107,6 +107,31 @@ unsigned CGProj::CGCollisionNarrow::sphereAndSphere(
 	return 1;
 }
 
+unsigned CGProj::CGCollisionNarrow::sphereAndTriangle(
+	const CGCollisionSphere & sphere, const CGCollisionTriangle & triangle, CGContactManager * data)
+{
+	glm::vec3 sphereCenter = sphere.getAxis(3);
+	glm::vec3 normal;
+	glm::vec3 p = ClosestPtPointTriangle(sphereCenter, triangle, normal);
+	glm::vec3 v = p - sphereCenter;
+	GPED::real distSq = glm::dot(v, v);
+
+	if (distSq > sphere.radius * sphere.radius) return 0;
+
+	GPED::real dist = real_sqrt(distSq);
+	v *= (GPED::real(1.0) / dist);
+
+	int contactId = data->GetEmptyContactNode();
+	GPED::Contact* contact = data->GetFirstContact();
+	contact->contactNormal = normal;
+	contact->contactPoint = p;
+	contact->penetration = dist;
+	std::cout << contact->penetration << '\n';
+	data->setBodyData(contactId, sphere.body, NULL);
+
+	return 1;
+}
+
 unsigned CGProj::CGCollisionNarrow::OBBAndHalfSpace(
 	const CGCollisionOBB & box, const CGCollisionPlane & plane, CGContactManager * data)
 {
@@ -459,8 +484,43 @@ unsigned CGProj::CGCollisionNarrow::OBBAndSphere(
 unsigned CGProj::CGCollisionNarrow::MeshAndSphere(
 	const CGCollisionMesh & mesh, const CGCollisionSphere & sphere, CGContactManager * data)
 {
-	mesh.getQuantizedTriangles(sphere.makeAABB());
-	return 1;
+	GPED::c3AABB sphereAABB = sphere.makeAABB();
+	
+	CGCollisionMesh::Mesh_QuantizedGridRange mR;
+	mesh.getQuantizedGridPoints(sphereAABB, mR);
+
+	unsigned collisionHit = 0;
+	for (unsigned j = mR.startZ; j <= mR.EndZ; ++j)
+	{
+		for (unsigned i = mR.startX; i <= mR.EndX; ++i)
+		{
+			// First Triangle
+			CGCollisionTriangle triangle;
+			mesh.getVertex(i, j, triangle.m_points[0]);
+			mesh.getVertex(i, j + 1, triangle.m_points[1]);
+			mesh.getVertex(i + 1, j , triangle.m_points[2]);
+
+			// Early Exit
+			if (CGCollisionEarlyExit::TriangleAndAABB(triangle, sphereAABB))
+			{
+				// Deep Narrow Phase
+				collisionHit += sphereAndTriangle(sphere, triangle, data);
+			}
+
+
+			// Second Triangle
+			mesh.getVertex(i + 1, j, triangle.m_points[0]);
+			mesh.getVertex(i + 1, j + 1, triangle.m_points[2]);
+			if (CGCollisionEarlyExit::TriangleAndAABB(triangle, sphereAABB))
+			{
+				// Deep Narrow Phase
+				collisionHit += sphereAndTriangle(sphere, triangle, data);
+			}
+
+		}
+	}
+
+	return collisionHit;
 }
 
 unsigned CGProj::CGCollisionNarrow::MeshAndOBB(

@@ -8,6 +8,7 @@
 #include <GPED/CGCollisionOBB.h>
 #include <GPED/CGCollisionMesh.h>
 #include <GPED/CGCollisionPlane.h>
+#include <GPED/CGCollisionTriangle.h>
 
 
 namespace CGProj
@@ -48,6 +49,13 @@ namespace CGProj
 		(
 			const CGCollisionSphere& one,
 			const CGCollisionSphere& two,
+			CGContactManager* data
+		);
+
+		static unsigned sphereAndTriangle
+		(
+			const CGCollisionSphere& sphere,
+			const CGCollisionTriangle&  triangle,
 			CGContactManager* data
 		);
 

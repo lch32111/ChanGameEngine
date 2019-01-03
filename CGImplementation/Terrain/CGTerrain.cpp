@@ -6,7 +6,8 @@
 CGProj::CGTerrain::CGTerrain()
 	: 
 	m_terrainWidth(32), m_terrainHeight(2), m_terrainDepth(32), // Manual Setting
-	m_terrainSubWidth(127), m_terrainSubDepth(127),
+	m_terrainSubWidth(127), m_terrainSubDepth(127), 
+	m_terrainOrigin(glm::vec3(0)),
 	m_gridVertexCount((m_terrainSubWidth + 1) * (m_terrainSubDepth + 1)),
 	m_indicesCount((m_terrainSubWidth + 1) * 2 * m_terrainSubDepth + (m_terrainSubWidth - 1) * 2),
 	m_VAO(0), m_VBO{ 0, 0, 0 }, m_EBO(0)
@@ -108,12 +109,18 @@ void CGProj::CGTerrain::initializeWithImage(CGAssetManager & am)
 					m_terrainWidth * (i * invSubWidth - 0.5f),
 					0,
 					m_terrainDepth * (j * invSubDepth - 0.5f)
-				);
+				) + m_terrainOrigin;
 
 			unsigned color = data[(i * pixelWidth + j * pixelHeight * textureX) * textureChannel];
 			float height = ((color / 255.f) - 0.5f) * m_terrainHeight;
 			vertices[Index].y = height;
 			m_HeightData[Index] = height;
+
+			// Translate the vertices into the terrain origin
+			vertices[Index] += m_terrainOrigin;
+			
+
+			
 			textures[Index] = glm::vec2(i * invSubWidth, j * invSubDepth);
 		}
 	}
@@ -230,6 +237,10 @@ void CGProj::CGTerrain::initializeWithGenerator(CGAssetManager & am)
 			vertices[Index].y = perlinHeight;
 			m_HeightData[Index] = perlinHeight;
 
+			// Translate the vertices into the terrain origin
+			vertices[Index] += m_terrainOrigin;
+			
+
 			// Analytical normal from partial derivative
 			normals[Index] = glm::normalize(glm::vec3(-derivs.x, 1.f, -derivs.z));
 
@@ -308,7 +319,14 @@ void CGProj::CGTerrain::initializePhysics()
 	m_localAABB.max.y = maxHeight;
 	// Find min/max height to make fitAABB of the terrain
 
-	
+	// Collision Primitive Init
+	m_collisionPrimitive.m_meshOrigin = m_terrainOrigin;
+	m_collisionPrimitive.m_meshWidth = m_terrainWidth;
+	m_collisionPrimitive.m_meshDepth = m_terrainDepth;
+	m_collisionPrimitive.m_meshSubWidth = m_terrainSubWidth;
+	m_collisionPrimitive.m_meshSubDepth = m_terrainSubDepth;
+	m_collisionPrimitive.m_heightData = m_HeightData;
+	m_collisionPrimitive.m_heightDataNumb = m_gridVertexCount;
 }
 
 float CGProj::CGTerrain::getHeight(unsigned x, unsigned z)

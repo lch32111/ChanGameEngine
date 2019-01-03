@@ -65,7 +65,21 @@ bool CGProj::CGCollisionEarlyExit::OBBAndHalfSpace(const CGCollisionOBB & box, c
 	return real_abs(boxDistance) <= projectedRadius;
 }
 
-bool CGProj::CGCollisionEarlyExit::MeshAndAABB(const CGCollisionMesh & mesh, const GPED::c3AABB & aabb)
+// This Code is from BulletPhysics : conservative test for overlap between triangle and aabb
+// The process is like making the aabb from triangle points and then do the aabb/aabb test
+bool CGProj::CGCollisionEarlyExit::TriangleAndAABB(const CGCollisionTriangle& triangle, const GPED::c3AABB & aabb)
 {
-	return false;
+	const glm::vec3 &p1 = triangle.m_points[0];
+	const glm::vec3 &p2 = triangle.m_points[1];
+	const glm::vec3 &p3 = triangle.m_points[2];
+
+	if (GPED::rMin(GPED::rMin(p1[0], p2[0]), p3[0]) > aabb.max[0]) return false;
+	if (GPED::rMax(GPED::rMax(p1[0], p2[0]), p3[0]) < aabb.min[0]) return false;
+
+	if (GPED::rMin(GPED::rMin(p1[2], p2[2]), p3[2]) > aabb.max[2]) return false;
+	if (GPED::rMax(GPED::rMax(p1[2], p2[2]), p3[2]) < aabb.min[2]) return false;
+
+	if (GPED::rMin(GPED::rMin(p1[1], p2[1]), p3[1]) > aabb.max[1]) return false;
+	if (GPED::rMax(GPED::rMax(p1[1], p2[1]), p3[1]) < aabb.min[1]) return false;
+	return true;
 }

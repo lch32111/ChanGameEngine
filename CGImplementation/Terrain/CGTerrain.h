@@ -36,6 +36,7 @@ namespace CGProj
 		// Common
 		unsigned m_terrainWidth, m_terrainHeight, m_terrainDepth;
 		unsigned m_terrainSubWidth, m_terrainSubDepth;
+		glm::vec3 m_terrainOrigin;
 
 		float* m_HeightData;
 	private:

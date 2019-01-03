@@ -154,6 +154,120 @@ namespace CGProj
 			return cOne * GPED::real(0.5) + cTwo * GPED::real(0.5);
 		}
 	}
+
+	// RTCD 136 ~ 142
+	inline glm::vec3 ClosestPtPointTriangle(const glm::vec3& sCenter, const CGCollisionTriangle& triangle)
+	{
+		// Check if P in vertex region outside A
+		glm::vec3 ab = triangle.m_points[1] - triangle.m_points[0];
+		glm::vec3 ac = triangle.m_points[2] - triangle.m_points[0];
+		glm::vec3 ap = sCenter - triangle.m_points[0];
+		GPED::real d1 = glm::dot(ab, ap);
+		GPED::real d2 = glm::dot(ac, ap);
+		if (d1 <= GPED::real(0.0) && d2 <= GPED::real(0.0)) return triangle.m_points[0]; // barycentric coordinates (1,0,0)
+
+		// Check if P in vertex region outside B
+		glm::vec3 bp = sCenter - triangle.m_points[1];
+		GPED::real d3 = glm::dot(ab, bp);
+		GPED::real d4 = glm::dot(ac, bp);
+		if (d3 >= GPED::real(0.0) && d4 <= d3) return triangle.m_points[1]; // barycentric coordinates (0,1,0)
+
+		// Check if P in edge region of AB, if so return projection P onto AB
+		GPED::real vc = d1 * d4 - d3 * d2;
+		if (vc <= GPED::real(0.0) && d1 >= GPED::real(0.0) && d3 <= GPED::real(0.0))
+		{
+			GPED::real v = d1 / (d1 - d3);
+			return triangle.m_points[0] + v * ab;  // barycentric coordinates (1-v, v, 0)
+		}
+
+		// Check if P in vertex region outside C
+		glm::vec3 cp = sCenter - triangle.m_points[2];
+		GPED::real d5 = glm::dot(ab, cp);
+		GPED::real d6 = glm::dot(ac, cp);
+		if (d6 >= GPED::real(0.0) && d5 <= d6) return triangle.m_points[2]; // barycentric coordinate (0, 0, 1)
+
+		// Check if P in edge region of AC, if so return projection of P onto AC
+		GPED::real vb = d5 * d2 - d1 * d6;
+		if (vb <= GPED::real(0.0) && d2 >= GPED::real(0.0) & d6 <= GPED::real(0.0))
+		{
+			GPED::real w = d2 / (d2 - d6);
+			return triangle.m_points[0] + w * ac; // barycentric coordinates (1-w, 0, w)
+		}
+
+		// Check if P in edge region of BC, if so return projection of P onto BC
+		GPED::real va = d3 * d6 - d5 * d4;
+		if (va <= GPED::real(0.0) && (d4 - d3) >= GPED::real(0.0) && (d5 - d6) >= GPED::real(0.0))
+		{
+			GPED::real w = (d4 - d3) / (d4 - d3) + (d5 - d6);
+			return triangle.m_points[1] + w * (triangle.m_points[2] - triangle.m_points[1]); // barycentric coordinates (0, 1 - w, w)
+		}
+
+		// P inside face region. COmpute Q through its barycentric coordinates (u,v,w)
+		GPED::real denom = GPED::real(1.0) / (va + vb + vc);
+		GPED::real v = vb * denom;
+		GPED::real w = vc * denom;
+		return triangle.m_points[0] + ab * v + ac * w; // = u*a + v*b + w*c, u = va * denom = 1.0f - v - w
+	}
+
+	// Get Normal Version
+	inline glm::vec3 ClosestPtPointTriangle(const glm::vec3& sCenter, const CGCollisionTriangle& triangle, glm::vec3& outNormal)
+	{
+		// Check if P in vertex region outside A
+		glm::vec3 ab = triangle.m_points[1] - triangle.m_points[0];
+		glm::vec3 ac = triangle.m_points[2] - triangle.m_points[0];
+
+		outNormal.x = ab.y * ac.z - ab.z * ac.y;
+		outNormal.y = ab.z * ac.x - ab.x * ac.z;
+		outNormal.z = ab.x * ac.y - ab.y * ac.x;
+		outNormal = glm::normalize(outNormal);
+
+		glm::vec3 ap = sCenter - triangle.m_points[0];
+		GPED::real d1 = glm::dot(ab, ap);
+		GPED::real d2 = glm::dot(ac, ap);
+		if (d1 <= GPED::real(0.0) && d2 <= GPED::real(0.0)) return triangle.m_points[0]; // barycentric coordinates (1,0,0)
+
+		// Check if P in vertex region outside B
+		glm::vec3 bp = sCenter - triangle.m_points[1];
+		GPED::real d3 = glm::dot(ab, bp);
+		GPED::real d4 = glm::dot(ac, bp);
+		if (d3 >= GPED::real(0.0) && d4 <= d3) return triangle.m_points[1]; // barycentric coordinates (0,1,0)
+
+		// Check if P in edge region of AB, if so return projection P onto AB
+		GPED::real vc = d1 * d4 - d3 * d2;
+		if (vc <= GPED::real(0.0) && d1 >= GPED::real(0.0) && d3 <= GPED::real(0.0))
+		{
+			GPED::real v = d1 / (d1 - d3);
+			return triangle.m_points[0] + v * ab;  // barycentric coordinates (1-v, v, 0)
+		}
+
+		// Check if P in vertex region outside C
+		glm::vec3 cp = sCenter - triangle.m_points[2];
+		GPED::real d5 = glm::dot(ab, cp);
+		GPED::real d6 = glm::dot(ac, cp);
+		if (d6 >= GPED::real(0.0) && d5 <= d6) return triangle.m_points[2]; // barycentric coordinate (0, 0, 1)
+
+		// Check if P in edge region of AC, if so return projection of P onto AC
+		GPED::real vb = d5 * d2 - d1 * d6;
+		if (vb <= GPED::real(0.0) && d2 >= GPED::real(0.0) & d6 <= GPED::real(0.0))
+		{
+			GPED::real w = d2 / (d2 - d6);
+			return triangle.m_points[0] + w * ac; // barycentric coordinates (1-w, 0, w)
+		}
+
+		// Check if P in edge region of BC, if so return projection of P onto BC
+		GPED::real va = d3 * d6 - d5 * d4;
+		if (va <= GPED::real(0.0) && (d4 - d3) >= GPED::real(0.0) && (d5 - d6) >= GPED::real(0.0))
+		{
+			GPED::real w = (d4 - d3) / (d4 - d3) + (d5 - d6);
+			return triangle.m_points[1] + w * (triangle.m_points[2] - triangle.m_points[1]); // barycentric coordinates (0, 1 - w, w)
+		}
+
+		// P inside face region. COmpute Q through its barycentric coordinates (u,v,w)
+		GPED::real denom = GPED::real(1.0) / (va + vb + vc);
+		GPED::real v = vb * denom;
+		GPED::real w = vc * denom;
+		return triangle.m_points[0] + ab * v + ac * w; // = u*a + v*b + w*c, u = va * denom = 1.0f - v - w
+	}
 }
 
 #endif

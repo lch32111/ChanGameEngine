@@ -476,6 +476,9 @@
     <ClInclude Include="GPED\CGCollisionAlgorithm.h">
       <Filter>GPED Header</Filter>
     </ClInclude>
+    <ClInclude Include="GPED\CGCollisionTriangle.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderFolder\DeferredFirst.fs">

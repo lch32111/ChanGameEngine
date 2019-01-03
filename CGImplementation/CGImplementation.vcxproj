@@ -201,6 +201,7 @@
     <ClInclude Include="GPED\CGCollisionPlane.h" />
     <ClInclude Include="GPED\CGCollisionPrimitive.h" />
     <ClInclude Include="GPED\CGCollisionSphere.h" />
+    <ClInclude Include="GPED\CGCollisionTriangle.h" />
     <ClInclude Include="GPED\CGCollisionUtil.h" />
     <ClInclude Include="GPED\CGContactManager.h" />
     <ClInclude Include="GPED\CGPhysicsUtil.h" />

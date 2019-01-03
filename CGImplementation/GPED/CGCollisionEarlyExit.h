@@ -6,6 +6,7 @@
 #include <GPED/CGCollisionOBB.h>
 #include <GPED/CGCollisionMesh.h>
 #include <GPED/CGCollisionPlane.h>
+#include <GPED/CGCollisionTriangle.h>
 
 namespace CGProj
 {
@@ -52,9 +53,9 @@ namespace CGProj
 			const CGCollisionPlane& plane
 		);
 
-		static bool MeshAndAABB
+		static bool TriangleAndAABB
 		(
-			const CGCollisionMesh& mesh,
+			const CGCollisionTriangle& triangle,
 			const GPED::c3AABB& aabb
 		);
 	};

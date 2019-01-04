@@ -27,13 +27,14 @@ void CGProj::TryFirst::initGraphics()
 
 	// Initialise the box
 	GPED::Random ranGen(334455);
+	GPED::c3AABB broadAABB;
 	for (Box *box = boxData; box < boxData + boxes; box++)
 	{
 		float xRan = ranGen.randomReal(-10, 10);
 		float yRan = ranGen.randomReal(3, 20);
 		float zRan = ranGen.randomReal(0, 50);
-		box->setState(xRan, yRan, zRan);
-		box->proxyId = FirstBroadPhase.CreateProxy(GPED::convertFromCollisionPrimitive(*box), box);
+		GPED::convertFromCollisionPrimitive(*box, broadAABB);
+		box->proxyId = FirstBroadPhase.CreateProxy(broadAABB, box);
 	}
 	currentShotType = ShotType::SHOT_PISTOL;
 
@@ -361,15 +362,22 @@ void CGProj::TryFirst::updateObjects(float duration, float lastFrame)
 // Sync the body AABBs in broad phase
 void CGProj::TryFirst::SyncAndUpdate()
 {
+	GPED::c3AABB broadAABB;
+	glm::vec3 displacement;
 	for (int i = 0; i < boxes; ++i)
 	{
-
-		FirstBroadPhase.UpdateProxy(boxData[i].proxyId, GPED::convertFromCollisionPrimitive(boxData[i]));
+		GPED::convertFromCollisionPrimitive(boxData[i], broadAABB);
+		displacement = boxData[i].body->getPosition() - boxData[i].body->getLastFramePosition();
+		FirstBroadPhase.UpdateProxy(boxData[i].proxyId, broadAABB, displacement);
 	}
 
 	for (int i = 0; i < ammoRounds; ++i)
 		if (ammo[i].m_shotType != ShotType::SHOT_UNUSED)
-			FirstBroadPhase.UpdateProxy(ammo[i].proxyId, GPED::convertFromCollisionPrimitive(ammo[i]));
+		{
+			GPED::convertFromCollisionPrimitive(ammo[i], broadAABB);
+			displacement = ammo[i].body->getPosition() - ammo[i].body->getLastFramePosition();
+			FirstBroadPhase.UpdateProxy(ammo[i].proxyId, broadAABB);
+		}
 }
 
 // Update Broad Phase Pairs
@@ -431,9 +439,11 @@ void CGProj::TryFirst::fire()
 	if (shotIndex >= ammoRounds) return;
 
 	// Set the shot
+	GPED::c3AABB broadAABB;
 	ammo[shotIndex].setState(currentShotType, camera);
-	ammo[shotIndex].proxyId = 
-		FirstBroadPhase.CreateProxy(GPED::convertFromCollisionPrimitive(ammo[shotIndex]), &ammo[shotIndex]);
+
+	GPED::convertFromCollisionPrimitive(ammo[shotIndex], broadAABB);
+	ammo[shotIndex].proxyId = FirstBroadPhase.CreateProxy(broadAABB, &ammo[shotIndex]);
 }
 
 void CGProj::TryFirst::totalFire()
@@ -455,7 +465,7 @@ void CGProj::TryFirst::totalFire()
 	float x;
 	float y;
 	float z = 0;
-
+	GPED::c3AABB broadAABB;
 	for(int i = index, j = 0; i < ammoRounds && j < 10; ++i)
 	{
 		x = ranGen.randomBinomial(50);
@@ -463,7 +473,8 @@ void CGProj::TryFirst::totalFire()
 		if (ammo[i].m_shotType == ShotType::SHOT_UNUSED)
 		{
 			ammo[i].setState(ShotType::SHOT_ARTILLERY, glm::vec3(x, y, z), glm::vec3(0, 3, 40));
-			ammo[i].proxyId = FirstBroadPhase.CreateProxy(GPED::convertFromCollisionPrimitive(ammo[i]), &ammo[i]);
+			GPED::convertFromCollisionPrimitive(ammo[i], broadAABB);
+			ammo[i].proxyId = FirstBroadPhase.CreateProxy(broadAABB, &ammo[i]);
 			++j;
 			x += 0.6;
 		}

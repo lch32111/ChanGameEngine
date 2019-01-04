@@ -111,6 +111,12 @@ namespace GPED
 		glm::vec3 position;
 
 		/**
+		 * Holds the linear position of the rigid body in world space 
+		 * from lastFrame. This is for the broadPhase update of predicting the aabb move
+		 */
+		glm::vec3 lastFramePosition;
+
+		/**
 		 * Holds the angular orientation of the rigid body in 
 		 * world space
 		 */
@@ -870,6 +876,8 @@ namespace GPED
 		 * The linear acceleration is given in world space
 		 */
 		glm::vec3 getLastFrameAcceleration() const;
+
+		glm::vec3 getLastFramePosition() const;
 
 	protected:
 		friend class Contact;

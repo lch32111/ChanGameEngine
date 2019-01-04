@@ -69,7 +69,7 @@ namespace CGProj
 		 * this method is for the broadPhase.
 		 * this virtual interface will make the code simple in the broadPhase class.
 		 */
-		virtual GPED::c3AABB makeAABB() const;
+		virtual void getAABB(GPED::c3AABB& OutAABB) const;
 
 	protected:
 		/**

@@ -5,31 +5,19 @@ CGProj::CGCollisionOBB::CGCollisionOBB()
 	CGCollisionPrimitive::m_primitiveType = COLLISION_PRIMITIVE_OBB;
 }
 
-GPED::c3AABB CGProj::CGCollisionOBB::makeAABB() const
+void CGProj::CGCollisionOBB::getAABB(GPED::c3AABB& outAABB) const
 {
-	GPED::c3AABB aabb;
-	aabb.min = glm::vec3(REAL_MAX);
-	aabb.max = glm::vec3(-REAL_MAX);
+	glm::mat3 AbsRotate;
+	for (unsigned i = 0; i < 3; ++i)
+		for (unsigned j = 0; j < 3; ++j)
+			AbsRotate[i][j] = real_abs(transform[j][i]);
 
-	glm::vec3 v[8] =
-	{
-		glm::vec3(-halfSize.x,-halfSize.y, -halfSize.z),
-		glm::vec3(-halfSize.x,-halfSize.y, halfSize.z),
-		glm::vec3(halfSize.x, -halfSize.y, halfSize.z),
-		glm::vec3(halfSize.x,-halfSize.y, -halfSize.z),
-		glm::vec3(-halfSize.x, halfSize.y, -halfSize.z),
-		glm::vec3(-halfSize.x, halfSize.y, halfSize.z),
-		glm::vec3(halfSize.x, halfSize.y, halfSize.z),
-		glm::vec3(halfSize.x, halfSize.y, -halfSize.z)
-	};
+	glm::vec3 extent;
+	for (unsigned i = 0; i < 3; ++i)
+		extent[i] = glm::dot(AbsRotate[i], halfSize);
+	
+	glm::vec3 origin = transform[3];
 
-	for (int i = 0; i < 8; ++i)
-	{
-		v[i] = transform * glm::vec4(v[i], 1.0);
-
-		aabb.min = GPED::rMin(aabb.min, v[i]);
-		aabb.max = GPED::rMax(aabb.max, v[i]);
-	}
-
-	return aabb;
+	outAABB.min = origin - extent;
+	outAABB.max = origin + extent;
 }

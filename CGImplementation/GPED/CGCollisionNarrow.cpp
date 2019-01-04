@@ -483,7 +483,8 @@ unsigned CGProj::CGCollisionNarrow::OBBAndSphere(
 unsigned CGProj::CGCollisionNarrow::MeshAndSphere(
 	const CGCollisionMesh & mesh, const CGCollisionSphere & sphere, CGContactManager * data)
 {
-	GPED::c3AABB sphereAABB = sphere.makeAABB();
+	GPED::c3AABB sphereAABB;
+	sphere.getAABB(sphereAABB);
 	
 	CGCollisionMesh::Mesh_QuantizedGridRange mR;
 	mesh.getQuantizedGridPoints(sphereAABB, mR);

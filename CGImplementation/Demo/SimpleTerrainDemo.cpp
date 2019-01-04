@@ -18,13 +18,15 @@ void CGProj::SimpleTerrainDemo::initGraphics(int width, int height)
 
 	// Init the boxes
 	GPED::Random ranGen(20190102);
+	GPED::c3AABB broadAABB;
 	for (Box *box = boxData; box < boxData + boxes; box++)
 	{
 		float xRan = ranGen.randomReal(-10, 10);
 		float yRan = ranGen.randomReal(15, 20);
 		float zRan = ranGen.randomReal(-10, 10);
 		box->setState(xRan, yRan, zRan);
-		box->proxyId = SecondBroadPhase.CreateProxy(GPED::convertFromCollisionPrimitive(*box), box);
+		GPED::convertFromCollisionPrimitive(*box, broadAABB);
+		box->proxyId = SecondBroadPhase.CreateProxy(broadAABB, box);
 	}
 	currentShotType = ShotType::SHOT_PISTOL;
 
@@ -90,7 +92,7 @@ void CGProj::SimpleTerrainDemo::updateSimulation(float deltaTime, float lastFram
 		*/
 
 		updateObjects(deltaTime, lastFrame);
-		SyncAndUpdate(); // sync between clientobject and rigid body in broadPhase
+		SyncAndUpdate(deltaTime); // sync between clientobject and rigid body in broadPhase
 		broadPhase(); // literally broadphase.
 		generateContacts(cManager); // narrow phase from broadphase
 		resolver.resolveContacts(&cManager, deltaTime);
@@ -264,17 +266,25 @@ void CGProj::SimpleTerrainDemo::updateObjects(float duration, float lastFrame)
 	}
 }
 
-void CGProj::SimpleTerrainDemo::SyncAndUpdate()
+void CGProj::SimpleTerrainDemo::SyncAndUpdate(float duration)
 {
+	GPED::c3AABB broadAABB;
+	glm::vec3 displacement;
+
 	for (int i = 0; i < boxes; ++i)
 	{
-
-		SecondBroadPhase.UpdateProxy(boxData[i].proxyId, GPED::convertFromCollisionPrimitive(boxData[i]));
+		GPED::convertFromCollisionPrimitive(boxData[i], broadAABB);
+		displacement = boxData[i].body->getPosition() - boxData[i].body->getLastFramePosition();
+		SecondBroadPhase.UpdateProxy(boxData[i].proxyId, broadAABB, displacement);
 	}
 
 	for (int i = 0; i < ammoRounds; ++i)
 		if (ammo[i].m_shotType != ShotType::SHOT_UNUSED)
-			SecondBroadPhase.UpdateProxy(ammo[i].proxyId, GPED::convertFromCollisionPrimitive(ammo[i]));
+		{
+			GPED::convertFromCollisionPrimitive(ammo[i], broadAABB);
+			displacement = ammo[i].body->getPosition() - ammo[i].body->getLastFramePosition();
+			SecondBroadPhase.UpdateProxy(ammo[i].proxyId, broadAABB, displacement);
+		}
 }
 
 void CGProj::SimpleTerrainDemo::broadPhase()
@@ -330,7 +340,9 @@ void CGProj::SimpleTerrainDemo::fire()
 	if (shotIndex >= ammoRounds) return;
 
 	// Set the shot
+	GPED::c3AABB broadAABB;
 	ammo[shotIndex].setState(currentShotType, camera);
-	ammo[shotIndex].proxyId =
-		SecondBroadPhase.CreateProxy(GPED::convertFromCollisionPrimitive(ammo[shotIndex]), &ammo[shotIndex]);
+
+	GPED::convertFromCollisionPrimitive(ammo[shotIndex], broadAABB);
+	ammo[shotIndex].proxyId = SecondBroadPhase.CreateProxy(broadAABB, &ammo[shotIndex]);
 }

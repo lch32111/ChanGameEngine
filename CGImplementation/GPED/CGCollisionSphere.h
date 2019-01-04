@@ -14,7 +14,7 @@ namespace CGProj
 	{
 	public:
 		CGCollisionSphere();
-		virtual GPED::c3AABB makeAABB() const;
+		virtual void getAABB(GPED::c3AABB& outAABB) const;
 
 		/**
 		 * The radius of the sphere.

@@ -185,9 +185,9 @@ bool GPED::rayaabbIntersection(GPED::c3RayOutput & output, const GPED::c3RayInpu
 	return true;
 }
 
-GPED::c3AABB GPED::convertFromCollisionPrimitive(const CGProj::CGCollisionPrimitive & primitive)
+void GPED::convertFromCollisionPrimitive(const CGProj::CGCollisionPrimitive & primitive, c3AABB& outAABB)
 {
-	return primitive.makeAABB();
+	primitive.getAABB(outAABB);
 }
 
 GPED::c3AABB GPED::makeAABB(const glm::vec3 & position, const glm::vec3 & halfExtents)

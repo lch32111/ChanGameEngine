@@ -14,7 +14,7 @@ namespace CGProj
 	{
 	public:
 		CGCollisionOBB();
-		virtual GPED::c3AABB makeAABB() const;
+		virtual void getAABB(GPED::c3AABB& outAABB) const;
 
 		/**
 		 * Holds the half-sizes of the box along each of its local axes.

@@ -90,7 +90,7 @@ namespace CGProj
 
 		// Simulation Logic
 		void updateObjects(float duration, float lastFrame);
-		void SyncAndUpdate();
+		void SyncAndUpdate(float duration);
 		void broadPhase();
 		void generateContacts(CGContactManager& cData);
 		// Simulation Logic

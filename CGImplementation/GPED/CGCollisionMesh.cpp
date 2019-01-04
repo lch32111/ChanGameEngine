@@ -1,5 +1,6 @@
 #include <GPED/CGCollisionMesh.h>
 #include <GPED/CGPhysicsUtil.h>
+#include <iostream>
 
 CGProj::CGCollisionMesh::CGCollisionMesh()
 {
@@ -41,9 +42,9 @@ CGProj::CGCollisionMesh::getQuantizedGridPoints(
 	}
 
 	outRange.startX = 0;
-	outRange.EndX = m_meshSubWidth + 1;
+	outRange.EndX = m_meshSubWidth;
 	outRange.startZ = 0;
-	outRange.EndZ = m_meshSubDepth + 1;
+	outRange.EndZ = m_meshSubDepth;
 	if (quantizedAABBmin[0] > outRange.startX)
 		outRange.startX = quantizedAABBmin[0];
 	if (quantizedAABBmax[0] < outRange.EndX)
@@ -58,9 +59,7 @@ void CGProj::CGCollisionMesh::getVertex(unsigned gridX, unsigned gridZ, glm::vec
 {
 	outVertex.x = m_meshWidth * (gridX * (1.f / m_meshSubWidth) - 0.5f);
 	outVertex.z = m_meshDepth * (gridZ * (1.f / m_meshSubDepth) - 0.5f);
-
-	assert(gridX + gridZ * (m_meshSubWidth) < m_heightDataNumb);
-	outVertex.y = m_heightData[gridX + gridZ * (m_meshSubWidth)];
+	outVertex.y = m_heightData[gridX + gridZ * (m_meshSubWidth + 1)];
 
 	outVertex += m_meshOrigin;
 }

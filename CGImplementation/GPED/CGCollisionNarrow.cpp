@@ -126,7 +126,6 @@ unsigned CGProj::CGCollisionNarrow::sphereAndTriangle(
 	contact->contactNormal = normal;
 	contact->contactPoint = p;
 	contact->penetration = dist;
-	std::cout << contact->penetration << '\n';
 	data->setBodyData(contactId, sphere.body, NULL);
 
 	return 1;
@@ -490,9 +489,9 @@ unsigned CGProj::CGCollisionNarrow::MeshAndSphere(
 	mesh.getQuantizedGridPoints(sphereAABB, mR);
 
 	unsigned collisionHit = 0;
-	for (unsigned j = mR.startZ; j <= mR.EndZ; ++j)
+	for (unsigned j = mR.startZ; j < mR.EndZ; ++j)
 	{
-		for (unsigned i = mR.startX; i <= mR.EndX; ++i)
+		for (unsigned i = mR.startX; i < mR.EndX; ++i)
 		{
 			// First Triangle
 			CGCollisionTriangle triangle;

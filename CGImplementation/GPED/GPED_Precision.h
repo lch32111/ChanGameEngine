@@ -117,7 +117,9 @@ namespace GPED
 	glm::mat3 getBlockInertiaTensor(const glm::vec3& halfSizes, real mass);
 
 	real rMin(real a, real b);
+	real rMin(real a, real b, real c);
 	real rMax(real a, real b);
+	real rMax(real a, real b, real c);
 	glm::vec3 rMin(const glm::vec3& a, const glm::vec3& b);
 	glm::vec3 rMax(const glm::vec3& a, const glm::vec3& b);
 	template<class T>

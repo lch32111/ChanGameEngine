@@ -5,8 +5,8 @@
 
 CGProj::CGTerrain::CGTerrain()
 	: 
-	m_terrainWidth(32), m_terrainHeight(2), m_terrainDepth(32), // Manual Setting
-	m_terrainSubWidth(127), m_terrainSubDepth(127), 
+	m_terrainWidth(64), m_terrainHeight(5), m_terrainDepth(64), // Manual Setting
+	m_terrainSubWidth(63), m_terrainSubDepth(63), 
 	m_terrainOrigin(glm::vec3(0)),
 	m_gridVertexCount((m_terrainSubWidth + 1) * (m_terrainSubDepth + 1)),
 	m_indicesCount((m_terrainSubWidth + 1) * 2 * m_terrainSubDepth + (m_terrainSubWidth - 1) * 2),
@@ -203,6 +203,9 @@ void CGProj::CGTerrain::initializeWithImage(CGAssetManager & am)
 void CGProj::CGTerrain::initializeWithGenerator(CGAssetManager & am)
 {
 	m_terrainShader = am.getShader(SHADER_SIMPLE_TERRAIN);
+	m_terrainShader->use();
+	m_terrainShader->setInt("terrTex", 0);
+	m_testTexture = am.getTexture(TEXTURE_FIELD_GRASS, false);
 
 	glm::vec3* vertices = new glm::vec3[m_gridVertexCount];
 	m_HeightData = new float[m_gridVertexCount];

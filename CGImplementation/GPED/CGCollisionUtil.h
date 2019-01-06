@@ -103,6 +103,40 @@ namespace CGProj
 		return true;
 	}
 
+	inline bool tryAxis
+	(
+		const CGCollisionOBB& OBB,
+		const glm::vec3& v0,
+		const glm::vec3& v1,
+		const glm::vec3& v2,
+		glm::vec3 axis,
+		unsigned index,
+
+		// These values may be updated
+		GPED::real& smallestPenetration,
+		unsigned& smallestCase
+	)
+	{
+		// Make sure we have a normalized axis and don't check almost parallel axes
+		if (glm::dot(axis, axis) < 0.0001) return true;
+		axis = glm::normalize(axis);
+		
+		GPED::real axisRadius = transformToAxis(OBB, axis);
+		GPED::real p0 = glm::dot(v0, axis);
+		GPED::real p1 = glm::dot(v1, axis);
+		GPED::real p2 = glm::dot(v2, axis);
+
+		GPED::real Length = GPED::rMax(-GPED::rMax(p0, p1, p2), GPED::rMin(p0, p1, p2));
+		GPED::real penetration = axisRadius - Length;
+
+		if (penetration < 0) return false;
+		if (penetration < smallestPenetration)
+		{
+			smallestPenetration = penetration;
+			smallestCase = index;
+		}
+	}
+
 	// Refer to RTCD ClosestPtSegmentSegment
 	inline glm::vec3 contactPoint(
 		const glm::vec3& pOne,

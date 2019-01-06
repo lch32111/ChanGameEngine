@@ -92,9 +92,21 @@ real GPED::rMin(real a, real b)
 	return a < b ? a : b;
 }
 
+real GPED::rMin(real a, real b, real c)
+{
+	GPED::real min = (a < b ? a : b);
+	return (min < c? min : c);
+}
+
 real GPED::rMax(real a, real b)
 {
 	return a > b ? a : b;
+}
+
+real GPED::rMax(real a, real b, real c)
+{
+	GPED::real max = (a > b ? a : b);
+	return (max > c ? max : c);
 }
 
 glm::vec3 GPED::rMin(const glm::vec3 & a, const glm::vec3 & b)

@@ -102,6 +102,13 @@ namespace CGProj
 			CGContactManager* data
 		);
 
+		static unsigned OBBAndTriangle
+		(
+			const CGCollisionOBB& box,
+			const CGCollisionTriangle& triangle,
+			CGContactManager* data
+		);
+
 		static unsigned MeshAndSphere
 		(
 			const CGCollisionMesh& mesh,

@@ -1,5 +1,5 @@
 #include "GPED_Precision.h"
-#include "GPED_collide_fine.h"
+#include <GPED/CGCollisionPrimitive.h>
 using namespace GPED;
 
 real GPED::sleepEpsilon = ((real)0.05);
@@ -92,9 +92,21 @@ real GPED::rMin(real a, real b)
 	return a < b ? a : b;
 }
 
+real GPED::rMin(real a, real b, real c)
+{
+	GPED::real min = (a < b ? a : b);
+	return (min < c? min : c);
+}
+
 real GPED::rMax(real a, real b)
 {
 	return a > b ? a : b;
+}
+
+real GPED::rMax(real a, real b, real c)
+{
+	GPED::real max = (a > b ? a : b);
+	return (max > c ? max : c);
 }
 
 glm::vec3 GPED::rMin(const glm::vec3 & a, const glm::vec3 & b)
@@ -185,9 +197,9 @@ bool GPED::rayaabbIntersection(GPED::c3RayOutput & output, const GPED::c3RayInpu
 	return true;
 }
 
-GPED::c3AABB GPED::convertFromCollisionPrimitive(const CollisionPrimitive & primitive)
+void GPED::convertFromCollisionPrimitive(const CGProj::CGCollisionPrimitive & primitive, c3AABB& outAABB)
 {
-	return primitive.makeAABB();
+	primitive.getAABB(outAABB);
 }
 
 GPED::c3AABB GPED::makeAABB(const glm::vec3 & position, const glm::vec3 & halfExtents)

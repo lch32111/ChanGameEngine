@@ -7,6 +7,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// Forward Declaration of accessing RigidBody
+namespace CGProj { class CGContactManager; }
+
 namespace GPED
 {
 	/**
@@ -106,6 +109,12 @@ namespace GPED
 		 * Holds the linear position of the rigid body in world space
 		 */
 		glm::vec3 position;
+
+		/**
+		 * Holds the linear position of the rigid body in world space 
+		 * from lastFrame. This is for the broadPhase update of predicting the aabb move
+		 */
+		glm::vec3 lastFramePosition;
 
 		/**
 		 * Holds the angular orientation of the rigid body in 
@@ -868,10 +877,12 @@ namespace GPED
 		 */
 		glm::vec3 getLastFrameAcceleration() const;
 
+		glm::vec3 getLastFramePosition() const;
+
 	protected:
 		friend class Contact;
 		friend class ContactResolver;
-		friend class ContactManager;
+		friend class CGProj::CGContactManager;
 		// Hold the list of contacts that involve this body
 		// use contacts->nextObject[index];
 		int contacts = -1; // -1 == Node_NUll

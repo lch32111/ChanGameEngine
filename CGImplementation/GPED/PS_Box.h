@@ -1,9 +1,9 @@
 #ifndef __PS_BOX_H__
 #define __PS_BOX_H__
 
-#include <GPED/GPED_collide_fine.h>
+#include <GPED/CGCollisionOBB.h>
 
-class Box : public GPED::CollisionBox
+class Box : public CGProj::CGCollisionOBB
 {
 public:
 	int proxyId;

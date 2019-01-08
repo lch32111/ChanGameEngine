@@ -6,6 +6,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// Forward Declaration 
+namespace CGProj { class CGCollisionPrimitive; }
+
 namespace GPED
 {
 #if 1
@@ -114,7 +117,9 @@ namespace GPED
 	glm::mat3 getBlockInertiaTensor(const glm::vec3& halfSizes, real mass);
 
 	real rMin(real a, real b);
+	real rMin(real a, real b, real c);
 	real rMax(real a, real b);
+	real rMax(real a, real b, real c);
 	glm::vec3 rMin(const glm::vec3& a, const glm::vec3& b);
 	glm::vec3 rMax(const glm::vec3& a, const glm::vec3& b);
 	template<class T>
@@ -167,8 +172,6 @@ namespace GPED
 			return result;
 		}
 	};
-
-	class CollisionPrimitive; // Forward Declaration
 	
 	struct c3RayInput
 	{
@@ -200,7 +203,7 @@ namespace GPED
 
 	/// The method to enable GPED Object to interact with CGBroadPhase 
 	/// which uses dynamicAABB tree
-	GPED::c3AABB convertFromCollisionPrimitive(const CollisionPrimitive& primitive);
+	void convertFromCollisionPrimitive(const CGProj::CGCollisionPrimitive& primitive, GPED::c3AABB& outAABB);
 	GPED::c3AABB makeAABB(const glm::vec3& position, const glm::vec3& halfExtents); // from AABB
 	GPED::c3AABB makeAABB(const glm::mat3& orientation, const glm::vec3& position, const glm::vec3& halfExtents); // from OBB
 	GPED::c3AABB makeAABB(const glm::vec3& position, const GPED::real radius); // from Sphere

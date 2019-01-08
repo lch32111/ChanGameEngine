@@ -80,6 +80,7 @@ void CGProj::DynamicAABBTree::DestroyProxy(int proxyId)
 	FreeNode(proxyId);
 }
 
+// For moving object
 bool CGProj::DynamicAABBTree::UpdateProxy(int proxyId, const GPED::c3AABB & aabb, const glm::vec3 displacement)
 {
 	assert(0 <= proxyId && proxyId < m_nodeCapacity);

@@ -55,6 +55,15 @@
     <Filter Include="ShaderFolder">
       <UniqueIdentifier>{5f596ca9-5fef-43cc-95ec-36d952bf3ca9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Demo\Terrain Demo">
+      <UniqueIdentifier>{4d40ea3e-cb8a-4413-82b6-7f6f55053aff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Terrain Header">
+      <UniqueIdentifier>{3fb7136c-72b6-4903-91d5-ecd881d37247}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Terrain Source">
+      <UniqueIdentifier>{18f226a6-4edc-46f0-8efe-bc8d7a495248}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -70,9 +79,6 @@
       <Filter>GPED Source</Filter>
     </ClCompile>
     <ClCompile Include="GPED\GPED_collide_coarse.cpp">
-      <Filter>GPED Source</Filter>
-    </ClCompile>
-    <ClCompile Include="GPED\GPED_collide_fine.cpp">
       <Filter>GPED Source</Filter>
     </ClCompile>
     <ClCompile Include="GPED\GPED_contacts.cpp">
@@ -216,6 +222,33 @@
     <ClCompile Include="Graphics\CGSpotShadowFrustumVisualizer.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
+    <ClCompile Include="Demo\SimpleTerrainDemo.cpp">
+      <Filter>Demo\Terrain Demo</Filter>
+    </ClCompile>
+    <ClCompile Include="Terrain\CGTerrain.cpp">
+      <Filter>Terrain Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\CGSizableRenderLine.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\CGCollisionPrimitive.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\CGCollisionSphere.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\CGCollisionOBB.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\CGCollisionMesh.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\CGCollisionEarlyExit.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="GPED\CGCollisionNarrow.cpp">
+      <Filter>GPED Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -225,9 +258,6 @@
       <Filter>GPED Header</Filter>
     </ClInclude>
     <ClInclude Include="GPED\GPED_collide_coarse.h">
-      <Filter>GPED Header</Filter>
-    </ClInclude>
-    <ClInclude Include="GPED\GPED_collide_fine.h">
       <Filter>GPED Header</Filter>
     </ClInclude>
     <ClInclude Include="GPED\GPED_contacts.h">
@@ -401,6 +431,54 @@
     <ClInclude Include="Graphics\CGSpotShadowFrustumVisualizer.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
+    <ClInclude Include="Terrain\CGTerrain.h">
+      <Filter>Terrain Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Demo\SimpleTerrainDemo.h">
+      <Filter>Demo\Terrain Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain\CGValueNoise1D.h">
+      <Filter>Terrain Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain\CGTerrainUtil.h">
+      <Filter>Terrain Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain\CGPerlinNoise.h">
+      <Filter>Terrain Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGSizableRenderLine.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionPrimitive.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionSphere.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionOBB.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionMesh.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionEarlyExit.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionPlane.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionUtil.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionNarrow.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionAlgorithm.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GPED\CGCollisionTriangle.h">
+      <Filter>GPED Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderFolder\DeferredFirst.fs">
@@ -500,6 +578,12 @@
       <Filter>ShaderFolder</Filter>
     </None>
     <None Include="ShaderFolder\CGSpotDepthMapDebugRender.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGSimpleTerrain.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGSimpleTerrain.fs">
       <Filter>ShaderFolder</Filter>
     </None>
   </ItemGroup>

@@ -10,7 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <GPED/DynamicAABBTree.h>
-#include <GPED/GPED_collide_fine.h>
+#include <GPED/CGCollisionNarrow.h>
 #include <Graphics/Shader.h>
 
 namespace CGProj
@@ -258,8 +258,8 @@ namespace CGProj
 			void* userData = broadPhase->GetUserData(nodeId);
 
 			GPED::c3RayOutput output;
-			bool hit = GPED::CollisionDetector::RayCollision(
-				output, input, (GPED::CollisionPrimitive*)userData);
+			bool hit = CGCollisionNarrow::RayCollisionCallback(
+				output, input, (CGCollisionPrimitive*)userData);
 
 			if (hit)
 			{

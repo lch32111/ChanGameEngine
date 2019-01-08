@@ -5,6 +5,12 @@
 #include <GPED/GPED_contacts.h>
 #include <GPED/GPED_ContactResolver.h>
 
+/*
+	!!! NOTICE !!!
+	THIS CLASS WILL NOT WORK WELL!
+	BECAUSE I didn't modify this class for lont time after changing lots of physics systems
+*/
+
 namespace GPED
 {
 	/**

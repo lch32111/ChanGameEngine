@@ -109,6 +109,7 @@ void GPED::RigidBody::integrate(real duration)
 
 	// Adjust positions
 	// Update linear position
+	lastFramePosition = position;
 	position += velocity * duration;
 
 	// Update angular position
@@ -479,4 +480,9 @@ void GPED::RigidBody::getLastFrameAcceleration(glm::vec3 * linearAcceleration) c
 glm::vec3 GPED::RigidBody::getLastFrameAcceleration() const
 {
 	return lastFrameAcceleration;
+}
+
+glm::vec3 GPED::RigidBody::getLastFramePosition() const
+{
+	return lastFramePosition;
 }

@@ -4,7 +4,7 @@
 
 #include <GPED/GPED_contacts.h>
 #include <iostream>
-namespace GPED
+namespace CGProj
 {
 	/* 181119 Chanhaeng Lee
 	* This class is the similar one as the CollisionData class in GPED.
@@ -24,19 +24,19 @@ namespace GPED
 	* For Example, GetEmptyContactNode();
 	*/
 
-constexpr int NODE_NULL = -1;
-	class ContactManager
+	constexpr int NODE_NULL = -1;
+	class CGContactManager
 	{
 	public:
-		ContactManager();
-		ContactManager(int nodeCapacity);
-		~ContactManager();
+		CGContactManager();
+		CGContactManager(int nodeCapacity);
+		~CGContactManager();
 
 		int GetEmptyContactNode();
-		void setBodyData(int nodeId, RigidBody* one, RigidBody* two);
+		void setBodyData(int nodeId, GPED::RigidBody* one, GPED::RigidBody* two);
 
-		Contact* GetMaxPenetration();
-		Contact* GetMaxVelocity();
+		GPED::Contact* GetMaxPenetration();
+		GPED::Contact* GetMaxVelocity();
 
 		void updatePenetration(int move, 
 			const int contactId, const int bodyIndex,
@@ -44,14 +44,14 @@ constexpr int NODE_NULL = -1;
 		void updateDesiredVelocity(int move,
 			const int contactId, const int bodyIndex,
 			const glm::vec3& velocityChange, const glm::vec3& rotationChange,
-			real duration);
+			GPED::real duration);
 
-		real friction;
-		real restitution;
-		real tolerance;
+		GPED::real friction;
+		GPED::real restitution;
+		GPED::real tolerance;
 
 		void AllcalculateInternals(GPED::real duration);
-		Contact* GetFirstContact();
+		GPED::Contact* GetFirstContact();
 
 		int GetNodeCount();
 		void reset();
@@ -64,7 +64,7 @@ constexpr int NODE_NULL = -1;
 		
 		int m_root;
 
-		Contact* m_nodes;
+		GPED::Contact* m_nodes;
 		int m_nodeCount;
 		int m_nodeCapacity;
 
@@ -72,7 +72,7 @@ constexpr int NODE_NULL = -1;
 	};
 	
 
-	inline void GPED::ContactManager::updatePenetration(int move,
+	inline void CGContactManager::updatePenetration(int move,
 		const int contactId, const int bodyIndex,
 		const glm::vec3 & linearChange, const glm::vec3 & angularChange)
 	{
@@ -87,10 +87,10 @@ constexpr int NODE_NULL = -1;
 		}
 	}
 
-	inline void GPED::ContactManager::updateDesiredVelocity(int move,
+	inline void CGContactManager::updateDesiredVelocity(int move,
 		const int contactId, const int bodyIndex,
 		const glm::vec3 & velocityChange, const glm::vec3 & rotationChange,
-		real duration)
+		GPED::real duration)
 	{
 		unsigned index = 0;
 		while (move != NODE_NULL)

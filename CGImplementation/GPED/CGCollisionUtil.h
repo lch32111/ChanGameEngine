@@ -126,10 +126,19 @@ namespace CGProj
 		GPED::real p1 = glm::dot(v1, axis);
 		GPED::real p2 = glm::dot(v2, axis);
 
-		GPED::real Length = GPED::rMax(-GPED::rMax(p0, p1, p2), GPED::rMin(p0, p1, p2));
-		GPED::real penetration = axisRadius - Length;
+		GPED::real minV = GPED::rMin(p0, p1, p2);
+		GPED::real maxV = GPED::rMax(p0, p1, p2);
 
-		if (penetration < 0) return false;
+		if (minV > axisRadius || maxV < -axisRadius) return false;
+		
+		GPED::real up, down;
+		if (axisRadius > maxV) up = maxV;
+		else up = axisRadius;
+		if (minV > -axisRadius) down = minV;
+		else down = -axisRadius;
+
+		GPED::real penetration = up - down;
+
 		if (penetration < smallestPenetration)
 		{
 			smallestPenetration = penetration;

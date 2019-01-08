@@ -258,7 +258,7 @@ unsigned CGProj::CGCollisionNarrow::OBBAndOBB(
 		// that by finding the point in the centre of the edge. We know
 		// its component in the direction of the box's collision axis is zero
 		// (its a mid-point) and we determine which of the extremes in each
-		// of the oher axes in closest
+		// of the other axes in closest
 		glm::vec3 ptOnOneEdge = one.halfSize;
 		glm::vec3 ptOnTwoEdge = two.halfSize;
 		for (unsigned i = 0; i < 3; ++i)
@@ -481,104 +481,103 @@ unsigned CGProj::CGCollisionNarrow::OBBAndSphere(
 unsigned CGProj::CGCollisionNarrow::OBBAndTriangle(
 	const CGCollisionOBB & box, const CGCollisionTriangle & triangle, CGContactManager * data)
 {
-	/*
-	glm::vec3 boxOrigin = box.body->getPosition();
-	glm::vec3 u0 = box.getAxis(0), u1 = box.getAxis(1), u2 = box.getAxis(2);
+	//glm::vec3 boxOrigin = box.body->getPosition();
+	//glm::vec3 u0 = box.getAxis(0), u1 = box.getAxis(1), u2 = box.getAxis(2);
 
-	// Translate triangle as conceptually moving box to origin
-	glm::vec3 v[3];
-	v[0] = triangle.m_points[0] - boxOrigin;
-	v[1] = triangle.m_points[1] - boxOrigin;
-	v[2] = triangle.m_points[2] - boxOrigin;
+	//// Translate triangle as conceptually moving box to origin
+	//glm::vec3 v[3];
+	//v[0] = triangle.m_points[0] - boxOrigin;
+	//v[1] = triangle.m_points[1] - boxOrigin;
+	//v[2] = triangle.m_points[2] - boxOrigin;
 
-	// Compute edge vectors for triangle
-	glm::vec3 f[3];
-	f[0] = v[1] - v[0], f[1] = v[2] - v[1], f[2] = v[0] - v[2];
+	//// Compute edge vectors for triangle
+	//glm::vec3 f[3];
+	//f[0] = v[1] - v[0], f[1] = v[2] - v[0], f[2] = v[2] - v[1];
 
-	// We start  assuming there is no contact
-	GPED::real pen = REAL_MAX;
-	unsigned best = 0xffffff;
-	
-	
-	// Category 3
-	CHECK_OVERLAP(glm::cross(u0, f[0]), 0);
-	CHECK_OVERLAP(glm::cross(u0, f[1]), 1);
-	CHECK_OVERLAP(glm::cross(u0, f[2]), 2);
-	CHECK_OVERLAP(glm::cross(u1, f[0]), 3);
-	CHECK_OVERLAP(glm::cross(u1, f[1]), 4);
-	CHECK_OVERLAP(glm::cross(u1, f[2]), 5);
-	CHECK_OVERLAP(glm::cross(u2, f[0]), 6);
-	CHECK_OVERLAP(glm::cross(u2, f[1]), 7);
-	CHECK_OVERLAP(glm::cross(u2, f[2]), 8);
+	//// We start  assuming there is no contact
+	//GPED::real pen = REAL_MAX;
+	//unsigned best = 0xffffff;
+	//
+	//
+	//// Category 3
+	//CHECK_OVERLAP(glm::cross(u0, f[0]), 0);
+	//CHECK_OVERLAP(glm::cross(u0, f[1]), 1);
+	//CHECK_OVERLAP(glm::cross(u0, f[2]), 2);
+	//CHECK_OVERLAP(glm::cross(u1, f[0]), 3);
+	//CHECK_OVERLAP(glm::cross(u1, f[1]), 4);
+	//CHECK_OVERLAP(glm::cross(u1, f[2]), 5);
+	//CHECK_OVERLAP(glm::cross(u2, f[0]), 6);
+	//CHECK_OVERLAP(glm::cross(u2, f[1]), 7);
+	//CHECK_OVERLAP(glm::cross(u2, f[2]), 8);
 
-	// Category 2
-	CHECK_OVERLAP(u0, 9);
-	CHECK_OVERLAP(u1, 10);
-	CHECK_OVERLAP(u2, 11);
+	//// Category 1
+	//CHECK_OVERLAP(u0, 9);
+	//CHECK_OVERLAP(u1, 10);
+	//CHECK_OVERLAP(u2, 11);
 
-	// Category 3
-	glm::vec3 normal = glm::cross(f[0], f[2]);
-	CHECK_OVERLAP(normal, 12);
+	//// Category 2
+	//glm::vec3 normal = glm::cross(f[0], f[1]);
+	//CHECK_OVERLAP(normal, 12);
 
-	assert(best != 0xffffff);
+	//assert(best != 0xffffff);
 
-	// Edge and Edge case
-	if (best < 9) 
-	{
-		unsigned boxAxisIndex = best / 3;
-		unsigned triangleEdgeIndex = best % 3;
+	//// Edge and Edge case
+	//if (best < 9) 
+	//{
+	//	unsigned boxAxisIndex = best / 3;
+	//	unsigned triangleEdgeIndex = best % 3;
 
-		glm::vec3 boxAxis = box.getAxis(boxAxisIndex);
-		glm::vec3 triangleEdge = f[triangleEdgeIndex];
+	//	glm::vec3 boxAxis = box.getAxis(boxAxisIndex);
+	//	glm::vec3 triangleEdge = f[triangleEdgeIndex];
 
-		glm::vec3 axis = glm::normalize(glm::cross(boxAxis, triangleEdge));
+	//	glm::vec3 axis = glm::normalize(glm::cross(boxAxis, triangleEdge));
 
-		// We have the axes, but not the edges: each axis has 4 edges parallel
-		// to it, we need to find which of the 4 for each object. We do
-		// that by finding the point in the centre of the edge. We know
-		// its component in the direction of the box's collision axis is zero
-		// (its a mid-point) and we determine which of the extremes in each
-		// of the oher axes in closest
-		glm::vec3 ptOnOneEdge = box.halfSize;
-		for (unsigned i = 0; i < 3; ++i)
-		{
-			if (i == boxAxisIndex) ptOnOneEdge[i] = 0;
-			else if (glm::dot(box.getAxis(i), axis) > 0)
-				ptOnOneEdge[i] = -ptOnOneEdge[i];
-		}
+	//	// We have the axes, but not the edges: each axis has 4 edges parallel
+	//	// to it, we need to find which of the 4 for each object. We do
+	//	// that by finding the point in the centre of the edge. We know
+	//	// its component in the direction of the box's collision axis is zero
+	//	// (its a mid-point) and we determine which of the extremes in each
+	//	// of the oher axes in closest
+	//	glm::vec3 ptOnOneEdge = box.halfSize;
+	//	for (unsigned i = 0; i < 3; ++i)
+	//	{
+	//		if (i == boxAxisIndex) ptOnOneEdge[i] = 0;
+	//		else if (glm::dot(box.getAxis(i), axis) > 0)
+	//			ptOnOneEdge[i] = -ptOnOneEdge[i];
+	//	}
 
-		ptOnOneEdge = glm::vec3(box.transform * glm::vec4(ptOnOneEdge, 1.0));
-		GPED::real edgeDist = real_sqrt(glm::dot(triangleEdge, triangleEdge));
+	//	ptOnOneEdge = glm::vec3(box.transform * glm::vec4(ptOnOneEdge, 1.0));
+	//	GPED::real edgeDist = real_sqrt(glm::dot(triangleEdge, triangleEdge));
 
-		glm::vec3 vertex = contactPoint(ptOnOneEdge, boxAxis, box.halfSize[boxAxisIndex],
-			triangleEdge, triangleEdge * (GPED::real(1.0) / edgeDist), edgeDist, true);
+	//	glm::vec3 vertex = contactPoint(ptOnOneEdge, boxAxis, box.halfSize[boxAxisIndex],
+	//		triangleEdge, triangleEdge * (GPED::real(1.0) / edgeDist), edgeDist, true);
 
-		int contactId = data->GetEmptyContactNode();
-		GPED::Contact* contact = data->GetFirstContact();
-		contact->penetration = pen;
-		contact->contactNormal = axis;
-		contact->contactPoint = vertex;
-		data->setBodyData(contactId, box.body, NULL);
-		return 1;
-	}
-	// Box Face
-	else if (best < 12)
-	{
-		unsigned boxAxisIndex = best % 3;
-		glm::vec3 normal = box.getAxis(boxAxisIndex) * -1.f;
-		
-		int contactId = data->GetEmptyContactNode();
-		GPED::Contact* contact = data->GetFirstContact();
-		contact->penetration = pen;
-		contact->contactNormal = normal;
-		data->setBodyData(contactId, box.body, NULL);
-	}
-	// Triangle face and edge case
-	else
-	{
-	}
-	
-	*/
+	//	int contactId = data->GetEmptyContactNode();
+	//	GPED::Contact* contact = data->GetFirstContact();
+	//	contact->penetration = pen;
+	//	contact->contactNormal = axis;
+	//	contact->contactPoint = vertex;
+	//	data->setBodyData(contactId, box.body, NULL);
+	//	return 1;
+	//}
+	//// Box Face
+	//else if (best < 12)
+	//{
+	//	unsigned boxAxisIndex = best % 3;
+	//	glm::vec3 normal = box.getAxis(boxAxisIndex) * -1.f;
+	//	
+	//	int contactId = data->GetEmptyContactNode();
+	//	GPED::Contact* contact = data->GetFirstContact();
+	//	contact->penetration = pen;
+	//	contact->contactNormal = normal;
+	//	data->setBodyData(contactId, box.body, NULL);
+	//}
+	//// Triangle face
+	//else
+	//{
+
+	//}
+	//
 	return 0;
 }
 #undef CHECK_OVERLAP

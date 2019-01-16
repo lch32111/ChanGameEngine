@@ -164,6 +164,8 @@ glm::vec3 CGProj::CGEditObject::getPosition()
 		assert(0);
 		break;
 	}
+
+	return glm::vec3();
 }
 
 void CGProj::CGEditObject::setScale(float scale)
@@ -198,6 +200,8 @@ glm::vec3 CGProj::CGEditObject::getScale()
 		assert(0);
 		break;
 	}
+
+	return glm::vec3();
 }
 
 GPED::c3AABB CGProj::CGEditObject::getFitAABB()
@@ -213,6 +217,8 @@ GPED::c3AABB CGProj::CGEditObject::getFitAABB()
 		assert(0);
 		break;
 	}
+
+	return GPED::c3AABB();
 }
 
 void CGProj::CGEditObject::setHalfSize(const glm::vec3 & h)
@@ -306,6 +312,8 @@ glm::vec3 CGProj::CGEditObject::getHalfSize()
 		assert(0);
 		break;
 	}
+
+	return glm::vec3();
 }
 
 void CGProj::CGEditObject::setRaidus(GPED::real r)
@@ -333,6 +341,8 @@ GPED::real CGProj::CGEditObject::getRadius()
 		assert(0);
 		break;
 	}
+
+	return GPED::real(0);
 }
 
 void CGProj::CGEditObject::render(const glm::mat4 & view, const glm::mat4 & proj)

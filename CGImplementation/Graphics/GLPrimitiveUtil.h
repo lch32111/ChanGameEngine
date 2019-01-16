@@ -226,7 +226,7 @@ namespace CGProj
 
 			const unsigned int X_SEGMENTS = 64;
 			const unsigned int Y_SEGMENTS = 64;
-			const float PI = 3.14159265359;
+			const float PI = 3.14159265359f;
 			for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
 			{
 				for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
@@ -267,7 +267,7 @@ namespace CGProj
 			indexCount = indices.size();
 
 			std::vector<float> data;
-			for (int i = 0; i < positions.size(); ++i)
+			for (unsigned i = 0; i < positions.size(); ++i)
 			{
 				data.push_back(positions[i].x);
 				data.push_back(positions[i].y);
@@ -289,7 +289,7 @@ namespace CGProj
 			glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-			float stride = (3 + 2 + 3) * sizeof(float);
+			GLsizei stride = (3 + 2 + 3) * sizeof(float);
 			glEnableVertexAttribArray(0);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
 			glEnableVertexAttribArray(1);
@@ -320,7 +320,7 @@ namespace CGProj
 			std::vector<float> vertices;
 			float width = 360 / 50;
 			float PI = glm::pi<float>();
-			for(int i = 0; i < 360; i += width)
+			for(int i = 0; i < 360; i += (int)width)
 			{
 				float angle = (float)i *  PI / 180.f;
 
@@ -363,7 +363,7 @@ namespace CGProj
 			
 			float width = 360 / 30;
 			float radPI = glm::pi<float>() / 180.f;
-			for (int i = 0; i <= 360; i += width)
+			for (int i = 0; i <= 360; i += (int)width)
 			{
 				float angle = i * radPI;
 
@@ -373,7 +373,7 @@ namespace CGProj
 			}
 			unsigned TopSideCut = vertices.size();
 
-			for (int i = 0; i <= 360; i += width)
+			for (int i = 0; i <= 360; i += (int)width)
 			{
 				float angle = i * radPI;
 
@@ -384,7 +384,7 @@ namespace CGProj
 			unsigned BottomSideCut = vertices.size();
 
 			// Make indices of cylinder side in CCW
-			for (int i = 0; i < TopSideCut; ++i)
+			for (unsigned i = 0; i < TopSideCut; ++i)
 			{
 				indices.push_back(i);
 				indices.push_back(i + TopSideCut);
@@ -398,7 +398,7 @@ namespace CGProj
 			// Top Center Vertex
 			vertices.push_back(TopCenter);
 			// Make indices of top cap of cylinder in CCW
-			for (int i = 0; i < TopSideCut; ++i)
+			for (unsigned i = 0; i < TopSideCut; ++i)
 			{
 				indices.push_back(vertices.size() - 1);
 				indices.push_back(i);
@@ -408,7 +408,7 @@ namespace CGProj
 			// Bottom Center Vertex
 			vertices.push_back(BottomCenter);
 			// Make indices of bottom cap of cylinder in CCW
-			for (int i = TopSideCut; i < BottomSideCut; ++i)
+			for (unsigned i = TopSideCut; i < BottomSideCut; ++i)
 			{
 				indices.push_back(vertices.size() - 1);
 				indices.push_back(i + 1);
@@ -461,7 +461,7 @@ namespace CGProj
 		glm::vec3 BottomCenter(0, 0, 0);
 
 		float radPI = glm::pi<float>() / 180.f;
-		for (int i = 0; i <= 360; i += width)
+		for (int i = 0; i <= 360; i += (int)width)
 		{
 			float angle = i * radPI;
 
@@ -471,7 +471,7 @@ namespace CGProj
 		}
 		unsigned TopSideCut = vertexN;
 		
-		for (int i = 0; i <= 360; i += width)
+		for (int i = 0; i <= 360; i += (int)width)
 		{
 			float angle = i * radPI;
 
@@ -482,7 +482,7 @@ namespace CGProj
 		unsigned BottomSideCut = vertexN;
 
 		// Make indices of cylinder side in CW  
-		for (int i = 0; i < TopSideCut; ++i)
+		for (unsigned i = 0; i < TopSideCut; ++i)
 		{
 			OutIndices[indexN++] = i;
 			OutIndices[indexN++] = i + 1;
@@ -496,7 +496,7 @@ namespace CGProj
 		// Top Center Vertex
 		OutVertices[vertexN++] = TopCenter;
 		// Make indices of top cap of cylinder in CW
-		for (int i = 0; i < TopSideCut; ++i)
+		for (unsigned i = 0; i < TopSideCut; ++i)
 		{
 			OutIndices[indexN++] = vertexN - 1; // center
 			OutIndices[indexN++] = i + 1;
@@ -506,7 +506,7 @@ namespace CGProj
 		// Bottom Center Vertex
 		OutVertices[vertexN++] = BottomCenter;
 		// Make indices of bottom cap of cylinder in CW
-		for (int i = TopSideCut; i < BottomSideCut; ++i)
+		for (unsigned i = TopSideCut; i < BottomSideCut; ++i)
 		{
 			OutIndices[indexN++] = vertexN - 1;
 			OutIndices[indexN++] = i;

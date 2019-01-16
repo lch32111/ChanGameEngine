@@ -23,7 +23,7 @@ void CGProj::CGDirShadowFrustumVisualizer::render(
 	float fov, float aspect, float nearP, float farP
 	)
 {
-	float tanHalfFov = std::tanf(0.5 * fov);
+	float tanHalfFov = std::tanf(0.5f * fov);
 
 	glm::vec3 vertices[8];
 

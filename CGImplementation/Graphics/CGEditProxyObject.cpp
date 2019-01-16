@@ -15,7 +15,7 @@ CGProj::CGEditProxyObject::CGEditProxyObject(CGAssetManager& am)
 	// other member variables of this class should be in the class header declaration!
 }
 
-void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 & proj)
+void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 & proj, const glm::vec3& cameraPos)
 {
 	// CGEditObject::render(view, proj);
 	m_DefShader->use();

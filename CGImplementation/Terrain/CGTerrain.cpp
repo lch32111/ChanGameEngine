@@ -95,8 +95,8 @@ void CGProj::CGTerrain::initializeWithImage(CGAssetManager & am)
 	float invSubDepth = 1.f / m_terrainSubDepth;
 
 	// prepare the grid and other informations
-	unsigned pixelWidth = ((float)textureX / (m_terrainSubWidth + 1.f));
-	unsigned pixelHeight = ((float)textureY / (m_terrainSubDepth + 1.f));
+	unsigned pixelWidth = static_cast<unsigned>((float)textureX / (m_terrainSubWidth + 1.f));
+	unsigned pixelHeight = static_cast<unsigned>((float)textureY / (m_terrainSubDepth + 1.f));
 	for (unsigned j = 0; j <= m_terrainSubDepth; ++j)
 	{
 		for (unsigned i = 0; i <= m_terrainSubWidth; ++i)

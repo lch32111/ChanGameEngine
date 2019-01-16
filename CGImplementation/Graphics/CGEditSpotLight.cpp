@@ -21,7 +21,7 @@ CGProj::CGEditSpotLight::CGEditSpotLight()
 
 	m_depthMapFBO = m_depthMapTexture = 0;
 	m_shadowWidth = m_shadowHeight = 1024;
-	m_shadowBias = 0.005;
+	m_shadowBias = 0.005f;
 
 	m_perFOV = glm::radians(17.5f * 2); // same as the degreeof spot outer cutoff
 	m_perAspect = (float)m_shadowWidth / (float)m_shadowHeight;
@@ -117,14 +117,14 @@ void CGProj::CGEditSpotLight::UIrenderForCommon(CGEditSpotLightVisualizer& spotV
 	ImGui::PopItemWidth();
 	ImGui::Text("Attn Constant : %.2f", m_lightFactors->AttnConstant); ImGui::SameLine();
 	ShowHelpMarker("As you know in the code,\nthe radius calculated in updateRadius() is also based on the diffuse color value");
-	if (ImGui::SliderFloat("linear", &m_lightFactors->AttnLinear, 0.0001, 1.0, "Attn Linear : %f"))
+	if (ImGui::SliderFloat("linear", &m_lightFactors->AttnLinear, 0.0001f, 1.0f, "Attn Linear : %f"))
 	{
 		spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_lightFactors->AttnRadius);
 		spotVis.setOuterConeInRadians(glm::acos(m_SpotOuterCutOff), m_lightFactors->AttnRadius);
 		updateRadius();
 		setShadowFarPlane(m_lightFactors->AttnRadius);
 	}
-	if (ImGui::SliderFloat("quadratic", &m_lightFactors->AttnQuadratic, 0.000001, 1.0, "Attn Quadratic : %f"))
+	if (ImGui::SliderFloat("quadratic", &m_lightFactors->AttnQuadratic, 0.000001f, 1.0f, "Attn Quadratic : %f"))
 	{
 		spotVis.setInnerConeInRadians(glm::acos(m_SpotInnerCutOff), m_lightFactors->AttnRadius);
 		spotVis.setOuterConeInRadians(glm::acos(m_SpotOuterCutOff), m_lightFactors->AttnRadius);

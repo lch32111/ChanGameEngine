@@ -64,9 +64,6 @@
     <Filter Include="Terrain Source">
       <UniqueIdentifier>{18f226a6-4edc-46f0-8efe-bc8d7a495248}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Demo\Graphics Demo\ModelLoader Demo">
-      <UniqueIdentifier>{6e7224ed-c1df-465e-857d-4643c6967701}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

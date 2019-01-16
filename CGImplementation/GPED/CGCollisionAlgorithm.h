@@ -73,6 +73,8 @@ namespace CGProj
 				// Something wrong happend;
 				assert(0);
 			}
+
+			return -1;
 		}
 	private:
 		// typedef of function pointer

@@ -24,7 +24,7 @@ CGProj::CGEditDirLight::CGEditDirLight()
 	m_depthMapFBO = m_depthMapTexture = 0;
 	m_shadowWidth = m_shadowHeight = 1024;
 
-	m_shadowBias = 0.005;
+	m_shadowBias = 0.005f;
 
 	m_shadowProjection = false; // Orthographic Projection
 
@@ -109,7 +109,7 @@ void CGProj::CGEditDirLight::UIrenderForShadow()
 	ImGui::Checkbox("Shadow Projection", &m_shadowProjection);
 	ImGui::SameLine(); ShowHelpMarker("Check -> Perspective, NonCheck -> Orthographic");
 
-	int wharr[2] = { m_shadowWidth, m_shadowHeight };
+	int wharr[2] = { static_cast<int>(m_shadowWidth), static_cast<int>(m_shadowHeight) };
 	if (ImGui::InputInt2("shadow width & height", wharr))
 	{
 		setShadowWidthHeight(wharr[0], wharr[1]);

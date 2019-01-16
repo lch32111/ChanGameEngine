@@ -145,13 +145,13 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	editLights.push_back(CGEditLightObject());
 	editLights[0].initialize(assetManager);
 	editLights[0].setLightType(EDIT_DIRECTION_LIGHT);
-	editLights[0].setScale(0.3);
+	editLights[0].setScale(0.3f);
 	editLights[0].connectBroadPhase(&dBroadPhase);
 	editLights[0].setBroadPhaseId(dBroadPhase.CreateProxy(editLights[0].getFitAABB(), &editLights[0]));
 	editLights[0].setLightDirection(glm::vec3(-0.2f, -1.0f, -0.3f));
-	editLights[0].setAmbientColor(glm::vec3(0.05));
-	editLights[0].setDiffuseColor(glm::vec3(0.4));
-	editLights[0].setSpecularColor(glm::vec3(0.5));
+	editLights[0].setAmbientColor(glm::vec3(0.05f));
+	editLights[0].setDiffuseColor(glm::vec3(0.4f));
+	editLights[0].setSpecularColor(glm::vec3(0.5f));
 
 	// Point Light
 	for (unsigned i = 1; i < 5; ++i)
@@ -159,7 +159,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 		editLights.push_back(CGEditLightObject());
 		editLights[i].initialize(assetManager);
 		editLights[i].setLightType(EDIT_POINT_LIGHT);
-		editLights[i].setScale(0.3);
+		editLights[i].setScale(0.3f);
 		editLights[i].connectBroadPhase(&dBroadPhase);
 		editLights[i].setBroadPhaseId(dBroadPhase.CreateProxy(editLights[i].getFitAABB(), &editLights[i]));
 
@@ -167,7 +167,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 		editLights[i].setAmbientColor(random.randomVector(glm::vec3(0, 0, 0) ,glm::vec3(1, 1, 1)));
 		editLights[i].setDiffuseColor(random.randomVector(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
 		editLights[i].setSpecularColor(random.randomVector(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
-		editLights[i].setAttnLinear(0.7);
+		editLights[i].setAttnLinear(0.7f);
 		editLights[i].setAttnQuadratic(0.5);
 	}
 	// Object Manual Setting + Light Manual Setting
@@ -205,9 +205,9 @@ void CGProj::DeferredRenderer::updateImgui()
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Camera Position %.1f %.1f %.1f", camera.Position.x, camera.Position.y, camera.Position.z);
 
-	ImGui::TextColored(ImVec4(0.99, 0.4, 0.37, 1.0), "Press Tab Button to convert GAME/UI Mode");
-	if (GameControl) ImGui::TextColored(ImVec4(0.78, 0.17, 0.54, 1.0), "GAME mode");
-	else ImGui::TextColored(ImVec4(0.11, 0.7, 0.81, 1.0), "UI mode");
+	ImGui::TextColored(ImVec4(0.99f, 0.4f, 0.37f, 1.0f), "Press Tab Button to convert GAME/UI Mode");
+	if (GameControl) ImGui::TextColored(ImVec4(0.78f, 0.17f, 0.54f, 1.0f), "GAME mode");
+	else ImGui::TextColored(ImVec4(0.11f, 0.7f, 0.81f, 1.0f), "UI mode");
 	
 	ImGui::Checkbox("Light Box Render", &lightDraw);
 	ImGui::Checkbox("Broad Phase Debug Render", &BroadDebug);
@@ -266,7 +266,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		for (unsigned i = 0; i < editProxies.size(); ++i)
 		{
-			editProxies[i].render(view, projection);
+			editProxies[i].render(view, projection, camera.Position);
 		}
 
 		model = glm::mat4(1.0);
@@ -276,10 +276,13 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		Deferred_First_Shader->setBool("material.isLMdiffuse", true);
 		Deferred_First_Shader->setBool("material.isLMspecular", false);
 		Deferred_First_Shader->setBool("material.isLMemissive", false);
+		Deferred_First_Shader->setBool("material.isNormalMap", false);
+		Deferred_First_Shader->setBool("material.isDepthMap", false);
 		Deferred_First_Shader->setMat4("projection", projection);
 		Deferred_First_Shader->setMat4("view", view);
 		Deferred_First_Shader->setMat4("model", model);
 		Deferred_First_Shader->setMat3("ModelNormalMatrix", glm::mat3(glm::transpose(glm::inverse(model))));
+		Deferred_First_Shader->setBool("IsUseTangentSpace", false);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, assetManager.getTexture(TEXTURE_WOOD_PANEL, true));
 		renderQuad();
@@ -358,14 +361,14 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		{
 			for (unsigned i = 0; i < rayCollector.size(); ++i)
 				lineRen.insertLine(rayCollector[i].first, rayCollector[i].second, glm::vec4(1.0, .0, .0, 1.));
-			lineRen.renderLine(view, projection, 0.5);
+			lineRen.renderLine(view, projection, 0.5f);
 		}
 
 		if (rayHitDraw)
 		{
 			for (unsigned i = 0; i < hitCollector.size(); ++i)
 				rayRen.insertLine(hitCollector[i].first, hitCollector[i].second, glm::vec4(1.0, 1.0, 0.0, 1.0));
-			rayRen.renderLine(view, projection, 1.8);
+			rayRen.renderLine(view, projection, 1.8f);
 		}
 
 		if (lightDraw)
@@ -439,23 +442,23 @@ void CGProj::DeferredRenderer::mouse(double xpos, double ypos)
 		if (firstMouse)
 		{
 			firstMouse = false;
-			GamelastX = xpos;
-			GamelastY = ypos;
+			GamelastX = (float)xpos;
+			GamelastY = (float)ypos;
 		}
 
-		float xoffset = xpos - GamelastX;
-		float yoffset = GamelastY - ypos;
-		GamelastX = xpos;
-		GamelastY = ypos;
+		float xoffset = (float)(xpos - GamelastX);
+		float yoffset = (float)(GamelastY - ypos);
+		GamelastX = (float)xpos;
+		GamelastY = (float)ypos;
 
 		camera.ProcessMouseMovement(xoffset, yoffset);
 	}
 	else
 	{
-		float xoffset = xpos - UILastX;
-		float yoffset = UILastY - ypos;
-		UILastX = xpos;
-		UILastY = ypos;
+		float xoffset = (float)(xpos - UILastX);
+		float yoffset = (float)(UILastY - ypos);
+		UILastX = (float)xpos;
+		UILastY = (float)ypos;
 
 		if (mouseClick) // Mouse Holding and Moving
 		{
@@ -536,7 +539,7 @@ void CGProj::DeferredRenderer::scroll(double yoffset)
 	// Exit out if mouse clicks on Imgui GUI
 	if (ImGui::IsMouseHoveringAnyWindow()) return;
 
-	camera.ProcessMouseScroll(yoffset);
+	camera.ProcessMouseScroll((float)yoffset);
 }
 
 void CGProj::DeferredRenderer::resize(int width, int height)

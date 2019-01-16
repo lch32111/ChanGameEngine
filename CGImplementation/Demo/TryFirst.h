@@ -43,9 +43,9 @@ namespace CGProj
 	private:
 		// User Input Interaction
 		ShotType currentShotType;
-		GPED::real contactFriction = 0.9;
-		GPED::real contactRestitution = 0.1;
-		GPED::real contactTolerance = 0.1;
+		GPED::real contactFriction = (GPED::real)0.9;
+		GPED::real contactRestitution = (GPED::real)0.1;
+		GPED::real contactTolerance = (GPED::real)0.1;
 
 		float lastX = 400, lastY = 300;
 		bool firstMouse = true;

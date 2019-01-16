@@ -23,7 +23,7 @@ namespace CGProj
 		CGEditProxyObject(CGAssetManager& am);
 
 		/*** Graphics Method ***/
-		virtual void render(const glm::mat4& view, const glm::mat4& proj);
+		void render(const glm::mat4& view, const glm::mat4& proj, const glm::vec3& cameraPos);
 		virtual void UIrender(CGAssetManager& am);
 
 		bool getCMorLM();

@@ -65,13 +65,13 @@ void CGProj::SimpleTerrainDemo::updateImgui()
 	ImGui::Text("Camera Position %.1f %.1f %.1f", camera.Position.x, camera.Position.y, camera.Position.z);
 	ImGui::Checkbox("Wire Mode", &wireDraw);
 
-	ImGui::TextColored(ImVec4(0.99, 0.4, 0.37, 1.0), "Press Tab Button to convert GAME/UI Mode");
-	if (GameControl) ImGui::TextColored(ImVec4(0.78, 0.17, 0.54, 1.0), "GAME mode");
-	else ImGui::TextColored(ImVec4(0.11, 0.7, 0.81, 1.0), "UI mode");
+	ImGui::TextColored(ImVec4(0.99f, 0.4f, 0.37f, 1.0f), "Press Tab Button to convert GAME/UI Mode");
+	if (GameControl) ImGui::TextColored(ImVec4(0.78f, 0.17f, 0.54f, 1.0f), "GAME mode");
+	else ImGui::TextColored(ImVec4(0.11f, 0.7f, 0.81f, 1.0f), "UI mode");
 
 	if (ImGui::Button("Simulation Start / End")) start = start ? false : true; ImGui::SameLine();
-	if (start) ImGui::TextColored(ImVec4(1.0, 0.89, 0, 1.0), "Simulating...");
-	else ImGui::TextColored(ImVec4(1.0, 0, 0, 1.0), "Not simulating!");
+	if (start) ImGui::TextColored(ImVec4(1.0f, 0.89f, 0.f, 1.0f), "Simulating...");
+	else ImGui::TextColored(ImVec4(1.0f, 0.f, 0.f, 1.0f), "Not simulating!");
 
 	ImGui::Checkbox("Broad Debug Render", &BroadDebug);
 
@@ -206,14 +206,14 @@ void CGProj::SimpleTerrainDemo::mouse(double xpos, double ypos)
 		if (firstMouse)
 		{
 			firstMouse = false;
-			GamelastX = xpos;
-			GamelastY = ypos;
+			GamelastX = (float)xpos;
+			GamelastY = (float)ypos;
 		}
 
-		float xoffset = xpos - GamelastX;
-		float yoffset = GamelastY - ypos;
-		GamelastX = xpos;
-		GamelastY = ypos;
+		float xoffset = (float)(xpos - GamelastX);
+		float yoffset = (float)(GamelastY - ypos);
+		GamelastX = (float)xpos;
+		GamelastY = (float)ypos;
 
 		camera.ProcessMouseMovement(xoffset, yoffset);
 	}
@@ -225,7 +225,7 @@ void CGProj::SimpleTerrainDemo::mouseButton(GLFWwindow * app_window, int button,
 
 void CGProj::SimpleTerrainDemo::scroll(double yoffset)
 {
-	camera.ProcessMouseScroll(yoffset);
+	camera.ProcessMouseScroll((float)yoffset);
 }
 
 void CGProj::SimpleTerrainDemo::resize(int width, int height)
@@ -306,15 +306,15 @@ void CGProj::SimpleTerrainDemo::generateContacts(CGContactManager & cData)
 
 	// Set up the collision data structure
 	cData.reset();
-	cData.friction = 0.9;
-	cData.restitution = 0.1;
-	cData.tolerance = 0.1;
+	cData.friction = (GPED::real)0.9;
+	cData.restitution = (GPED::real)0.1;
+	cData.tolerance = (GPED::real)0.1;
 
 	// we will generate contacts from the pairs detected by broadphase
 	// In addition, we will generate contacts manually with planes
 	const std::vector<std::pair<CGCollisionPrimitive*, CGCollisionPrimitive*>>& t_pair
 		= SecondResult.vPairs;
-	for (int i = 0; i < t_pair.size(); ++i)
+	for (unsigned i = 0; i < t_pair.size(); ++i)
 	{
 		cAlgo.findNarrowAlgorithmAndProcess(t_pair[i].first, t_pair[i].second, &cData);
 	}

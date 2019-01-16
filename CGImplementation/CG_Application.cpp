@@ -365,6 +365,6 @@ void CGProj::TerrainDemo::resize(int width, int height)
 
 CGProj::Application* getApplication()
 {
-	return new CGProj::TerrainDemo();
+	return new CGProj::GraphicsDemo();
 }
 

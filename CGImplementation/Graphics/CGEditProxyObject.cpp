@@ -18,44 +18,72 @@ CGProj::CGEditProxyObject::CGEditProxyObject(CGAssetManager& am)
 void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 & proj)
 {
 	// CGEditObject::render(view, proj);
-
 	m_DefShader->use();
 
-	// 1. Material Setting
-	m_DefShader->setBool("material.CMorLM", m_CMorLM);
-	m_DefShader->setBool("material.isLMdiffuse", m_isLMdiffuse);
-	m_DefShader->setBool("material.isLMspecular", m_isLMspecular);
-	m_DefShader->setBool("material.isLMemissive", m_isLMemissive);
-	if (m_CMorLM) // CM == false, LM == true
+	if (m_useModelData == false) // for the primitive rendering
 	{
-		if (m_isLMdiffuse) glActiveTexture(GL_TEXTURE0), glBindTexture(GL_TEXTURE_2D, m_diffuseTexture);
-		if (m_isLMspecular) glActiveTexture(GL_TEXTURE1), glBindTexture(GL_TEXTURE_2D, m_specularTexture);
-		if (m_isLMemissive) glActiveTexture(GL_TEXTURE2), glBindTexture(GL_TEXTURE_2D, m_emissiveTexture);
-	}
-	else
-	{
-		m_DefShader->setVec3("material.CMambient", m_CMambient);
-		m_DefShader->setVec3("material.CMdiffuse", m_CMdiffuse);
-		m_DefShader->setVec3("material.CMspecular", m_CMspecular);
-		m_DefShader->setFloat("material.CMshininess", m_CMshininess);
-	}
-	// 1. Material Setting
+		// 1. Material Setting
+		m_DefShader->setBool("material.CMorLM", m_CMorLM);
+		
+		if (m_CMorLM) // CM == false, LM == true
+		{
+			if (m_isLMdiffuse) glActiveTexture(GL_TEXTURE0), glBindTexture(GL_TEXTURE_2D, m_diffuseTexture);
+			if (m_isLMspecular) glActiveTexture(GL_TEXTURE1), glBindTexture(GL_TEXTURE_2D, m_specularTexture);
+			if (m_isLMemissive) glActiveTexture(GL_TEXTURE2), glBindTexture(GL_TEXTURE_2D, m_emissiveTexture);
 
+			m_DefShader->setBool("material.isLMdiffuse", m_isLMdiffuse);
+			m_DefShader->setBool("material.isLMspecular", m_isLMspecular);
+			m_DefShader->setBool("material.isLMemissive", m_isLMemissive);
+			m_DefShader->setBool("material.isNormalMap", m_isNormalMap);
+			m_DefShader->setBool("material.isDepthMap", m_isDepthMap);
+
+			if (m_isNormalMap || m_isDepthMap)
+			{
+				m_DefShader->setBool("IsUseTangentSpace", true); // Calculate TBN Matrix
+			}
+			else
+			{
+				m_DefShader->setBool("IsUseTangentSpace", false);
+			}
+		}
+		else
+		{
+			m_DefShader->setVec3("material.CMambient", m_CMambient);
+			m_DefShader->setVec3("material.CMdiffuse", m_CMdiffuse);
+			m_DefShader->setVec3("material.CMspecular", m_CMspecular);
+			m_DefShader->setFloat("material.CMshininess", m_CMshininess);
+		}
+	}
+	else if (m_useModelData == true) // for the loaded model rendering
+	{
+		m_DefShader->setBool("material.CMorLM", true); // use light map
+
+		// the below flags will be set automatically by CGModel class.
+		// So I'm initializing to prevent the shader for using garbage value.
+		m_DefShader->setBool("material.isLMdiffuse", false);
+		m_DefShader->setBool("material.isLMspecular", false);
+		m_DefShader->setBool("material.isLMemissive", false);
+		m_DefShader->setBool("material.isNormalMap", false);
+		m_DefShader->setBool("material.isDepthMap", false);
+	}
+	
 	// 2. Vertex Setting
-	m_DefShader->setMat4("projection", proj);
-	m_DefShader->setMat4("view", view);
-
 	glm::mat4 model(1.0);
 	model = glm::translate(model, this->getPosition());
 	// model = glm::rotate(model, ) // TODO: add the rotation function later
 	model = glm::scale(model, this->getScale());
 
+	m_DefShader->setMat4("projection", proj);
+	m_DefShader->setMat4("view", view);
 	m_DefShader->setMat4("model", model);
 	m_DefShader->setMat3("ModelNormalMatrix", glm::mat3(glm::transpose(glm::inverse(model))));
 	// 2. Vertex Setting
 
-	// Now Ready to render. Go render according to the primitive
-	renderPrimitive();
+	// Now Ready to render. Go render according to the flags
+	if (m_useModelData)
+		m_Model->deferredFirstRender(m_DefShader);
+	else
+		renderPrimitive();
 }
 
 void CGProj::CGEditProxyObject::UIrender(CGAssetManager& am)
@@ -215,6 +243,36 @@ void CGProj::CGEditProxyObject::setEmissiveTexture(unsigned texId)
 	CGEditProxyObject::m_emissiveTexture = texId;
 }
 
+bool CGProj::CGEditProxyObject::isNormalMapOn()
+{
+	return m_isNormalMap;
+}
+
+void CGProj::CGEditProxyObject::setNormalMapFlag(bool flag)
+{
+	m_isNormalMap = flag;
+}
+
+void CGProj::CGEditProxyObject::setNormalMapTexture(unsigned texId)
+{
+	m_normalMapTexture = texId;
+}
+
+bool CGProj::CGEditProxyObject::isDepthMapon()
+{
+	return m_isDepthMap;
+}
+
+void CGProj::CGEditProxyObject::setDepthMapFalg(bool flag)
+{
+	m_isDepthMap = flag;
+}
+
+void CGProj::CGEditProxyObject::setDepthMapTexture(unsigned texId)
+{
+	m_depthMapTexture = texId;
+}
+
 void CGProj::CGEditProxyObject::setCMambinet(const glm::vec3 & ambient)
 {
 	CGEditProxyObject::m_CMambient = ambient;
@@ -233,6 +291,16 @@ void CGProj::CGEditProxyObject::setCMspecular(const glm::vec3 & specular)
 void CGProj::CGEditProxyObject::setCMshininess(float s)
 {
 	CGEditProxyObject::m_CMshininess = s;
+}
+
+void CGProj::CGEditProxyObject::setModelData(bool m)
+{
+	m_useModelData = m;
+}
+
+void CGProj::CGEditProxyObject::setModel(CGModel * model)
+{
+	m_Model = model;
 }
 
 void CGProj::CGEditProxyObject::setProxyType(EditProxyType e)

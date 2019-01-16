@@ -64,6 +64,9 @@
     <Filter Include="Terrain Source">
       <UniqueIdentifier>{18f226a6-4edc-46f0-8efe-bc8d7a495248}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Demo\Graphics Demo\ModelLoader Demo">
+      <UniqueIdentifier>{6e7224ed-c1df-465e-857d-4643c6967701}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -248,6 +251,12 @@
     </ClCompile>
     <ClCompile Include="GPED\CGCollisionNarrow.cpp">
       <Filter>GPED Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\CGModel.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\CGModelMesh.cpp">
+      <Filter>Graphics Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -478,6 +487,15 @@
     </ClInclude>
     <ClInclude Include="GPED\CGCollisionTriangle.h">
       <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGModel.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGModelMesh.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGModelUtils.h">
+      <Filter>Graphics Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

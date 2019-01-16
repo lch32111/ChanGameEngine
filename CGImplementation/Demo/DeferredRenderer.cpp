@@ -20,6 +20,8 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	Deferred_First_Shader->setInt("material.LMdiffuse", 0);
 	Deferred_First_Shader->setInt("material.LMspecular", 1);
 	Deferred_First_Shader->setInt("material.LMemissive", 2);
+	Deferred_First_Shader->setInt("material.NormalMap", 3);
+	Deferred_First_Shader->setInt("material.DepthMap", 4);
 
 	Deferred_Second_Shader = assetManager.getShader(SHADER_DEFERRED_SECOND);
 	Deferred_Second_Shader->use();
@@ -135,6 +137,8 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 
 		editProxies[i].setPosition(prandom.randomVector(glm::vec3(-7, -5, 0), glm::vec3(-4, -4, 5)));
 	}
+	editProxies[0].setModelData(true);
+	editProxies[0].setModel(assetManager.getModelData(MODEL_NANO_SUIT));
 
 	GPED::Random random(331);
 	editLights.reserve(400); // prevent the memory address of editLights from not changing because of dBroadPhase userProxy pointer!
@@ -189,6 +193,7 @@ void CGProj::DeferredRenderer::initImgui()
 
 void CGProj::DeferredRenderer::deinit()
 {
+	assetManager.destroy();
 }
 
 void CGProj::DeferredRenderer::updateImgui()

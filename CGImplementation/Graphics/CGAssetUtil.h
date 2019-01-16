@@ -49,6 +49,12 @@ namespace CGProj
 		NUM_CG_TEXTURE_ENUM
 	};
 
+	enum CG_MODEL_ENUM
+	{
+		MODEL_NANO_SUIT,
+		NUM_CG_MODEL_ENUM
+	};
+
 	static const char* CG_TEXTURE_LIST[] =
 	{
 		"TEXTURE_CONTAINER_DIFFUSE",

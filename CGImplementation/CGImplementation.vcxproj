@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{792F3151-E667-41A8-A222-CF178CF2FC13}</ProjectGuid>
     <RootNamespace>CGImplementation</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -170,6 +170,8 @@
     <ClCompile Include="Graphics\CGEditSpotLight.cpp" />
     <ClCompile Include="Graphics\CGEditSpotLightVisualizer.cpp" />
     <ClCompile Include="Graphics\CGGizmo.cpp" />
+    <ClCompile Include="Graphics\CGModel.cpp" />
+    <ClCompile Include="Graphics\CGModelMesh.cpp" />
     <ClCompile Include="Graphics\CGPointShadowFrustumVisualizer.cpp" />
     <ClCompile Include="Graphics\CGRenderLine.cpp" />
     <ClCompile Include="Graphics\CGSizableRenderLine.cpp" />
@@ -241,6 +243,9 @@
     <ClInclude Include="Graphics\CGEditSpotLightVisualizer.h" />
     <ClInclude Include="Graphics\CGFrustum.h" />
     <ClInclude Include="Graphics\CGGizmo.h" />
+    <ClInclude Include="Graphics\CGModel.h" />
+    <ClInclude Include="Graphics\CGModelMesh.h" />
+    <ClInclude Include="Graphics\CGModelUtils.h" />
     <ClInclude Include="Graphics\CGPointShadowFrustumVisualizer.h" />
     <ClInclude Include="Graphics\CGRenderLine.h" />
     <ClInclude Include="Graphics\CGSizableRenderLine.h" />

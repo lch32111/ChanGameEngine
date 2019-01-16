@@ -5,6 +5,7 @@
 #include <Graphics/Shader.h>
 #include <Graphics/CGAssetUtil.h>
 #include <Graphics/GLTextureUtility.h>
+#include <Graphics/CGModel.h>
 
 namespace CGProj
 {
@@ -20,6 +21,8 @@ namespace CGProj
 		Shader getGeoShader(CG_GEO_SHADER_ENUM _shaderEnum, char);
 
 		unsigned getTexture(CG_TEXTURE_ENUM _textureEnum, bool gamma);
+
+		CGModel* getModelData(CG_MODEL_ENUM _modelEnum);
 
 		// Manual Setting
 		void assetInit()
@@ -43,32 +46,40 @@ namespace CGProj
 			m_geoShaders[SHADER_GEO_POINT_SHADOW_MAP] = Shader("ShaderFolder/CGPointDepthMap.vs", "ShaderFolder/CGPointDepthMap.gs", "ShaderFolder/CGPointDepthMap.fs");
 
 			// TODO: make texture class for on-demand process. TextureFromFile() is just loading the image...
-			m_NoGammaTexture[TEXTURE_CONTAINER_DIFFUSE] = TextureFromFile("ImageFolder/container2.png", false);
-			m_GammaTextures[TEXTURE_CONTAINER_DIFFUSE] = TextureFromFile("ImageFolder/container2.png", true);
+			m_NoGammaTexture[TEXTURE_CONTAINER_DIFFUSE] = TextureFromFile("ResourceFolder/ImageFolder/container2.png", false);
+			m_GammaTextures[TEXTURE_CONTAINER_DIFFUSE] = TextureFromFile("ResourceFolder/ImageFolder/container2.png", true);
 
-			m_NoGammaTexture[TEXTURE_CONTAINER_SPECULAR] = TextureFromFile("ImageFolder/container2_specular.png", false);
-			m_GammaTextures[TEXTURE_CONTAINER_SPECULAR] = TextureFromFile("ImageFolder/container2_specular.png", true);
+			m_NoGammaTexture[TEXTURE_CONTAINER_SPECULAR] = TextureFromFile("ResourceFolder/ImageFolder/container2_specular.png", false);
+			m_GammaTextures[TEXTURE_CONTAINER_SPECULAR] = TextureFromFile("ResourceFolder/ImageFolder/container2_specular.png", true);
 
-			m_NoGammaTexture[TEXTURE_FIELD_GRASS] = TextureFromFile("ImageFolder/fieldGrass.jpg", false);
-			m_GammaTextures[TEXTURE_FIELD_GRASS] = TextureFromFile("ImageFolder/fieldGrass.jpg", true);
+			m_NoGammaTexture[TEXTURE_FIELD_GRASS] = TextureFromFile("ResourceFolder/ImageFolder/fieldGrass.jpg", false);
+			m_GammaTextures[TEXTURE_FIELD_GRASS] = TextureFromFile("ResourceFolder/ImageFolder/fieldGrass.jpg", true);
 
-			m_NoGammaTexture[TEXTURE_GOLD] = TextureFromFile("ImageFolder/gold.jpg", false);
-			m_GammaTextures[TEXTURE_GOLD] = TextureFromFile("ImageFolder/gold.jpg", true);
+			m_NoGammaTexture[TEXTURE_GOLD] = TextureFromFile("ResourceFolder/ImageFolder/gold.jpg", false);
+			m_GammaTextures[TEXTURE_GOLD] = TextureFromFile("ResourceFolder/ImageFolder/gold.jpg", true);
 			
-			m_NoGammaTexture[TEXTURE_MARBLE] = TextureFromFile("ImageFolder/marble.jpg", false);
-			m_GammaTextures[TEXTURE_MARBLE] = TextureFromFile("ImageFolder/marble.jpg", true);
+			m_NoGammaTexture[TEXTURE_MARBLE] = TextureFromFile("ResourceFolder/ImageFolder/marble.jpg", false);
+			m_GammaTextures[TEXTURE_MARBLE] = TextureFromFile("ResourceFolder/ImageFolder/marble.jpg", true);
 
-			m_NoGammaTexture[TEXTURE_RED_MARBLE] = TextureFromFile("ImageFolder/redMarble.jpg", false);
-			m_GammaTextures[TEXTURE_RED_MARBLE] = TextureFromFile("ImageFolder/redMarble.jpg", true);
+			m_NoGammaTexture[TEXTURE_RED_MARBLE] = TextureFromFile("ResourceFolder/ImageFolder/redMarble.jpg", false);
+			m_GammaTextures[TEXTURE_RED_MARBLE] = TextureFromFile("ResourceFolder/ImageFolder/redMarble.jpg", true);
 
-			m_NoGammaTexture[TEXTURE_MATRIX] = TextureFromFile("ImageFolder/matrix.jpg", false);
-			m_GammaTextures[TEXTURE_MATRIX] = TextureFromFile("ImageFolder/matrix.jpg", true);
+			m_NoGammaTexture[TEXTURE_MATRIX] = TextureFromFile("ResourceFolder/ImageFolder/matrix.jpg", false);
+			m_GammaTextures[TEXTURE_MATRIX] = TextureFromFile("ResourceFolder/ImageFolder/matrix.jpg", true);
 
-			m_NoGammaTexture[TEXTURE_BLUE_MATRIX] = TextureFromFile("ImageFolder/bluematrix.jpg", false);
-			m_GammaTextures[TEXTURE_BLUE_MATRIX] = TextureFromFile("ImageFolder/bluematrix.jpg", true);
+			m_NoGammaTexture[TEXTURE_BLUE_MATRIX] = TextureFromFile("ResourceFolder/ImageFolder/bluematrix.jpg", false);
+			m_GammaTextures[TEXTURE_BLUE_MATRIX] = TextureFromFile("ResourceFolder/ImageFolder/bluematrix.jpg", true);
 
-			m_NoGammaTexture[TEXTURE_WOOD_PANEL] = TextureFromFile("ImageFolder/woodpanel.png", false);
-			m_GammaTextures[TEXTURE_WOOD_PANEL] = TextureFromFile("ImageFolder/woodpanel.png", true);
+			m_NoGammaTexture[TEXTURE_WOOD_PANEL] = TextureFromFile("ResourceFolder/ImageFolder/woodpanel.png", false);
+			m_GammaTextures[TEXTURE_WOOD_PANEL] = TextureFromFile("ResourceFolder/ImageFolder/woodpanel.png", true);
+
+			m_models[MODEL_NANO_SUIT] = CGModel("ResourceFolder/ModelFolder/nanosuit/nanosuit.obj");
+		}
+
+		void destroy()
+		{
+			for (unsigned i = 0; i < (unsigned)NUM_CG_MODEL_ENUM; ++i)
+				m_models[i].destroy();
 		}
 	private:
 		Shader m_shaders[NUM_CG_SHADER_ENUM];
@@ -76,6 +87,8 @@ namespace CGProj
 
 		unsigned m_NoGammaTexture[NUM_CG_TEXTURE_ENUM];
 		unsigned m_GammaTextures[NUM_CG_TEXTURE_ENUM];
+
+		CGModel m_models[NUM_CG_MODEL_ENUM];
 	};
 }
 

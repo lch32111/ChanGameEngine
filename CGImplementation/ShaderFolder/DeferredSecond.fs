@@ -123,7 +123,7 @@ void main()
     {
         // Light Map Calculation
         vec3 LMAlbedo = vec3(1.0); 
-		float LMSpecular = 0.0; 
+		float LMSpecular = 1.0; 
 		vec3 LMemissive = vec3(0.0);
         if(MyBool.r == 1) LMAlbedo = texture(gAlbedoSpec, TexCoords).rgb;
         if(MyBool.g == 1) LMSpecular = texture(gAlbedoSpec, TexCoords).a;

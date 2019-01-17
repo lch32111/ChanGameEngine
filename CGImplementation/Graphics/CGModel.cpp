@@ -56,6 +56,14 @@ void CGProj::CGModel::deferredFirstRender(Shader* shader)
 	}
 }
 
+void CGProj::CGModel::shadowFirstRender()
+{
+	for (unsigned i = 0; i < m_meshes.size(); ++i)
+	{
+		m_meshes[i].shadowFirstRender();
+	}
+}
+
 void CGProj::CGModel::processNode(aiNode * node, const aiScene * scene)
 {
 	// process all the node's meshes (if any)

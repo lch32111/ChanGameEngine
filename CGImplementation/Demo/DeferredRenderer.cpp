@@ -140,8 +140,8 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 		editProxies[i].setPosition(prandom.randomVector(glm::vec3(-7, -5, 0), glm::vec3(-4, -4, 5)));
 	}
 	editProxies[0].setModelData(true);
-	editProxies[0].setModel(assetManager.getModelData(MODEL_SPONZA_BUILDING));
-	editProxies[0].setScale(0.01f);
+	editProxies[0].setModel(assetManager.getModelData(MODEL_ROYAL_ROOSTER));
+	editProxies[0].setScale(0.5f);
 	editProxies[1].setModelData(true);
 	editProxies[1].setModel(assetManager.getModelData(MODEL_NANO_SUIT));
 	editProxies[1].setScale(0.5f);

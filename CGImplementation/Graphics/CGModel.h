@@ -32,6 +32,7 @@ namespace CGProj
 		bool loadModel();
 
 		void deferredFirstRender(Shader* shader);
+		void shadowFirstRender();
 	private:
 		/* Model Data */
 		std::vector<CGModelMesh> m_meshes;

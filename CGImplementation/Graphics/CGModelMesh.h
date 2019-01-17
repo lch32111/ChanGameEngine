@@ -46,6 +46,7 @@ namespace CGProj
 
 		// Deferred Rendering 
 		void deferredFirstRender(Shader* shader);
+		void shadowFirstRender();
 		
 		unsigned m_VAO, m_VBO, m_EBO;
 		void setupMesh();

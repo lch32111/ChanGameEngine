@@ -25,6 +25,7 @@ namespace CGProj
 
 		/*** Graphics Method ***/
 		void render(const glm::mat4& view, const glm::mat4& proj, const glm::vec3& cameraPos);
+		void shadowMapRender();
 		virtual void UIrender(CGAssetManager& am);
 
 		bool getCMorLM();

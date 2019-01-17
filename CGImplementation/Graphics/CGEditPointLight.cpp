@@ -176,7 +176,7 @@ void CGProj::CGEditPointLight::renderShadowMap(std::vector<CGEditProxyObject>& o
 		model = glm::translate(model, objects[i].getPosition());
 		model = glm::scale(model, objects[i].getScale());
 		m_DepthMapShader->setMat4("model", model);
-		objects[i].renderPrimitive();
+		objects[i].shadowMapRender();
 	}
 
 	// Plane

@@ -3,12 +3,13 @@
 
 #include <GPED/GPED_Precision.h>
 #include <GPED/CGBroadPhase.h>
-
-#include <Graphics/CGAssetManager.h>
 #include <Graphics/CGEditPrimitive.h>
 
 namespace CGProj
 {
+	// Forward Declaration
+	class CGAssetManager;
+
 	enum EditObjectType
 	{
 		EDIT_OBJECT_PROXY,

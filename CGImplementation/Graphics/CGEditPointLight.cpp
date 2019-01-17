@@ -5,6 +5,8 @@
 
 #include <Graphics/CGDefSecondUtil.h>
 #include <Graphics/GLPrimitiveUtil.h>
+#include <Graphics/CGAssetManager.h>
+#include <Graphics/CGEditProxyObject.h>
 
 CGProj::CGEditPointLight::CGEditPointLight()
 {

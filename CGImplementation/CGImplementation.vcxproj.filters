@@ -255,6 +255,9 @@
     <ClCompile Include="Graphics\CGModelMesh.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\CGAssetTexture.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -492,6 +495,12 @@
       <Filter>Graphics Header</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\CGModelUtils.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CGErrorLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGAssetTexture.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
   </ItemGroup>

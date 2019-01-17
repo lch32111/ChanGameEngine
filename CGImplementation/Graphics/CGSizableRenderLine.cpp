@@ -1,4 +1,6 @@
-#include "CGSizableRenderLine.h"
+#include <Graphics/CGSizableRenderLine.h>
+
+#include <Graphics/CGAssetManager.h>
 
 CGProj::CGSizableRenderLine::CGSizableRenderLine()
 {

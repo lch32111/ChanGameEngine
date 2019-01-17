@@ -34,7 +34,7 @@ public:
 	/** Sets the box to a specific location. */
 	void setState(ShotType shotType);
 	void setState(ShotType shotType, glm::vec3 Position, glm::vec3 Velocity);
-	void setState(ShotType shotType, const chanQuatCamera& camera);
+	void setState(ShotType shotType, const CGProj::chanQuatCamera& camera);
 };
 
 #endif

@@ -2,13 +2,17 @@
 #ifndef __CG_EDIT_POINT_LIGHT_H__
 #define __CG_EDIT_POINT_LIGHT_H__
 
+#include <vector>
+
 #include <Graphics/Shader.h>
-#include <Graphics/CGAssetManager.h>
-#include <Graphics/CGEditProxyObject.h>
 #include <Graphics/CGEditLightCommonFactor.h>
 
 namespace CGProj
 {
+	// Forward Declartion
+	class CGAssetManager;
+	class CGEditProxyObject;
+
 	/** 2018-12-19, Chanhaeng Lee
 	* This Class includes variables
 	* related to the point light component.

@@ -11,7 +11,7 @@ void FireworksDemo::initFireworkRules()
 		0.5f, 1.4f, // age range
 		glm::vec3(-5, 25, -5), // min velocity
 		glm::vec3(5, 28, 5), // max velocity
-		0.1 // damping
+		0.1f // damping
 	);
 	rules[0].payloads[0].set(3, 5);
 	rules[0].payloads[1].set(5, 5);
@@ -22,7 +22,7 @@ void FireworksDemo::initFireworkRules()
 		0.5f, 1.0f, // age range
 		glm::vec3(-5, 10, -5), // min velocity
 		glm::vec3(5, 20, 5), // max velocity
-		0.8 // damping
+		0.8f // damping
 	);
 	rules[1].payloads[0].set(4, 2);
 
@@ -32,7 +32,7 @@ void FireworksDemo::initFireworkRules()
 		0.5f, 1.5f, // age range
 		glm::vec3(-5, -5, -5), // min velocity
 		glm::vec3(5, 5, 5), // max velocity
-		0.1 // damping
+		0.1f // damping
 	);
 
 	rules[3].init(0);
@@ -41,7 +41,7 @@ void FireworksDemo::initFireworkRules()
 		0.25f, 0.5f, // age range
 		glm::vec3(-20, 5, -5), // min velocity
 		glm::vec3(20, 5, 5), // max velocity
-		0.2 // damping
+		0.2f // damping
 	);
 
 	rules[4].init(1);
@@ -50,7 +50,7 @@ void FireworksDemo::initFireworkRules()
 		0.5f, 1.0f, // age range
 		glm::vec3(-20, 2, -5), // min velocity
 		glm::vec3(20, 18, 5), // max velocity
-		0.01 // damping
+		0.01f // damping
 	);
 	rules[4].payloads[0].set(3, 5);
 
@@ -60,7 +60,7 @@ void FireworksDemo::initFireworkRules()
 		3, 5, // age range
 		glm::vec3(-5, 5, -5), // min velocity
 		glm::vec3(5, 10, 5), // max velocity
-		0.95 // damping
+		0.95f // damping
 	);
 
 	rules[6].init(1);
@@ -69,7 +69,7 @@ void FireworksDemo::initFireworkRules()
 		4, 5, // age range
 		glm::vec3(-5, 50, -5), // min velocity
 		glm::vec3(5, 60, 5), // max velocity
-		0.01 // damping
+		0.01f // damping
 	);
 	rules[6].payloads[0].set(8, 10);
 
@@ -79,7 +79,7 @@ void FireworksDemo::initFireworkRules()
 		0.25f, 0.5f, // age range
 		glm::vec3(-1, -1, -1), // min velocity
 		glm::vec3(1, 1, 1), // max velocity
-		0.01 // damping
+		0.01f // damping
 	);
 
 	rules[8].init(0);
@@ -88,7 +88,7 @@ void FireworksDemo::initFireworkRules()
 		3, 5, // age range
 		glm::vec3(-15, 10, -5), // min velocity
 		glm::vec3(15, 15, 5), // max velocity
-		0.95 // damping
+		0.95f // damping
 	);
 	// ... and so on for other firework types ...
 }
@@ -158,7 +158,7 @@ void GPED::FireworksDemo::update(float duration)
 	}
 }
 
-void GPED::FireworksDemo::render(Shader * shader, glm::mat4& view, glm::mat4& proj)
+void GPED::FireworksDemo::render(CGProj::Shader * shader, glm::mat4& view, glm::mat4& proj)
 {
 	shader->use();
 	shader->setMat4("view", view);

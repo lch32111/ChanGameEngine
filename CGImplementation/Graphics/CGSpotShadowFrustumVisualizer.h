@@ -7,10 +7,12 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <Graphics/Shader.h>
-#include <Graphics/CGAssetManager.h>
 
 namespace CGProj
 {
+	// Forward Declaration
+	class CGAssetManager;
+
 	class CGSpotShadowFrustumVisualizer
 	{
 	public:

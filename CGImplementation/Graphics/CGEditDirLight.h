@@ -2,14 +2,21 @@
 #ifndef __CG_EDIT_DIR_LIGHT_H__
 #define __CG_EDIT_DIR_LIGHT_H__
 
+#include <vector>
+
 #include <Graphics/Shader.h>
-#include <Graphics/CGAssetManager.h>
 #include <Graphics/CGEditLightCommonFactor.h>
-#include <Graphics/CGEditProxyObject.h>
-#include <Graphics/CGFrustum.h>
+
 
 namespace CGProj
 {
+	// Forward Declaration
+	class CGAssetManager;
+	class CGEditProxyObject;
+	struct CGOrthoFrustum;
+	struct CGPerFrustum;
+	
+
 	/** 2018-12-19, Chanhaeng Lee
 	 * This Class includes variables 
 	 * related to the directional light component.

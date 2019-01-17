@@ -7,6 +7,7 @@
 
 namespace CGProj
 {
+	// Forward Declaration
 	enum EditProxyType
 	{
 		EDIT_PROXY_STATIC = 0,

@@ -1,5 +1,7 @@
-#include "CGDirShadowFrustumVisualizer.h"
+#include <Graphics/CGDirShadowFrustumVisualizer.h>
+
 #include <GPED/CGPhysicsUtil.h>
+#include <Graphics/CGAssetManager.h>
 
 CGProj::CGDirShadowFrustumVisualizer::CGDirShadowFrustumVisualizer()
 {

@@ -2,14 +2,15 @@
 #ifndef __CG_GIZMO_H__
 #define __CG_GIZMO_H__
 
-#include <GPED/CGBroadPhase.h>
-#include <Graphics/chanQuatCamera.h>
 #include <Graphics/CGRenderLine.h>
 #include <Graphics/CGEditObject.h>
-#include <Graphics/CGAssetManager.h>
 
 namespace CGProj
 {
+	// Forward Declaration
+	class CGAssetManager;
+	class chanQuatCamera;
+
 	class CGGizmo
 	{
 	public:

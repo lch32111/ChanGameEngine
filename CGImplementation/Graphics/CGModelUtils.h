@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <CGErrorLogger.h>
 
 namespace CGProj
 {
@@ -41,6 +42,18 @@ namespace CGProj
 		(1 << (int)('h' - 'a')), // depthMap('h'eightMap) == 128 (1 << 7)
 		// (1 << (int)('r' - 'a')) // reflect == 131072 (1 << 17)
 	};
+
+	inline unsigned getIndexFromKey(int key)
+	{
+		for (unsigned i = 0; i < materialKeyList.size(); ++i)
+		{
+			if (materialKeyList[i] & key)
+				return i;
+		}
+
+		CGassert();
+		return -1;
+	}
 }
 
 #endif 

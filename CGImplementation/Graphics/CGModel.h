@@ -10,6 +10,9 @@
 
 namespace CGProj
 {
+	// Forward Declaration
+	class Shader;
+
 	/* 2019-01-16 Chanhaeng Lee
 	 * This is the class where you can load model, using the asset manager
 	 * Also This model is used by Chan Game Deferred Renderer.

@@ -1,6 +1,8 @@
 #include <Graphics/CGModel.h>
-#include <Graphics/CGAssetManager.h>
 
+#include <Graphics/CGAssetManager.h>
+#include <Graphics/Shader.h>
+#include <Graphics/GLTextureUtility.h>
 
 CGProj::CGModel::CGModel()
 	: m_isLoaded(false), m_directory("")
@@ -28,8 +30,7 @@ bool CGProj::CGModel::loadModel()
 		m_directory, 
 		aiProcess_Triangulate |
 		aiProcess_GenNormals |
-		aiProcess_FlipUVs | 
-		aiProcess_CalcTangentSpace
+		aiProcess_FlipUVs
 	);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -99,10 +100,16 @@ CGProj::CGModelMesh CGProj::CGModel::processMesh(aiMesh * mesh, const aiScene * 
 		}
 		else
 			vertex.TexCoords = glm::vec2(0.0f, 0.0f);
-
-		vector.x = mesh->mTangents[i].x;
-		vector.y = mesh->mTangents[i].y;
-		vector.z = mesh->mTangents[i].z;
+		
+		if (mesh->mTangents)
+		{
+			vector.x = mesh->mTangents[i].x;
+			vector.y = mesh->mTangents[i].y;
+			vector.z = mesh->mTangents[i].z;
+			vertex.Tangent = vector;
+		}
+		else
+			vertex.Tangent = glm::vec3(0.0f);
 
 		vertices.push_back(vertex);
 	}
@@ -130,7 +137,7 @@ CGProj::CGModelMesh CGProj::CGModel::processMesh(aiMesh * mesh, const aiScene * 
 		textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
 		// depthMap -> heightMap for the key of textures
-		std::vector<Texture> depthMaps = loadMaterialTextures(material, aiTextureType_DISPLACEMENT, "hepthMap"); 
+		std::vector<Texture> depthMaps = loadMaterialTextures(material, aiTextureType_DISPLACEMENT, "heighthMap");
 		textures.insert(textures.end(), depthMaps.begin(), depthMaps.end());
 
 		// std::vector<Texture> reflectMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "LMreflect");

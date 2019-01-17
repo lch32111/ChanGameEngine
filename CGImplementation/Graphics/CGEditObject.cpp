@@ -1,6 +1,6 @@
 #include <Graphics/CGEditObject.h>
-
 #include <Graphics/GLPrimitiveUtil.h>
+#include <Graphics/CGAssetManager.h>
 
 // =================================================================
 /*** CG EDIT Object  ***/

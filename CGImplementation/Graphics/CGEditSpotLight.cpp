@@ -6,6 +6,10 @@
 
 #include <Graphics/CGDefSecondUtil.h>
 #include <Graphics/GLPrimitiveUtil.h>
+#include <Graphics/CGAssetManager.h>
+#include <Graphics/CGEditProxyObject.h>
+#include <Graphics/CGEditSpotLightVisualizer.h>
+#include <Graphics/CGFrustum.h>
 
 #include <GPED/CGPhysicsUtil.h>
 

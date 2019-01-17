@@ -2,15 +2,19 @@
 #ifndef __CG_EDIT_SPOT_LIGHT_H__
 #define __CG_EDIT_SPOT_LIGHT_H__
 
+#include <vector>
+
 #include <Graphics/Shader.h>
-#include <Graphics/CGAssetManager.h>
 #include <Graphics/CGEditLightCommonFactor.h>
-#include <Graphics/CGEditSpotLightVisualizer.h>
-#include <Graphics/CGEditProxyObject.h>
-#include <Graphics/CGFrustum.h>
 
 namespace CGProj
 {
+	// Forward Declaration
+	class CGAssetManager;
+	class CGEditProxyObject;
+	class CGEditSpotLightVisualizer;
+	struct CGPerFrustum;
+
 	/** 2018-12-19, Chanhaeng Lee
 	* This Class includes variables
 	* related to the spot light component.

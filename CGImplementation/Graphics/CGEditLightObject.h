@@ -2,8 +2,9 @@
 #ifndef __CG_EDIT_LIGHT_OBJECT_H__
 #define __CG_EDIT_LIGHT_OBJECT_H__
 
+#include <vector>
+
 #include <Graphics/CGEditObject.h>
-#include <Graphics/CGEditProxyObject.h>
 
 #include <Graphics/CGEditLightCommonFactor.h>
 

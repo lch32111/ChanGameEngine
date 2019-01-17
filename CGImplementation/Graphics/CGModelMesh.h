@@ -6,11 +6,10 @@
 #include <string>
 #include <vector>
 
-// Forward Declaration
-class Shader;
 
 namespace CGProj
 {
+	class Shader;
 	struct Vertex
 	{
 		glm::vec3 Position;

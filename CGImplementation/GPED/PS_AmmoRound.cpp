@@ -51,7 +51,7 @@ void AmmoRound::setState(ShotType shotType)
 
 	// Set the data common to all particle types
 	body->setPosition(0.f, 1.5f, 0.f);
-	startTime = glfwGetTime();
+	startTime = (unsigned)glfwGetTime();
 	body->setOrientation(1, 0, 0, 0);
 	body->setRotation(0, 0, 0);
 	body->clearAccumulators();
@@ -110,7 +110,7 @@ void AmmoRound::setState(ShotType shotType, glm::vec3 Position, glm::vec3 Veloci
 
 	// Set the data common to all particle types
 	body->setPosition(Position);
-	startTime = glfwGetTime();
+	startTime = (unsigned)glfwGetTime();
 	body->setOrientation(1,0,0,0);
 
 	// Camera Direction Shooting
@@ -124,7 +124,7 @@ void AmmoRound::setState(ShotType shotType, glm::vec3 Position, glm::vec3 Veloci
 	calculateInternals();
 }
 
-void AmmoRound::setState(ShotType shotType, const chanQuatCamera& camera)
+void AmmoRound::setState(ShotType shotType, const CGProj::chanQuatCamera& camera)
 {
 	m_shotType = shotType;
 
@@ -176,7 +176,7 @@ void AmmoRound::setState(ShotType shotType, const chanQuatCamera& camera)
 	glm::quat mzQ = camera.Orientation *  glm::quat(0, MinusZaxis)  * glm::conjugate(camera.Orientation);
 	glm::vec3 forwardSetting(mzQ.x, mzQ.y, mzQ.z);
 	body->setPosition(camera.Position + forwardSetting * 5.f);
-	startTime = glfwGetTime();
+	startTime = (unsigned)glfwGetTime();
 	body->setOrientation(camera.Orientation);
 
 	// Camera Direction Shooting

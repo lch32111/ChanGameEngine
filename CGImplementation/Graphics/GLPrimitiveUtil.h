@@ -6,6 +6,8 @@
 
 #include <glad/glad.h>
 
+#include <glm/gtc/constants.hpp>
+
 namespace CGProj
 {
 	static inline void renderCube()

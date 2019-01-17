@@ -3,6 +3,8 @@
 #include <stb_image.h>
 #include <fstream>
 
+#include <Graphics/CGAssetManager.h>
+
 CGProj::CGTerrain::CGTerrain()
 	: 
 	m_terrainWidth(64), m_terrainHeight(5), m_terrainDepth(64), // Manual Setting

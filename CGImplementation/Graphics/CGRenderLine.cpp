@@ -1,4 +1,6 @@
-#include "CGRenderLine.h"
+#include <Graphics/CGRenderLine.h>
+
+#include <Graphics/CGAssetManager.h>
 
 CGProj::CGRenderLine::CGRenderLine()
 {

@@ -123,7 +123,7 @@ namespace GPED
 		~FireworksDemo();
 		void create(unsigned type, const GPEDFirework* parent);
 		void update(float duration);
-		void render(Shader* shader, glm::mat4& view, glm::mat4& proj);
+		void render(CGProj::Shader* shader, glm::mat4& view, glm::mat4& proj);
 	};
 }
 

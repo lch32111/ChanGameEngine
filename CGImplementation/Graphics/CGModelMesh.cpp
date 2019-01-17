@@ -35,6 +35,8 @@ void CGProj::CGModelMesh::deferredFirstRender(Shader* shader)
 	{
 		// pack the all information related to textures
 		texture_key = texture_key | m_textures[i].key;
+		glActiveTexture(GL_TEXTURE0 + getIndexFromKey(m_textures[i].key)); // active proper texture unit before binding
+		glBindTexture(GL_TEXTURE_2D, m_textures[i].id);
 	}
 
 	for (unsigned int i = 0; i < materialKeyList.size(); ++i)
@@ -42,8 +44,6 @@ void CGProj::CGModelMesh::deferredFirstRender(Shader* shader)
 		if (materialKeyList[i] & texture_key)
 		{
 			shader->setBool("material.is" + materialList[i], true);
-			glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
-			glBindTexture(GL_TEXTURE_2D, m_textures[i].id);
 		}
 		else
 		{

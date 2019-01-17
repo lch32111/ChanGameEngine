@@ -3,6 +3,11 @@
 #include <Imgui/imgui.h>
 #include <Imgui/CGimguiUtil.h>
 
+#include <Graphics/CGAssetManager.h>
+#include <Graphics/CGEditObject.h>
+#include <Graphics/CGEditProxyObject.h>
+#include <Graphics/CGFrustum.h>
+
 // =================================================================
 /*** CG Light Object  ***/
 CGProj::CGEditLightObject::CGEditLightObject()

@@ -2,6 +2,9 @@
 
 #include <Imgui/imgui.h>
 
+#include <Graphics/CGAssetManager.h>
+
+
 // =================================================================
 /*** CG EDIT Proxy Object  ***/
 
@@ -40,6 +43,7 @@ void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 &
 			if (m_isNormalMap || m_isDepthMap)
 			{
 				m_DefShader->setBool("IsUseTangentSpace", true); // Calculate TBN Matrix
+				m_DefShader->setVec3("cameraPos", cameraPos);
 			}
 			else
 			{
@@ -65,6 +69,8 @@ void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 &
 		m_DefShader->setBool("material.isLMemissive", false);
 		m_DefShader->setBool("material.isNormalMap", false);
 		m_DefShader->setBool("material.isDepthMap", false);
+
+		m_DefShader->setVec3("cameraPos", cameraPos);
 	}
 	
 	// 2. Vertex Setting

@@ -1,6 +1,7 @@
 #include <Graphics/CGSpotShadowFrustumVisualizer.h>
 
 #include <GPED/CGPhysicsUtil.h>
+#include <Graphics/CGAssetManager.h>
 
 CGProj::CGSpotShadowFrustumVisualizer::CGSpotShadowFrustumVisualizer()
 {

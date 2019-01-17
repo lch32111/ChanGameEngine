@@ -1,8 +1,12 @@
 #include <Graphics/CGGizmo.h>
 
+#include <Graphics/chanQuatCamera.h>
 #include <Graphics/GLPrimitiveUtil.h>
+#include <Graphics/CGAssetManager.h>
 #include <Graphics/CGEditProxyObject.h>
 #include <Graphics/CGEditLightObject.h>
+
+#include <GPED/CGBroadPhase.h>
 
 CGProj::CGGizmo::CGGizmo()
 {

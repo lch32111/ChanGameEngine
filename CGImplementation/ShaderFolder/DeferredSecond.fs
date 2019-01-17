@@ -99,6 +99,8 @@ uniform mat4 spotLightSpace[NR_SPOT_SHADOWS];
 uniform float spotBias[NR_SPOT_SHADOWS];
 
 uniform vec3 cameraPos;
+uniform vec3 brightExtractor;
+uniform float brightThreshold;
 
 // function prototypes
 vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal);
@@ -163,8 +165,8 @@ void main()
     FragColor = vec4(lighting, 1.0);
 
 	// Bloom Effect
-	float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
-	if(brightness > 1.0)
+	float brightness = dot(FragColor.rgb, brightExtractor);
+	if(brightness > brightThreshold)
 		BrightColor = vec4(FragColor.rgb, 1.0);
 	else
 		BrightColor = vec4(0.0, 0.0, 0.0, 1.0);

@@ -12,7 +12,7 @@
 #include <Graphics/CGAssetManager.h>
 #include <Graphics/CGEditProxyObject.h>
 #include <Graphics/CGEditLightObject.h>
-
+#include <Graphics/CGBloomEffect.h>
 
 #include <GPED/CGBroadPhase.h>
 
@@ -71,6 +71,8 @@ namespace CGProj
 
 		float pGamma;
 		float pExposure;
+		bool isBloom;
+		CGBloomEffect myBloom;
 
 		// Broad Phase
 		CGBroadPhase dBroadPhase;

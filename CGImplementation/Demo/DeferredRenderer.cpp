@@ -41,9 +41,19 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 
 	Deferred_Post_Shader = assetManager.getShader(SHADER_DEFERRED_POST);
 	Deferred_Post_Shader->use();
-	Deferred_Post_Shader->setInt("screenTexture", 0);
-	pGamma = 2.2; Deferred_Post_Shader->setFloat("gamma", pGamma);
+	Deferred_Post_Shader->setInt("currentScene", 0);
+	Deferred_Post_Shader->setInt("bloomedScene", 1);
+	
+	pGamma = 2.2f; Deferred_Post_Shader->setFloat("gamma", pGamma);
 	pExposure = 1.0; Deferred_Post_Shader->setFloat("exposure", pExposure);
+	
+	isBloom = true;
+	Shader* tempBlurInit = assetManager.getShader(SHADER_GAUSSIAN_BLUR);
+	tempBlurInit->use();
+	tempBlurInit->setInt("image", 0);
+	myBloom.Initialize(assetManager, width, height, 10);
+	myBloom.m_BrightnessExtractor = glm::vec3(0.2126, 0.7152, 0.0722);
+	myBloom.m_BrightnessThreShold = 1.f;
 
 	// Shadow shader setting
 	Shader* DirdepthMapShader = assetManager.getShader(SHADER_DIR_SHADOW_MAP);
@@ -128,16 +138,16 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	
 	glGenTextures(1, &dSecondHDRColorBuffer);
 	glBindTexture(GL_TEXTURE_2D, dSecondHDRColorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dSecondHDRColorBuffer, 0);
 
-	glGenTextures(1, &dSecondHDRColorBuffer);
+	glGenTextures(1, &dSecondHDRBloomBuffer);
 	glBindTexture(GL_TEXTURE_2D, dSecondHDRBloomBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -243,6 +253,7 @@ void CGProj::DeferredRenderer::initImgui()
 void CGProj::DeferredRenderer::deinit()
 {
 	assetManager.destroy();
+	myBloom.Destroy();
 }
 
 void CGProj::DeferredRenderer::updateImgui()
@@ -270,6 +281,13 @@ void CGProj::DeferredRenderer::updateImgui()
 	// Post-Processing Control
 	ImGui::InputFloat("Gamma", &pGamma, 0.02f, 5.0f, "%.3f");
 	ImGui::InputFloat("Exposure", &pExposure, 0.02f, 5.0f, "%.3f");
+	
+	ImGui::Checkbox("Bloom", &isBloom);
+	if (isBloom)
+	{
+		ImGui::InputFloat3("Extractor Vector", &myBloom.m_BrightnessExtractor[0]);
+		ImGui::InputFloat("Extractor Threshold", &myBloom.m_BrightnessThreShold);
+	}
 	
 
 	ImGui::End();
@@ -392,21 +410,31 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		num_dir_light = num_point_light = num_spot_light = 0;
 		num_dir_shadow = num_point_shadow = num_spot_shadow = 0;
 
+		// For the bloom effect
+		Deferred_Second_Shader->setVec3("brightExtractor", myBloom.m_BrightnessExtractor);
+		Deferred_Second_Shader->setFloat("brightThreshold", myBloom.m_BrightnessThreShold);
+
 		renderScreenQuad();
 	}
 	// Second Pass
 
 	// Post Processing
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	{
+		unsigned result = 0;
+		if(isBloom) result = myBloom.getBloomedTexture(dSecondHDRBloomBuffer);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glClearColor(0, 0, 0, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		Deferred_Post_Shader->use();
 		Deferred_Post_Shader->setFloat("gamma", pGamma);
 		Deferred_Post_Shader->setFloat("exposure", pExposure);
+		Deferred_Post_Shader->setBool("useBloom", isBloom);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, dSecondHDRColorBuffer);
+		glActiveTexture(GL_TEXTURE1);
+		if(isBloom)	glBindTexture(GL_TEXTURE_2D, result);
 		renderScreenQuad();
 	}
 	// Post Processing
@@ -651,6 +679,9 @@ void CGProj::DeferredRenderer::resize(int width, int height)
 	glBindTexture(GL_TEXTURE_2D, dSecondHDRColorBuffer);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
 
+	glBindTexture(GL_TEXTURE_2D, dSecondHDRBloomBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+
 	glBindRenderbuffer(GL_RENDERBUFFER, dSecondHDRDepthRBO);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
 
@@ -659,4 +690,6 @@ void CGProj::DeferredRenderer::resize(int width, int height)
 	glCheckError();
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	myBloom.setTextureDimension(width, height);
 }

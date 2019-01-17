@@ -125,6 +125,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Graphics\CGBloomEffect.cpp" />
     <ClCompile Include="CG_Application.cpp" />
     <ClCompile Include="Demo\DeferredRenderer.cpp" />
     <ClCompile Include="Demo\SimpleTerrainDemo.cpp" />
@@ -191,6 +192,7 @@
     <ClCompile Include="Terrain\CGTerrain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Graphics\CGBloomEffect.h" />
     <ClInclude Include="CGErrorLogger.h" />
     <ClInclude Include="CG_Application.h" />
     <ClInclude Include="Demo\DeferredRenderer.h" />
@@ -280,6 +282,8 @@
     <None Include="ShaderFolder\CGDirDepthMapDebugRender.vs" />
     <None Include="ShaderFolder\CGDirVisualizer.fs" />
     <None Include="ShaderFolder\CGDirVisualizer.vs" />
+    <None Include="ShaderFolder\CGGaussianBlur.fs" />
+    <None Include="ShaderFolder\CGGaussianBlur.vs" />
     <None Include="ShaderFolder\CGLineShader.fs" />
     <None Include="ShaderFolder\CGLineShader.vs" />
     <None Include="ShaderFolder\CGPointDepthMap.fs" />

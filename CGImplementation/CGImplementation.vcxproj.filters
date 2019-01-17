@@ -258,6 +258,9 @@
     <ClCompile Include="Graphics\CGAssetTexture.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\CGBloomEffect.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -503,6 +506,9 @@
     <ClInclude Include="Graphics\CGAssetTexture.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\CGBloomEffect.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderFolder\DeferredFirst.fs">
@@ -608,6 +614,12 @@
       <Filter>ShaderFolder</Filter>
     </None>
     <None Include="ShaderFolder\CGSimpleTerrain.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGGaussianBlur.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGGaussianBlur.fs">
       <Filter>ShaderFolder</Filter>
     </None>
   </ItemGroup>

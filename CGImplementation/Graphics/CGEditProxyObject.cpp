@@ -132,63 +132,70 @@ void CGProj::CGEditProxyObject::UIrender(CGAssetManager& am)
 		break;
 	}
 
-	int cmorlm = (int)m_CMorLM;
-	ImGui::RadioButton("Color Material", &cmorlm, 0); ImGui::SameLine();
-	ImGui::RadioButton("Light Map Material", &cmorlm, 1);
-	m_CMorLM = bool(cmorlm);
-
-	if (m_CMorLM) // Light Map Material
+	if (m_useModelData == false) // Just Manual Vertex Data
 	{
-		ImGui::Checkbox("Diffuse Texture", &m_isLMdiffuse);
-		if (m_isLMdiffuse)
-		{
-			int selected = 0;
-			if (ImGui::Combo("Set Diffuse", &selected, CG_TEXTURE_LIST, NUM_CG_TEXTURE_ENUM))
-				setDiffuseTexture(am.getTexture(CG_TEXTURE_ENUM(selected), true));
-		}
+		int cmorlm = (int)m_CMorLM;
+		ImGui::RadioButton("Color Material", &cmorlm, 0); ImGui::SameLine();
+		ImGui::RadioButton("Light Map Material", &cmorlm, 1);
+		m_CMorLM = bool(cmorlm);
 
-		ImGui::Checkbox("Specular Texture", &m_isLMspecular);
-		if (m_isLMspecular)
+		if (m_CMorLM) // Light Map Material
 		{
-			int selected = 0;
-			if (ImGui::Combo("Set Specular", &selected, CG_TEXTURE_LIST, NUM_CG_TEXTURE_ENUM))
-				setSpecularTexture(am.getTexture(CG_TEXTURE_ENUM(selected), true));
-		}
+			ImGui::Checkbox("Diffuse Texture", &m_isLMdiffuse);
+			if (m_isLMdiffuse)
+			{
+				int selected = 0;
+				if (ImGui::Combo("Set Diffuse", &selected, CG_TEXTURE_LIST, NUM_CG_TEXTURE_ENUM))
+					setDiffuseTexture(am.getTexture(CG_TEXTURE_ENUM(selected), true));
+			}
 
-		ImGui::Checkbox("Emissive Texture", &m_isLMemissive);
-		if (m_isLMemissive)
+			ImGui::Checkbox("Specular Texture", &m_isLMspecular);
+			if (m_isLMspecular)
+			{
+				int selected = 0;
+				if (ImGui::Combo("Set Specular", &selected, CG_TEXTURE_LIST, NUM_CG_TEXTURE_ENUM))
+					setSpecularTexture(am.getTexture(CG_TEXTURE_ENUM(selected), true));
+			}
+
+			ImGui::Checkbox("Emissive Texture", &m_isLMemissive);
+			if (m_isLMemissive)
+			{
+				int selected = 0;
+				if (ImGui::Combo("Set Emissive", &selected, CG_TEXTURE_LIST, NUM_CG_TEXTURE_ENUM))
+					setEmissiveTexture(am.getTexture(CG_TEXTURE_ENUM(selected), true));
+			}
+		}
+		else // Colro Material
 		{
+			float temp[3] = { m_CMambient.x,m_CMambient.y, m_CMambient.z };
+			ImGui::ColorEdit3("Ambient", temp);
+			m_CMambient = { temp[0], temp[1], temp[2] };
+
+			temp[0] = m_CMdiffuse.x, temp[1] = m_CMdiffuse.y, temp[2] = m_CMdiffuse.z;
+			ImGui::ColorEdit3("Diffuse", temp);
+			m_CMdiffuse = { temp[0], temp[1], temp[2] };
+
+			temp[0] = m_CMspecular.x, temp[1] = m_CMspecular.y, temp[2] = m_CMspecular.z;
+			ImGui::ColorEdit3("specular", temp);
+			m_CMspecular = { temp[0], temp[1], temp[2] };
+
+			float min = 0.1f;
+			float max = 1.f;
+			ImGui::DragScalar("shininess", ImGuiDataType_Float, &m_CMshininess, 0.005f, &min, &max, "%f", 1.0f);
+
 			int selected = 0;
-			if (ImGui::Combo("Set Emissive", &selected, CG_TEXTURE_LIST, NUM_CG_TEXTURE_ENUM))
-				setEmissiveTexture(am.getTexture(CG_TEXTURE_ENUM(selected), true));
+			if (ImGui::Combo("Set Color Material", &selected, CG_COLOR_MATERIAL_LIST, 24))
+			{
+				setCMambinet(CG_COLOR_MATERIAL_AMBIENT[selected]);
+				setCMdiffuse(CG_COLOR_MATERIAL_DIFFUSE[selected]);
+				setCMspecular(CG_COLOR_MATERIAL_SPECULAR[selected]);
+				setCMshininess(CG_COLOR_MATERIAL_SHININESS[selected]);
+			}
 		}
 	}
-	else // Colro Material
+	else if (m_useModelData == true)// Loaded Model Dat
 	{
-		float temp[3] = { m_CMambient.x,m_CMambient.y, m_CMambient.z };
-		ImGui::ColorEdit3("Ambient", temp);
-		m_CMambient = { temp[0], temp[1], temp[2] };
 
-		temp[0] = m_CMdiffuse.x, temp[1] = m_CMdiffuse.y, temp[2] = m_CMdiffuse.z;
-		ImGui::ColorEdit3("Diffuse", temp);
-		m_CMdiffuse = { temp[0], temp[1], temp[2] };
-
-		temp[0] = m_CMspecular.x, temp[1] = m_CMspecular.y, temp[2] = m_CMspecular.z;
-		ImGui::ColorEdit3("specular", temp);
-		m_CMspecular = { temp[0], temp[1], temp[2] };
-
-		float min = 0.1f;
-		float max = 1.f;
-		ImGui::DragScalar("shininess", ImGuiDataType_Float, &m_CMshininess, 0.005f, &min, &max, "%f", 1.0f);
-
-		int selected = 0;
-		if (ImGui::Combo("Set Color Material", &selected, CG_COLOR_MATERIAL_LIST, 24))
-		{
-			setCMambinet(CG_COLOR_MATERIAL_AMBIENT[selected]);
-			setCMdiffuse(CG_COLOR_MATERIAL_DIFFUSE[selected]);
-			setCMspecular(CG_COLOR_MATERIAL_SPECULAR[selected]);
-			setCMshininess(CG_COLOR_MATERIAL_SHININESS[selected]);
-		}
 	}
 
 	ImGui::End();

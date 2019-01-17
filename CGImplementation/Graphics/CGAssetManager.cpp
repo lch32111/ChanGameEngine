@@ -151,9 +151,18 @@ void CGProj::CGAssetManager::assetInit()
 	m_NoGammaTexture[TEXTURE_WOOD_PANEL] = CGAssetTexture("ResourceFolder/ImageFolder/woodpanel.png");
 	m_GammaTextures[TEXTURE_WOOD_PANEL] = CGAssetTexture("ResourceFolder/ImageFolder/woodpanel.png");
 
+	m_NoGammaTexture[TEXTURE_BRICK_WALL] = CGAssetTexture("ResourceFolder/ImageFolder/brickwall.jpg");
+	m_GammaTextures[TEXTURE_BRICK_WALL] = CGAssetTexture("ResourceFolder/ImageFolder/brickwall.jpg");
+	
+	m_NoGammaTexture[TEXTURE_BRICK_WALL_NORMAL] = CGAssetTexture("ResourceFolder/ImageFolder/brickwall_normal.jpg");
+	m_GammaTextures[TEXTURE_BRICK_WALL_NORMAL] = CGAssetTexture("ResourceFolder/ImageFolder/brickwall_normal.jpg");
+
 	m_models[MODEL_NANO_SUIT] = CGModel("ResourceFolder/ModelFolder/nanosuit/nanosuit.obj");
 	m_models[MODEL_SPONZA_BUILDING] = CGModel("ResourceFolder/ModelFolder/sponza/sponza.obj");
 	m_models[MODEL_ROYAL_ROOSTER] = CGModel("ResourceFolder/ModelFolder/royal-rooster/rooster.dae");
+	m_models[MODEL_BUNNY] = CGModel("ResourceFolder/ModelFolder/bunny/bunny.obj");
+	m_models[MODEL_HOUSE_OBJ] = CGModel("ResourceFolder/ModelFolder/house_obj/house_obj.obj");
+	m_models[MODEL_OLD_HOUSE] = CGModel("ResourceFolder/ModelFolder/old_house/house_01.obj");
 }
 
 void CGProj::CGAssetManager::destroy()

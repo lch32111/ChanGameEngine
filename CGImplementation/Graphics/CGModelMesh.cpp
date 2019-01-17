@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 
+#include <CGErrorLogger.h>
 #include <Graphics/Shader.h>
 #include <Graphics/CGModelUtils.h>
 
@@ -82,20 +83,23 @@ void CGProj::CGModelMesh::setupMesh()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), &m_indices[0], GL_STATIC_DRAW);
 
 	// vertex positions
-	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+	glEnableVertexAttribArray(0);
 
 	// vertex normals
-	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)offsetof(Vertex, Vertex::Normal));
+	glEnableVertexAttribArray(1);
 
 	// vertex texture coords
-	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)offsetof(Vertex, Vertex::TexCoords));
+	glEnableVertexAttribArray(2);
 
 	// vertex tangent
-	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, (void*)offsetof(Vertex, Vertex::Tangent));
+	glEnableVertexAttribArray(3);
 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+	glCheckError();
 }

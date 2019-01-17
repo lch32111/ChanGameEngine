@@ -60,6 +60,9 @@ void main()
         real_TexCoords = ParallaxOcclusionMapping(TexCoords, transpose(TBNmat) * (cameraPos - FragPos));
     }
 
+	if(real_TexCoords.x > 1.0 || real_TexCoords.y > 1.0 || real_TexCoords.x < 0.0 || real_TexCoords.y < 0.0)
+		real_TexCoords = TexCoords;
+
     if(material.isNormalMap)
     {
         // Normal Mapping -> get new normal, and then transform it into world space.

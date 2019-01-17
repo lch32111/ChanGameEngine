@@ -1,4 +1,6 @@
-#include "Graphics\GLTextureUtility.h"
+#include <Graphics/GLTextureUtility.h>
+#include <CGErrorLogger.h>
+
 
 #include <iostream>
 #define STB_IMAGE_IMPLEMENTATION
@@ -44,6 +46,8 @@ unsigned int CGProj::TextureFromFile(const std::string file, bool gamma_correct)
 	else
 		std::cout << "Texture failed to load at path: " << file << std::endl;
 
+	glCheckError();
+
 	stbi_image_free(data);
 
 	return textureID;
@@ -73,6 +77,8 @@ unsigned int CGProj::loadCubeMap(const std::vector<std::string>& faces)
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	glCheckError();
 
 	return textureID;
 }

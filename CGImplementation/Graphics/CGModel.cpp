@@ -29,8 +29,9 @@ bool CGProj::CGModel::loadModel()
 	(
 		m_directory, 
 		aiProcess_Triangulate |
-		aiProcess_GenNormals |
-		aiProcess_FlipUVs
+		aiProcess_GenSmoothNormals |
+		aiProcess_FlipUVs | 
+		aiProcess_CalcTangentSpace
 	);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -137,7 +138,7 @@ CGProj::CGModelMesh CGProj::CGModel::processMesh(aiMesh * mesh, const aiScene * 
 		textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
 		// depthMap -> heightMap for the key of textures
-		std::vector<Texture> depthMaps = loadMaterialTextures(material, aiTextureType_DISPLACEMENT, "heighthMap");
+		std::vector<Texture> depthMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "heighthMap");
 		textures.insert(textures.end(), depthMaps.begin(), depthMaps.end());
 
 		// std::vector<Texture> reflectMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "LMreflect");

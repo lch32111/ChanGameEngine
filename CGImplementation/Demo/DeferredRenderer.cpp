@@ -2,6 +2,8 @@
 
 #include <Imgui/imgui.h>
 
+#include <CGErrorLogger.h>
+
 #include <Graphics/GLTextureUtility.h>
 #include <Graphics/GLPrimitiveUtil.h>
 #include <Graphics/CGDefSecondUtil.h>
@@ -30,7 +32,6 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	Deferred_Second_Shader->setInt("gAlbedoSpec", 2);
 	Deferred_Second_Shader->setInt("gEmissive", 3);
 	Deferred_Second_Shader->setInt("gBool", 4);
-	Deferred_Second_Shader->setFloat("shadowBias", 0);
 	for (unsigned i = 0; i < NR_DIR_SHADOWS; ++i)
 		Deferred_Second_Shader->setInt("dirShadowMap[" + std::to_string(i) + "]", NR_GBUFFER_TEXTURES + i);
 	for (unsigned i = 0; i < NR_POINT_SHADOWS; ++i)
@@ -113,6 +114,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		assert(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glCheckError();
 	// First Pass Setup For Deferred Rendering
 
 	// Object Manual Setting + Light Manual Setting
@@ -139,7 +141,11 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	}
 	editProxies[0].setModelData(true);
 	editProxies[0].setModel(assetManager.getModelData(MODEL_SPONZA_BUILDING));
-	editProxies[0].setScale(0.005f);
+	editProxies[0].setScale(0.01f);
+	editProxies[1].setModelData(true);
+	editProxies[1].setModel(assetManager.getModelData(MODEL_NANO_SUIT));
+	editProxies[1].setScale(0.5f);
+
 
 	GPED::Random random(331);
 	editLights.reserve(400); // prevent the memory address of editLights from not changing because of dBroadPhase userProxy pointer!
@@ -273,6 +279,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0, -5, 0));
+		// model = glm::rotate(model, glm::radians(-90.f), glm::vec3(1, 0, 0));
 		model = glm::scale(model, glm::vec3(25));
 		Deferred_First_Shader->setBool("material.CMorLM", true);
 		Deferred_First_Shader->setBool("material.isLMdiffuse", true);
@@ -285,6 +292,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		Deferred_First_Shader->setMat4("model", model);
 		Deferred_First_Shader->setMat3("ModelNormalMatrix", glm::mat3(glm::transpose(glm::inverse(model))));
 		Deferred_First_Shader->setBool("IsUseTangentSpace", false);
+		Deferred_First_Shader->setVec3("cameraPos", camera.Position);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, assetManager.getTexture(TEXTURE_WOOD_PANEL, true));
 		renderQuad();

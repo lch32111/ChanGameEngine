@@ -39,7 +39,7 @@ void CGProj::CGModelMesh::deferredFirstRender(Shader* shader)
 		glActiveTexture(GL_TEXTURE0 + getIndexFromKey(m_textures[i].key)); // active proper texture unit before binding
 		glBindTexture(GL_TEXTURE_2D, m_textures[i].id);
 	}
-
+	
 	for (unsigned int i = 0; i < materialKeyList.size(); ++i)
 	{
 		if (materialKeyList[i] & texture_key)
@@ -61,10 +61,10 @@ void CGProj::CGModelMesh::deferredFirstRender(Shader* shader)
 
 	// Draw Mesh
 	glBindVertexArray(m_VAO);
-	glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0); glCheckError();
 
 	glBindVertexArray(0);
-}
+} 
 
 void CGProj::CGModelMesh::setupMesh()
 {

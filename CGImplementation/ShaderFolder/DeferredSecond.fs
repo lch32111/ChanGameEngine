@@ -2,7 +2,7 @@
 // Deferred Second Pass Fragment Shader
 // The lighting will be calculated in World Space.
 
-#version 330 core
+#version 430 core
 out vec4 FragColor;
 
 in vec2 TexCoords;

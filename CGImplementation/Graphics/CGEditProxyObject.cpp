@@ -87,7 +87,9 @@ void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 &
 
 	// Now Ready to render. Go render according to the flags
 	if (m_useModelData)
+	{
 		m_Model->deferredFirstRender(m_DefShader);
+	}
 	else
 		renderPrimitive();
 }

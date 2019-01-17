@@ -157,6 +157,15 @@ void CGProj::CGAssetManager::assetInit()
 	m_NoGammaTexture[TEXTURE_BRICK_WALL_NORMAL] = CGAssetTexture("ResourceFolder/ImageFolder/brickwall_normal.jpg");
 	m_GammaTextures[TEXTURE_BRICK_WALL_NORMAL] = CGAssetTexture("ResourceFolder/ImageFolder/brickwall_normal.jpg");
 
+	m_NoGammaTexture[TEXTURE_BRICK2] = CGAssetTexture("ResourceFolder/ImageFolder/bricks2.jpg");
+	m_GammaTextures[TEXTURE_BRICK2] = CGAssetTexture("ResourceFolder/ImageFolder/bricks2.jpg");
+
+	m_NoGammaTexture[TEXTURE_BRICK2_NORMAL] = CGAssetTexture("ResourceFolder/ImageFolder/bricks2_normal.jpg");
+	m_GammaTextures[TEXTURE_BRICK2_NORMAL] = CGAssetTexture("ResourceFolder/ImageFolder/bricks2_normal.jpg");
+
+	m_NoGammaTexture[TEXTURE_BRICK2_HEIGHT] = CGAssetTexture("ResourceFolder/ImageFolder/bricks2_disp.jpg");
+	m_GammaTextures[TEXTURE_BRICK2_HEIGHT] = CGAssetTexture("ResourceFolder/ImageFolder/bricks2_disp.jpg");
+
 	m_models[MODEL_NANO_SUIT] = CGModel("ResourceFolder/ModelFolder/nanosuit/nanosuit.obj");
 	m_models[MODEL_SPONZA_BUILDING] = CGModel("ResourceFolder/ModelFolder/sponza/sponza.obj");
 	m_models[MODEL_ROYAL_ROOSTER] = CGModel("ResourceFolder/ModelFolder/royal-rooster/rooster.dae");

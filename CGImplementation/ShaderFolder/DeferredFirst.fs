@@ -56,10 +56,11 @@ void main()
 
     if(material.isDepthMap)
     {
-        // Parallax Mapping ->get new TexCoords;
-        real_TexCoords = ParallaxOcclusionMapping(TexCoords, transpose(TBNmat) * (cameraPos - FragPos));
+        // Parallax Mapping ->get new TexCoords; *** Direction Normalize ***
+        real_TexCoords = ParallaxOcclusionMapping(TexCoords, normalize(transpose(TBNmat) * (cameraPos - FragPos)));
     }
 
+	// Overcase : just put normal TexCoords. If you discard this one, model rendering is not working properly
 	if(real_TexCoords.x > 1.0 || real_TexCoords.y > 1.0 || real_TexCoords.x < 0.0 || real_TexCoords.y < 0.0)
 		real_TexCoords = TexCoords;
 

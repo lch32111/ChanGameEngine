@@ -64,6 +64,14 @@ namespace CGProj
 		unsigned int gPosition, gNormal, gAlbedoSpec, gEmissive, gBool;
 		unsigned gRBO;
 
+		unsigned int dSecondFBO;
+		unsigned int dSecondHDRColorBuffer;
+		unsigned int dSecondHDRBloomBuffer;
+		unsigned int dSecondHDRDepthRBO;
+
+		float pGamma;
+		float pExposure;
+
 		// Broad Phase
 		CGBroadPhase dBroadPhase;
 		BroadRendererWrapper bRender;
@@ -118,8 +126,6 @@ namespace CGProj
 		CGGizmo gizmoTest;
 
 		CGAssetManager assetManager;
-
-		float shadowBias = 0.005f;
 	};
 
 }

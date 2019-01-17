@@ -3,7 +3,8 @@
 // The lighting will be calculated in World Space.
 
 #version 430 core
-out vec4 FragColor;
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 BrightColor; // For Bloom Effect
 
 in vec2 TexCoords;
 
@@ -159,15 +160,14 @@ void main()
 
     }
 
-    // post-processing for HDR with tone mapping and gamma corection
-    const float gamma = 2.2;
-    const float exposure = 1.0;
+    FragColor = vec4(lighting, 1.0);
 
-    vec3 hdrColor = lighting;
-    vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);
-    mapped = pow(mapped, vec3(1.0 / gamma));
-    FragColor = vec4(mapped, 1.0);
-	// FragColor = vec4(lighting, 1.0);
+	// Bloom Effect
+	float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+	if(brightness > 1.0)
+		BrightColor = vec4(FragColor.rgb, 1.0);
+	else
+		BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
 }
 
 vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal)

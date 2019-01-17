@@ -39,6 +39,12 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	for (unsigned i = 0; i < NR_SPOT_SHADOWS; ++i)
 		Deferred_Second_Shader->setInt("spotShadowMap[" + std::to_string(i) + "]", NR_GBUFFER_TEXTURES + NR_DIR_SHADOWS + NR_POINT_SHADOWS + i);
 
+	Deferred_Post_Shader = assetManager.getShader(SHADER_DEFERRED_POST);
+	Deferred_Post_Shader->use();
+	Deferred_Post_Shader->setInt("screenTexture", 0);
+	pGamma = 2.2; Deferred_Post_Shader->setFloat("gamma", pGamma);
+	pExposure = 1.0; Deferred_Post_Shader->setFloat("exposure", pExposure);
+
 	// Shadow shader setting
 	Shader* DirdepthMapShader = assetManager.getShader(SHADER_DIR_SHADOW_MAP);
 	Shader* DirdepthMapDebugShader = assetManager.getShader(SHADER_DIR_SHADOW_MAP_DEBUG_RENDER);
@@ -112,10 +118,46 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, gRBO);
 	
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		assert(0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		CGassert();
 	glCheckError();
 	// First Pass Setup For Deferred Rendering
+
+	// Second Pass Setup For Deferred Rendering
+	glGenFramebuffers(1, &dSecondFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, dSecondFBO);
+	
+	glGenTextures(1, &dSecondHDRColorBuffer);
+	glBindTexture(GL_TEXTURE_2D, dSecondHDRColorBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dSecondHDRColorBuffer, 0);
+
+	glGenTextures(1, &dSecondHDRColorBuffer);
+	glBindTexture(GL_TEXTURE_2D, dSecondHDRBloomBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, dSecondHDRBloomBuffer, 0);
+
+	unsigned SecondAttachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(2, SecondAttachments);
+
+	glGenRenderbuffers(1, &dSecondHDRDepthRBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, dSecondHDRDepthRBO);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, dSecondHDRDepthRBO);
+	
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		CGassert();
+	glCheckError();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	// Second Pass Setup For Deferred Rendering
 
 	// Object Manual Setting + Light Manual Setting
 	GPED::Random prandom(554);
@@ -224,11 +266,11 @@ void CGProj::DeferredRenderer::updateImgui()
 
 	ImGui::Checkbox("Hit Ray Render", &rayHitDraw); ImGui::SameLine();
 	if (ImGui::Button("Hit Ray Reset")) hitCollector.clear();
+
+	// Post-Processing Control
+	ImGui::InputFloat("Gamma", &pGamma, 0.02f, 5.0f, "%.3f");
+	ImGui::InputFloat("Exposure", &pExposure, 0.02f, 5.0f, "%.3f");
 	
-	if (ImGui::InputFloat("Shadow Bias", &shadowBias))
-	{
-		Deferred_Second_Shader->setFloat("shadowBias", shadowBias);
-	}
 
 	ImGui::End();
 
@@ -236,6 +278,8 @@ void CGProj::DeferredRenderer::updateImgui()
 	{
 		pickedEditBox->UIrender(assetManager);
 	}
+
+	
 }
 
 void CGProj::DeferredRenderer::updateSimulation(float deltaTime, float lastFrame)
@@ -299,8 +343,8 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	}
 	// First Pass
 
-	// Second Pass + Post Process
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	// Second Pass
+	glBindFramebuffer(GL_FRAMEBUFFER, dSecondFBO);
 	{
 		if (wireDraw)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // This quad always fills the screen plane!
@@ -345,13 +389,27 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		Deferred_Second_Shader->setInt("DIR_USED_NUM", num_dir_light);
 		Deferred_Second_Shader->setInt("POINT_USED_NUM", num_point_light);
 		Deferred_Second_Shader->setInt("SPOT_USED_NUM", num_spot_light);
-		Deferred_Second_Shader->setFloat("shadowBias", shadowBias);
 		num_dir_light = num_point_light = num_spot_light = 0;
 		num_dir_shadow = num_point_shadow = num_spot_shadow = 0;
 
 		renderScreenQuad();
 	}
-	// Second Pass + Post Process
+	// Second Pass
+
+	// Post Processing
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	{
+		glClearColor(0, 0, 0, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		Deferred_Post_Shader->use();
+		Deferred_Post_Shader->setFloat("gamma", pGamma);
+		Deferred_Post_Shader->setFloat("exposure", pExposure);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, dSecondHDRColorBuffer);
+		renderScreenQuad();
+	}
+	// Post Processing
 
 	// Debug Drawing and UI Render like forward processing
 	{
@@ -584,6 +642,21 @@ void CGProj::DeferredRenderer::resize(int width, int height)
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		assert(0);
+		CGassert();
+	glCheckError();
+
+	// Second Pass Setup For Deferred Rendering
+	glBindFramebuffer(GL_FRAMEBUFFER, dSecondFBO);
+
+	glBindTexture(GL_TEXTURE_2D, dSecondHDRColorBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+
+	glBindRenderbuffer(GL_RENDERBUFFER, dSecondHDRDepthRBO);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		CGassert();
+	glCheckError();
+	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

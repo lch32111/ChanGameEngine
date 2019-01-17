@@ -1,6 +1,7 @@
 #include <Graphics/CGSpotShadowFrustumVisualizer.h>
 
 #include <GPED/CGPhysicsUtil.h>
+#include <Graphics/CGAssetManager.h>
 
 CGProj::CGSpotShadowFrustumVisualizer::CGSpotShadowFrustumVisualizer()
 {
@@ -23,7 +24,7 @@ void CGProj::CGSpotShadowFrustumVisualizer::render(
 	const glm::vec3 & position, const glm::vec3 & direction, 
 	float fov, float aspect, float nearP, float farP)
 {
-	float tanHalfFov = std::tanf(0.5 * fov);
+	float tanHalfFov = std::tanf(0.5f * fov);
 
 	glm::vec3 vertices[8];
 

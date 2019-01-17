@@ -60,7 +60,7 @@ void CGProj::Application::execute()
 {
 	while (!glfwWindowShouldClose(app_window))
 	{
-		float currentFrame = glfwGetTime();
+		float currentFrame = (float)glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		glfwPollEvents();
@@ -87,7 +87,7 @@ void CGProj::Application::update(float deltaTime, float lastFrame)
 
 void CGProj::Application::display()
 {
-	glClearColor(0.11, 0.11, 0.11, 1.0);
+	glClearColor(0.11f, 0.11f, 0.11f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -365,6 +365,6 @@ void CGProj::TerrainDemo::resize(int width, int height)
 
 CGProj::Application* getApplication()
 {
-	return new CGProj::TerrainDemo();
+	return new CGProj::GraphicsDemo();
 }
 

@@ -1,5 +1,7 @@
-#include "CGDirShadowFrustumVisualizer.h"
+#include <Graphics/CGDirShadowFrustumVisualizer.h>
+
 #include <GPED/CGPhysicsUtil.h>
+#include <Graphics/CGAssetManager.h>
 
 CGProj::CGDirShadowFrustumVisualizer::CGDirShadowFrustumVisualizer()
 {
@@ -23,7 +25,7 @@ void CGProj::CGDirShadowFrustumVisualizer::render(
 	float fov, float aspect, float nearP, float farP
 	)
 {
-	float tanHalfFov = std::tanf(0.5 * fov);
+	float tanHalfFov = std::tanf(0.5f * fov);
 
 	glm::vec3 vertices[8];
 

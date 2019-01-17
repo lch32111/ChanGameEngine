@@ -4,7 +4,6 @@
 
 #include <Terrain/CGPerlinNoise.h>
 
-#include <Graphics/CGAssetManager.h>
 #include <Graphics/CGSizableRenderLine.h>
 #include <Graphics/CGRenderLine.h>
 
@@ -13,6 +12,9 @@
 
 namespace CGProj
 {
+	// Forward Declaration
+	class CGAssetManager;
+
 	class CGTerrain
 	{
 	public:

@@ -5,8 +5,12 @@
 # The 'Debug/' will ignore Root/Debug/ and also Root/CGImplementation/Debug
 Debug/
 
-# Don't Include Image Folder. We will share the design resources with Google Drive
+# Don't Include Resource Folder
+# Don't Include Image Folder. We will share the design resources on other platform
+# Don't Include Model Folder. we will shaer the design resources on other platform
+ResourceFolder/
 ImageFolder/
+ModelFolder/
 
 # Don't Include Imgui Setting Save File.
 imgui.ini

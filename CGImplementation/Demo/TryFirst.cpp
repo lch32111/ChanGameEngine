@@ -69,14 +69,14 @@ void CGProj::TryFirst::updateImgui()
 
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Camera Position %.1f %.1f %.1f", camera.Position.x, camera.Position.y, camera.Position.z);
-	ImGui::TextColored(ImVec4(0.99, 0.4, 0.37, 1.0), "Press Tab Button to convert GAME/UI Mode");
-	if (GameControl) ImGui::TextColored(ImVec4(0.78, 0.17, 0.54, 1.0), "GAME mode");
-	else ImGui::TextColored(ImVec4(0.11, 0.7, 0.81, 1.0), "UI mode");
+	ImGui::TextColored(ImVec4(0.99f, 0.4f, 0.37f, 1.0f), "Press Tab Button to convert GAME/UI Mode");
+	if (GameControl) ImGui::TextColored(ImVec4(0.78f, 0.17f, 0.54f, 1.0f), "GAME mode");
+	else ImGui::TextColored(ImVec4(0.11f, 0.7f, 0.81f, 1.0f), "UI mode");
 
 	if (ImGui::Button("Simulation Start / End")) start = start ? false : true; ImGui::SameLine();
 	
-	if (start) ImGui::TextColored(ImVec4(1.0, 0.89, 0, 1.0), "Simulating...");
-	else ImGui::TextColored(ImVec4(1.0, 0, 0, 1.0), "Not simulating!");
+	if (start) ImGui::TextColored(ImVec4(1.0f, 0.89f, 0.f, 1.0f), "Simulating...");
+	else ImGui::TextColored(ImVec4(1.0f, 0.f, 0.f, 1.0f), "Not simulating!");
 
 	if (ImGui::Button("Reset Simulation")) reset();
 
@@ -252,14 +252,14 @@ void CGProj::TryFirst::mouse(double xpos, double ypos)
 		if (firstMouse)
 		{
 			firstMouse = false;
-			lastX = xpos;
-			lastY = ypos;
+			lastX = (float)xpos;
+			lastY = (float)ypos;
 		}
 
-		float xoffset = xpos - lastX;
-		float yoffset = lastY - ypos;
-		lastX = xpos;
-		lastY = ypos;
+		float xoffset = (float)(xpos - lastX);
+		float yoffset = (float)(lastY - ypos);
+		lastX = (float)xpos;
+		lastY = (float)ypos;
 
 		camera.ProcessMouseMovement(xoffset, yoffset);
 	}
@@ -320,7 +320,7 @@ void CGProj::TryFirst::scroll(double yoffset)
 {
 	if (GameControl)
 	{
-		camera.ProcessMouseScroll(yoffset);
+		camera.ProcessMouseScroll((float)yoffset);
 	}
 }
 
@@ -412,7 +412,7 @@ void CGProj::TryFirst::generateContacts(CGContactManager& cData)
 	const std::vector<std::pair<CGCollisionPrimitive*, CGCollisionPrimitive*>>& t_pair
 		= firstResult.vPairs;
 	// std::cout << t_pair.size() << '\n';
-	for (int i = 0; i < t_pair.size(); ++i)
+	for (unsigned i = 0; i < t_pair.size(); ++i)
 	{
 		cAlgo.findNarrowAlgorithmAndProcess(t_pair[i].first, t_pair[i].second, &cData);
 	}
@@ -461,7 +461,7 @@ void CGProj::TryFirst::totalFire()
 	// If we didn't find a round, then exit- we can't fire.
 	if (index >= ammoRounds) return;
 
-	GPED::Random ranGen(glfwGetTime());
+	GPED::Random ranGen((unsigned)glfwGetTime());
 	float x;
 	float y;
 	float z = 0;
@@ -476,14 +476,14 @@ void CGProj::TryFirst::totalFire()
 			GPED::convertFromCollisionPrimitive(ammo[i], broadAABB);
 			ammo[i].proxyId = FirstBroadPhase.CreateProxy(broadAABB, &ammo[i]);
 			++j;
-			x += 0.6;
+			x += 0.6f;
 		}
 	}
 }
 
 void CGProj::TryFirst::reset()
 {
-	GPED::Random ranGen(glfwGetTime());
+	GPED::Random ranGen((unsigned)glfwGetTime());
 	for (Box *box = boxData; box < boxData + boxes; box++)
 	{
 		float xRan = ranGen.randomReal(-10, 10);

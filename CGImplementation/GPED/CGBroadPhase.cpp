@@ -69,8 +69,8 @@ bool CGProj::CGBroadPhase::QueryCallback(int proxyId)
 		oldBuffer = nullptr;
 	}
 
-	m_pairBuffer[m_pairCount].proxyIdA = GPED::rMin(proxyId, m_queryProxyId);
-	m_pairBuffer[m_pairCount].proxyIdB = GPED::rMax(proxyId, m_queryProxyId);
+	m_pairBuffer[m_pairCount].proxyIdA = (int)GPED::rMin((GPED::real)proxyId, (GPED::real)m_queryProxyId);
+	m_pairBuffer[m_pairCount].proxyIdB = (int)GPED::rMax((GPED::real)proxyId, (GPED::real)m_queryProxyId);
 	++m_pairCount;
 
 	return true;

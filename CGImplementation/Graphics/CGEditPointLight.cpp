@@ -5,6 +5,8 @@
 
 #include <Graphics/CGDefSecondUtil.h>
 #include <Graphics/GLPrimitiveUtil.h>
+#include <Graphics/CGAssetManager.h>
+#include <Graphics/CGEditProxyObject.h>
 
 CGProj::CGEditPointLight::CGEditPointLight()
 {
@@ -20,7 +22,7 @@ CGProj::CGEditPointLight::CGEditPointLight()
 	m_perAspect = (float)m_shadowWidth / (float)m_shadowHeight;
 	m_shadowNearPlane = 0.5f;
 	m_shadowFarPlane = 10.0f;
-	m_shadowBias = 0.005;
+	m_shadowBias = 0.005f;
 }
 
 void CGProj::CGEditPointLight::initialize(CGAssetManager & am, CGEditLightCommonFactor * factor)
@@ -84,13 +86,13 @@ void CGProj::CGEditPointLight::UIrenderForCommon()
 	ImGui::Text("Attn Constant : %.2f", m_lightFactors->AttnConstant); ImGui::SameLine();
 	ShowHelpMarker("As you know in the code,\nthe radius calculated in updateRadius() is also based on the diffuse color value");
 
-	if (ImGui::SliderFloat("linear", &m_lightFactors->AttnLinear, 0.0001, 1.0, "Attn Linear : %f"))
+	if (ImGui::SliderFloat("linear", &m_lightFactors->AttnLinear, 0.0001f, 1.0f, "Attn Linear : %f"))
 	{
 		updateRadius();
 		setShadowFarPlane(m_lightFactors->AttnRadius);
 	}
 
-	if (ImGui::SliderFloat("quadratic", &m_lightFactors->AttnQuadratic, 0.000001, 1.0, "Attn Quadratic : %f"))
+	if (ImGui::SliderFloat("quadratic", &m_lightFactors->AttnQuadratic, 0.000001f, 1.0f, "Attn Quadratic : %f"))
 	{
 		updateRadius();
 		setShadowFarPlane(m_lightFactors->AttnRadius);
@@ -174,7 +176,7 @@ void CGProj::CGEditPointLight::renderShadowMap(std::vector<CGEditProxyObject>& o
 		model = glm::translate(model, objects[i].getPosition());
 		model = glm::scale(model, objects[i].getScale());
 		m_DepthMapShader->setMat4("model", model);
-		objects[i].renderPrimitive();
+		objects[i].shadowMapRender();
 	}
 
 	// Plane

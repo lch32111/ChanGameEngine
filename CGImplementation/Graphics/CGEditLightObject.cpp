@@ -3,6 +3,11 @@
 #include <Imgui/imgui.h>
 #include <Imgui/CGimguiUtil.h>
 
+#include <Graphics/CGAssetManager.h>
+#include <Graphics/CGEditObject.h>
+#include <Graphics/CGEditProxyObject.h>
+#include <Graphics/CGFrustum.h>
+
 // =================================================================
 /*** CG Light Object  ***/
 CGProj::CGEditLightObject::CGEditLightObject()
@@ -23,9 +28,9 @@ void CGProj::CGEditLightObject::initialize(CGAssetManager & am)
 	setLightType(EDIT_POINT_LIGHT);
 	setPosition(glm::vec3(0));
 	setLightDirection(glm::vec3(0, 1, 0));
-	setAmbientColor(glm::vec3(0.1));
-	setDiffuseColor(glm::vec3(0.2));
-	setSpecularColor(glm::vec3(1.0));
+	setAmbientColor(glm::vec3(0.1f));
+	setDiffuseColor(glm::vec3(0.2f));
+	setSpecularColor(glm::vec3(1.0f));
 	m_CommonlightFactors.lightIntensity = 1.f;
 	m_CommonlightFactors.isRangeRender = false;
 	m_CommonlightFactors.AttnConstant = 1.f;
@@ -42,7 +47,7 @@ void CGProj::CGEditLightObject::initialize(CGAssetManager & am)
 	m_dirLight.initialize(am, &m_CommonlightFactors);
 
 	m_dirVis.prepareData(am.getShader(SHADER_DIR_VISUALIZER));
-	m_dirVis.setCylinderDimension(5, 0.1, 0.1);
+	m_dirVis.setCylinderDimension(5.f, 0.1f, 0.1f);
 	m_dirVis.setConeDimension(1.5, 0, 0.5);
 
 	m_dirShadowVis.setShader(am.getShader(SHADER_CG_LINE));

@@ -1,8 +1,12 @@
 #include <Graphics/CGGizmo.h>
 
+#include <Graphics/chanQuatCamera.h>
 #include <Graphics/GLPrimitiveUtil.h>
+#include <Graphics/CGAssetManager.h>
 #include <Graphics/CGEditProxyObject.h>
 #include <Graphics/CGEditLightObject.h>
+
+#include <GPED/CGBroadPhase.h>
 
 CGProj::CGGizmo::CGGizmo()
 {
@@ -54,7 +58,6 @@ void CGProj::CGGizmo::setEditObject(CGEditObject * object)
 {
 	if (object == nullptr)
 	{
-		object == nullptr; 
 		return;
 	}
 
@@ -130,7 +133,7 @@ void CGProj::CGGizmo::translate(float xoffset, float yoffset, const chanQuatCame
 	{
 		// glm::dot(camera.Right, worldXAxis) makes correct direction for translation.
 		// below command is the same as dot equation above.
-		sign = ((camera.Right.x > 0) ? 1 : -1);
+		sign = (GPED::real)((camera.Right.x > 0) ? 1 : -1);
 
 		deltaPos = objectPosition.x;
 		deltaPos += xoffset * sign;
@@ -154,7 +157,7 @@ void CGProj::CGGizmo::translate(float xoffset, float yoffset, const chanQuatCame
 	{
 		// screen is 2D(X, Y), and we need to sync z-axis move with x-axis
 		// beow command is the same as glm::dot(camera.Right, worldZAxis)
-		sign = ((camera.Right.z > 0) ? 1 : -1);
+		sign = (GPED::real)((camera.Right.z > 0) ? 1 : -1);
 
 		deltaPos = objectPosition.z;
 		deltaPos += xoffset * sign;

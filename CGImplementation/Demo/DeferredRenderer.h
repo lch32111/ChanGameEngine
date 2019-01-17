@@ -119,7 +119,7 @@ namespace CGProj
 
 		CGAssetManager assetManager;
 
-		float shadowBias = 0.005;
+		float shadowBias = 0.005f;
 	};
 
 }

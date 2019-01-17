@@ -249,6 +249,15 @@
     <ClCompile Include="GPED\CGCollisionNarrow.cpp">
       <Filter>GPED Source</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\CGModel.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\CGModelMesh.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\CGAssetTexture.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -478,6 +487,21 @@
     </ClInclude>
     <ClInclude Include="GPED\CGCollisionTriangle.h">
       <Filter>GPED Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGModel.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGModelMesh.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGModelUtils.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CGErrorLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGAssetTexture.h">
+      <Filter>Graphics Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

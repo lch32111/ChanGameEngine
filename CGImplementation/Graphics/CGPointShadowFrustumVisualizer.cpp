@@ -1,6 +1,7 @@
 #include <Graphics/CGPointShadowFrustumVisualizer.h>
 
 #include <Graphics/GLPrimitiveUtil.h>
+#include <Graphics/CGAssetManager.h>
 
 CGProj::CGPointShadowFrustumVisualizer::CGPointShadowFrustumVisualizer()
 {

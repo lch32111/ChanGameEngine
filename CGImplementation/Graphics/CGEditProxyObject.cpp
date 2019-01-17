@@ -2,6 +2,9 @@
 
 #include <Imgui/imgui.h>
 
+#include <Graphics/CGAssetManager.h>
+
+
 // =================================================================
 /*** CG EDIT Proxy Object  ***/
 
@@ -15,47 +18,86 @@ CGProj::CGEditProxyObject::CGEditProxyObject(CGAssetManager& am)
 	// other member variables of this class should be in the class header declaration!
 }
 
-void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 & proj)
+void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 & proj, const glm::vec3& cameraPos)
 {
 	// CGEditObject::render(view, proj);
-
 	m_DefShader->use();
 
-	// 1. Material Setting
-	m_DefShader->setBool("material.CMorLM", m_CMorLM);
-	m_DefShader->setBool("material.isLMdiffuse", m_isLMdiffuse);
-	m_DefShader->setBool("material.isLMspecular", m_isLMspecular);
-	m_DefShader->setBool("material.isLMemissive", m_isLMemissive);
-	if (m_CMorLM) // CM == false, LM == true
+	if (m_useModelData == false) // for the primitive rendering
 	{
-		if (m_isLMdiffuse) glActiveTexture(GL_TEXTURE0), glBindTexture(GL_TEXTURE_2D, m_diffuseTexture);
-		if (m_isLMspecular) glActiveTexture(GL_TEXTURE1), glBindTexture(GL_TEXTURE_2D, m_specularTexture);
-		if (m_isLMemissive) glActiveTexture(GL_TEXTURE2), glBindTexture(GL_TEXTURE_2D, m_emissiveTexture);
-	}
-	else
-	{
-		m_DefShader->setVec3("material.CMambient", m_CMambient);
-		m_DefShader->setVec3("material.CMdiffuse", m_CMdiffuse);
-		m_DefShader->setVec3("material.CMspecular", m_CMspecular);
-		m_DefShader->setFloat("material.CMshininess", m_CMshininess);
-	}
-	// 1. Material Setting
+		// 1. Material Setting
+		m_DefShader->setBool("material.CMorLM", m_CMorLM);
+		
+		if (m_CMorLM) // CM == false, LM == true
+		{
+			if (m_isLMdiffuse) glActiveTexture(GL_TEXTURE0), glBindTexture(GL_TEXTURE_2D, m_diffuseTexture);
+			if (m_isLMspecular) glActiveTexture(GL_TEXTURE1), glBindTexture(GL_TEXTURE_2D, m_specularTexture);
+			if (m_isLMemissive) glActiveTexture(GL_TEXTURE2), glBindTexture(GL_TEXTURE_2D, m_emissiveTexture);
 
+			m_DefShader->setBool("material.isLMdiffuse", m_isLMdiffuse);
+			m_DefShader->setBool("material.isLMspecular", m_isLMspecular);
+			m_DefShader->setBool("material.isLMemissive", m_isLMemissive);
+			m_DefShader->setBool("material.isNormalMap", m_isNormalMap);
+			m_DefShader->setBool("material.isDepthMap", m_isDepthMap);
+
+			if (m_isNormalMap || m_isDepthMap)
+			{
+				m_DefShader->setBool("IsUseTangentSpace", true); // Calculate TBN Matrix
+				m_DefShader->setVec3("cameraPos", cameraPos);
+			}
+			else
+			{
+				m_DefShader->setBool("IsUseTangentSpace", false);
+			}
+		}
+		else
+		{
+			m_DefShader->setVec3("material.CMambient", m_CMambient);
+			m_DefShader->setVec3("material.CMdiffuse", m_CMdiffuse);
+			m_DefShader->setVec3("material.CMspecular", m_CMspecular);
+			m_DefShader->setFloat("material.CMshininess", m_CMshininess);
+		}
+	}
+	else if (m_useModelData == true) // for the loaded model rendering
+	{
+		m_DefShader->setBool("material.CMorLM", true); // use light map
+
+		// the below flags will be set automatically by CGModel class.
+		// So I'm initializing to prevent the shader for using garbage value.
+		m_DefShader->setBool("material.isLMdiffuse", false);
+		m_DefShader->setBool("material.isLMspecular", false);
+		m_DefShader->setBool("material.isLMemissive", false);
+		m_DefShader->setBool("material.isNormalMap", false);
+		m_DefShader->setBool("material.isDepthMap", false);
+
+		m_DefShader->setVec3("cameraPos", cameraPos);
+	}
+	
 	// 2. Vertex Setting
-	m_DefShader->setMat4("projection", proj);
-	m_DefShader->setMat4("view", view);
-
 	glm::mat4 model(1.0);
 	model = glm::translate(model, this->getPosition());
 	// model = glm::rotate(model, ) // TODO: add the rotation function later
 	model = glm::scale(model, this->getScale());
 
+	m_DefShader->setMat4("projection", proj);
+	m_DefShader->setMat4("view", view);
 	m_DefShader->setMat4("model", model);
 	m_DefShader->setMat3("ModelNormalMatrix", glm::mat3(glm::transpose(glm::inverse(model))));
 	// 2. Vertex Setting
 
-	// Now Ready to render. Go render according to the primitive
-	renderPrimitive();
+	// Now Ready to render. Go render according to the flags
+	if (m_useModelData)
+		m_Model->deferredFirstRender(m_DefShader);
+	else
+		renderPrimitive();
+}
+
+void CGProj::CGEditProxyObject::shadowMapRender()
+{
+	if (m_useModelData)
+		m_Model->shadowFirstRender();
+	else
+		renderPrimitive();
 }
 
 void CGProj::CGEditProxyObject::UIrender(CGAssetManager& am)
@@ -98,63 +140,70 @@ void CGProj::CGEditProxyObject::UIrender(CGAssetManager& am)
 		break;
 	}
 
-	int cmorlm = (int)m_CMorLM;
-	ImGui::RadioButton("Color Material", &cmorlm, 0); ImGui::SameLine();
-	ImGui::RadioButton("Light Map Material", &cmorlm, 1);
-	m_CMorLM = bool(cmorlm);
-
-	if (m_CMorLM) // Light Map Material
+	if (m_useModelData == false) // Just Manual Vertex Data
 	{
-		ImGui::Checkbox("Diffuse Texture", &m_isLMdiffuse);
-		if (m_isLMdiffuse)
-		{
-			int selected = 0;
-			if (ImGui::Combo("Set Diffuse", &selected, CG_TEXTURE_LIST, NUM_CG_TEXTURE_ENUM))
-				setDiffuseTexture(am.getTexture(CG_TEXTURE_ENUM(selected), true));
-		}
+		int cmorlm = (int)m_CMorLM;
+		ImGui::RadioButton("Color Material", &cmorlm, 0); ImGui::SameLine();
+		ImGui::RadioButton("Light Map Material", &cmorlm, 1);
+		m_CMorLM = bool(cmorlm);
 
-		ImGui::Checkbox("Specular Texture", &m_isLMspecular);
-		if (m_isLMspecular)
+		if (m_CMorLM) // Light Map Material
 		{
-			int selected = 0;
-			if (ImGui::Combo("Set Specular", &selected, CG_TEXTURE_LIST, NUM_CG_TEXTURE_ENUM))
-				setSpecularTexture(am.getTexture(CG_TEXTURE_ENUM(selected), true));
-		}
+			ImGui::Checkbox("Diffuse Texture", &m_isLMdiffuse);
+			if (m_isLMdiffuse)
+			{
+				int selected = 0;
+				if (ImGui::Combo("Set Diffuse", &selected, CG_TEXTURE_LIST, NUM_CG_TEXTURE_ENUM))
+					setDiffuseTexture(am.getTexture(CG_TEXTURE_ENUM(selected), true));
+			}
 
-		ImGui::Checkbox("Emissive Texture", &m_isLMemissive);
-		if (m_isLMemissive)
+			ImGui::Checkbox("Specular Texture", &m_isLMspecular);
+			if (m_isLMspecular)
+			{
+				int selected = 0;
+				if (ImGui::Combo("Set Specular", &selected, CG_TEXTURE_LIST, NUM_CG_TEXTURE_ENUM))
+					setSpecularTexture(am.getTexture(CG_TEXTURE_ENUM(selected), true));
+			}
+
+			ImGui::Checkbox("Emissive Texture", &m_isLMemissive);
+			if (m_isLMemissive)
+			{
+				int selected = 0;
+				if (ImGui::Combo("Set Emissive", &selected, CG_TEXTURE_LIST, NUM_CG_TEXTURE_ENUM))
+					setEmissiveTexture(am.getTexture(CG_TEXTURE_ENUM(selected), true));
+			}
+		}
+		else // Colro Material
 		{
+			float temp[3] = { m_CMambient.x,m_CMambient.y, m_CMambient.z };
+			ImGui::ColorEdit3("Ambient", temp);
+			m_CMambient = { temp[0], temp[1], temp[2] };
+
+			temp[0] = m_CMdiffuse.x, temp[1] = m_CMdiffuse.y, temp[2] = m_CMdiffuse.z;
+			ImGui::ColorEdit3("Diffuse", temp);
+			m_CMdiffuse = { temp[0], temp[1], temp[2] };
+
+			temp[0] = m_CMspecular.x, temp[1] = m_CMspecular.y, temp[2] = m_CMspecular.z;
+			ImGui::ColorEdit3("specular", temp);
+			m_CMspecular = { temp[0], temp[1], temp[2] };
+
+			float min = 0.1f;
+			float max = 1.f;
+			ImGui::DragScalar("shininess", ImGuiDataType_Float, &m_CMshininess, 0.005f, &min, &max, "%f", 1.0f);
+
 			int selected = 0;
-			if (ImGui::Combo("Set Emissive", &selected, CG_TEXTURE_LIST, NUM_CG_TEXTURE_ENUM))
-				setEmissiveTexture(am.getTexture(CG_TEXTURE_ENUM(selected), true));
+			if (ImGui::Combo("Set Color Material", &selected, CG_COLOR_MATERIAL_LIST, 24))
+			{
+				setCMambinet(CG_COLOR_MATERIAL_AMBIENT[selected]);
+				setCMdiffuse(CG_COLOR_MATERIAL_DIFFUSE[selected]);
+				setCMspecular(CG_COLOR_MATERIAL_SPECULAR[selected]);
+				setCMshininess(CG_COLOR_MATERIAL_SHININESS[selected]);
+			}
 		}
 	}
-	else // Colro Material
+	else if (m_useModelData == true)// Loaded Model Dat
 	{
-		float temp[3] = { m_CMambient.x,m_CMambient.y, m_CMambient.z };
-		ImGui::ColorEdit3("Ambient", temp);
-		m_CMambient = { temp[0], temp[1], temp[2] };
 
-		temp[0] = m_CMdiffuse.x, temp[1] = m_CMdiffuse.y, temp[2] = m_CMdiffuse.z;
-		ImGui::ColorEdit3("Diffuse", temp);
-		m_CMdiffuse = { temp[0], temp[1], temp[2] };
-
-		temp[0] = m_CMspecular.x, temp[1] = m_CMspecular.y, temp[2] = m_CMspecular.z;
-		ImGui::ColorEdit3("specular", temp);
-		m_CMspecular = { temp[0], temp[1], temp[2] };
-
-		float min = 0.1f;
-		float max = 1.f;
-		ImGui::DragScalar("shininess", ImGuiDataType_Float, &m_CMshininess, 0.005f, &min, &max, "%f", 1.0f);
-
-		int selected = 0;
-		if (ImGui::Combo("Set Color Material", &selected, CG_COLOR_MATERIAL_LIST, 24))
-		{
-			setCMambinet(CG_COLOR_MATERIAL_AMBIENT[selected]);
-			setCMdiffuse(CG_COLOR_MATERIAL_DIFFUSE[selected]);
-			setCMspecular(CG_COLOR_MATERIAL_SPECULAR[selected]);
-			setCMshininess(CG_COLOR_MATERIAL_SHININESS[selected]);
-		}
 	}
 
 	ImGui::End();
@@ -215,6 +264,36 @@ void CGProj::CGEditProxyObject::setEmissiveTexture(unsigned texId)
 	CGEditProxyObject::m_emissiveTexture = texId;
 }
 
+bool CGProj::CGEditProxyObject::isNormalMapOn()
+{
+	return m_isNormalMap;
+}
+
+void CGProj::CGEditProxyObject::setNormalMapFlag(bool flag)
+{
+	m_isNormalMap = flag;
+}
+
+void CGProj::CGEditProxyObject::setNormalMapTexture(unsigned texId)
+{
+	m_normalMapTexture = texId;
+}
+
+bool CGProj::CGEditProxyObject::isDepthMapon()
+{
+	return m_isDepthMap;
+}
+
+void CGProj::CGEditProxyObject::setDepthMapFalg(bool flag)
+{
+	m_isDepthMap = flag;
+}
+
+void CGProj::CGEditProxyObject::setDepthMapTexture(unsigned texId)
+{
+	m_depthMapTexture = texId;
+}
+
 void CGProj::CGEditProxyObject::setCMambinet(const glm::vec3 & ambient)
 {
 	CGEditProxyObject::m_CMambient = ambient;
@@ -233,6 +312,16 @@ void CGProj::CGEditProxyObject::setCMspecular(const glm::vec3 & specular)
 void CGProj::CGEditProxyObject::setCMshininess(float s)
 {
 	CGEditProxyObject::m_CMshininess = s;
+}
+
+void CGProj::CGEditProxyObject::setModelData(bool m)
+{
+	m_useModelData = m;
+}
+
+void CGProj::CGEditProxyObject::setModel(CGModel * model)
+{
+	m_Model = model;
 }
 
 void CGProj::CGEditProxyObject::setProxyType(EditProxyType e)

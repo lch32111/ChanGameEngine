@@ -178,6 +178,7 @@
     <ClCompile Include="Graphics\CGRenderLine.cpp" />
     <ClCompile Include="Graphics\CGSizableRenderLine.cpp" />
     <ClCompile Include="Graphics\CGSpotShadowFrustumVisualizer.cpp" />
+    <ClCompile Include="Graphics\CGSSAOEffect.cpp" />
     <ClCompile Include="Graphics\chanEulerCamera.cpp" />
     <ClCompile Include="Graphics\chanQuatCamera.cpp" />
     <ClCompile Include="Graphics\GLTextureUtility.cpp" />
@@ -255,6 +256,7 @@
     <ClInclude Include="Graphics\CGRenderLine.h" />
     <ClInclude Include="Graphics\CGSizableRenderLine.h" />
     <ClInclude Include="Graphics\CGSpotShadowFrustumVisualizer.h" />
+    <ClInclude Include="Graphics\CGSSAOEffect.h" />
     <ClInclude Include="Graphics\chanEulerCamera.h" />
     <ClInclude Include="Graphics\chanQuatCamera.h" />
     <ClInclude Include="Graphics\GLPrimitiveUtil.h" />

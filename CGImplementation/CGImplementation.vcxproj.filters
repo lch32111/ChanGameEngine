@@ -261,6 +261,9 @@
     <ClCompile Include="Graphics\CGBloomEffect.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\CGSSAOEffect.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -507,6 +510,9 @@
       <Filter>Graphics Header</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\CGBloomEffect.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGSSAOEffect.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
   </ItemGroup>

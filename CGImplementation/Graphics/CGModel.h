@@ -23,20 +23,26 @@ namespace CGProj
 	{
 	public:
 		bool m_isLoaded;
+		
 		std::string m_directory;
 
 		CGModel();
 		CGModel(const char* path);
 		void destroy();
 
-		bool loadModel();
-
-		void deferredFirstRender(Shader* shader);
+		bool loadModel(unsigned maxInstanceNumb);
+		void setInstanceData(const std::vector<glm::mat4>& model, const std::vector<glm::mat4>& worldNormal);
+		void deferredFirstRender(Shader* shader, unsigned instanceNumb);
 		void shadowFirstRender();
+
+		unsigned getMaxInstanceNumb();
 	private:
 		/* Model Data */
 		std::vector<CGModelMesh> m_meshes;
 		std::vector<Texture> m_texture_loaded;
+
+		// Instnacing
+		unsigned m_maxInstancingNumb;
 
 		/* Functions */
 		void processNode(aiNode* node, const aiScene* scene);

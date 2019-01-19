@@ -24,7 +24,9 @@ namespace CGProj
 		CGEditProxyObject(CGAssetManager& am);
 
 		/*** Graphics Method ***/
-		void render(const glm::mat4& view, const glm::mat4& proj, const glm::vec3& cameraPos);
+		void setInstanceData(const std::vector<glm::mat4>& model, const std::vector<glm::mat4>& worldNormal);
+		void render(const glm::vec3& cameraPos);
+		void renderOneInstancePrimitive();
 		void shadowMapRender();
 		virtual void UIrender(CGAssetManager& am);
 
@@ -92,6 +94,7 @@ namespace CGProj
 
 		bool m_useModelData = false;
 		CGModel* m_Model = nullptr;
+		unsigned m_instanceNumb;
 
 		/*** Graphics ***/
 

@@ -92,11 +92,11 @@ unsigned CGProj::CGAssetManager::getTexture(CG_TEXTURE_ENUM _textureEnum, bool g
 	return -1;
 }
 
-CGProj::CGModel* CGProj::CGAssetManager::getModelData(CG_MODEL_ENUM _modelEnum)
+CGProj::CGModel* CGProj::CGAssetManager::getModelData(CG_MODEL_ENUM _modelEnum, unsigned maxInstanceNumb)
 {
 	if (m_models[_modelEnum].m_isLoaded == false)
 	{
-		if (m_models[_modelEnum].loadModel() == false)
+		if (m_models[_modelEnum].loadModel(maxInstanceNumb) == false)
 		{
 			std::cout << "CHAN_ASSET_MANAGER::GETMODEL::The number of Model Enum : " << _modelEnum << '\n';
 			CGassert();

@@ -3,6 +3,7 @@
 #include <Imgui/imgui.h>
 
 #include <Graphics/CGAssetManager.h>
+#include <Graphics/GLInstancePrimitiveUtil.h>
 
 
 // =================================================================
@@ -18,7 +19,37 @@ CGProj::CGEditProxyObject::CGEditProxyObject(CGAssetManager& am)
 	// other member variables of this class should be in the class header declaration!
 }
 
-void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 & proj, const glm::vec3& cameraPos)
+void CGProj::CGEditProxyObject::setInstanceData(const std::vector<glm::mat4>& model, const std::vector<glm::mat4>& worldNormal)
+{
+	m_instanceNumb = model.size();
+
+	// Just Decrease the instance numb to the max
+	if (m_Model->getMaxInstanceNumb() < m_instanceNumb)
+		CGassert();
+
+	if (m_useModelData)
+	{
+		m_Model->setInstanceData(model, worldNormal);
+	}
+	else
+	{
+		switch (m_PrimitiveType)
+		{
+		case EDIT_PRIMITIVE_AABB:
+		case EDIT_PRIMITIVE_OBB:
+			CGInstancePrimitiveUtil::setCubeOneInstanceData(model, worldNormal);
+			break;
+		case EDIT_PRIMITIVE_SPHERE:
+			CGInstancePrimitiveUtil::setSphereOneInstanceData(model, worldNormal);
+			break;
+		default:
+			assert(0);
+			break;
+		}
+	}
+}
+
+void CGProj::CGEditProxyObject::render(const glm::vec3& cameraPos)
 {
 	// CGEditObject::render(view, proj);
 	m_DefShader->use();
@@ -79,17 +110,32 @@ void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 &
 	// model = glm::rotate(model, ) // TODO: add the rotation function later
 	model = glm::scale(model, this->getScale());
 
-	m_DefShader->setMat4("projection", proj);
-	m_DefShader->setMat4("view", view);
 	m_DefShader->setMat4("model", model);
 	m_DefShader->setMat3("ModelNormalMatrix", glm::mat3(glm::transpose(glm::inverse(model))));
 	// 2. Vertex Setting
 
 	// Now Ready to render. Go render according to the flags
 	if (m_useModelData)
-		m_Model->deferredFirstRender(m_DefShader);
+		m_Model->deferredFirstRender(m_DefShader, m_instanceNumb);
 	else
-		renderPrimitive();
+		renderOneInstancePrimitive();
+}
+
+void CGProj::CGEditProxyObject::renderOneInstancePrimitive()
+{
+	switch (m_PrimitiveType)
+	{
+	case EDIT_PRIMITIVE_AABB:
+	case EDIT_PRIMITIVE_OBB:
+		CGInstancePrimitiveUtil::renderCube();
+		break;
+	case EDIT_PRIMITIVE_SPHERE:
+		CGInstancePrimitiveUtil::renderSphere();
+		break;
+	default:
+		assert(0);
+		break;
+	}
 }
 
 void CGProj::CGEditProxyObject::shadowMapRender()

@@ -7,9 +7,12 @@
 #include <Graphics/GLTextureUtility.h>
 #include <Graphics/GLPrimitiveUtil.h>
 #include <Graphics/CGDefSecondUtil.h>
+#include <Graphics/GLInstancePrimitiveUtil.h>
+
 
 #include <GPED/CGPhysicsUtil.h>
 #include <GPED/GPED_random.h>
+
 
 void CGProj::DeferredRenderer::initGraphics(int width, int height)
 {
@@ -44,6 +47,9 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	Deferred_Post_Shader->use();
 	Deferred_Post_Shader->setInt("currentScene", 0);
 	Deferred_Post_Shader->setInt("bloomedScene", 1);
+
+	Deferred_STD140.initialize("Matrices");
+	Deferred_STD140.addShader(Deferred_First_Shader);
 	
 	pGamma = 2.2f; Deferred_Post_Shader->setFloat("gamma", pGamma);
 	pExposure = 1.0; Deferred_Post_Shader->setFloat("exposure", pExposure);
@@ -98,6 +104,8 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
 
 	// Normal Buffer
@@ -210,11 +218,71 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 		editProxies[i].setPosition(prandom.randomVector(glm::vec3(-7, -5, 0), glm::vec3(-4, -4, 5)));
 	}
 	editProxies[0].setModelData(true);
-	editProxies[0].setModel(assetManager.getModelData(MODEL_ROYAL_ROOSTER));
+	editProxies[0].setModel(assetManager.getModelData(MODEL_ROYAL_ROOSTER, 400));
 	editProxies[0].setScale(0.5f);
 	editProxies[1].setModelData(true);
-	editProxies[1].setModel(assetManager.getModelData(MODEL_NANO_SUIT));
+	editProxies[1].setModel(assetManager.getModelData(MODEL_NANO_SUIT, 50));
 	editProxies[1].setScale(0.5f);
+
+	srand(glfwGetTime()); // initialize random seed
+	float radius = 10.0f;
+	float offset = 2.5f;
+
+	modelMatrices = std::vector<glm::mat4>(50);
+	worldNormalMatrices = std::vector<glm::mat4>(50);
+	for (unsigned int i = 0; i < modelMatrices.size(); ++i)
+	{
+		glm::mat4 model(1.0);
+		// 1. translation: displace along circle with 'radius' in range [-offset, offset]
+		float angle = (float)i / (float)400 * 360.0f;
+		float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+		float x = sin(angle) * radius + displacement;
+		displacement = (rand() % (int)(offset * 100)) / 100.0f - offset;
+		float y = displacement * 0.4f; // keep the height of the filed smaller compared to width of x and z
+		displacement = (rand() % (int)(offset * 100)) / 100.0f - offset;
+		float z = cos(angle) * radius + displacement;
+		model = glm::translate(model, glm::vec3(x, y, z));
+
+		// 2. scale: Scale between 0.05 and 0.25f;
+		// float scale = (rand() % 10) / 100.0f + 0.05f;
+		model = glm::scale(model, glm::vec3(0.08));
+
+		// 3. rotation: add random rotation around a (semi) randomly picked rotation axis vector
+		float rotAngle = (rand() % 360);
+		model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
+
+		modelMatrices[i] = model;
+		worldNormalMatrices[i] = glm::transpose(glm::inverse(model));
+	}
+	srand(glfwGetTime()); // initialize random seed
+	radius = 15;
+	offset = 6;
+	HeavymodelMatrices = std::vector<glm::mat4>(400);
+	HeavyworldNormalMatrices = std::vector<glm::mat4>(400);
+	for (unsigned int i = 0; i < HeavymodelMatrices.size(); ++i)
+	{
+		glm::mat4 model(1.0);
+		// 1. translation: displace along circle with 'radius' in range [-offset, offset]
+		float angle = (float)i / (float)400 * 360.0f;
+		float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+		float x = sin(angle) * radius + displacement;
+		displacement = (rand() % (int)(offset * 100)) / 100.0f - offset;
+		float y = displacement * 0.4f; // keep the height of the filed smaller compared to width of x and z
+		displacement = (rand() % (int)(offset * 100)) / 100.0f - offset;
+		float z = cos(angle) * radius + displacement;
+		model = glm::translate(model, glm::vec3(x, y, z));
+
+		// 2. scale: Scale between 0.05 and 0.25f;
+		// float scale = (rand() % 10) / 100.0f + 0.05f;
+		model = glm::scale(model, glm::vec3(1.0));
+
+		// 3. rotation: add random rotation around a (semi) randomly picked rotation axis vector
+		float rotAngle = (rand() % 360);
+		model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
+
+		HeavymodelMatrices[i] = model;
+		HeavyworldNormalMatrices[i] = glm::transpose(glm::inverse(model));
+	}
 
 
 	GPED::Random random(331);
@@ -273,6 +341,8 @@ void CGProj::DeferredRenderer::deinit()
 	assetManager.destroy();
 	myBloom.Destroy();
 	mySSAO.Destroy();
+	Deferred_STD140.Destroy();
+	CGInstancePrimitiveUtil::destroy();
 
 	glDeleteTextures(1, &gPosition);
 	glDeleteTextures(1, &gNormal);
@@ -397,10 +467,13 @@ void CGProj::DeferredRenderer::display(int width, int height)
 
 		glClearColor(0, 0, 0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		for (unsigned i = 0; i < editProxies.size(); ++i)
-		{
 
-			editProxies[i].render(view, projection, camera.Position);
+		Deferred_STD140.populateBuffer(view, projection);
+
+		for (unsigned i = 0; i < 1; ++i)
+		{
+			editProxies[i].setInstanceData(HeavymodelMatrices, HeavyworldNormalMatrices);
+			editProxies[i].render(camera.Position);
 		}
 
 		
@@ -410,30 +483,34 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		Deferred_First_Shader->setBool("material.isLMemissive", false);
 		Deferred_First_Shader->setBool("material.isNormalMap", false);
 		Deferred_First_Shader->setBool("material.isDepthMap", false);
-		Deferred_First_Shader->setMat4("projection", projection);
-		Deferred_First_Shader->setMat4("view", view);
 		
-		Deferred_First_Shader->setMat3("ModelNormalMatrix", glm::mat3(glm::transpose(glm::inverse(model))));
 		Deferred_First_Shader->setBool("IsUseTangentSpace", false);
 		Deferred_First_Shader->setVec3("cameraPos", camera.Position);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, assetManager.getTexture(TEXTURE_WOOD_PANEL, true));
 
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0, -5, 0));
 		// model = glm::rotate(model, glm::radians(-90.f), glm::vec3(1, 0, 0));
 		model = glm::scale(model, glm::vec3(25));
-		Deferred_First_Shader->setMat4("model", model);
+		std::vector<glm::mat4> tModel, tNormal;
+		tModel.push_back(model);
+		tNormal.push_back(glm::transpose(glm::inverse(model)));
+		CGInstancePrimitiveUtil::setQuadOneInstanceData(tModel, tNormal);
+		CGInstancePrimitiveUtil::renderQuad();
+
+		/*
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, assetManager.getTexture(TEXTURE_WOOD_PANEL, true));
-		renderQuad();
-
 		model = model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0, -5, -10));
 		model = glm::rotate(model, glm::radians(90.f), glm::vec3(1, 0, 0));
 		model = glm::scale(model, glm::vec3(25));
-		Deferred_First_Shader->setMat4("model", model);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, assetManager.getTexture(TEXTURE_WOOD_PANEL, true));
-		renderQuad();
+		tModel[0] = model;
+		tNormal[0] = glm::transpose(glm::inverse(model));
+		CGInstancePrimitiveUtil::setQuadOneInstanceData(tModel, tNormal);
+		CGInstancePrimitiveUtil::renderQuad();
+		*/
 	}
 	// First Pass
 

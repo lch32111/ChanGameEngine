@@ -23,7 +23,7 @@ namespace CGProj
 		
 		unsigned getTexture(CG_TEXTURE_ENUM _textureEnum, bool gamma);
 		
-		CGModel* getModelData(CG_MODEL_ENUM _modelEnum);
+		CGModel* getModelData(CG_MODEL_ENUM _modelEnum, unsigned maxInstanceNumb);
 
 		void assetInit();
 		void destroy();

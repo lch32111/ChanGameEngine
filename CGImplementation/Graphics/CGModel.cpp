@@ -22,8 +22,10 @@ void CGProj::CGModel::destroy()
 }
 
 
-bool CGProj::CGModel::loadModel()
+bool CGProj::CGModel::loadModel(unsigned maxInstancNumb)
 {
+	m_maxInstancingNumb = maxInstancNumb;
+
 	Assimp::Importer import;
 	const aiScene* scene = import.ReadFile
 	(
@@ -43,16 +45,25 @@ bool CGProj::CGModel::loadModel()
 	m_directory = m_directory.substr(0, m_directory.find_last_of('/'));
 
 	processNode(scene->mRootNode, scene);
+	
 	m_isLoaded = true;
 	return true;
 }
 
-
-void CGProj::CGModel::deferredFirstRender(Shader* shader)
+void CGProj::CGModel::setInstanceData(const std::vector<glm::mat4>& model, const std::vector<glm::mat4>& worldNormal)
 {
 	for (unsigned i = 0; i < m_meshes.size(); ++i)
 	{
-		m_meshes[i].deferredFirstRender(shader);
+		m_meshes[i].setInstanceData(model, worldNormal);
+	}
+}
+
+
+void CGProj::CGModel::deferredFirstRender(Shader* shader, unsigned instanceNumb)
+{
+	for (unsigned i = 0; i < m_meshes.size(); ++i)
+	{
+		m_meshes[i].deferredFirstRender(shader, m_maxInstancingNumb);
 	}
 }
 
@@ -62,6 +73,11 @@ void CGProj::CGModel::shadowFirstRender()
 	{
 		m_meshes[i].shadowFirstRender();
 	}
+}
+
+unsigned CGProj::CGModel::getMaxInstanceNumb()
+{
+	return m_maxInstancingNumb;
 }
 
 void CGProj::CGModel::processNode(aiNode * node, const aiScene * scene)
@@ -153,7 +169,7 @@ CGProj::CGModelMesh CGProj::CGModel::processMesh(aiMesh * mesh, const aiScene * 
 		// textures.insert(textures.end(), reflectMaps.begin(), reflectMaps.end());
 	}
 
-	return CGModelMesh(vertices, indices, textures);
+	return CGModelMesh(vertices, indices, textures, m_maxInstancingNumb);
 }
 
 std::vector<CGProj::Texture> CGProj::CGModel::loadMaterialTextures(aiMaterial * mat, aiTextureType type, std::string typeName)

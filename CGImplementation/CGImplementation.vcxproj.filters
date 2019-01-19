@@ -264,6 +264,9 @@
     <ClCompile Include="Graphics\CGSSAOEffect.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\CGStd140Module.cpp">
+      <Filter>Graphics Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CG_Application.h">
@@ -513,6 +516,12 @@
       <Filter>Graphics Header</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\CGSSAOEffect.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGStd140Module.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GLInstancePrimitiveUtil.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
   </ItemGroup>

@@ -35,6 +35,9 @@ namespace CGProj
 
 		void setNoiseNum(unsigned noiseNum);
 		unsigned getNoiseNum();
+
+		void setBlurState(bool b);
+		bool getBlurState();
 	private:
 		Shader* m_ssaoShader;
 		Shader* m_ssaoBlurShader;
@@ -56,6 +59,7 @@ namespace CGProj
 		float m_ssaoBias;
 		float m_ssaoPower;
 		
+		bool m_useBlur;
 	};
 }
 

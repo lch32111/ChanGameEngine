@@ -345,6 +345,9 @@ void CGProj::DeferredRenderer::updateImgui()
 			mySSAO.setNoiseNum((unsigned)ssaoNoise);
 		
 		ImGui::Text("SSAO Kernel Numb : %d", NR_SSAO_KERNEL);
+		
+		bool blurState = mySSAO.getBlurState();
+		if (ImGui::Checkbox("SSAO Blur", &blurState)) mySSAO.setBlurState(blurState);
 
 		ImGui::Checkbox("SSAO Debug", &isSSAODebug);
 	}

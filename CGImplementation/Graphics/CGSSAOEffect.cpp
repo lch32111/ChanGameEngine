@@ -33,6 +33,8 @@ void CGProj::CGSSAOEffect::Initialize(CGAssetManager & am, unsigned seed,
 	m_ssaoBias = bias;
 	m_ssaoPower = power;
 
+	m_useBlur = true;
+
 	// Sample Kernerl Init
 	// Kerner will be in tangent space point toard z direction
 	std::mt19937 gen(seed);
@@ -150,18 +152,23 @@ unsigned CGProj::CGSSAOEffect::getSSAOTexture(
 	m_ssaoShader->setFloat("power", m_ssaoPower);
 	renderScreenQuad();
 
-	// Second pass of SSAO : make the occlusions blurred to get the better result.
-	glBindFramebuffer(GL_FRAMEBUFFER, m_ssaoBlurFBO);
-	glClear(GL_COLOR_BUFFER_BIT);
+	if (m_useBlur)
+	{
+		// Second pass of SSAO : make the occlusions blurred to get the better result.
+		glBindFramebuffer(GL_FRAMEBUFFER, m_ssaoBlurFBO);
+		glClear(GL_COLOR_BUFFER_BIT);
 
-	m_ssaoBlurShader->use();
+		m_ssaoBlurShader->use();
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_ssaoRawTexture);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_ssaoRawTexture);
 
-	renderScreenQuad();
+		renderScreenQuad();
+		return m_ssaoBlurredTexture;
+	}
+	
 
-	return m_ssaoBlurredTexture;
+	return m_ssaoRawTexture;
 }
 
 void CGProj::CGSSAOEffect::setTextureDimension(int width, int height)
@@ -253,4 +260,14 @@ void CGProj::CGSSAOEffect::setNoiseNum(unsigned noiseNum)
 unsigned CGProj::CGSSAOEffect::getNoiseNum()
 {
 	return m_noiseNum * m_noiseNum;
+}
+
+void CGProj::CGSSAOEffect::setBlurState(bool b)
+{
+	m_useBlur = b;
+}
+
+bool CGProj::CGSSAOEffect::getBlurState()
+{
+	return m_useBlur;
 }

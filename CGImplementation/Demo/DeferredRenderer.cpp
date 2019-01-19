@@ -403,10 +403,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 			editProxies[i].render(view, projection, camera.Position);
 		}
 
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0, -5, 0));
-		// model = glm::rotate(model, glm::radians(-90.f), glm::vec3(1, 0, 0));
-		model = glm::scale(model, glm::vec3(25));
+		
 		Deferred_First_Shader->setBool("material.CMorLM", true);
 		Deferred_First_Shader->setBool("material.isLMdiffuse", true);
 		Deferred_First_Shader->setBool("material.isLMspecular", false);
@@ -415,10 +412,25 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		Deferred_First_Shader->setBool("material.isDepthMap", false);
 		Deferred_First_Shader->setMat4("projection", projection);
 		Deferred_First_Shader->setMat4("view", view);
-		Deferred_First_Shader->setMat4("model", model);
+		
 		Deferred_First_Shader->setMat3("ModelNormalMatrix", glm::mat3(glm::transpose(glm::inverse(model))));
 		Deferred_First_Shader->setBool("IsUseTangentSpace", false);
 		Deferred_First_Shader->setVec3("cameraPos", camera.Position);
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(0, -5, 0));
+		// model = glm::rotate(model, glm::radians(-90.f), glm::vec3(1, 0, 0));
+		model = glm::scale(model, glm::vec3(25));
+		Deferred_First_Shader->setMat4("model", model);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, assetManager.getTexture(TEXTURE_WOOD_PANEL, true));
+		renderQuad();
+
+		model = model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(0, -5, -10));
+		model = glm::rotate(model, glm::radians(90.f), glm::vec3(1, 0, 0));
+		model = glm::scale(model, glm::vec3(25));
+		Deferred_First_Shader->setMat4("model", model);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, assetManager.getTexture(TEXTURE_WOOD_PANEL, true));
 		renderQuad();

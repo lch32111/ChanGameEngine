@@ -15,7 +15,7 @@ namespace CGProj
 		CGSSAOEffect();
 
 		void Initialize(CGAssetManager& am, unsigned seed, 
-		unsigned noiseNum, float radius, float bias, 
+		unsigned noiseNum, float radius, float bias, float power,
 		int width, int height);
 		void Destroy();
 
@@ -29,6 +29,9 @@ namespace CGProj
 
 		void setBias(float bias);
 		float getBias();
+
+		void setPower(float power);
+		float getPower();
 
 		void setNoiseNum(unsigned noiseNum);
 		unsigned getNoiseNum();
@@ -51,6 +54,7 @@ namespace CGProj
 
 		float m_ssaoRadius;
 		float m_ssaoBias;
+		float m_ssaoPower;
 		
 	};
 }

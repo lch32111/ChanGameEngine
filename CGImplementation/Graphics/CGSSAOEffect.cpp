@@ -16,7 +16,7 @@ CGProj::CGSSAOEffect::CGSSAOEffect()
 
 #define quickLerp(a, b, c) ((1.f - (c)) * (a) + (c) * (b))
 void CGProj::CGSSAOEffect::Initialize(CGAssetManager & am, unsigned seed, 
-	unsigned noiseNum, float radius, float bias,
+	unsigned noiseNum, float radius, float bias, float power,
 	int width, int height)
 {
 	m_ssaoShader = am.getShader(SHADER_SSAO_EFFECT);
@@ -31,6 +31,7 @@ void CGProj::CGSSAOEffect::Initialize(CGAssetManager & am, unsigned seed,
 
 	m_ssaoRadius = radius;
 	m_ssaoBias = bias;
+	m_ssaoPower = power;
 
 	// Sample Kernerl Init
 	// Kerner will be in tangent space point toard z direction
@@ -112,6 +113,13 @@ void CGProj::CGSSAOEffect::Destroy()
 {
 	delete[] m_ssaoKernal;
 	delete[] m_ssaoNoise;
+
+	glDeleteTextures(1, &m_noiseTexture);
+	glDeleteTextures(1, &m_ssaoRawTexture);
+	glDeleteTextures(1, &m_ssaoBlurredTexture);
+	
+	glDeleteFramebuffers(1, &m_ssaoFBO);
+	glDeleteFramebuffers(1, &m_ssaoBlurFBO);
 }
 
 unsigned CGProj::CGSSAOEffect::getSSAOTexture(
@@ -139,6 +147,7 @@ unsigned CGProj::CGSSAOEffect::getSSAOTexture(
 	m_ssaoShader->setInt("noiseTexDimension", m_noiseNum);
 	m_ssaoShader->setFloat("radius", m_ssaoRadius);
 	m_ssaoShader->setFloat("bias", m_ssaoBias);
+	m_ssaoShader->setFloat("power", m_ssaoPower);
 	renderScreenQuad();
 
 	// Second pass of SSAO : make the occlusions blurred to get the better result.
@@ -191,6 +200,16 @@ void CGProj::CGSSAOEffect::setBias(float bias)
 float CGProj::CGSSAOEffect::getBias()
 {
 	return m_ssaoBias;
+}
+
+void CGProj::CGSSAOEffect::setPower(float power)
+{
+	m_ssaoPower = power;
+}
+
+float CGProj::CGSSAOEffect::getPower()
+{
+	return m_ssaoPower;
 }
 
 void CGProj::CGSSAOEffect::setNoiseNum(unsigned noiseNum)

@@ -68,7 +68,6 @@ namespace CGProj
 		unsigned int dSecondFBO;
 		unsigned int dSecondHDRColorBuffer;
 		unsigned int dSecondHDRBloomBuffer;
-		unsigned int dSecondHDRDepthRBO;
 
 		float pGamma;
 		float pExposure;
@@ -76,7 +75,9 @@ namespace CGProj
 		CGBloomEffect myBloom;
 
 		bool isSSAO;
+		bool isSSAODebug;
 		CGSSAOEffect mySSAO;
+		Shader* SSAODebugShader;
 
 		// Broad Phase
 		CGBroadPhase dBroadPhase;

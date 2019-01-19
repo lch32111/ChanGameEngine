@@ -640,5 +640,11 @@
     <None Include="ShaderFolder\CGSSAOBlur.fs">
       <Filter>ShaderFolder</Filter>
     </None>
+    <None Include="ShaderFolder\CGSSAODebug.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGSSAODebug.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
   </ItemGroup>
 </Project>

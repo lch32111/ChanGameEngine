@@ -305,6 +305,8 @@
     <None Include="ShaderFolder\CGSpotVisualizer.vs" />
     <None Include="ShaderFolder\CGSSAOBlur.fs" />
     <None Include="ShaderFolder\CGSSAOBlur.vs" />
+    <None Include="ShaderFolder\CGSSAODebug.fs" />
+    <None Include="ShaderFolder\CGSSAODebug.vs" />
     <None Include="ShaderFolder\CGSSAOEffect.fs" />
     <None Include="ShaderFolder\CGSSAOEffect.vs" />
     <None Include="ShaderFolder\DeferredFirst.fs" />

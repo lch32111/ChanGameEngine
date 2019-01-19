@@ -31,6 +31,6 @@
 #define SHADOW_INDEX_NONE -1
 
 // SSAO Shader
-#define NR_SSAO_KERNEL 32
+#define NR_SSAO_KERNEL 64
 
 #endif

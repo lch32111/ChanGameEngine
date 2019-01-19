@@ -57,6 +57,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	myBloom.m_BrightnessThreShold = 1.f;
 
 	isSSAO = true;
+	isSSAODebug = false;
 	Shader* tempSSAOInit = assetManager.getShader(SHADER_SSAO_EFFECT);
 	tempSSAOInit->use();
 	tempSSAOInit->setInt("gPosition", 0);
@@ -65,7 +66,10 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	tempSSAOInit = assetManager.getShader(SHADER_SSAO_BLUR);
 	tempSSAOInit->use();
 	tempSSAOInit->setInt("ssaoInput", 0);
-	mySSAO.Initialize(assetManager, 123456, 16, 0.5f, 0.025f, width, height);
+	SSAODebugShader = assetManager.getShader(SHADER_SSAO_DEBUG);
+	SSAODebugShader->use();
+	SSAODebugShader->setInt("SSAO", 0);
+	mySSAO.Initialize(assetManager, 123456, 16, 0.5f, 0.025f, 1.0f, width, height);
 
 	// Shadow shader setting
 	Shader* DirdepthMapShader = assetManager.getShader(SHADER_DIR_SHADOW_MAP);
@@ -209,7 +213,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	editProxies[0].setModel(assetManager.getModelData(MODEL_ROYAL_ROOSTER));
 	editProxies[0].setScale(0.5f);
 	editProxies[1].setModelData(true);
-	editProxies[1].setModel(assetManager.getModelData(MODEL_ROYAL_ROOSTER));
+	editProxies[1].setModel(assetManager.getModelData(MODEL_NANO_SUIT));
 	editProxies[1].setScale(0.5f);
 
 
@@ -268,6 +272,20 @@ void CGProj::DeferredRenderer::deinit()
 {
 	assetManager.destroy();
 	myBloom.Destroy();
+	mySSAO.Destroy();
+
+	glDeleteTextures(1, &gPosition);
+	glDeleteTextures(1, &gNormal);
+	glDeleteTextures(1, &gAlbedoSpec);
+	glDeleteTextures(1, &gEmissive);
+	glDeleteTextures(1, &gBool);
+	glDeleteRenderbuffers(1, &gRBO);
+
+	glDeleteTextures(1, &dSecondHDRColorBuffer);
+	glDeleteTextures(1, &dSecondHDRBloomBuffer);
+
+	glDeleteFramebuffers(1, &gFBO);
+	glDeleteFramebuffers(1, &dSecondFBO);
 }
 
 void CGProj::DeferredRenderer::updateImgui()
@@ -318,12 +336,19 @@ void CGProj::DeferredRenderer::updateImgui()
 		if (ImGui::InputFloat("SSAO bias", &ssaoTemp, 0.02f, 5.0f, "%.3f"))
 			mySSAO.setBias(ssaoTemp);
 
+		ssaoTemp = mySSAO.getPower();
+		if (ImGui::InputFloat("SSAO power", &ssaoTemp, 0.02f, 5.0f, "%.3f"))
+			mySSAO.setPower(ssaoTemp);
+
 		int ssaoNoise = (int)mySSAO.getNoiseNum();
 		if (ImGui::InputInt("SSAO Noise Numb", &ssaoNoise, 2, 1))
 			mySSAO.setNoiseNum((unsigned)ssaoNoise);
 		
 		ImGui::Text("SSAO Kernel Numb : %d", NR_SSAO_KERNEL);
+
+		ImGui::Checkbox("SSAO Debug", &isSSAODebug);
 	}
+	
 	
 
 	ImGui::End();
@@ -489,6 +514,22 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		glActiveTexture(GL_TEXTURE1);
 		if(isBloom)	glBindTexture(GL_TEXTURE_2D, result);
 		renderScreenQuad();
+
+		if (isSSAODebug && isSSAO)
+		{
+			glViewport(width / 4 * 3, 0, width / 4, height / 4);
+			glScissor(width / 4 * 3, 0, width / 4, height / 4);
+			glEnable(GL_SCISSOR_TEST);
+			glClear(GL_DEPTH_BUFFER_BIT);
+
+			SSAODebugShader->use();
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, ssaoResult);
+			renderScreenQuad();
+
+			glDisable(GL_SCISSOR_TEST);
+			glViewport(0, 0, width, height);
+		}
 	}
 	// Post Processing
 

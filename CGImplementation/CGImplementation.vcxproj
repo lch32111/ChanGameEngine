@@ -261,6 +261,7 @@
     <ClInclude Include="Graphics\CGStd140Module.h" />
     <ClInclude Include="Graphics\chanEulerCamera.h" />
     <ClInclude Include="Graphics\chanQuatCamera.h" />
+    <ClInclude Include="Graphics\GLInstancePrimitiveUtil.h" />
     <ClInclude Include="Graphics\GLPrimitiveUtil.h" />
     <ClInclude Include="Graphics\GLTextureUtility.h" />
     <ClInclude Include="Graphics\Shader.h" />

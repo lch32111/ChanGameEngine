@@ -3,6 +3,7 @@
 #define __CG_MODEL_MESH_H__
 
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <string>
 #include <vector>
 
@@ -38,18 +39,28 @@ namespace CGProj
 	{
 	public:
 		// Mesh Data
-		CGModelMesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, std::vector<Texture>& textures);
+		CGModelMesh(
+			std::vector<Vertex>& vertices, 
+			std::vector<unsigned int>& indices, 
+			std::vector<Texture>& textures,
+			unsigned maxInstancingNumb);
 		void destroy();
 		std::vector<Vertex> m_vertices;
 		std::vector<unsigned> m_indices;
 		std::vector<Texture> m_textures;
 
 		// Deferred Rendering 
-		void deferredFirstRender(Shader* shader);
+		void setInstanceData(const std::vector<glm::mat4>& model, const std::vector<glm::mat4>& worldNormal);
+		void deferredFirstRender(Shader* shader, unsigned instanceNumb);
 		void shadowFirstRender();
 		
+	private:
 		unsigned m_VAO, m_VBO, m_EBO;
+		unsigned m_instanceModelVBO;
+		unsigned m_instanceWorldNormalVBO;
+		unsigned m_maxInstancingNumb;
 		void setupMesh();
+		void setupInstancing();
 	};
 }
 

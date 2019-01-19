@@ -135,6 +135,11 @@ namespace CGProj
 		CGGizmo gizmoTest;
 
 		CGAssetManager assetManager;
+		std::vector<glm::mat4> modelMatrices;
+		std::vector<glm::mat4> worldNormalMatrices;
+
+		std::vector<glm::mat4> HeavymodelMatrices;
+		std::vector<glm::mat4> HeavyworldNormalMatrices;
 	};
 
 }

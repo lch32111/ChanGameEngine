@@ -9,23 +9,39 @@
 CGProj::CGModelMesh::CGModelMesh(
 	std::vector<Vertex>& vertices, 
 	std::vector<unsigned int>& indices, 
-	std::vector<Texture>& textures)
+	std::vector<Texture>& textures,
+	unsigned maxInstancingNumb)
 	:
 	m_vertices(vertices),
 	m_indices(indices),
-	m_textures(textures)
+	m_textures(textures),
+	m_maxInstancingNumb(maxInstancingNumb)
 {
 	setupMesh();
+	setupInstancing();
 }
 
 void CGProj::CGModelMesh::destroy()
 {
-	glDeleteVertexArrays(1, &m_VAO);
+	glDeleteBuffers(1, &m_instanceModelVBO);
+	glDeleteBuffers(1, &m_instanceWorldNormalVBO);
+	
 	glDeleteBuffers(1, &m_VBO);
 	glDeleteBuffers(1, &m_EBO);
+
+	glDeleteVertexArrays(1, &m_VAO);
 }
 
-void CGProj::CGModelMesh::deferredFirstRender(Shader* shader)
+void CGProj::CGModelMesh::setInstanceData(const std::vector<glm::mat4>& model, const std::vector<glm::mat4>& worldNormal)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, m_instanceModelVBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * model.size(), glm::value_ptr(model[0]));
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_instanceWorldNormalVBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * worldNormal.size(), glm::value_ptr(worldNormal[0]));
+}
+
+void CGProj::CGModelMesh::deferredFirstRender(Shader* shader, unsigned instanceNumb)
 {
 	// Deferred First Pass Shader already set the texture unit number
 	// CGModel class already set the transform matrix before this scope
@@ -62,7 +78,7 @@ void CGProj::CGModelMesh::deferredFirstRender(Shader* shader)
 	// Draw Mesh
 	glBindVertexArray(m_VAO);
 	// glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0); glCheckError();
-	glDrawElementsInstanced(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0, 1); glCheckError();
+	glDrawElementsInstanced(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0, instanceNumb); glCheckError();
 
 	glBindVertexArray(0);
 }
@@ -112,4 +128,42 @@ void CGProj::CGModelMesh::setupMesh()
 	glBindVertexArray(0);
 
 	glCheckError();
+}
+
+void CGProj::CGModelMesh::setupInstancing()
+{
+	glBindVertexArray(m_VAO);
+
+	// Allocate Memory
+	glGenBuffers(1, &m_instanceModelVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_instanceModelVBO);
+	glBufferData(GL_ARRAY_BUFFER, m_maxInstancingNumb * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &m_instanceWorldNormalVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_instanceWorldNormalVBO);
+	glBufferData(GL_ARRAY_BUFFER, m_maxInstancingNumb * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+	// Allocate Memory
+
+	GLsizei vec4Size = sizeof(glm::vec4);
+
+	// Refer to the DeferredFirst.vs Shader!
+	// Model Matrix Instance Vertex Attribute Setting by manual setting 
+	glBindBuffer(GL_ARRAY_BUFFER, m_instanceModelVBO);
+	for (int i = 4; i < 4 + 4; ++i)
+	{
+		glEnableVertexAttribArray(i);
+		glVertexAttribPointer(i, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(vec4Size * (i - 4)));
+		glVertexAttribDivisor(i, 1);
+	}
+
+	// World Normal Matrix Instance Vertex Attribute Setting by manual setting 
+	glBindBuffer(GL_ARRAY_BUFFER, m_instanceWorldNormalVBO);
+	for (int i = 8; i < 8 + 4; ++i)
+	{
+		glEnableVertexAttribArray(i);
+		glVertexAttribPointer(i, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(vec4Size * (i - 8)));
+		glVertexAttribDivisor(i, 1);
+	}
+
+	glBindVertexArray(0);
 }

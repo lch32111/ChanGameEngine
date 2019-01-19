@@ -521,6 +521,9 @@
     <ClInclude Include="Graphics\CGStd140Module.h">
       <Filter>Graphics Header</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\GLInstancePrimitiveUtil.h">
+      <Filter>Graphics Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderFolder\DeferredFirst.fs">

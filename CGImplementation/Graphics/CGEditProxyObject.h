@@ -24,7 +24,7 @@ namespace CGProj
 		CGEditProxyObject(CGAssetManager& am);
 
 		/*** Graphics Method ***/
-		void render(const glm::mat4& view, const glm::mat4& proj, const glm::vec3& cameraPos);
+		void render(const glm::vec3& cameraPos);
 		void shadowMapRender();
 		virtual void UIrender(CGAssetManager& am);
 

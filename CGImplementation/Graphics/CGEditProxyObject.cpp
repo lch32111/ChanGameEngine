@@ -18,7 +18,7 @@ CGProj::CGEditProxyObject::CGEditProxyObject(CGAssetManager& am)
 	// other member variables of this class should be in the class header declaration!
 }
 
-void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 & proj, const glm::vec3& cameraPos)
+void CGProj::CGEditProxyObject::render(const glm::vec3& cameraPos)
 {
 	// CGEditObject::render(view, proj);
 	m_DefShader->use();
@@ -79,8 +79,6 @@ void CGProj::CGEditProxyObject::render(const glm::mat4 & view, const glm::mat4 &
 	// model = glm::rotate(model, ) // TODO: add the rotation function later
 	model = glm::scale(model, this->getScale());
 
-	m_DefShader->setMat4("projection", proj);
-	m_DefShader->setMat4("view", view);
 	m_DefShader->setMat4("model", model);
 	m_DefShader->setMat3("ModelNormalMatrix", glm::mat3(glm::transpose(glm::inverse(model))));
 	// 2. Vertex Setting

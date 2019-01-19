@@ -61,7 +61,8 @@ void CGProj::CGModelMesh::deferredFirstRender(Shader* shader)
 
 	// Draw Mesh
 	glBindVertexArray(m_VAO);
-	glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0); glCheckError();
+	// glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0); glCheckError();
+	glDrawElementsInstanced(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0, 1); glCheckError();
 
 	glBindVertexArray(0);
 }
@@ -69,7 +70,7 @@ void CGProj::CGModelMesh::shadowFirstRender()
 {
 	// Draw Mesh
 	glBindVertexArray(m_VAO);
-	glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0); glCheckError();
+	glDrawElementsInstanced(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0, 1); glCheckError();
 
 	glBindVertexArray(0);
 }

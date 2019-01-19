@@ -14,6 +14,7 @@
 #include <Graphics/CGEditLightObject.h>
 #include <Graphics/CGBloomEffect.h>
 #include <Graphics/CGSSAOEffect.h>
+#include <Graphics/CGStd140Module.h>
 
 #include <GPED/CGBroadPhase.h>
 
@@ -56,6 +57,7 @@ namespace CGProj
 		bool clickDraw = false;
 		bool rayHitDraw = false;
 
+		CGStd140Module Deferred_STD140;
 		Shader* Deferred_First_Shader;
 		Shader* Deferred_Second_Shader;
 		Shader* Deferred_Post_Shader;

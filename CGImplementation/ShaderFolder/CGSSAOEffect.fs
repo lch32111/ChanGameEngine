@@ -46,8 +46,8 @@ void main()
         vec4 offset = vec4(f_sample, 1.0);
 
         offset = projection * offset;  // from view to clip-space
-		offset.xyz /= offset.w; // perspective divide
-		offset.xyz = offset.xyz * 0.5 + 0.5; // transform to range 0.0 - 1.0
+		offset.xy /= offset.w; // perspective divide
+		offset.xy = offset.xy * 0.5 + 0.5; // transform to range 0.0 - 1.0
     
         // World Space -> View Space Transformation
         // But We only need the z position. So I just use dot product.
@@ -56,7 +56,6 @@ void main()
         for(int i = 0; i < 4; ++i)
             sampleDepth += view[i][2] * WorldPosition[i];
 		
-        
         float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleDepth));
 		occlusion += (sampleDepth >= f_sample.z + bias ? 1.0 : 0.0) * rangeCheck;
     }

@@ -1,16 +1,25 @@
 // shadertype=glsl
-#version 430 core
+#version 330 core
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
 layout (location = 3) in vec3 aTangent;
 
-uniform mat4 projection;
-uniform mat4 view;
+layout (std140) uniform Matrices
+{
+	mat4 view;			// col0 0 ~ 15
+		                // col1 16 ~ 31
+						// col2 32 ~ 47
+						// col3 48 ~ 63
+	mat4 projection;    // col0 64 ~ 79
+						// col1 80 ~ 95
+						// col2 96 ~ 111
+						// col3 112 ~ 128
+};
+
 uniform mat4 model;
 uniform mat3 ModelNormalMatrix;
-
 uniform bool IsUseTangentSpace;
 
 out vec3 FragPos;

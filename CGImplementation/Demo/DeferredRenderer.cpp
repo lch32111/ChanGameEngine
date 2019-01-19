@@ -44,6 +44,9 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	Deferred_Post_Shader->use();
 	Deferred_Post_Shader->setInt("currentScene", 0);
 	Deferred_Post_Shader->setInt("bloomedScene", 1);
+
+	Deferred_STD140.initialize("Matrices");
+	Deferred_STD140.addShader(Deferred_First_Shader);
 	
 	pGamma = 2.2f; Deferred_Post_Shader->setFloat("gamma", pGamma);
 	pExposure = 1.0; Deferred_Post_Shader->setFloat("exposure", pExposure);
@@ -98,6 +101,8 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
 
 	// Normal Buffer
@@ -273,6 +278,7 @@ void CGProj::DeferredRenderer::deinit()
 	assetManager.destroy();
 	myBloom.Destroy();
 	mySSAO.Destroy();
+	Deferred_STD140.Destroy();
 
 	glDeleteTextures(1, &gPosition);
 	glDeleteTextures(1, &gNormal);
@@ -397,10 +403,12 @@ void CGProj::DeferredRenderer::display(int width, int height)
 
 		glClearColor(0, 0, 0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		Deferred_STD140.populateBuffer(view, projection);
+
 		for (unsigned i = 0; i < editProxies.size(); ++i)
 		{
-
-			editProxies[i].render(view, projection, camera.Position);
+			editProxies[i].render(camera.Position);
 		}
 
 		
@@ -410,8 +418,6 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		Deferred_First_Shader->setBool("material.isLMemissive", false);
 		Deferred_First_Shader->setBool("material.isNormalMap", false);
 		Deferred_First_Shader->setBool("material.isDepthMap", false);
-		Deferred_First_Shader->setMat4("projection", projection);
-		Deferred_First_Shader->setMat4("view", view);
 		
 		Deferred_First_Shader->setMat3("ModelNormalMatrix", glm::mat3(glm::transpose(glm::inverse(model))));
 		Deferred_First_Shader->setBool("IsUseTangentSpace", false);
@@ -431,6 +437,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		model = glm::rotate(model, glm::radians(90.f), glm::vec3(1, 0, 0));
 		model = glm::scale(model, glm::vec3(25));
 		Deferred_First_Shader->setMat4("model", model);
+		Deferred_First_Shader->setMat3("ModelNormalMatrix", glm::mat3(glm::transpose(glm::inverse(model))));
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, assetManager.getTexture(TEXTURE_WOOD_PANEL, true));
 		renderQuad();

@@ -628,5 +628,17 @@
     <None Include="ShaderFolder\CGGaussianBlur.fs">
       <Filter>ShaderFolder</Filter>
     </None>
+    <None Include="ShaderFolder\CGSSAOEffect.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGSSAOEffect.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGSSAOBlur.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGSSAOBlur.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
   </ItemGroup>
 </Project>

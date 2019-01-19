@@ -42,15 +42,13 @@ void CGProj::CGBloomEffect::setTextureDimension(int width, int height)
 {
 	for (unsigned i = 0; i < 2; ++i)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, m_FBO[i]);
 		glBindTexture(GL_TEXTURE_2D, m_ColorBuffer[i]);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_ColorBuffer[i], 0);
 
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-			CGassert();
 		glCheckError();
 	}
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void CGProj::CGBloomEffect::setIteration(unsigned num)

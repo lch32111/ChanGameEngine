@@ -114,6 +114,8 @@ void CGProj::CGAssetManager::assetInit()
 	m_shaders[SHADER_DEFERRED_SECOND] = Shader("ShaderFolder/DeferredSecond.vs", "ShaderFolder/DeferredSecond.fs");
 	m_shaders[SHADER_DEFERRED_POST] = Shader("ShaderFolder/DeferredPost.vs", "ShaderFolder/DeferredPost.fs");
 	m_shaders[SHADER_GAUSSIAN_BLUR] = Shader("ShaderFolder/CGGaussianBlur.vs", "ShaderFolder/CGGaussianBlur.fs");
+	m_shaders[SHADER_SSAO_EFFECT] = Shader("ShaderFolder/CGSSAOEffect.vs", "ShaderFolder/CGSSAOEffect.fs");
+	m_shaders[SHADER_SSAO_BLUR] = Shader("ShaderFolder/CGSSAOBlur.vs", "ShaderFolder/CGSSAOBlur.fs");
 	m_shaders[SHADER_CG_LINE] = Shader("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
 	m_shaders[SHADER_SIMPLE_RENDER] = Shader("ShaderFolder/simpleRender.vs", "ShaderFolder/simpleRender.fs");
 	m_shaders[SHADER_SIMPLE_COLOR_RENDER] = Shader("ShaderFolder/simpleColorRender.vs", "ShaderFolder/simpleColorRender.fs");

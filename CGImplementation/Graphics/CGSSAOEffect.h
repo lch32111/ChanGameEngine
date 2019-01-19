@@ -15,19 +15,43 @@ namespace CGProj
 		CGSSAOEffect();
 
 		void Initialize(CGAssetManager& am, unsigned seed, 
-			unsigned kernelNum, unsigned noiseNum);
+		unsigned noiseNum, float radius, float bias, 
+		int width, int height);
 		void Destroy();
 
+		unsigned getSSAOTexture(unsigned gPosition, unsigned gNormal,
+			const glm::mat4& view, const glm::mat4& proj);
 
+		void setTextureDimension(int width, int height);
+
+		void setRadius(float radius);
+		float getRadius();
+
+		void setBias(float bias);
+		float getBias();
+
+		void setNoiseNum(unsigned noiseNum);
+		unsigned getNoiseNum();
 	private:
-		Shader* m_SSAOShader;
+		Shader* m_ssaoShader;
+		Shader* m_ssaoBlurShader;
 		
 		glm::vec3* m_ssaoKernal;
-		unsigned m_kernelNum;
 		
 		glm::vec3* m_ssaoNoise;
 		unsigned m_noiseNum;
 		unsigned m_noiseTexture;
+
+		unsigned m_ssaoFBO;
+		unsigned m_ssaoRawTexture;
+		unsigned m_screenWidth, m_screenHeight;
+
+		unsigned m_ssaoBlurFBO;
+		unsigned m_ssaoBlurredTexture;
+
+		float m_ssaoRadius;
+		float m_ssaoBias;
+		
 	};
 }
 

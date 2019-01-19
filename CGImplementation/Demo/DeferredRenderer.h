@@ -13,6 +13,7 @@
 #include <Graphics/CGEditProxyObject.h>
 #include <Graphics/CGEditLightObject.h>
 #include <Graphics/CGBloomEffect.h>
+#include <Graphics/CGSSAOEffect.h>
 
 #include <GPED/CGBroadPhase.h>
 
@@ -73,6 +74,9 @@ namespace CGProj
 		float pExposure;
 		bool isBloom;
 		CGBloomEffect myBloom;
+
+		bool isSSAO;
+		CGSSAOEffect mySSAO;
 
 		// Broad Phase
 		CGBroadPhase dBroadPhase;

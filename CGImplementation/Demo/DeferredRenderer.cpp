@@ -32,6 +32,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	Deferred_Second_Shader->setInt("gAlbedoSpec", 2);
 	Deferred_Second_Shader->setInt("gEmissive", 3);
 	Deferred_Second_Shader->setInt("gBool", 4);
+	Deferred_Second_Shader->setInt("ssaoTexture", 5);
 	for (unsigned i = 0; i < NR_DIR_SHADOWS; ++i)
 		Deferred_Second_Shader->setInt("dirShadowMap[" + std::to_string(i) + "]", NR_GBUFFER_TEXTURES + i);
 	for (unsigned i = 0; i < NR_POINT_SHADOWS; ++i)
@@ -54,6 +55,17 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	myBloom.Initialize(assetManager, width, height, 10);
 	myBloom.m_BrightnessExtractor = glm::vec3(0.2126, 0.7152, 0.0722);
 	myBloom.m_BrightnessThreShold = 1.f;
+
+	isSSAO = true;
+	Shader* tempSSAOInit = assetManager.getShader(SHADER_SSAO_EFFECT);
+	tempSSAOInit->use();
+	tempSSAOInit->setInt("gPosition", 0);
+	tempSSAOInit->setInt("gNormal", 1);
+	tempSSAOInit->setInt("texNoise", 2);
+	tempSSAOInit = assetManager.getShader(SHADER_SSAO_BLUR);
+	tempSSAOInit->use();
+	tempSSAOInit->setInt("ssaoInput", 0);
+	mySSAO.Initialize(assetManager, 123456, 16, 0.5f, 0.025f, width, height);
 
 	// Shadow shader setting
 	Shader* DirdepthMapShader = assetManager.getShader(SHADER_DIR_SHADOW_MAP);
@@ -157,10 +169,12 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	unsigned SecondAttachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	glDrawBuffers(2, SecondAttachments);
 
+	/*
 	glGenRenderbuffers(1, &dSecondHDRDepthRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, dSecondHDRDepthRBO);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, dSecondHDRDepthRBO);
+	*/
 	
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		CGassert();
@@ -195,7 +209,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	editProxies[0].setModel(assetManager.getModelData(MODEL_ROYAL_ROOSTER));
 	editProxies[0].setScale(0.5f);
 	editProxies[1].setModelData(true);
-	editProxies[1].setModel(assetManager.getModelData(MODEL_NANO_SUIT));
+	editProxies[1].setModel(assetManager.getModelData(MODEL_ROYAL_ROOSTER));
 	editProxies[1].setScale(0.5f);
 
 
@@ -287,6 +301,28 @@ void CGProj::DeferredRenderer::updateImgui()
 	{
 		ImGui::InputFloat3("Extractor Vector", &myBloom.m_BrightnessExtractor[0]);
 		ImGui::InputFloat("Extractor Threshold", &myBloom.m_BrightnessThreShold);
+
+		int iteration = (unsigned)myBloom.getIteration();
+		if (ImGui::InputInt("Bloom Iteration", &iteration, 1, 1))
+			myBloom.setIteration((unsigned)iteration);
+	}
+
+	ImGui::Checkbox("SSAO", &isSSAO);
+	if (isSSAO)
+	{
+		float ssaoTemp = mySSAO.getRadius();
+		if (ImGui::InputFloat("SSAO radius", &ssaoTemp, 0.02f, 5.0f, "%.3f"))
+			mySSAO.setRadius(ssaoTemp);
+
+		ssaoTemp = mySSAO.getBias();
+		if (ImGui::InputFloat("SSAO bias", &ssaoTemp, 0.02f, 5.0f, "%.3f"))
+			mySSAO.setBias(ssaoTemp);
+
+		int ssaoNoise = (int)mySSAO.getNoiseNum();
+		if (ImGui::InputInt("SSAO Noise Numb", &ssaoNoise, 2, 1))
+			mySSAO.setNoiseNum((unsigned)ssaoNoise);
+		
+		ImGui::Text("SSAO Kernel Numb : %d", NR_SSAO_KERNEL);
 	}
 	
 
@@ -361,6 +397,11 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	}
 	// First Pass
 
+	// SSAO between Deferred Rendering Pass
+	unsigned ssaoResult;
+	if (isSSAO)
+		ssaoResult = mySSAO.getSSAOTexture(gPosition, gNormal, view, projection);
+
 	// Second Pass
 	glBindFramebuffer(GL_FRAMEBUFFER, dSecondFBO);
 	{
@@ -381,6 +422,22 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		glBindTexture(GL_TEXTURE_2D, gEmissive);
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, gBool);
+		
+		// SSAO
+		Deferred_Second_Shader->setBool("useSSAO", isSSAO);
+		if (isSSAO)
+		{
+			glActiveTexture(GL_TEXTURE5);
+			glBindTexture(GL_TEXTURE_2D, ssaoResult);
+		}
+
+		// Bloom
+		Deferred_Second_Shader->setBool("useBloom", isBloom);
+		if (isBloom)
+		{
+			Deferred_Second_Shader->setVec3("brightExtractor", myBloom.m_BrightnessExtractor);
+			Deferred_Second_Shader->setFloat("brightThreshold", myBloom.m_BrightnessThreShold);
+		}
 
 		for (unsigned i = 0; i < editLights.size(); ++i)
 		{
@@ -409,10 +466,6 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		Deferred_Second_Shader->setInt("SPOT_USED_NUM", num_spot_light);
 		num_dir_light = num_point_light = num_spot_light = 0;
 		num_dir_shadow = num_point_shadow = num_spot_shadow = 0;
-
-		// For the bloom effect
-		Deferred_Second_Shader->setVec3("brightExtractor", myBloom.m_BrightnessExtractor);
-		Deferred_Second_Shader->setFloat("brightThreshold", myBloom.m_BrightnessThreShold);
 
 		renderScreenQuad();
 	}
@@ -643,11 +696,9 @@ void CGProj::DeferredRenderer::resize(int width, int height)
 	if (width <= 0 || height <= 0) return; // Ignore window minimization case
 
 	// First Pass Setup For Deferred Rendering
-	glBindFramebuffer(GL_FRAMEBUFFER, gFBO);
-
 	// Position Buffer
 	glBindTexture(GL_TEXTURE_2D, gPosition);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
 
 	// Normal Buffer
 	glBindTexture(GL_TEXTURE_2D, gNormal);
@@ -669,27 +720,21 @@ void CGProj::DeferredRenderer::resize(int width, int height)
 	glBindRenderbuffer(GL_RENDERBUFFER, gRBO);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		CGassert();
 	glCheckError();
 
 	// Second Pass Setup For Deferred Rendering
-	glBindFramebuffer(GL_FRAMEBUFFER, dSecondFBO);
 
 	glBindTexture(GL_TEXTURE_2D, dSecondHDRColorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
 
 	glBindTexture(GL_TEXTURE_2D, dSecondHDRBloomBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
 
-	glBindRenderbuffer(GL_RENDERBUFFER, dSecondHDRDepthRBO);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		CGassert();
 	glCheckError();
 	
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	myBloom.setTextureDimension(width, height);
+	mySSAO.setTextureDimension(width, height);
 }

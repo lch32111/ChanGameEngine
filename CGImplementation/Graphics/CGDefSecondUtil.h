@@ -8,7 +8,15 @@
  */
 
 // The number of G-buffer texture
-#define NR_GBUFFER_TEXTURES 5
+/*
+ * Position
+ * Normal
+ * AlbeoSpec
+ * Emissive
+ * Bool
+ * SSAO Kernel Number (Not G-buffer. for the SSAO Effect.)
+ */
+#define NR_GBUFFER_TEXTURES 6
 
  // Limit of the array size for each kind of light
 #define NR_DIR_LIGHTS 3
@@ -21,5 +29,8 @@
 #define NR_SPOT_SHADOWS 4
 
 #define SHADOW_INDEX_NONE -1
+
+// SSAO Shader
+#define NR_SSAO_KERNEL 64
 
 #endif

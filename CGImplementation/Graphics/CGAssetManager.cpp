@@ -8,6 +8,7 @@ CGProj::Shader * CGProj::CGAssetManager::getShader(CG_SHADER_ENUM _shaderEnum)
 		if (m_shaders[_shaderEnum].loadShader() == false)
 		{
 			std::cout << "CG_ASSET_MANAGER::GETSHADER::The number of Shader Enum : " << _shaderEnum << '\n';
+			CGassert();
 			return nullptr;
 		}
 	}
@@ -22,6 +23,7 @@ CGProj::Shader CGProj::CGAssetManager::getShader(CG_SHADER_ENUM _shaderEnum, cha
 		if (m_shaders[_shaderEnum].loadShader() == false)
 		{
 			std::cout << "CG_ASSET_MANAGER::GETSHADER::The number of Shader Enum : " << _shaderEnum << '\n';
+			CGassert();
 			return Shader();
 		}
 	}
@@ -36,6 +38,7 @@ CGProj::Shader * CGProj::CGAssetManager::getGeoShader(CG_GEO_SHADER_ENUM _shader
 		if (m_geoShaders[_shaderEnum].loadShaderWithGeo() == false)
 		{
 			std::cout << "CG_ASSET_MANAGER::GETGEOSHADER::The number of Shader Enum : " << _shaderEnum << '\n';
+			CGassert();
 			return nullptr;
 		}
 	}
@@ -50,6 +53,7 @@ CGProj::Shader CGProj::CGAssetManager::getGeoShader(CG_GEO_SHADER_ENUM _shaderEn
 		if (m_geoShaders[_shaderEnum].loadShaderWithGeo() == false)
 		{
 			std::cout << "CG_ASSET_MANAGER::GETGEOSHADER::The number of Shader Enum : " << _shaderEnum << '\n';
+			CGassert();
 			return Shader();
 		}
 	}
@@ -95,6 +99,7 @@ CGProj::CGModel* CGProj::CGAssetManager::getModelData(CG_MODEL_ENUM _modelEnum)
 		if (m_models[_modelEnum].loadModel() == false)
 		{
 			std::cout << "CHAN_ASSET_MANAGER::GETMODEL::The number of Model Enum : " << _modelEnum << '\n';
+			CGassert();
 			return nullptr;
 		}
 	}
@@ -107,6 +112,11 @@ void CGProj::CGAssetManager::assetInit()
 {
 	m_shaders[SHADER_DEFERRED_FIRST] = Shader("ShaderFolder/DeferredFirst.vs", "ShaderFolder/DeferredFirst.fs");
 	m_shaders[SHADER_DEFERRED_SECOND] = Shader("ShaderFolder/DeferredSecond.vs", "ShaderFolder/DeferredSecond.fs");
+	m_shaders[SHADER_DEFERRED_POST] = Shader("ShaderFolder/DeferredPost.vs", "ShaderFolder/DeferredPost.fs");
+	m_shaders[SHADER_GAUSSIAN_BLUR] = Shader("ShaderFolder/CGGaussianBlur.vs", "ShaderFolder/CGGaussianBlur.fs");
+	m_shaders[SHADER_SSAO_EFFECT] = Shader("ShaderFolder/CGSSAOEffect.vs", "ShaderFolder/CGSSAOEffect.fs");
+	m_shaders[SHADER_SSAO_BLUR] = Shader("ShaderFolder/CGSSAOBlur.vs", "ShaderFolder/CGSSAOBlur.fs");
+	m_shaders[SHADER_SSAO_DEBUG] = Shader("ShaderFolder/CGSSAODebug.vs", "ShaderFolder/CGSSAODebug.fs");
 	m_shaders[SHADER_CG_LINE] = Shader("ShaderFolder/CGLineShader.vs", "ShaderFolder/CGLineShader.fs");
 	m_shaders[SHADER_SIMPLE_RENDER] = Shader("ShaderFolder/simpleRender.vs", "ShaderFolder/simpleRender.fs");
 	m_shaders[SHADER_SIMPLE_COLOR_RENDER] = Shader("ShaderFolder/simpleColorRender.vs", "ShaderFolder/simpleColorRender.fs");

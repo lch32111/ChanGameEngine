@@ -2,8 +2,9 @@
 // Deferred Second Pass Fragment Shader
 // The lighting will be calculated in World Space.
 
-#version 430 core
-out vec4 FragColor;
+#version 330 core
+layout (location = 0) out vec3 FragColor;
+layout (location = 1) out vec3 BrightColor; // For Bloom Effect
 
 in vec2 TexCoords;
 
@@ -79,6 +80,18 @@ struct SpotLight {
 
 #define SHADOW_INDEX_NONE -1
 
+// SSAO
+uniform bool useSSAO;
+uniform sampler2D ssaoTexture;
+// SSAO
+
+// Bloom
+uniform bool useBloom;
+uniform vec3 brightExtractor;
+uniform float brightThreshold;
+// Bloom
+
+// Lihgt Shadow
 uniform int DIR_USED_NUM;
 uniform DirLight dirLights[NR_DIR_LIGHTS];
 uniform sampler2D dirShadowMap[NR_DIR_SHADOWS];
@@ -98,14 +111,15 @@ uniform mat4 spotLightSpace[NR_SPOT_SHADOWS];
 uniform float spotBias[NR_SPOT_SHADOWS];
 
 uniform vec3 cameraPos;
+// Lihgt Shadow
 
 // function prototypes
-vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal);
-vec3 CalcLMPointLight(PointLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal);
-vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal);
-vec3 CalcCMDirLight(DirLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal);
-vec3 CalcCMPointLight(PointLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal);
-vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal);
+vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal, float AO);
+vec3 CalcLMPointLight(PointLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal, float AO);
+vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal, float AO);
+vec3 CalcCMDirLight(DirLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal, float AO);
+vec3 CalcCMPointLight(PointLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal, float AO);
+vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal, float AO);
 float DirShadowCalculation(vec3 normal, vec3 lightDir, vec3 fragpos, int index);
 float PointShadowCalculation(vec3 fragpos, vec3 lightpos, int index);
 float SpotShadowCalculation(vec3 fragpos, int index);
@@ -117,6 +131,8 @@ void main()
     if(MyBool.a >= 1.0) discard;
     vec3 FragPos = texture(gPosition, TexCoords).rgb;
     vec3 Normal = texture(gNormal, TexCoords).rgb;
+    float AmbientOcclusion = 1.0;
+    if(useSSAO == true) AmbientOcclusion = texture(ssaoTexture, TexCoords).r;
     
 	vec3 lighting = vec3(0.0);
     if(MyBool.a - 0.5 >= 0.0)
@@ -130,13 +146,13 @@ void main()
         if(MyBool.b == 1) LMemissive = texture(gEmissive, TexCoords).rgb;
         
 		for(int i = 0; i < DIR_USED_NUM; ++i)
-            lighting += CalcLMDirLight(dirLights[i], LMAlbedo, LMSpecular, 128, FragPos, Normal);
+            lighting += CalcLMDirLight(dirLights[i], LMAlbedo, LMSpecular, 128, FragPos, Normal, AmbientOcclusion);
         
         for(int i = 0; i < POINT_USED_NUM; ++i)
-            lighting += CalcLMPointLight(pointLights[i], LMAlbedo, LMSpecular, 128, FragPos, Normal);
+            lighting += CalcLMPointLight(pointLights[i], LMAlbedo, LMSpecular, 128, FragPos, Normal, AmbientOcclusion);
 
         for(int i = 0; i < SPOT_USED_NUM; ++i)
-            lighting += CalcLMSpotLight(spotLights[i], LMAlbedo, LMSpecular, 128, FragPos, Normal);
+            lighting += CalcLMSpotLight(spotLights[i], LMAlbedo, LMSpecular, 128, FragPos, Normal, AmbientOcclusion);
 
         lighting += LMemissive;
     }
@@ -149,28 +165,29 @@ void main()
         vec3 CMspecular = texture(gEmissive, TexCoords).rgb;
         
 		for(int i = 0; i < DIR_USED_NUM; ++i)
-            lighting += CalcCMDirLight(dirLights[i], CMambient, CMdiffuse, CMspecular, CMshininess * 128.0, FragPos, Normal);
+            lighting += CalcCMDirLight(dirLights[i], CMambient, CMdiffuse, CMspecular, CMshininess * 128.0, FragPos, Normal, AmbientOcclusion);
         
         for(int i = 0; i < POINT_USED_NUM; ++i)
-            lighting += CalcCMPointLight(pointLights[i], CMambient, CMdiffuse, CMspecular, CMshininess * 128.0, FragPos, Normal);
+            lighting += CalcCMPointLight(pointLights[i], CMambient, CMdiffuse, CMspecular, CMshininess * 128.0, FragPos, Normal, AmbientOcclusion);
 
         for(int i = 0; i < SPOT_USED_NUM; ++i)
-            lighting += CalcCMSpotLight(spotLights[i], CMambient, CMdiffuse, CMspecular, CMshininess * 128.0, FragPos, Normal);
+            lighting += CalcCMSpotLight(spotLights[i], CMambient, CMdiffuse, CMspecular, CMshininess * 128.0, FragPos, Normal, AmbientOcclusion);
 
     }
 
-    // post-processing for HDR with tone mapping and gamma corection
-    const float gamma = 2.2;
-    const float exposure = 1.0;
-
-    vec3 hdrColor = lighting;
-    vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);
-    mapped = pow(mapped, vec3(1.0 / gamma));
-    FragColor = vec4(mapped, 1.0);
-	// FragColor = vec4(lighting, 1.0);
+    FragColor = lighting;
+    BrightColor = vec3(0.0);
+	
+// Bloom Effect
+    if(useBloom == true)
+    {
+        float brightness = dot(FragColor, brightExtractor);
+	    if(brightness > brightThreshold)
+		    BrightColor = FragColor;
+    }
 }
 
-vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal)
+vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal, float AO)
 {
     // World Space + Blinn-Phong Lighting
     vec3 lightDir = normalize(-light.Direction);
@@ -185,7 +202,7 @@ vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, v
     
     // No attenuation for Directional Light
     // Then Combine the result
-    vec3 ambient = light.Ambient * albedo;
+    vec3 ambient = light.Ambient * albedo * AO;
     vec3 diffuse = light.Diffuse * diff * albedo;
     vec3 specular = light.Specular * spec * spclr;
 	
@@ -197,7 +214,7 @@ vec3 CalcLMDirLight(DirLight light, vec3 albedo, float spclr, float shininess, v
     return (ambient + (1.0 - shadow) * (diffuse + specular)) * light.Intensity;
 }
 
-vec3 CalcLMPointLight(PointLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal)
+vec3 CalcLMPointLight(PointLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal, float AO)
 {
 	// World Space + Blinn-Phong Lighting
 	
@@ -222,7 +239,7 @@ vec3 CalcLMPointLight(PointLight light, vec3 albedo, float spclr, float shinines
 	float attenuation = 1.0 / (light.Constant + light.Linear * dist + light.Quadratic * dist * dist);
 	
 	// combine the result
-	vec3 ambient = light.Ambient * albedo;
+	vec3 ambient = light.Ambient * albedo * AO;
 	vec3 diffuse = light.Diffuse * diff * albedo;
 	vec3 specular = light.Specular * spec * spclr;
 
@@ -237,7 +254,7 @@ vec3 CalcLMPointLight(PointLight light, vec3 albedo, float spclr, float shinines
     return (ambient + (1.0 - shadow) * (diffuse + specular)) * light.Intensity;
 }
 
-vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal)
+vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess, vec3 fragpos, vec3 normal, float AO)
 {
 	// World Space + Blinn-Phong Lighting
 	
@@ -267,7 +284,7 @@ vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess,
 	float spot_intensity = clamp((theta - light.Outer_CutOff) / epsilon, 0.0, 1.0);
 
 	// combine the result
-	vec3 ambient = light.Ambient * albedo;	
+	vec3 ambient = light.Ambient * albedo * AO;	
 	vec3 diffuse = light.Diffuse * diff * albedo;
 	vec3 specular = light.Specular * spec * spclr;
 
@@ -282,7 +299,7 @@ vec3 CalcLMSpotLight(SpotLight light, vec3 albedo, float spclr, float shininess,
 	return  (ambient + (1.0 - shadow) * (diffuse + specular)) * light.Intensity;
 }
 
-vec3 CalcCMDirLight(DirLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal)
+vec3 CalcCMDirLight(DirLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal, float AO)
 {
     // World Space + Blinn-Phong Lighting
     vec3 lightDir = normalize(-light.Direction);
@@ -297,7 +314,7 @@ vec3 CalcCMDirLight(DirLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float s
     
     // No attenuation for Directional Light
     // Then Combine the result
-    vec3 ambient = light.Ambient * ambnt;
+    vec3 ambient = light.Ambient * ambnt * AO;
     vec3 diffuse = light.Diffuse * diff * albedo;
     vec3 specular = light.Specular * spec * spclr;
 
@@ -309,7 +326,7 @@ vec3 CalcCMDirLight(DirLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float s
     return (ambient + (1.0 - shadow) * (diffuse + specular)) * light.Intensity;
 }
 
-vec3 CalcCMPointLight(PointLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal)
+vec3 CalcCMPointLight(PointLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal, float AO)
 {
 	// World Space + Blinn-Phong Lighting
 	
@@ -334,7 +351,7 @@ vec3 CalcCMPointLight(PointLight light, vec3 ambnt, vec3 albedo, vec3 spclr, flo
 	float attenuation = 1.0 / (light.Constant + light.Linear * dist + light.Quadratic * dist * dist);
 	
 	// combine the result
-	vec3 ambient = light.Ambient * ambnt;
+	vec3 ambient = light.Ambient * ambnt * AO;
 	vec3 diffuse = light.Diffuse * diff * albedo;
 	vec3 specular = light.Specular * spec * spclr;
 
@@ -349,7 +366,7 @@ vec3 CalcCMPointLight(PointLight light, vec3 ambnt, vec3 albedo, vec3 spclr, flo
     return (ambient + (1.0 - shadow) * (diffuse + specular)) * light.Intensity;
 }
 
-vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal)
+vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float shininess, vec3 fragpos, vec3 normal, float AO)
 {
 	// World Space + Blinn-Phong Lighting
 	
@@ -379,7 +396,7 @@ vec3 CalcCMSpotLight(SpotLight light, vec3 ambnt, vec3 albedo, vec3 spclr, float
 	float spot_intensity = clamp((theta - light.Outer_CutOff) / epsilon, 0.0, 1.0);
 
 	// combine the result
-	vec3 ambient = light.Ambient * ambnt;
+	vec3 ambient = light.Ambient * ambnt * AO;
 	vec3 diffuse = light.Diffuse * diff * albedo;
 	vec3 specular = light.Specular * spec * spclr;
 

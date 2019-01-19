@@ -12,7 +12,8 @@
 #include <Graphics/CGAssetManager.h>
 #include <Graphics/CGEditProxyObject.h>
 #include <Graphics/CGEditLightObject.h>
-
+#include <Graphics/CGBloomEffect.h>
+#include <Graphics/CGSSAOEffect.h>
 
 #include <GPED/CGBroadPhase.h>
 
@@ -63,6 +64,20 @@ namespace CGProj
 		unsigned int gFBO;
 		unsigned int gPosition, gNormal, gAlbedoSpec, gEmissive, gBool;
 		unsigned gRBO;
+
+		unsigned int dSecondFBO;
+		unsigned int dSecondHDRColorBuffer;
+		unsigned int dSecondHDRBloomBuffer;
+
+		float pGamma;
+		float pExposure;
+		bool isBloom;
+		CGBloomEffect myBloom;
+
+		bool isSSAO;
+		bool isSSAODebug;
+		CGSSAOEffect mySSAO;
+		Shader* SSAODebugShader;
 
 		// Broad Phase
 		CGBroadPhase dBroadPhase;
@@ -118,8 +133,6 @@ namespace CGProj
 		CGGizmo gizmoTest;
 
 		CGAssetManager assetManager;
-
-		float shadowBias = 0.005f;
 	};
 
 }

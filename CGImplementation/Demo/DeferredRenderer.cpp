@@ -32,12 +32,44 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	Deferred_Second_Shader->setInt("gAlbedoSpec", 2);
 	Deferred_Second_Shader->setInt("gEmissive", 3);
 	Deferred_Second_Shader->setInt("gBool", 4);
+	Deferred_Second_Shader->setInt("ssaoTexture", 5);
 	for (unsigned i = 0; i < NR_DIR_SHADOWS; ++i)
 		Deferred_Second_Shader->setInt("dirShadowMap[" + std::to_string(i) + "]", NR_GBUFFER_TEXTURES + i);
 	for (unsigned i = 0; i < NR_POINT_SHADOWS; ++i)
 		Deferred_Second_Shader->setInt("pointShadowMap[" + std::to_string(i) + "]", NR_GBUFFER_TEXTURES + NR_DIR_SHADOWS + i);
 	for (unsigned i = 0; i < NR_SPOT_SHADOWS; ++i)
 		Deferred_Second_Shader->setInt("spotShadowMap[" + std::to_string(i) + "]", NR_GBUFFER_TEXTURES + NR_DIR_SHADOWS + NR_POINT_SHADOWS + i);
+
+	Deferred_Post_Shader = assetManager.getShader(SHADER_DEFERRED_POST);
+	Deferred_Post_Shader->use();
+	Deferred_Post_Shader->setInt("currentScene", 0);
+	Deferred_Post_Shader->setInt("bloomedScene", 1);
+	
+	pGamma = 2.2f; Deferred_Post_Shader->setFloat("gamma", pGamma);
+	pExposure = 1.0; Deferred_Post_Shader->setFloat("exposure", pExposure);
+	
+	isBloom = true;
+	Shader* tempBlurInit = assetManager.getShader(SHADER_GAUSSIAN_BLUR);
+	tempBlurInit->use();
+	tempBlurInit->setInt("image", 0);
+	myBloom.Initialize(assetManager, width, height, 10);
+	myBloom.m_BrightnessExtractor = glm::vec3(0.2126, 0.7152, 0.0722);
+	myBloom.m_BrightnessThreShold = 1.f;
+
+	isSSAO = true;
+	isSSAODebug = false;
+	Shader* tempSSAOInit = assetManager.getShader(SHADER_SSAO_EFFECT);
+	tempSSAOInit->use();
+	tempSSAOInit->setInt("gPosition", 0);
+	tempSSAOInit->setInt("gNormal", 1);
+	tempSSAOInit->setInt("texNoise", 2);
+	tempSSAOInit = assetManager.getShader(SHADER_SSAO_BLUR);
+	tempSSAOInit->use();
+	tempSSAOInit->setInt("ssaoInput", 0);
+	SSAODebugShader = assetManager.getShader(SHADER_SSAO_DEBUG);
+	SSAODebugShader->use();
+	SSAODebugShader->setInt("SSAO", 0);
+	mySSAO.Initialize(assetManager, 123456, 16, 0.5f, 0.025f, 1.0f, width, height);
 
 	// Shadow shader setting
 	Shader* DirdepthMapShader = assetManager.getShader(SHADER_DIR_SHADOW_MAP);
@@ -112,10 +144,48 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, gRBO);
 	
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		assert(0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		CGassert();
 	glCheckError();
 	// First Pass Setup For Deferred Rendering
+
+	// Second Pass Setup For Deferred Rendering
+	glGenFramebuffers(1, &dSecondFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, dSecondFBO);
+	
+	glGenTextures(1, &dSecondHDRColorBuffer);
+	glBindTexture(GL_TEXTURE_2D, dSecondHDRColorBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dSecondHDRColorBuffer, 0);
+
+	glGenTextures(1, &dSecondHDRBloomBuffer);
+	glBindTexture(GL_TEXTURE_2D, dSecondHDRBloomBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, dSecondHDRBloomBuffer, 0);
+
+	unsigned SecondAttachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(2, SecondAttachments);
+
+	/*
+	glGenRenderbuffers(1, &dSecondHDRDepthRBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, dSecondHDRDepthRBO);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, dSecondHDRDepthRBO);
+	*/
+	
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		CGassert();
+	glCheckError();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	// Second Pass Setup For Deferred Rendering
 
 	// Object Manual Setting + Light Manual Setting
 	GPED::Random prandom(554);
@@ -201,6 +271,21 @@ void CGProj::DeferredRenderer::initImgui()
 void CGProj::DeferredRenderer::deinit()
 {
 	assetManager.destroy();
+	myBloom.Destroy();
+	mySSAO.Destroy();
+
+	glDeleteTextures(1, &gPosition);
+	glDeleteTextures(1, &gNormal);
+	glDeleteTextures(1, &gAlbedoSpec);
+	glDeleteTextures(1, &gEmissive);
+	glDeleteTextures(1, &gBool);
+	glDeleteRenderbuffers(1, &gRBO);
+
+	glDeleteTextures(1, &dSecondHDRColorBuffer);
+	glDeleteTextures(1, &dSecondHDRBloomBuffer);
+
+	glDeleteFramebuffers(1, &gFBO);
+	glDeleteFramebuffers(1, &dSecondFBO);
 }
 
 void CGProj::DeferredRenderer::updateImgui()
@@ -224,11 +309,50 @@ void CGProj::DeferredRenderer::updateImgui()
 
 	ImGui::Checkbox("Hit Ray Render", &rayHitDraw); ImGui::SameLine();
 	if (ImGui::Button("Hit Ray Reset")) hitCollector.clear();
+
+	// Post-Processing Control
+	ImGui::InputFloat("Gamma", &pGamma, 0.02f, 5.0f, "%.3f");
+	ImGui::InputFloat("Exposure", &pExposure, 0.02f, 5.0f, "%.3f");
 	
-	if (ImGui::InputFloat("Shadow Bias", &shadowBias))
+	ImGui::Checkbox("Bloom", &isBloom);
+	if (isBloom)
 	{
-		Deferred_Second_Shader->setFloat("shadowBias", shadowBias);
+		ImGui::InputFloat3("Extractor Vector", &myBloom.m_BrightnessExtractor[0]);
+		ImGui::InputFloat("Extractor Threshold", &myBloom.m_BrightnessThreShold);
+
+		int iteration = (unsigned)myBloom.getIteration();
+		if (ImGui::InputInt("Bloom Iteration", &iteration, 1, 1))
+			myBloom.setIteration((unsigned)iteration);
 	}
+
+	ImGui::Checkbox("SSAO", &isSSAO);
+	if (isSSAO)
+	{
+		float ssaoTemp = mySSAO.getRadius();
+		if (ImGui::InputFloat("SSAO radius", &ssaoTemp, 0.02f, 5.0f, "%.3f"))
+			mySSAO.setRadius(ssaoTemp);
+
+		ssaoTemp = mySSAO.getBias();
+		if (ImGui::InputFloat("SSAO bias", &ssaoTemp, 0.02f, 5.0f, "%.3f"))
+			mySSAO.setBias(ssaoTemp);
+
+		ssaoTemp = mySSAO.getPower();
+		if (ImGui::InputFloat("SSAO power", &ssaoTemp, 0.02f, 5.0f, "%.3f"))
+			mySSAO.setPower(ssaoTemp);
+
+		int ssaoNoise = (int)mySSAO.getNoiseNum();
+		if (ImGui::InputInt("SSAO Noise Numb", &ssaoNoise, 2, 1))
+			mySSAO.setNoiseNum((unsigned)ssaoNoise);
+		
+		ImGui::Text("SSAO Kernel Numb : %d", NR_SSAO_KERNEL);
+		
+		bool blurState = mySSAO.getBlurState();
+		if (ImGui::Checkbox("SSAO Blur", &blurState)) mySSAO.setBlurState(blurState);
+
+		ImGui::Checkbox("SSAO Debug", &isSSAODebug);
+	}
+	
+	
 
 	ImGui::End();
 
@@ -236,6 +360,8 @@ void CGProj::DeferredRenderer::updateImgui()
 	{
 		pickedEditBox->UIrender(assetManager);
 	}
+
+	
 }
 
 void CGProj::DeferredRenderer::updateSimulation(float deltaTime, float lastFrame)
@@ -277,10 +403,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 			editProxies[i].render(view, projection, camera.Position);
 		}
 
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0, -5, 0));
-		// model = glm::rotate(model, glm::radians(-90.f), glm::vec3(1, 0, 0));
-		model = glm::scale(model, glm::vec3(25));
+		
 		Deferred_First_Shader->setBool("material.CMorLM", true);
 		Deferred_First_Shader->setBool("material.isLMdiffuse", true);
 		Deferred_First_Shader->setBool("material.isLMspecular", false);
@@ -289,18 +412,38 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		Deferred_First_Shader->setBool("material.isDepthMap", false);
 		Deferred_First_Shader->setMat4("projection", projection);
 		Deferred_First_Shader->setMat4("view", view);
-		Deferred_First_Shader->setMat4("model", model);
+		
 		Deferred_First_Shader->setMat3("ModelNormalMatrix", glm::mat3(glm::transpose(glm::inverse(model))));
 		Deferred_First_Shader->setBool("IsUseTangentSpace", false);
 		Deferred_First_Shader->setVec3("cameraPos", camera.Position);
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(0, -5, 0));
+		// model = glm::rotate(model, glm::radians(-90.f), glm::vec3(1, 0, 0));
+		model = glm::scale(model, glm::vec3(25));
+		Deferred_First_Shader->setMat4("model", model);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, assetManager.getTexture(TEXTURE_WOOD_PANEL, true));
+		renderQuad();
+
+		model = model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(0, -5, -10));
+		model = glm::rotate(model, glm::radians(90.f), glm::vec3(1, 0, 0));
+		model = glm::scale(model, glm::vec3(25));
+		Deferred_First_Shader->setMat4("model", model);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, assetManager.getTexture(TEXTURE_WOOD_PANEL, true));
 		renderQuad();
 	}
 	// First Pass
 
-	// Second Pass + Post Process
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	// SSAO between Deferred Rendering Pass
+	unsigned ssaoResult;
+	if (isSSAO)
+		ssaoResult = mySSAO.getSSAOTexture(gPosition, gNormal, view, projection);
+
+	// Second Pass
+	glBindFramebuffer(GL_FRAMEBUFFER, dSecondFBO);
 	{
 		if (wireDraw)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // This quad always fills the screen plane!
@@ -319,6 +462,22 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		glBindTexture(GL_TEXTURE_2D, gEmissive);
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, gBool);
+		
+		// SSAO
+		Deferred_Second_Shader->setBool("useSSAO", isSSAO);
+		if (isSSAO)
+		{
+			glActiveTexture(GL_TEXTURE5);
+			glBindTexture(GL_TEXTURE_2D, ssaoResult);
+		}
+
+		// Bloom
+		Deferred_Second_Shader->setBool("useBloom", isBloom);
+		if (isBloom)
+		{
+			Deferred_Second_Shader->setVec3("brightExtractor", myBloom.m_BrightnessExtractor);
+			Deferred_Second_Shader->setFloat("brightThreshold", myBloom.m_BrightnessThreShold);
+		}
 
 		for (unsigned i = 0; i < editLights.size(); ++i)
 		{
@@ -345,13 +504,49 @@ void CGProj::DeferredRenderer::display(int width, int height)
 		Deferred_Second_Shader->setInt("DIR_USED_NUM", num_dir_light);
 		Deferred_Second_Shader->setInt("POINT_USED_NUM", num_point_light);
 		Deferred_Second_Shader->setInt("SPOT_USED_NUM", num_spot_light);
-		Deferred_Second_Shader->setFloat("shadowBias", shadowBias);
 		num_dir_light = num_point_light = num_spot_light = 0;
 		num_dir_shadow = num_point_shadow = num_spot_shadow = 0;
 
 		renderScreenQuad();
 	}
-	// Second Pass + Post Process
+	// Second Pass
+
+	// Post Processing
+	{
+		unsigned result = 0;
+		if(isBloom) result = myBloom.getBloomedTexture(dSecondHDRBloomBuffer);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glClearColor(0, 0, 0, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		Deferred_Post_Shader->use();
+		Deferred_Post_Shader->setFloat("gamma", pGamma);
+		Deferred_Post_Shader->setFloat("exposure", pExposure);
+		Deferred_Post_Shader->setBool("useBloom", isBloom);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, dSecondHDRColorBuffer);
+		glActiveTexture(GL_TEXTURE1);
+		if(isBloom)	glBindTexture(GL_TEXTURE_2D, result);
+		renderScreenQuad();
+
+		if (isSSAODebug && isSSAO)
+		{
+			glViewport(width / 4 * 3, 0, width / 4, height / 4);
+			glScissor(width / 4 * 3, 0, width / 4, height / 4);
+			glEnable(GL_SCISSOR_TEST);
+			glClear(GL_DEPTH_BUFFER_BIT);
+
+			SSAODebugShader->use();
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, ssaoResult);
+			renderScreenQuad();
+
+			glDisable(GL_SCISSOR_TEST);
+			glViewport(0, 0, width, height);
+		}
+	}
+	// Post Processing
 
 	// Debug Drawing and UI Render like forward processing
 	{
@@ -557,11 +752,9 @@ void CGProj::DeferredRenderer::resize(int width, int height)
 	if (width <= 0 || height <= 0) return; // Ignore window minimization case
 
 	// First Pass Setup For Deferred Rendering
-	glBindFramebuffer(GL_FRAMEBUFFER, gFBO);
-
 	// Position Buffer
 	glBindTexture(GL_TEXTURE_2D, gPosition);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
 
 	// Normal Buffer
 	glBindTexture(GL_TEXTURE_2D, gNormal);
@@ -583,7 +776,21 @@ void CGProj::DeferredRenderer::resize(int width, int height)
 	glBindRenderbuffer(GL_RENDERBUFFER, gRBO);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		assert(0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glCheckError();
+
+	// Second Pass Setup For Deferred Rendering
+
+	glBindTexture(GL_TEXTURE_2D, dSecondHDRColorBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+
+	glBindTexture(GL_TEXTURE_2D, dSecondHDRBloomBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+
+	glCheckError();
+	
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	myBloom.setTextureDimension(width, height);
+	mySSAO.setTextureDimension(width, height);
 }

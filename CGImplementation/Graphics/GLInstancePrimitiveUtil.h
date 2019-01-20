@@ -27,8 +27,8 @@ namespace CGProj
 	static unsigned sphereOneInstanceModelVBO;
 	static unsigned sphereOneInstanceWorldNormalVBO;
 
-	static unsigned int quadVAO;
-	static unsigned int quadVBO;
+	static unsigned quadVAO;
+	static unsigned quadVBO;
 	static unsigned quadOneInstanceModelVBO;
 	static unsigned quadOneInstanceWorldNormalVBO;
 

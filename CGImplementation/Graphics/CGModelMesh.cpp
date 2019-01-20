@@ -34,11 +34,20 @@ void CGProj::CGModelMesh::destroy()
 
 void CGProj::CGModelMesh::setInstanceData(const std::vector<glm::mat4>& model, const std::vector<glm::mat4>& worldNormal)
 {
+	m_currentInstanceNumb = model.size();
+
 	glBindBuffer(GL_ARRAY_BUFFER, m_instanceModelVBO);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * model.size(), glm::value_ptr(model[0]));
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * m_currentInstanceNumb, glm::value_ptr(model[0]));
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_instanceWorldNormalVBO);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * worldNormal.size(), glm::value_ptr(worldNormal[0]));
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * m_currentInstanceNumb, glm::value_ptr(worldNormal[0]));
+}
+
+void CGProj::CGModelMesh::setInstanceData(const std::vector<glm::mat4>& model)
+{
+	m_currentInstanceNumb = model.size();
+	glBindBuffer(GL_ARRAY_BUFFER, m_instanceModelVBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * m_currentInstanceNumb, glm::value_ptr(model[0]));
 }
 
 void CGProj::CGModelMesh::deferredFirstRender(Shader* shader, unsigned instanceNumb)
@@ -86,7 +95,7 @@ void CGProj::CGModelMesh::shadowFirstRender()
 {
 	// Draw Mesh
 	glBindVertexArray(m_VAO);
-	glDrawElementsInstanced(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0, 1); glCheckError();
+	glDrawElementsInstanced(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0, m_currentInstanceNumb); glCheckError();
 
 	glBindVertexArray(0);
 }

@@ -58,6 +58,7 @@ namespace CGProj
 
 		/*** Shadow Properties ***/
 		Shader* m_DepthMapShader;
+		Shader* m_InstanceDepthMapShader;
 		Shader* m_DebugDepthMapShader;
 
 		unsigned int m_depthMapFBO, m_depthMapTexture;

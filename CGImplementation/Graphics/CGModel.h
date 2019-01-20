@@ -32,6 +32,7 @@ namespace CGProj
 
 		bool loadModel(unsigned maxInstanceNumb);
 		void setInstanceData(const std::vector<glm::mat4>& model, const std::vector<glm::mat4>& worldNormal);
+		void setInstanceData(const std::vector<glm::mat4>& model);
 		void deferredFirstRender(Shader* shader, unsigned instanceNumb);
 		void shadowFirstRender();
 

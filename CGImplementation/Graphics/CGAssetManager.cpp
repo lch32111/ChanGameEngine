@@ -125,13 +125,16 @@ void CGProj::CGAssetManager::assetInit()
 	m_shaders[SHADER_POINT_VISUALIZER] = Shader("ShaderFolder/CGPointVisualizer.vs", "ShaderFolder/CGPointVisualizer.fs");
 	m_shaders[SHADER_SPOT_VISUALIZER] = Shader("ShaderFolder/CGSpotVisualizer.vs", "ShaderFolder/CGSpotVisualizer.fs");
 	m_shaders[SHADER_DIR_SHADOW_MAP] = Shader("ShaderFolder/CGDirDepthMap.vs", "ShaderFolder/CGDirDepthMap.fs");
+	m_shaders[SHADER_INSTANCE_DIR_SHADOW_MAP] = Shader("ShaderFolder/CGInstanceDirDepthMap.vs", "ShaderFolder/CGInstanceDirDepthMap.fs");
 	m_shaders[SHADER_DIR_SHADOW_MAP_DEBUG_RENDER] = Shader("ShaderFolder/CGDirDepthMapDebugRender.vs", "ShaderFolder/CGDirDepthMapDebugRender.fs");
 	m_shaders[SHADER_POINT_SHADOW_MAP_DEBUG_RENDER] = Shader("ShaderFolder/CGPointDepthMapDebugRender.vs", "ShaderFolder/CGPointDepthMapDebugRender.fs");
 	m_shaders[SHADER_SPOT_SHADOW_MAP] = Shader("ShaderFolder/CGSpotDepthMap.vs", "ShaderFolder/CGSpotDepthMap.fs");
+	m_shaders[SHADER_INSTANCE_SPOT_SHADOW_MAP] = Shader("ShaderFolder/CGInstanceSpotDepthMap.vs", "ShaderFolder/CGInstanceSpotDepthMap.fs");
 	m_shaders[SHADER_SPOT_SHADOW_MAP_DEBUG_RENDER] = Shader("ShaderFolder/CGSpotDepthMapDebugRender.vs", "ShaderFolder/CGSpotDepthMapDebugRender.fs");
 	m_shaders[SHADER_SIMPLE_TERRAIN] = Shader("ShaderFolder/CGSimpleTerrain.vs", "ShaderFolder/CGSimpleTerrain.fs");
 
 	m_geoShaders[SHADER_GEO_POINT_SHADOW_MAP] = Shader("ShaderFolder/CGPointDepthMap.vs", "ShaderFolder/CGPointDepthMap.gs", "ShaderFolder/CGPointDepthMap.fs");
+	m_geoShaders[SHADER_GEO_INSTANCE_POINT_SHADOW_MAP] = Shader("ShaderFolder/CGInstancePointDepthMap.vs", "ShaderFolder/CGInstancePointDepthMap.gs", "ShaderFolder/CGInstancePointDepthMap.fs");
 
 	// TODO: make texture class for on-demand process. CGAssetTexture() is just loading the image...
 	m_NoGammaTexture[TEXTURE_CONTAINER_DIFFUSE] = CGAssetTexture("ResourceFolder/ImageFolder/container2.png");

@@ -655,5 +655,26 @@
     <None Include="ShaderFolder\CGSSAODebug.fs">
       <Filter>ShaderFolder</Filter>
     </None>
+    <None Include="ShaderFolder\CGInstanceDirDepthMap.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGInstanceDirDepthMap.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGInstancePointDepthMap.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGInstancePointDepthMap.gs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGInstancePointDepthMap.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGInstanceSpotDepthMap.vs">
+      <Filter>ShaderFolder</Filter>
+    </None>
+    <None Include="ShaderFolder\CGInstanceSpotDepthMap.fs">
+      <Filter>ShaderFolder</Filter>
+    </None>
   </ItemGroup>
 </Project>

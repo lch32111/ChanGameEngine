@@ -360,6 +360,11 @@ void CGProj::CGEditProxyObject::setCMshininess(float s)
 	CGEditProxyObject::m_CMshininess = s;
 }
 
+bool CGProj::CGEditProxyObject::isModelData()
+{
+	return m_useModelData;
+}
+
 void CGProj::CGEditProxyObject::setModelData(bool m)
 {
 	m_useModelData = m;

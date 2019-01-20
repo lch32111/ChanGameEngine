@@ -54,7 +54,9 @@ void CGProj::CGEditDirLight::initialize(CGAssetManager & am, CGEditLightCommonFa
 	// Shadow Map Initialization
 	// Also note that the shadow map shader should be initialized before this constructor!
 	m_DepthMapShader = am.getShader(SHADER_DIR_SHADOW_MAP);
+	m_InstanceDepthMapShader = am.getShader(SHADER_INSTANCE_DIR_SHADOW_MAP);
 	m_DebugDepthMapShader = am.getShader(SHADER_DIR_SHADOW_MAP_DEBUG_RENDER);
+	// TODO : Add the Instance DebugDepthMap Shader
 	
 	// Shadow Map Initialization
 	glGenFramebuffers(1, &m_depthMapFBO);
@@ -163,8 +165,6 @@ void CGProj::CGEditDirLight::setLightPropertyOnShader(Shader* shader,
 
 void CGProj::CGEditDirLight::renderShadowMap(std::vector<CGEditProxyObject>& objects)
 {
-	m_DepthMapShader->use();
-
 	// Light Space Setting
 	m_shadowLightView = safeLookAt(
 		m_lightFactors->lightPosition,
@@ -178,7 +178,6 @@ void CGProj::CGEditDirLight::renderShadowMap(std::vector<CGEditProxyObject>& obj
 			m_perFOV, m_perAspect,
 			m_shadowNearPlane, m_shadowFarPlane
 		);
-		m_DepthMapShader->setBool("shadowProjection", true);
 	}
 	else
 	{
@@ -187,31 +186,43 @@ void CGProj::CGEditDirLight::renderShadowMap(std::vector<CGEditProxyObject>& obj
 			m_orthoLeft, m_orthoRight, m_orthoBottom, m_orthoTop,
 			m_shadowNearPlane, m_shadowFarPlane
 		);
-		m_DepthMapShader->setBool("shadowProjection", false);
 	}
-
 	m_shadowLightSpaceMatrix = m_shadowLightProjection * m_shadowLightView;
-	m_DepthMapShader->setMat4("lightSpaceMatrix", m_shadowLightSpaceMatrix);
-	// Light Space Setting
 
 	// Shadow Mapping Pass
 	glViewport(0, 0, m_shadowWidth, m_shadowHeight);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
+	m_DepthMapShader->use();
+	m_DepthMapShader->setMat4("lightSpaceMatrix", m_shadowLightSpaceMatrix);
+	m_InstanceDepthMapShader->use();
+	m_InstanceDepthMapShader->setMat4("lightSpaceMatrix", m_shadowLightSpaceMatrix);
 
-	// TODO : Do the Frustum Culling!
-	glm::mat4 model;
 	for (unsigned i = 0; i < objects.size(); ++i)
 	{
-		model = glm::mat4(1.0);
-		model = glm::translate(model, objects[i].getPosition());
-		model = glm::scale(model, objects[i].getScale());
-		m_DepthMapShader->setMat4("model", model);
+		if (objects[i].isModelData())
+		{
+			m_InstanceDepthMapShader->use();
+		}
+		else
+		{
+			m_DepthMapShader->use();
+
+			// TODO : Do the Frustum Culling!
+			glm::mat4 model;
+			model = glm::mat4(1.0);
+			model = glm::translate(model, objects[i].getPosition());
+			model = glm::scale(model, objects[i].getScale());
+			m_DepthMapShader->setMat4("model", model);
+		}
+
 		objects[i].shadowMapRender();
 	}
-	
+
 	// Plane
+	m_DepthMapShader->use();
+	glm::mat4 model;
 	model = glm::mat4(1.0);
 	model = glm::translate(model, glm::vec3(0, -5, 0));
 	model = glm::scale(model, glm::vec3(25));

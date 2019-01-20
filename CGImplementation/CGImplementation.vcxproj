@@ -289,6 +289,13 @@
     <None Include="ShaderFolder\CGDirVisualizer.vs" />
     <None Include="ShaderFolder\CGGaussianBlur.fs" />
     <None Include="ShaderFolder\CGGaussianBlur.vs" />
+    <None Include="ShaderFolder\CGInstanceDirDepthMap.fs" />
+    <None Include="ShaderFolder\CGInstanceDirDepthMap.vs" />
+    <None Include="ShaderFolder\CGInstancePointDepthMap.fs" />
+    <None Include="ShaderFolder\CGInstancePointDepthMap.gs" />
+    <None Include="ShaderFolder\CGInstancePointDepthMap.vs" />
+    <None Include="ShaderFolder\CGInstanceSpotDepthMap.fs" />
+    <None Include="ShaderFolder\CGInstanceSpotDepthMap.vs" />
     <None Include="ShaderFolder\CGLineShader.fs" />
     <None Include="ShaderFolder\CGLineShader.vs" />
     <None Include="ShaderFolder\CGPointDepthMap.fs" />

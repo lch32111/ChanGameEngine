@@ -51,6 +51,7 @@ namespace CGProj
 
 		// Deferred Rendering 
 		void setInstanceData(const std::vector<glm::mat4>& model, const std::vector<glm::mat4>& worldNormal);
+		void setInstanceData(const std::vector<glm::mat4>& model);
 		void deferredFirstRender(Shader* shader, unsigned instanceNumb);
 		void shadowFirstRender();
 		
@@ -59,6 +60,9 @@ namespace CGProj
 		unsigned m_instanceModelVBO;
 		unsigned m_instanceWorldNormalVBO;
 		unsigned m_maxInstancingNumb;
+
+		unsigned m_currentInstanceNumb;
+
 		void setupMesh();
 		void setupInstancing();
 	};

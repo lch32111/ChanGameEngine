@@ -58,6 +58,14 @@ void CGProj::CGModel::setInstanceData(const std::vector<glm::mat4>& model, const
 	}
 }
 
+void CGProj::CGModel::setInstanceData(const std::vector<glm::mat4>& model)
+{
+	for (unsigned i = 0; i < m_meshes.size(); ++i)
+	{
+		m_meshes[i].setInstanceData(model);
+	}
+}
+
 
 void CGProj::CGModel::deferredFirstRender(Shader* shader, unsigned instanceNumb)
 {

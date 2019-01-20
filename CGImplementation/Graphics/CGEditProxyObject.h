@@ -58,6 +58,7 @@ namespace CGProj
 		void setCMspecular(const glm::vec3& specular);
 		void setCMshininess(float s);
 
+		bool isModelData();
 		void setModelData(bool m);
 		void setModel(CGModel* model);
 		/*** Graphics Method ***/

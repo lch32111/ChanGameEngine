@@ -78,7 +78,6 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	mySSAO.Initialize(assetManager, 123456, 16, 0.5f, 0.025f, 1.0f, width, height);
 
 	// Shadow shader setting
-	Shader* DirdepthMapShader = assetManager.getShader(SHADER_DIR_SHADOW_MAP);
 	Shader* DirdepthMapDebugShader = assetManager.getShader(SHADER_DIR_SHADOW_MAP_DEBUG_RENDER);
 	DirdepthMapDebugShader->use();
 	DirdepthMapDebugShader->setInt("depthMap", 0);
@@ -224,7 +223,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	editProxies[1].setModel(assetManager.getModelData(MODEL_NANO_SUIT, 50));
 	editProxies[1].setScale(0.5f);
 
-	srand(glfwGetTime()); // initialize random seed
+	srand((unsigned)glfwGetTime()); // initialize random seed
 	float radius = 10.0f;
 	float offset = 2.5f;
 
@@ -245,18 +244,18 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 
 		// 2. scale: Scale between 0.05 and 0.25f;
 		// float scale = (rand() % 10) / 100.0f + 0.05f;
-		model = glm::scale(model, glm::vec3(0.08));
+		model = glm::scale(model, glm::vec3(0.5f));
 
 		// 3. rotation: add random rotation around a (semi) randomly picked rotation axis vector
-		float rotAngle = (rand() % 360);
+		float rotAngle = (float)(rand() % 360);
 		model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
 
 		modelMatrices[i] = model;
 		worldNormalMatrices[i] = glm::transpose(glm::inverse(model));
 	}
-	srand(glfwGetTime()); // initialize random seed
+	srand((unsigned)glfwGetTime()); // initialize random seed
 	radius = 15;
-	offset = 6;
+	offset = 20;
 	HeavymodelMatrices = std::vector<glm::mat4>(400);
 	HeavyworldNormalMatrices = std::vector<glm::mat4>(400);
 	for (unsigned int i = 0; i < HeavymodelMatrices.size(); ++i)
@@ -274,7 +273,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 
 		// 2. scale: Scale between 0.05 and 0.25f;
 		// float scale = (rand() % 10) / 100.0f + 0.05f;
-		model = glm::scale(model, glm::vec3(1.0));
+		model = glm::scale(model, glm::vec3(1.5));
 
 		// 3. rotation: add random rotation around a (semi) randomly picked rotation axis vector
 		float rotAngle = (rand() % 360);
@@ -445,6 +444,12 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 1000.f);
 	glm::mat4 model(1.0);
 
+	// Get/Set Proxy Model, Normal Data
+	// Now it is done by manual setting
+	// TODO : make a structure to manage this kind of process
+	editProxies[0].setInstanceData(HeavymodelMatrices, HeavyworldNormalMatrices);
+	editProxies[1].setInstanceData(modelMatrices, worldNormalMatrices);
+
 	// Shadow Mapping Pass
 	{
 		// TODO : use the shadow light array in case of lots of lights
@@ -470,11 +475,14 @@ void CGProj::DeferredRenderer::display(int width, int height)
 
 		Deferred_STD140.populateBuffer(view, projection);
 
-		for (unsigned i = 0; i < 1; ++i)
+		editProxies[0].render(camera.Position);
+		editProxies[1].render(camera.Position);
+		/*
+		for (unsigned i = 0; i < editProxies.size(); ++i)
 		{
-			editProxies[i].setInstanceData(HeavymodelMatrices, HeavyworldNormalMatrices);
 			editProxies[i].render(camera.Position);
 		}
+		*/
 
 		
 		Deferred_First_Shader->setBool("material.CMorLM", true);

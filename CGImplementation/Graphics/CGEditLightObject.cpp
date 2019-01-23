@@ -564,6 +564,7 @@ bool CGProj::CGEditLightObject::getIsShadowRender()
 
 void CGProj::CGEditLightObject::renderShadowMap(std::vector<CGEditProxyObject>& objects)
 {
+	// glCullFace(GL_FRONT);
 	switch (m_LightType)
 	{
 	case EDIT_DIRECTION_LIGHT:
@@ -576,6 +577,7 @@ void CGProj::CGEditLightObject::renderShadowMap(std::vector<CGEditProxyObject>& 
 		m_spotLight.renderShadowMap(objects);
 		break;
 	}
+	// glCullFace(GL_BACK);
 }
 
 /*** CG Light Object  ***/

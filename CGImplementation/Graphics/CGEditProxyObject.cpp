@@ -23,12 +23,12 @@ void CGProj::CGEditProxyObject::setInstanceData(const std::vector<glm::mat4>& mo
 {
 	m_instanceNumb = model.size();
 
-	// Just Decrease the instance numb to the max
-	if (m_Model->getMaxInstanceNumb() < m_instanceNumb)
-		CGassert();
-
 	if (m_useModelData)
 	{
+		// Just Decrease the instance numb to the max
+		if (m_Model->getMaxInstanceNumb() < m_instanceNumb)
+			CGassert();
+
 		m_Model->setInstanceData(model, worldNormal);
 	}
 	else
@@ -103,16 +103,6 @@ void CGProj::CGEditProxyObject::render(const glm::vec3& cameraPos)
 
 		m_DefShader->setVec3("cameraPos", cameraPos);
 	}
-	
-	// 2. Vertex Setting
-	glm::mat4 model(1.0);
-	model = glm::translate(model, this->getPosition());
-	// model = glm::rotate(model, ) // TODO: add the rotation function later
-	model = glm::scale(model, this->getScale());
-
-	m_DefShader->setMat4("model", model);
-	m_DefShader->setMat3("ModelNormalMatrix", glm::mat3(glm::transpose(glm::inverse(model))));
-	// 2. Vertex Setting
 
 	// Now Ready to render. Go render according to the flags
 	if (m_useModelData)
@@ -143,7 +133,7 @@ void CGProj::CGEditProxyObject::shadowMapRender()
 	if (m_useModelData)
 		m_Model->shadowFirstRender();
 	else
-		renderPrimitive();
+		renderOneInstancePrimitive();
 }
 
 void CGProj::CGEditProxyObject::UIrender(CGAssetManager& am)

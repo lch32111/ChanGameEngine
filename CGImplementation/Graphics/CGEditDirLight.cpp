@@ -8,6 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <Graphics/GLPrimitiveUtil.h>
+#include <Graphics/GLInstancePrimitiveUtil.h>
 #include <Graphics/CGDefSecondUtil.h>
 #include <Graphics/CGEditObject.h>
 #include <Graphics/CGAssetManager.h>
@@ -194,40 +195,25 @@ void CGProj::CGEditDirLight::renderShadowMap(std::vector<CGEditProxyObject>& obj
 	glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	m_DepthMapShader->use();
-	m_DepthMapShader->setMat4("lightSpaceMatrix", m_shadowLightSpaceMatrix);
 	m_InstanceDepthMapShader->use();
 	m_InstanceDepthMapShader->setMat4("lightSpaceMatrix", m_shadowLightSpaceMatrix);
 
 	for (unsigned i = 0; i < objects.size(); ++i)
 	{
-		if (objects[i].isModelData())
-		{
-			m_InstanceDepthMapShader->use();
-		}
-		else
-		{
-			m_DepthMapShader->use();
-
-			// TODO : Do the Frustum Culling!
-			glm::mat4 model;
-			model = glm::mat4(1.0);
-			model = glm::translate(model, objects[i].getPosition());
-			model = glm::scale(model, objects[i].getScale());
-			m_DepthMapShader->setMat4("model", model);
-		}
-
+		m_InstanceDepthMapShader->use();
 		objects[i].shadowMapRender();
 	}
 
 	// Plane
-	m_DepthMapShader->use();
+	m_InstanceDepthMapShader->use();
 	glm::mat4 model;
 	model = glm::mat4(1.0);
 	model = glm::translate(model, glm::vec3(0, -5, 0));
 	model = glm::scale(model, glm::vec3(25));
-	m_DepthMapShader->setMat4("model", model);
-	renderQuad();
+	std::vector<glm::mat4> vmodel, vnormal;
+	vmodel.push_back(model); vnormal.push_back(glm::transpose(glm::inverse(model)));
+	CGInstancePrimitiveUtil::setQuadOneInstanceData(vmodel, vnormal);
+	CGInstancePrimitiveUtil::renderQuad();
 }
 
 bool CGProj::CGEditDirLight::getShadowProjection()

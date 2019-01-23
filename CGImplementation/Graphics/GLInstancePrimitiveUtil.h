@@ -19,6 +19,7 @@ namespace CGProj
 	static unsigned cubeVBO;
 	static unsigned cubeOneInstanceModelVBO;
 	static unsigned cubeOneInstanceWorldNormalVBO;
+	static unsigned cubeInstanceNumb;
 
 	static unsigned sphereVAO;
 	static unsigned sphereVBO;
@@ -105,7 +106,7 @@ namespace CGProj
 
 				glGenBuffers(1, &cubeOneInstanceModelVBO);
 				glBindBuffer(GL_ARRAY_BUFFER, cubeOneInstanceModelVBO);
-				glBufferData(GL_ARRAY_BUFFER, 1 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+				glBufferData(GL_ARRAY_BUFFER, model.size() * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
 				for (int i = 4; i < 4 + 4; ++i)
 				{
 					glEnableVertexAttribArray(i);
@@ -115,7 +116,7 @@ namespace CGProj
 
 				glGenBuffers(1, &cubeOneInstanceWorldNormalVBO);
 				glBindBuffer(GL_ARRAY_BUFFER, cubeOneInstanceWorldNormalVBO);
-				glBufferData(GL_ARRAY_BUFFER, 1 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+				glBufferData(GL_ARRAY_BUFFER, model.size() * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
 				for (int i = 8; i < 8 + 4; ++i)
 				{
 					glEnableVertexAttribArray(i);
@@ -124,6 +125,7 @@ namespace CGProj
 				}
 
 				glBindVertexArray(0);
+				cubeInstanceNumb = model.size();
 
 				glCheckError();
 			}
@@ -323,7 +325,7 @@ namespace CGProj
 		static void renderCube()
 		{
 			glBindVertexArray(cubeVAO);
-			glDrawArraysInstanced(GL_TRIANGLES, 0, 36, 1);
+			glDrawArraysInstanced(GL_TRIANGLES, 0, 36, cubeInstanceNumb);
 
 			glBindVertexArray(0);
 		}

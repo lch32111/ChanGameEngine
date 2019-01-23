@@ -9,7 +9,6 @@
 #include <Graphics/CGDefSecondUtil.h>
 #include <Graphics/GLInstancePrimitiveUtil.h>
 
-
 #include <GPED/CGPhysicsUtil.h>
 #include <GPED/GPED_random.h>
 
@@ -197,7 +196,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	// Object Manual Setting + Light Manual Setting
 	GPED::Random prandom(554);
 	editProxies.reserve(20); // prevent STL from reallocating dynamically because of broad phase user data
-	for (unsigned i = 0; i < 2; ++i)
+	for (unsigned i = 0; i < 3; ++i)
 	{
 		editProxies.push_back(CGEditProxyObject(assetManager));
 		editProxies[i].connectBroadPhase(&dBroadPhase);
@@ -216,9 +215,9 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 
 		editProxies[i].setPosition(prandom.randomVector(glm::vec3(-7, -5, 0), glm::vec3(-4, -4, 5)));
 	}
-	editProxies[0].setModelData(true);
-	editProxies[0].setModel(assetManager.getModelData(MODEL_ROYAL_ROOSTER, 400));
-	editProxies[0].setScale(0.5f);
+	editProxies[0].setModelData(false);
+	// editProxies[0].setModel(assetManager.getModelData(MODEL_ROYAL_ROOSTER, 400));
+	editProxies[0].setScale(1.f);
 	editProxies[1].setModelData(true);
 	editProxies[1].setModel(assetManager.getModelData(MODEL_NANO_SUIT, 50));
 	editProxies[1].setScale(0.5f);
@@ -282,6 +281,9 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 		HeavymodelMatrices[i] = model;
 		HeavyworldNormalMatrices[i] = glm::transpose(glm::inverse(model));
 	}
+	// CGInstancePrimitiveUtil::setCubeOneInstanceData(HeavymodelMatrices, HeavyworldNormalMatrices);
+	// CGInstancePrimitiveUtil::setQuadOneInstanceData(HeavymodelMatrices, HeavyworldNormalMatrices);
+	// CGInstancePrimitiveUtil::setSphereOneInstanceData(HeavymodelMatrices, HeavyworldNormalMatrices);
 
 
 	GPED::Random random(331);
@@ -449,6 +451,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	// TODO : make a structure to manage this kind of process
 	editProxies[0].setInstanceData(HeavymodelMatrices, HeavyworldNormalMatrices);
 	editProxies[1].setInstanceData(modelMatrices, worldNormalMatrices);
+
 
 	// Shadow Mapping Pass
 	{

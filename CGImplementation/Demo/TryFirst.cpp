@@ -19,11 +19,10 @@ void CGProj::TryFirst::initGraphics()
 	wireShader = Shader("ShaderFolder/wireRender.vs", "ShaderFolder/wireRender.fs");
 	wireShader.loadShader();
 
-	woodTexture = TextureFromFile("ImageFolder/fieldGrass.jpg", false);
-	containerTexture = TextureFromFile("ImageFolder/container2.png", false);
+	woodTexture = TextureFromFile("ResourceFolder/ImageFolder/fieldGrass.jpg", false);
+	containerTexture = TextureFromFile("ResourceFolder/ImageFolder/container2.png", false);
 
 	resolver = GPED::ContactResolver(256 * 8);
-	// cManager = GPED::ContactManager(200);
 
 	// Initialise the box
 	GPED::Random ranGen(334455);
@@ -33,6 +32,7 @@ void CGProj::TryFirst::initGraphics()
 		float xRan = ranGen.randomReal(-10, 10);
 		float yRan = ranGen.randomReal(3, 20);
 		float zRan = ranGen.randomReal(0, 50);
+		box->setState(xRan, yRan, zRan);
 		GPED::convertFromCollisionPrimitive(*box, broadAABB);
 		box->proxyId = FirstBroadPhase.CreateProxy(broadAABB, box);
 	}

@@ -18,6 +18,8 @@
 
 #include <GPED/CGBroadPhase.h>
 
+#include <Terrain/CGValueNoise1D.h>
+
 #include <vector>
 
 namespace CGProj

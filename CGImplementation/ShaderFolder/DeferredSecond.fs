@@ -72,7 +72,7 @@ struct SpotLight {
 #define NR_DIR_LIGHTS 3
 #define NR_DIR_SHADOWS 2
 
-#define NR_POINT_LIGHTS 15
+#define NR_POINT_LIGHTS 50
 #define NR_POINT_SHADOWS 4
 
 #define NR_SPOT_LIGHTS 10
@@ -128,16 +128,19 @@ void main()
 {
     // retrieve data from G-buffer
     vec4 MyBool = texture(gBool, TexCoords).rgba;
+
+	// discard this fragment if it doesn't include any gBuffer Data.
     if(MyBool.a >= 1.0) discard;
+
     vec3 FragPos = texture(gPosition, TexCoords).rgb;
     vec3 Normal = texture(gNormal, TexCoords).rgb;
     float AmbientOcclusion = 1.0;
     if(useSSAO == true) AmbientOcclusion = texture(ssaoTexture, TexCoords).r;
     
 	vec3 lighting = vec3(0.0);
+	// Light Map Calculation
     if(MyBool.a - 0.5 >= 0.0)
     {
-        // Light Map Calculation
         vec3 LMAlbedo = vec3(1.0); 
 		float LMSpecular = 1.0; 
 		vec3 LMemissive = vec3(0.0);
@@ -156,9 +159,9 @@ void main()
 
         lighting += LMemissive;
     }
+	// Color Material Calculation
     else
     {
-        // Color Material Calculation
         vec3 CMambient = vec3(MyBool.rgb);
         vec3 CMdiffuse = texture(gAlbedoSpec, TexCoords).rgb;
         float CMshininess = texture(gAlbedoSpec, TexCoords).a;
@@ -178,7 +181,7 @@ void main()
     FragColor = lighting;
     BrightColor = vec3(0.0);
 	
-// Bloom Effect
+	// Bloom Effect
     if(useBloom == true)
     {
         float brightness = dot(FragColor, brightExtractor);

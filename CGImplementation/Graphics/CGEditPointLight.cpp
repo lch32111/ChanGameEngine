@@ -184,19 +184,7 @@ void CGProj::CGEditPointLight::renderShadowMap(std::vector<CGEditProxyObject>& o
 	glm::mat4 model;
 	for (unsigned i = 0; i < objects.size(); ++i)
 	{
-		if (objects[i].isModelData())
-		{
-			m_InstanceDepthMapShader->use();
-		}
-		else
-		{
-			m_DepthMapShader->use();
-			model = glm::mat4(1.0);
-			model = glm::translate(model, objects[i].getPosition());
-			model = glm::scale(model, objects[i].getScale());
-			m_DepthMapShader->setMat4("model", model);
-		}
-
+		m_InstanceDepthMapShader->use();
 		objects[i].shadowMapRender();
 	}
 

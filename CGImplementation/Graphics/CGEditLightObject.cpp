@@ -495,6 +495,11 @@ float CGProj::CGEditLightObject::getAttnQuadratic()
 	return m_CommonlightFactors.AttnQuadratic;
 }
 
+void CGProj::CGEditLightObject::setLightIntensity(const float i)
+{
+	m_CommonlightFactors.lightIntensity = i;
+}
+
 float CGProj::CGEditLightObject::getLightRadius()
 {
 	return m_CommonlightFactors.AttnRadius;

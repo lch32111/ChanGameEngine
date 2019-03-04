@@ -22,7 +22,7 @@
 #define NR_DIR_LIGHTS 3
 #define NR_DIR_SHADOWS 2
 
-#define NR_POINT_LIGHTS 15
+#define NR_POINT_LIGHTS 50
 #define NR_POINT_SHADOWS 4
 
 #define NR_SPOT_LIGHTS 10

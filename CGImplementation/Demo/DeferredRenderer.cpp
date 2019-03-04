@@ -196,7 +196,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	// Object Manual Setting + Light Manual Setting
 	GPED::Random prandom(554);
 	editProxies.reserve(20); // prevent STL from reallocating dynamically because of broad phase user data
-	for (unsigned i = 0; i < 3; ++i)
+	for (unsigned i = 0; i < 2; ++i)
 	{
 		editProxies.push_back(CGEditProxyObject(assetManager));
 		editProxies[i].connectBroadPhase(&dBroadPhase);
@@ -215,75 +215,45 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 
 		editProxies[i].setPosition(prandom.randomVector(glm::vec3(-7, -5, 0), glm::vec3(-4, -4, 5)));
 	}
-	editProxies[0].setModelData(false);
-	// editProxies[0].setModel(assetManager.getModelData(MODEL_ROYAL_ROOSTER, 400));
+	editProxies[0].setModelData(true);
+	editProxies[0].setModel(assetManager.getModelData(MODEL_OLD_HOUSE, 1));
 	editProxies[0].setScale(1.f);
-	editProxies[1].setModelData(true);
-	editProxies[1].setModel(assetManager.getModelData(MODEL_NANO_SUIT, 50));
+	editProxies[1].setModelData(false);
+	// editProxies[1].setModel(assetManager.getModelData(MODEL_NANO_SUIT, 100));
 	editProxies[1].setScale(0.5f);
 
 	srand((unsigned)glfwGetTime()); // initialize random seed
 	float radius = 10.0f;
 	float offset = 2.5f;
 
-	modelMatrices = std::vector<glm::mat4>(50);
-	worldNormalMatrices = std::vector<glm::mat4>(50);
-	for (unsigned int i = 0; i < modelMatrices.size(); ++i)
+	int modelNumb = 100;
+	modelMatrices.reserve(modelNumb);
+	worldNormalMatrices.reserve(modelNumb);
+	int leftZ = 5, rightZ = -9;
+	int downX = 60, UpX = -70;
+	float step = (float)(-UpX + downX) / (modelNumb / 2) + 1.5f;
+	for (int i = 0; i < modelNumb / 2; ++i)
 	{
 		glm::mat4 model(1.0);
-		// 1. translation: displace along circle with 'radius' in range [-offset, offset]
-		float angle = (float)i / (float)400 * 360.0f;
-		float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-		float x = sin(angle) * radius + displacement;
-		displacement = (rand() % (int)(offset * 100)) / 100.0f - offset;
-		float y = displacement * 0.4f; // keep the height of the filed smaller compared to width of x and z
-		displacement = (rand() % (int)(offset * 100)) / 100.0f - offset;
-		float z = cos(angle) * radius + displacement;
-		model = glm::translate(model, glm::vec3(x, y, z));
-
-		// 2. scale: Scale between 0.05 and 0.25f;
-		// float scale = (rand() % 10) / 100.0f + 0.05f;
+		model = glm::translate(model, glm::vec3(downX - step * i , 0, leftZ));
+		model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.5f));
 
-		// 3. rotation: add random rotation around a (semi) randomly picked rotation axis vector
-		float rotAngle = (float)(rand() % 360);
-		model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
 
-		modelMatrices[i] = model;
-		worldNormalMatrices[i] = glm::transpose(glm::inverse(model));
+		modelMatrices.push_back(model);
+		worldNormalMatrices.push_back(glm::transpose(glm::inverse(model)));
 	}
-	srand((unsigned)glfwGetTime()); // initialize random seed
-	radius = 15;
-	offset = 20;
-	HeavymodelMatrices = std::vector<glm::mat4>(400);
-	HeavyworldNormalMatrices = std::vector<glm::mat4>(400);
-	for (unsigned int i = 0; i < HeavymodelMatrices.size(); ++i)
+
+	for (int i = 0; i < modelNumb / 2; ++i)
 	{
 		glm::mat4 model(1.0);
-		// 1. translation: displace along circle with 'radius' in range [-offset, offset]
-		float angle = (float)i / (float)400 * 360.0f;
-		float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-		float x = sin(angle) * radius + displacement;
-		displacement = (rand() % (int)(offset * 100)) / 100.0f - offset;
-		float y = displacement * 0.4f; // keep the height of the filed smaller compared to width of x and z
-		displacement = (rand() % (int)(offset * 100)) / 100.0f - offset;
-		float z = cos(angle) * radius + displacement;
-		model = glm::translate(model, glm::vec3(x, y, z));
+		model = glm::translate(model, glm::vec3(downX - step * i, 0, rightZ));
+		// model = glm::rotate(model, glm::radians(180.f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.5f));
 
-		// 2. scale: Scale between 0.05 and 0.25f;
-		// float scale = (rand() % 10) / 100.0f + 0.05f;
-		model = glm::scale(model, glm::vec3(1.5));
-
-		// 3. rotation: add random rotation around a (semi) randomly picked rotation axis vector
-		float rotAngle = (rand() % 360);
-		model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
-
-		HeavymodelMatrices[i] = model;
-		HeavyworldNormalMatrices[i] = glm::transpose(glm::inverse(model));
+		modelMatrices.push_back(model);
+		worldNormalMatrices.push_back(glm::transpose(glm::inverse(model)));
 	}
-	// CGInstancePrimitiveUtil::setCubeOneInstanceData(HeavymodelMatrices, HeavyworldNormalMatrices);
-	// CGInstancePrimitiveUtil::setQuadOneInstanceData(HeavymodelMatrices, HeavyworldNormalMatrices);
-	// CGInstancePrimitiveUtil::setSphereOneInstanceData(HeavymodelMatrices, HeavyworldNormalMatrices);
 
 
 	GPED::Random random(331);
@@ -291,6 +261,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	editLights.push_back(CGEditLightObject());
 	editLights[0].initialize(assetManager);
 	editLights[0].setLightType(EDIT_DIRECTION_LIGHT);
+	editLights[0].setPosition(0.f, 95.f, 0.f);
 	editLights[0].setScale(0.3f);
 	editLights[0].connectBroadPhase(&dBroadPhase);
 	editLights[0].setBroadPhaseId(dBroadPhase.CreateProxy(editLights[0].getFitAABB(), &editLights[0]));
@@ -300,7 +271,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	editLights[0].setSpecularColor(glm::vec3(0.5f));
 
 	// Point Light
-	for (unsigned i = 1; i < 5; ++i)
+	for (unsigned i = 1; i < 50; ++i)
 	{
 		editLights.push_back(CGEditLightObject());
 		editLights[i].initialize(assetManager);
@@ -308,13 +279,15 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 		editLights[i].setScale(0.3f);
 		editLights[i].connectBroadPhase(&dBroadPhase);
 		editLights[i].setBroadPhaseId(dBroadPhase.CreateProxy(editLights[i].getFitAABB(), &editLights[i]));
-
-		editLights[i].setPosition(random.randomVector(glm::vec3(-20, -5, -20), glm::vec3(20, 5, 20)));
+		
+		glm::vec3 pos = random.randomVector(glm::vec3(60, 0, 5), glm::vec3(-70, 10, -9));
+		editLights[i].setPosition(pos);
 		editLights[i].setAmbientColor(random.randomVector(glm::vec3(0, 0, 0) ,glm::vec3(1, 1, 1)));
 		editLights[i].setDiffuseColor(random.randomVector(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
 		editLights[i].setSpecularColor(random.randomVector(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
 		editLights[i].setAttnLinear(0.7f);
 		editLights[i].setAttnQuadratic(0.5);
+		editLights[i].setLightIntensity(3.8f);
 	}
 	// Object Manual Setting + Light Manual Setting
 
@@ -364,75 +337,71 @@ void CGProj::DeferredRenderer::updateImgui()
 	GLFWwindow* app_window = (GLFWwindow*)ImGui::GetIO().ClipboardUserData;
 
 	ImGui::Begin("Deferred Lighting Demo"); // Create a window called " " and append into it.
-
-	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-	ImGui::Text("Camera Position %.1f %.1f %.1f", camera.Position.x, camera.Position.y, camera.Position.z);
-
-	ImGui::TextColored(ImVec4(0.99f, 0.4f, 0.37f, 1.0f), "Press Tab Button to convert GAME/UI Mode");
-	if (GameControl) ImGui::TextColored(ImVec4(0.78f, 0.17f, 0.54f, 1.0f), "GAME mode");
-	else ImGui::TextColored(ImVec4(0.11f, 0.7f, 0.81f, 1.0f), "UI mode");
-	
-	ImGui::Checkbox("Light Box Render", &lightDraw);
-	ImGui::Checkbox("Broad Phase Debug Render", &BroadDebug);
-	ImGui::Checkbox("Wire Mode", &wireDraw);
-	ImGui::Checkbox("Click Ray Render", &clickDraw); ImGui::SameLine();
-	if(ImGui::Button("Click Ray Reset")) rayCollector.clear();
-
-	ImGui::Checkbox("Hit Ray Render", &rayHitDraw); ImGui::SameLine();
-	if (ImGui::Button("Hit Ray Reset")) hitCollector.clear();
-
-	// Post-Processing Control
-	ImGui::InputFloat("Gamma", &pGamma, 0.02f, 5.0f, "%.3f");
-	ImGui::InputFloat("Exposure", &pExposure, 0.02f, 5.0f, "%.3f");
-	
-	ImGui::Checkbox("Bloom", &isBloom);
-	if (isBloom)
 	{
-		ImGui::InputFloat3("Extractor Vector", &myBloom.m_BrightnessExtractor[0]);
-		ImGui::InputFloat("Extractor Threshold", &myBloom.m_BrightnessThreShold);
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::Text("Camera Position %.1f %.1f %.1f", camera.Position.x, camera.Position.y, camera.Position.z);
 
-		int iteration = (unsigned)myBloom.getIteration();
-		if (ImGui::InputInt("Bloom Iteration", &iteration, 1, 1))
-			myBloom.setIteration((unsigned)iteration);
+		ImGui::TextColored(ImVec4(0.99f, 0.4f, 0.37f, 1.0f), "Press Tab Button to convert GAME/UI Mode");
+		if (GameControl) ImGui::TextColored(ImVec4(0.78f, 0.17f, 0.54f, 1.0f), "GAME mode");
+		else ImGui::TextColored(ImVec4(0.11f, 0.7f, 0.81f, 1.0f), "UI mode");
+
+		ImGui::Checkbox("Light Box Render", &lightDraw);
+		ImGui::Checkbox("Broad Phase Debug Render", &BroadDebug);
+		ImGui::Checkbox("Wire Mode", &wireDraw);
+		ImGui::Checkbox("Click Ray Render", &clickDraw); ImGui::SameLine();
+		if (ImGui::Button("Click Ray Reset")) rayCollector.clear();
+
+		ImGui::Checkbox("Hit Ray Render", &rayHitDraw); ImGui::SameLine();
+		if (ImGui::Button("Hit Ray Reset")) hitCollector.clear();
+
+		// Post-Processing Control
+		ImGui::InputFloat("Gamma", &pGamma, 0.02f, 5.0f, "%.3f");
+		ImGui::InputFloat("Exposure", &pExposure, 0.02f, 5.0f, "%.3f");
+
+		ImGui::Checkbox("Bloom", &isBloom);
+		if (isBloom)
+		{
+			ImGui::InputFloat3("Extractor Vector", &myBloom.m_BrightnessExtractor[0]);
+			ImGui::InputFloat("Extractor Threshold", &myBloom.m_BrightnessThreShold);
+
+			int iteration = (unsigned)myBloom.getIteration();
+			if (ImGui::InputInt("Bloom Iteration", &iteration, 1, 1))
+				myBloom.setIteration((unsigned)iteration);
+		}
+
+		ImGui::Checkbox("SSAO", &isSSAO);
+		if (isSSAO)
+		{
+			float ssaoTemp = mySSAO.getRadius();
+			if (ImGui::InputFloat("SSAO radius", &ssaoTemp, 0.02f, 5.0f, "%.3f"))
+				mySSAO.setRadius(ssaoTemp);
+
+			ssaoTemp = mySSAO.getBias();
+			if (ImGui::InputFloat("SSAO bias", &ssaoTemp, 0.02f, 5.0f, "%.3f"))
+				mySSAO.setBias(ssaoTemp);
+
+			ssaoTemp = mySSAO.getPower();
+			if (ImGui::InputFloat("SSAO power", &ssaoTemp, 0.02f, 5.0f, "%.3f"))
+				mySSAO.setPower(ssaoTemp);
+
+			int ssaoNoise = (int)mySSAO.getNoiseNum();
+			if (ImGui::InputInt("SSAO Noise Numb", &ssaoNoise, 2, 1))
+				mySSAO.setNoiseNum((unsigned)ssaoNoise);
+
+			ImGui::Text("SSAO Kernel Numb : %d", NR_SSAO_KERNEL);
+
+			bool blurState = mySSAO.getBlurState();
+			if (ImGui::Checkbox("SSAO Blur", &blurState)) mySSAO.setBlurState(blurState);
+
+			ImGui::Checkbox("SSAO Debug", &isSSAODebug);
+		}
 	}
-
-	ImGui::Checkbox("SSAO", &isSSAO);
-	if (isSSAO)
-	{
-		float ssaoTemp = mySSAO.getRadius();
-		if (ImGui::InputFloat("SSAO radius", &ssaoTemp, 0.02f, 5.0f, "%.3f"))
-			mySSAO.setRadius(ssaoTemp);
-
-		ssaoTemp = mySSAO.getBias();
-		if (ImGui::InputFloat("SSAO bias", &ssaoTemp, 0.02f, 5.0f, "%.3f"))
-			mySSAO.setBias(ssaoTemp);
-
-		ssaoTemp = mySSAO.getPower();
-		if (ImGui::InputFloat("SSAO power", &ssaoTemp, 0.02f, 5.0f, "%.3f"))
-			mySSAO.setPower(ssaoTemp);
-
-		int ssaoNoise = (int)mySSAO.getNoiseNum();
-		if (ImGui::InputInt("SSAO Noise Numb", &ssaoNoise, 2, 1))
-			mySSAO.setNoiseNum((unsigned)ssaoNoise);
-		
-		ImGui::Text("SSAO Kernel Numb : %d", NR_SSAO_KERNEL);
-		
-		bool blurState = mySSAO.getBlurState();
-		if (ImGui::Checkbox("SSAO Blur", &blurState)) mySSAO.setBlurState(blurState);
-
-		ImGui::Checkbox("SSAO Debug", &isSSAODebug);
-	}
-	
-	
-
 	ImGui::End();
 
 	if (pickedEditBox)
 	{
 		pickedEditBox->UIrender(assetManager);
 	}
-
-	
 }
 
 void CGProj::DeferredRenderer::updateSimulation(float deltaTime, float lastFrame)
@@ -449,7 +418,12 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	// Get/Set Proxy Model, Normal Data
 	// Now it is done by manual setting
 	// TODO : make a structure to manage this kind of process
-	editProxies[0].setInstanceData(HeavymodelMatrices, HeavyworldNormalMatrices);
+	std::vector<glm::mat4> tModel, tNormalMatrix;
+	model = glm::translate(model, glm::vec3(0.f));
+	model = glm::scale(model, glm::vec3(0.05f));
+	tModel.push_back(model); tNormalMatrix.push_back(glm::transpose(glm::inverse(model)));
+
+	editProxies[0].setInstanceData(tModel, tNormalMatrix);
 	editProxies[1].setInstanceData(modelMatrices, worldNormalMatrices);
 
 

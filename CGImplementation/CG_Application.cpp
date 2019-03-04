@@ -247,6 +247,7 @@ void CGProj::GraphicsDemo::update(float deltaTime, float lastFrame)
 {
 	test2.key(app_window, deltaTime);
 	test2.updateImgui();
+	test2.updateSimulation(deltaTime, lastFrame);
 }
 
 void CGProj::GraphicsDemo::display()

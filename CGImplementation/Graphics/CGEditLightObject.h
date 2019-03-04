@@ -91,6 +91,8 @@ namespace CGProj
 		void setAttnQuadratic(const float q);
 		float getAttnQuadratic();
 
+		void setLightIntensity(const float i);
+
 		float getLightRadius();
 
 		// lighting Setting in World Space

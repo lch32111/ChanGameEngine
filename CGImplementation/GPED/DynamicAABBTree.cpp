@@ -233,10 +233,10 @@ void CGProj::DynamicAABBTree::InsertLeaf(int leaf)
 		GPED::real combinedArea = combinedAABB.GetPerimeter();
 
 		// Cost of creating a new parent for this node and the new leaf
-		GPED::real cost = GPED::real(2) * combinedArea;
+		GPED::real cost = GPED::real(2.0) * combinedArea;
 
 		// Minimum cost of pushing the leaf further down the three
-		GPED::real inheritanceCost = GPED::real(2) * (combinedArea - area);
+		GPED::real inheritanceCost = GPED::real(2.0) * (combinedArea - area);
 
 		// Cost of descending into left child
 		GPED::real cost1;

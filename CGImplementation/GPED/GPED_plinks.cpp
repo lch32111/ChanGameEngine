@@ -101,6 +101,8 @@ unsigned GPED::ParticleRodConstraint::addContact(ParticleContact * contact, unsi
 	// Check if we're over extended
 	if (currentLen == length)
 		return 0;
+	
+	// TODO : ..
 
-
+	return 1;
 }

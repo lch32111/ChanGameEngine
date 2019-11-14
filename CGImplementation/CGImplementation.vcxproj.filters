@@ -64,6 +64,21 @@
     <Filter Include="Terrain Source">
       <UniqueIdentifier>{18f226a6-4edc-46f0-8efe-bc8d7a495248}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Demo\CollisionDetection Demo">
+      <UniqueIdentifier>{4b477c2f-0a49-453a-b0ec-5d6e9b7d321e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CollisionDetection">
+      <UniqueIdentifier>{3f934dfe-e199-4fff-adca-5e3b91e309a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{d7e902a4-9e93-452b-8057-9131722b7fa0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CollisionDetection\Header">
+      <UniqueIdentifier>{ec8d8188-9c95-4de2-b35b-4222c7bdb1d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CollisionDetection\Source">
+      <UniqueIdentifier>{6c628e4f-f51e-4080-a539-d12717c2d534}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -266,6 +281,9 @@
     </ClCompile>
     <ClCompile Include="Graphics\CGStd140Module.cpp">
       <Filter>Graphics Source</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionDetection\CGCollisionFunction.cpp">
+      <Filter>CollisionDetection\Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -523,6 +541,24 @@
     </ClInclude>
     <ClInclude Include="Graphics\GLInstancePrimitiveUtil.h">
       <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\CGMathConfig.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\CGVector3.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\CGMathHeader.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\CGRay.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetection\CGCollisionSphere.h">
+      <Filter>CollisionDetection\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetection\CGCollisionFunction.h">
+      <Filter>CollisionDetection\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

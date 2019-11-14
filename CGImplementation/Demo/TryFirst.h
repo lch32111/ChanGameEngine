@@ -4,6 +4,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include <CG_Application.h>
+
 #include <Graphics/Shader.h>
 #include <Graphics/chanQuatCamera.h>
 #include <Graphics/CGRenderLine.h>
@@ -24,6 +26,29 @@
 
 namespace CGProj
 {
+	// Forward Decalration
+	class TryFirst;
+	class PhysicsDemo : public Application
+	{
+	public:
+		~PhysicsDemo() { }
+
+		virtual const char* getTitle();
+		virtual void initGraphics();
+		virtual void initImgui();
+		virtual void setView();
+		virtual void deinit();
+
+		virtual void update(float deltaTime, float lastFrame);
+		virtual void display();
+
+		virtual void mouse(double xpos, double ypos);
+		virtual void mouseButton(int button, int action, int mods);
+		virtual void scroll(double yoffset);
+	private:
+		TryFirst* test1;
+	};
+
 	class TryFirst
 	{
 	public:

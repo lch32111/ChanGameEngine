@@ -9,6 +9,85 @@
 #include <Graphics/GLPrimitiveUtil.h>
 #include <Graphics/GLTextureUtility.h>
 
+/* ### Physics Demo ### */
+const char * CGProj::PhysicsDemo::getTitle()
+{
+	std::string str = Application::getTitle();
+	str += " > PhysicsDemo";
+	return str.c_str();
+}
+
+void CGProj::PhysicsDemo::initGraphics()
+{
+	Application::initGraphics();
+
+	glfwSwapInterval(0); // Turn off Vsync and measure the FPS
+	// glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+
+	test1 = new TryFirst();
+	test1->initGraphics();
+}
+
+void CGProj::PhysicsDemo::initImgui()
+{
+	Application::initImgui();
+}
+
+void CGProj::PhysicsDemo::setView()
+{
+	// Application::setView();
+}
+
+void CGProj::PhysicsDemo::deinit()
+{
+	Application::deinit();
+
+	test1->deinit();
+	delete test1;
+}
+
+void CGProj::PhysicsDemo::update(float deltaTime, float lastFrame)
+{
+	// Application::update(deltaTime, lastFrame);
+
+	test1->key(app_window, deltaTime);
+	test1->updateImgui();
+	test1->updateSimulation(deltaTime, lastFrame);
+}
+
+void CGProj::PhysicsDemo::display()
+{
+	Application::display();
+
+	test1->display(width, height);
+}
+
+void CGProj::PhysicsDemo::mouse(double xpos, double ypos)
+{
+	// Application::mouse(xpos, ypos);
+
+	test1->mouse(xpos, ypos);
+}
+
+void CGProj::PhysicsDemo::mouseButton(int button, int action, int mods)
+{
+	// Application::mouseButton(button, action, mods)
+
+	test1->mouseButton(app_window, button, action, mods, width, height);
+}
+
+
+void CGProj::PhysicsDemo::scroll(double yoffset)
+{
+	// Application::scroll(yoffset);
+
+	test1->scroll(yoffset);
+}
+
+/* ### Physics Demo ### */
+
 void CGProj::TryFirst::initGraphics()
 {
 	simpleShader = Shader("ShaderFolder/simpleRender.vs", "ShaderFolder/simpleRender.fs");
@@ -281,7 +360,7 @@ void CGProj::TryFirst::mouseButton(GLFWwindow* app_window,
 			glm::vec3 rayFrom = camera.Position;
 			glm::vec3 rayTo = GetRayTo((int)x, (int)y, &camera, screen_width, screen_height);
 			GPED::c3RayInput rayInput(rayFrom, rayTo);
-			rayCollector.push_back({ rayFrom, rayTo });
+			// rayCollector.push_back({ rayFrom, rayTo });
 			struct CGTestClickCastCallback : CGRayCastCallback
 			{
 				virtual bool process

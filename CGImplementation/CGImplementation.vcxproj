@@ -125,6 +125,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CollisionDetection\CGCollisionFunction.cpp" />
     <ClCompile Include="Graphics\CGBloomEffect.cpp" />
     <ClCompile Include="CG_Application.cpp" />
     <ClCompile Include="Demo\DeferredRenderer.cpp" />
@@ -194,6 +195,8 @@
     <ClCompile Include="Terrain\CGTerrain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CollisionDetection\CGCollisionFunction.h" />
+    <ClInclude Include="CollisionDetection\CGCollisionSphere.h" />
     <ClInclude Include="Graphics\CGBloomEffect.h" />
     <ClInclude Include="CGErrorLogger.h" />
     <ClInclude Include="CG_Application.h" />
@@ -274,6 +277,10 @@
     <ClInclude Include="Imgui\imstb_rectpack.h" />
     <ClInclude Include="Imgui\imstb_textedit.h" />
     <ClInclude Include="Imgui\imstb_truetype.h" />
+    <ClInclude Include="Math\CGMathConfig.h" />
+    <ClInclude Include="Math\CGMathHeader.h" />
+    <ClInclude Include="Math\CGRay.h" />
+    <ClInclude Include="Math\CGVector3.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Terrain\CGPerlinNoise.h" />
     <ClInclude Include="Terrain\CGTerrain.h" />

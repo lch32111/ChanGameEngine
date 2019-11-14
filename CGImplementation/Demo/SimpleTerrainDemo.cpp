@@ -4,6 +4,87 @@
 
 #include <Graphics/GLPrimitiveUtil.h>
 
+/****************************************************************************************/
+/* ### Terrain Demo ### */
+const char * CGProj::TerrainDemo::getTitle()
+{
+	std::string str = Application::getTitle();
+	str += " > TerrainDemo";
+	return str.c_str();
+}
+
+void CGProj::TerrainDemo::initGraphics()
+{
+	Application::initGraphics();
+	glfwSwapInterval(0); // Turn off Vsync and measure the FPS
+	glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+
+	test3 = new SimpleTerrainDemo();
+	test3->initGraphics(width, height);
+}
+
+void CGProj::TerrainDemo::initImgui()
+{
+	Application::initImgui();
+
+	test3->initImgui();
+}
+
+void CGProj::TerrainDemo::setView()
+{
+}
+
+void CGProj::TerrainDemo::deinit()
+{
+	Application::deinit();
+
+	test3->deinit();
+	delete test3;
+}
+
+void CGProj::TerrainDemo::update(float deltaTime, float lastFrame)
+{
+	test3->key(app_window, deltaTime);
+	test3->updateImgui();
+	test3->updateSimulation(deltaTime, lastFrame);
+}
+
+void CGProj::TerrainDemo::display()
+{
+	Application::display();
+
+	test3->display(width, height);
+}
+
+void CGProj::TerrainDemo::mouse(double xpos, double ypos)
+{
+	test3->mouse(xpos, ypos);
+}
+
+void CGProj::TerrainDemo::mouseButton(int button, int action, int mods)
+{
+	// Application::mouseButton(button, action, mods);
+
+	test3->mouseButton(app_window, button, action, mods, width, height);
+}
+
+void CGProj::TerrainDemo::scroll(double yoffset)
+{
+	test3->scroll(yoffset);
+}
+
+void CGProj::TerrainDemo::resize(int width, int height)
+{
+	Application::resize(width, height);
+
+	test3->resize(width, height);
+}
+
+/* ### Terrain Demo ### */
+/****************************************************************************************/
+
 void CGProj::SimpleTerrainDemo::initGraphics(int width, int height)
 {
 	assetManager.assetInit();

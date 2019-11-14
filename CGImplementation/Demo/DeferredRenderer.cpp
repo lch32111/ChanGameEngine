@@ -12,6 +12,86 @@
 #include <GPED/CGPhysicsUtil.h>
 #include <GPED/GPED_random.h>
 
+/****************************************************************************************/
+/* ### Graphics Demo ### */
+const char * CGProj::GraphicsDemo::getTitle()
+{
+	std::string str = Application::getTitle();
+	str += " > GraphicsDemo";
+	return str.c_str();
+}
+
+void CGProj::GraphicsDemo::initGraphics()
+{
+	Application::initGraphics();
+	glfwSwapInterval(0); // Turn off Vsync and measure the FPS
+	glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+
+	test2 = new DeferredRenderer();
+	test2->initGraphics(width, height);
+}
+
+void CGProj::GraphicsDemo::initImgui()
+{
+	Application::initImgui();
+
+	test2->initImgui();
+}
+
+void CGProj::GraphicsDemo::setView()
+{
+}
+
+void CGProj::GraphicsDemo::deinit()
+{
+	Application::deinit();
+
+	test2->deinit();
+	delete test2;
+}
+
+void CGProj::GraphicsDemo::update(float deltaTime, float lastFrame)
+{
+	test2->key(app_window, deltaTime);
+	test2->updateImgui();
+	test2->updateSimulation(deltaTime, lastFrame);
+}
+
+void CGProj::GraphicsDemo::display()
+{
+	Application::display();
+
+	test2->display(width, height);
+}
+
+void CGProj::GraphicsDemo::mouse(double xpos, double ypos)
+{
+	test2->mouse(xpos, ypos);
+}
+
+void CGProj::GraphicsDemo::mouseButton(int button, int action, int mods)
+{
+	// Application::mouseButton(button, action, mods);
+
+	test2->mouseButton(app_window, button, action, mods, width, height);
+}
+
+void CGProj::GraphicsDemo::scroll(double yoffset)
+{
+	test2->scroll(yoffset);
+}
+
+void CGProj::GraphicsDemo::resize(int width, int height)
+{
+	Application::resize(width, height);
+
+	test2->resize(width, height);
+}
+
+/* ### Graphics Demo ### */
+/****************************************************************************************/
 
 void CGProj::DeferredRenderer::initGraphics(int width, int height)
 {

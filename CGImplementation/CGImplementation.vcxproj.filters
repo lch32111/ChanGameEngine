@@ -551,14 +551,35 @@
     <ClInclude Include="Math\CGMathHeader.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="Math\CGRay.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="CollisionDetection\CGCollisionSphere.h">
       <Filter>CollisionDetection\Header</Filter>
     </ClInclude>
     <ClInclude Include="CollisionDetection\CGCollisionFunction.h">
       <Filter>CollisionDetection\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetection\CGCollisionRay.h">
+      <Filter>CollisionDetection\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CGPrecompiled.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetection\CGCollisionLineSegment.h">
+      <Filter>CollisionDetection\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetection\CGCollisionConvex.h">
+      <Filter>CollisionDetection\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetection\CGCollisionShape.h">
+      <Filter>CollisionDetection\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\CGMat4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetection\CGCollisionConfig.h">
+      <Filter>CollisionDetection\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\CGMat3.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,17 +1,18 @@
 #ifndef __CG_COLLISION_SPHERE_H__
 #define __CG_COLLISION_SPHERE_H__
 
-#include <Math/CGMathHeader.h>
+#include <CollisionDetection/CGCollisionConfig.h>
+#include <CollisionDetection/CGCollisionConvex.h>
 
 namespace CGProj
 {
 	namespace CollisionDetection
 	{
-		class CGCollisionSphere
+		class CGCollisionSphere : public CGCollisionConvex
 		{
 		public:
-			real scale;
-			Math::CGVector3 pos;
+			CGScalar m_radius;
+			CGVec3 m_pos;
 		};
 	}
 }

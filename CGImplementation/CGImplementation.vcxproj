@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{792F3151-E667-41A8-A222-CF178CF2FC13}</ProjectGuid>
     <RootNamespace>CGImplementation</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -195,7 +195,13 @@
     <ClCompile Include="Terrain\CGTerrain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CGPrecompiled.h" />
+    <ClInclude Include="CollisionDetection\CGCollisionConfig.h" />
+    <ClInclude Include="CollisionDetection\CGCollisionConvex.h" />
     <ClInclude Include="CollisionDetection\CGCollisionFunction.h" />
+    <ClInclude Include="CollisionDetection\CGCollisionLineSegment.h" />
+    <ClInclude Include="CollisionDetection\CGCollisionRay.h" />
+    <ClInclude Include="CollisionDetection\CGCollisionShape.h" />
     <ClInclude Include="CollisionDetection\CGCollisionSphere.h" />
     <ClInclude Include="Graphics\CGBloomEffect.h" />
     <ClInclude Include="CGErrorLogger.h" />
@@ -277,9 +283,10 @@
     <ClInclude Include="Imgui\imstb_rectpack.h" />
     <ClInclude Include="Imgui\imstb_textedit.h" />
     <ClInclude Include="Imgui\imstb_truetype.h" />
+    <ClInclude Include="Math\CGMat3.h" />
+    <ClInclude Include="Math\CGMat4.h" />
     <ClInclude Include="Math\CGMathConfig.h" />
     <ClInclude Include="Math\CGMathHeader.h" />
-    <ClInclude Include="Math\CGRay.h" />
     <ClInclude Include="Math\CGVector3.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Terrain\CGPerlinNoise.h" />

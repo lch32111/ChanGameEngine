@@ -126,6 +126,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CollisionDetection\CGCollisionFunction.cpp" />
+    <ClCompile Include="Demo\CollisionTestBedDemo.cpp" />
     <ClCompile Include="Graphics\CGBloomEffect.cpp" />
     <ClCompile Include="CG_Application.cpp" />
     <ClCompile Include="Demo\DeferredRenderer.cpp" />
@@ -203,6 +204,7 @@
     <ClInclude Include="CollisionDetection\CGCollisionRay.h" />
     <ClInclude Include="CollisionDetection\CGCollisionShape.h" />
     <ClInclude Include="CollisionDetection\CGCollisionSphere.h" />
+    <ClInclude Include="Demo\CollisionTestBedDemo.h" />
     <ClInclude Include="Graphics\CGBloomEffect.h" />
     <ClInclude Include="CGErrorLogger.h" />
     <ClInclude Include="CG_Application.h" />

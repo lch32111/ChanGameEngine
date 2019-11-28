@@ -574,7 +574,7 @@ void GPED::Contact::updatePenetration(
 	const glm::vec3& angularChange, 
 	unsigned index)
 {
-	real sign = (index ? 1 : -1);
+	real sign = (index ? (real)1 : (real)-1);
 	glm::vec3 deltaPosition = linearChange + 
 		glm::cross(angularChange, relativeContactPosition[index]);
 	penetration += glm::dot(deltaPosition, contactNormal) * sign;
@@ -587,7 +587,7 @@ void GPED::Contact::updateDesiredVelocity(
 	real duration
 )
 {
-	real sign = (index ? -1 : 1);
+	real sign = (index ? (real)-1 : (real)1);
 	glm::vec3 deltaVel = velocityChange + 
 		glm::cross(rotationChange, relativeContactPosition[index]);
 	

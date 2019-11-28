@@ -16,6 +16,7 @@ unsigned CGProj::CGCollisionNarrow::RayCollisionCallback(
 		return rayAndOBB(output, input, *(CGCollisionOBB*)primitive);
 	default:
 		assert(0);
+		return -1;
 	}
 }
 
@@ -592,9 +593,9 @@ unsigned CGProj::CGCollisionNarrow::MeshAndSphere(
 	mesh.getQuantizedGridPoints(sphereAABB, mR);
 
 	unsigned collisionHit = 0;
-	for (unsigned j = mR.startZ; j < mR.EndZ; ++j)
+	for (int j = mR.startZ; j < mR.EndZ; ++j)
 	{
-		for (unsigned i = mR.startX; i < mR.EndX; ++i)
+		for (int i = mR.startX; i < mR.EndX; ++i)
 		{
 			// First Triangle
 			CGCollisionTriangle triangle;

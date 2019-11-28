@@ -4,7 +4,7 @@ using namespace CGProj;
 using namespace CGProj::Math;
 using namespace CGProj::CollisionDetection;
 
-bool intersect(const CGCollisionSphere& a, const CGCollisionSphere& b)
+bool CGProj::CollisionDetection::intersect(const CGCollisionSphere& a, const CGCollisionSphere& b)
 {
 	CGVec3 ba = a.m_pos - b.m_pos;
 	CGScalar radiSum = a.m_radius + b.m_radius;
@@ -15,7 +15,7 @@ bool intersect(const CGCollisionSphere& a, const CGCollisionSphere& b)
 // From Section 3.1.2
 // x = s + a * r
 // norm(x) = radius
-bool intersect(const CGCollisionSphere& sphere, const CGCollisionRay& ray)
+bool CGProj::CollisionDetection::intersect(const CGCollisionSphere& sphere, const CGCollisionRay& ray)
 {
 	CGVec3 r = ray.m_target - ray.m_source;
 	CGScalar r_length2 = Dot(r, r);
@@ -23,7 +23,7 @@ bool intersect(const CGCollisionSphere& sphere, const CGCollisionRay& ray)
 	return true;
 }
 
-bool intersect(const CGCollisionSphere& sphere, const CGCollisionLineSegment& segment)
+bool CGProj::CollisionDetection::intersect(const CGCollisionSphere& sphere, const CGCollisionLineSegment& segment)
 {
 	CGVec3 segmentDir = segment.GetDirection();
 

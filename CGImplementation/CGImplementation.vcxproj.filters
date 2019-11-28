@@ -79,6 +79,9 @@
     <Filter Include="CollisionDetection\Source">
       <UniqueIdentifier>{6c628e4f-f51e-4080-a539-d12717c2d534}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Demo\CollisionDetection Demo\CDFirstExperiment">
+      <UniqueIdentifier>{86c7187a-d3e6-4b4c-8d02-64443d1a10a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -284,6 +287,9 @@
     </ClCompile>
     <ClCompile Include="CollisionDetection\CGCollisionFunction.cpp">
       <Filter>CollisionDetection\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Demo\CollisionTestBedDemo.cpp">
+      <Filter>Demo\CollisionDetection Demo\CDFirstExperiment</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -580,6 +586,9 @@
     </ClInclude>
     <ClInclude Include="Math\CGMat3.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Demo\CollisionTestBedDemo.h">
+      <Filter>Demo\CollisionDetection Demo\CDFirstExperiment</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

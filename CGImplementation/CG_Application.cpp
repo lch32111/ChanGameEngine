@@ -7,6 +7,7 @@
 #include <Demo/TryFirst.h>
 #include <Demo/DeferredRenderer.h>
 #include <Demo/SimpleTerrainDemo.h>
+#include <Demo/CollisionTestBedDemo.h>
 
 /* ### Application ### */
 const char * CGProj::Application::getTitle()
@@ -133,5 +134,5 @@ void CGProj::Application::renderText(int xpos, int ypos, const char * text)
 
 CGProj::Application* getApplication()
 {
-	return new CGProj::GraphicsDemo();
+	return new CGProj::CollisionDemo();
 }

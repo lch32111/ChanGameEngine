@@ -375,7 +375,7 @@ void GPED::Contact::applyPositionChange(
 		{
 			// The linear and angular movements required are in proportion to
 			// the two inverse inertias.
-			real sign = (i == 0) ? 1 : -1;
+			real sign = real((i == 0) ? 1 : -1);
 			angularMove[i] = sign * penetration * (angularInertia[i] * inverseTotalInertia);
 			linearMove[i] = sign * penetration * (linearInertia[i] * inverseTotalInertia);
 

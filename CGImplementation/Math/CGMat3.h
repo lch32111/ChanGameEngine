@@ -7,26 +7,28 @@ namespace CGProj
 {
 	namespace Math
 	{
-		
-
 		template<typename Scalar>
 		class CGMat3
 		{
 		public:
 			CGMat3() { }
-			explicit CGMat3(Scalar s00, Scalar s10, Scalar s20,
-				Scalar s01, Scalar s11, Scalar s21,
-				Scalar s02, Scalar s12, Scalar s22)
-				: m_col[0]{s00, s10, s20}, 
-				m_col[1]{s01, s11, s21},
-				m_col[2]{s02, s12, s22} { }
-			
+
+			explicit CGMat3(Scalar s)
+				: m_col{ s, 0, 0,
+				0, s, 0, 
+				0, 0, s } { }
+
+			explicit CGMat3(Scalar* s)
+			{
+				memcpy(m_col->data(), s, sizeof(Scalar) * 9);
+			}
+
 			explicit CGMat3(const CGVector3<Scalar>& col1, 
 				const CGVector3<Scalar>& col2, 
 				const CGVector3<Scalar>& col3)
 				: m_col {col1, col2, col3} { }
 
-			explicit CGMat3(const CGMat3<Scalar>& m)
+			CGMat3(const CGMat3<Scalar>& m)
 				: m_col {m.m_col[0], m.m_col[1], m.m_col[2] } { }
 
 			CGMat3<Scalar>& operator=(const CGMat3<Scalar>& m)
@@ -207,39 +209,38 @@ namespace CGProj
 		template<typename Scalar>
 		inline CGMat3<Scalar> operator*(const CGMat3<Scalar>& a, const CGMat3<Scalar>& b)
 		{
-			const Scalar s00 = a.m_col[0][0] * b.m_col[0][0] +
+			CGMat3<Scalar> r;
+			r.m_col[0][0] = a.m_col[0][0] * b.m_col[0][0] +
 				a.m_col[1][0] * b.m_col[0][1] +
 				a.m_col[2][0] * b.m_col[0][2];
-			const Scalar s10 = a.m_col[0][1] * b.m_col[0][0] +
+			r.m_col[0][1] = a.m_col[0][1] * b.m_col[0][0] +
 				a.m_col[1][1] * b.m_col[0][1] +
 				a.m_col[2][1] * b.m_col[0][2];
-			const Scalar s20 = a.m_col[0][2] * b.m_col[0][0] +
+			r.m_col[0][2] = a.m_col[0][2] * b.m_col[0][0] +
 				a.m_col[1][2] * b.m_col[0][1] +
 				a.m_col[2][2] * b.m_col[0][2];
 
-			const Scalar s01 = a.m_col[0][0] * b.m_col[1][0] +
+			r.m_col[1][0] = a.m_col[0][0] * b.m_col[1][0] +
 				a.m_col[1][0] * b.m_col[1][1] +
 				a.m_col[2][0] * b.m_col[1][2];
-			const Scalar s11 = a.m_col[0][1] * b.m_col[1][0] +
+			r.m_col[1][1] = a.m_col[0][1] * b.m_col[1][0] +
 				a.m_col[1][1] * b.m_col[1][1] +
 				a.m_col[2][1] * b.m_col[1][2];
-			const Scalar s21 = a.m_col[0][2] * b.m_col[1][0] +
+			r.m_col[1][2] = a.m_col[0][2] * b.m_col[1][0] +
 				a.m_col[1][2] * b.m_col[1][1] +
 				a.m_col[2][2] * b.m_col[1][2];
 
-			const Scalar s02 = a.m_col[0][0] * b.m_col[2][0] +
+			r.m_col[2][0] = a.m_col[0][0] * b.m_col[2][0] +
 				a.m_col[1][0] * b.m_col[2][1] +
 				a.m_col[2][0] * b.m_col[2][2];
-			const Scalar s12 = a.m_col[0][1] * b.m_col[2][0] +
+			r.m_col[2][1] = a.m_col[0][1] * b.m_col[2][0] +
 				a.m_col[1][1] * b.m_col[2][1] +
 				a.m_col[2][1] * b.m_col[2][2];
-			const Scalar s22 = a.m_col[0][2] * b.m_col[2][0] +
+			r.m_col[2][2] = a.m_col[0][2] * b.m_col[2][0] +
 				a.m_col[1][2] * b.m_col[2][1] +
 				a.m_col[2][2] * b.m_col[2][2];
 
-			return CGMat3<Scalar>(s00, s10, s20,
-				s01, s11, s21,
-				s02, s12, s22);
+			return r;
 		}
 
 		template<typename Scalar>
@@ -267,9 +268,17 @@ namespace CGProj
 		template<typename Scalar>
 		inline CGMat3<Scalar> Transpose(const CGMat3<Scalar>& m)
 		{
-			return CGMat3<Scalar>(m.m_col[0][0], m.m_col[1][0], m.m_col[2][0],
-				m.m_col[0][1], m.m_col[1][1], m.m_col[2][1],
-				m.m_col[0][2], m.m_col[1][2], m.m_col[2][2]);
+			CGMat3<Scalar> r;
+			r.m_col[0][0] = m.m_col[0][0];
+			r.m_col[0][1] = m.m_col[1][0];
+			r.m_col[0][2] = m.m_col[2][0];
+			r.m_col[1][0] = m.m_col[0][1];
+			r.m_col[1][1] = m.m_col[1][1];
+			r.m_col[1][2] = m.m_col[2][1];
+			r.m_col[2][0] = m.m_col[0][2];
+			r.m_col[2][1] = m.m_col[1][2];
+			r.m_col[2][2] = m.m_col[2][2];
+			return r;
 		}
 
 		template<typename Scalar>
@@ -291,7 +300,7 @@ namespace CGProj
 				+ m.m_col[2][0] * (m.m_col[0][1] * m.m_col[1][2] - m.m_col[1][1] * m.m_col[0][2]);
 
 			r.m_col[0][0] = +(m.m_col[1][1] * m.m_col[2][2] - m.m_col[2][1] * m.m_col[1][2]) * oneOverDeterminant;
-			r.m_col[0][1] = -(m.m_col[1][0] * m.m_col[2][2] - m.m_col[2][0] * m.m_col[1][2]) * oneOverDeterminant;
+			r.m_col[0][1] = -(m.m_col[0][1] * m.m_col[2][2] - m.m_col[2][1] * m.m_col[0][2]) * oneOverDeterminant;
 			r.m_col[0][2] = +(m.m_col[0][1] * m.m_col[1][2] - m.m_col[1][1] * m.m_col[0][2]) * oneOverDeterminant;
 			r.m_col[1][0] = -(m.m_col[1][0] * m.m_col[2][2] - m.m_col[2][0] * m.m_col[1][2]) * oneOverDeterminant;
 			r.m_col[1][1] = +(m.m_col[0][0] * m.m_col[2][2] - m.m_col[2][0] * m.m_col[0][2]) * oneOverDeterminant;

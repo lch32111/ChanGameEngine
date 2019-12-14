@@ -11,16 +11,20 @@ namespace CGProj
 		class CGMat2
 		{
 		public:
-			CGMat3() { }
+			CGMat2() { }
+			
+			explicit CGMat2(Scalar s)
+				: m_col{ s, 0, 0, s } { }
+
 			explicit CGMat2(Scalar s00, Scalar s10, Scalar s01, Scalar s11)
-				: m_col[0]{ s00, s10}, m_col[1]{ s01, s11} { }
+				: m_col{ s00, s10, s01, s11} { }
 				
 			explicit CGMat2(const CGVector2<Scalar>& col1,
 				const CGVector2<Scalar>& col2)
 				: m_col{ col1, col2} { }
 
-			explicit CGMat2(const CGMat2<Scalar>& m)
-				: m_col{ m.m_col[0], m.m_col[1} { }
+			CGMat2(const CGMat2<Scalar>& m)
+				: m_col{ m.m_col[0], m.m_col[1] } { }
 
 			CGMat2<Scalar>& operator=(const CGMat2<Scalar>& m)
 			{
@@ -31,7 +35,7 @@ namespace CGProj
 
 			CGMat2<Scalar> operator-()
 			{
-				return CGMat3(-m_col[0], -m_col[1]);
+				return CGMat2<Scalar>(-m_col[0], -m_col[1]);
 			}
 
 			CGMat2<Scalar>& operator+=(const CGMat2<Scalar>& m)

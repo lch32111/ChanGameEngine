@@ -1,0 +1,27 @@
+﻿  CollisionTestBedDemo.cpp
+e:\###visual studio project folder###\visual studio 2017\projects\git cg chan\changameengine\cgimplementation\demo\collisiontestbeddemo.cpp(162): warning C4244: 'argument': conversion from 'unsigned int' to 'Scalar', possible loss of data
+          with
+          [
+              Scalar=CGScalar
+          ]
+e:\###visual studio project folder###\visual studio 2017\projects\git cg chan\changameengine\cgimplementation\demo\collisiontestbeddemo.cpp(163): warning C4244: 'argument': conversion from 'unsigned int' to 'Scalar', possible loss of data
+          with
+          [
+              Scalar=CGScalar
+          ]
+e:\###visual studio project folder###\visual studio 2017\projects\git cg chan\changameengine\cgimplementation\demo\collisiontestbeddemo.cpp(164): warning C4244: 'argument': conversion from 'unsigned int' to 'Scalar', possible loss of data
+          with
+          [
+              Scalar=CGScalar
+          ]
+e:\###visual studio project folder###\visual studio 2017\projects\git cg chan\changameengine\cgimplementation\demo\collisiontestbeddemo.cpp(165): warning C4244: 'argument': conversion from 'unsigned int' to 'Scalar', possible loss of data
+          with
+          [
+              Scalar=CGScalar
+          ]
+  Generating code
+  6 of 1776 functions ( 0.3%) were compiled, the rest were copied from previous compilation.
+    2 functions were new in current compilation
+    11 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  CGImplementation.vcxproj -> E:\###Visual Studio Project Folder###\Visual Studio 2017\Projects\Git CG chan\ChanGameEngine\Release\CGImplementation.exe

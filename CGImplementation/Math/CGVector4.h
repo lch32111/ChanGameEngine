@@ -13,7 +13,7 @@ namespace CGProj
 		public:
 			CGVector4() { }
 			explicit CGVector4(Scalar _x, Scalar _y, Scalar _z, Scalar _w) : m_value{ _x, _y,_z , _w} { }
-			explicit CGVector4(const CGVector4<Scalar>& v) : m_value{ v.m_value[0], v.m_value[1], v.m_value[2], v.m_value[3] } { }
+			CGVector4(const CGVector4<Scalar>& v) : m_value{ v.m_value[0], v.m_value[1], v.m_value[2], v.m_value[3] } { }
 
 			CGVector4<Scalar>& operator=(const CGVector4<Scalar>& v)
 			{
@@ -127,15 +127,15 @@ namespace CGProj
 				return *this;
 			}
 
-			Scalar operator[](unsigned i) const
+			template<typename indexType>
+			Scalar operator[](indexType i) const
 			{
-				CG_DEBUG_BREAK(i >= 0 && i <= 3);
 				return m_value[i];
 			}
 
-			Scalar& operator[](unsigned i)
+			template<typename indexType>
+			Scalar& operator[](indexType i)
 			{
-				CG_DEBUG_ASSERT(i >= 0 && i <= 3);
 				return m_value[i];
 			}
 

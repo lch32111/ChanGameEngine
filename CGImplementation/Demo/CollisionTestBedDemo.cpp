@@ -10,6 +10,8 @@
 
 #include <CollisionDetection/CGCollisionFunction.h>
 
+#include <GPED/GPED_random.h>
+
 /****************************************************************************************/
 /* ### Collision Demo ### */
 const char* CGProj::CollisionDemo::getTitle()
@@ -40,7 +42,7 @@ void CGProj::CollisionDemo::initImgui()
 
 void CGProj::CollisionDemo::setView()
 {
-
+	
 }
 
 void CGProj::CollisionDemo::deinit()
@@ -132,9 +134,117 @@ void CGProj::CollisionTestBed::initGraphics(int width, int height)
 	bSphere.m_pos = CGVec3(1.f, 1.f, 0.f);
 }
 
+template<typename Scalar>
+static inline bool isSame(const CGProj::Math::CGMat4<Scalar>& cm, const glm::mat4& gm)
+{
+	for (int i = 0; i < 4; ++i)
+	{
+		for(int j = 0; j < 4; ++j)
+			if (CGScalarUtil::abs(cm[i][j] - gm[i][j]) > CGScalarUtil::epsilon())
+			{
+				return false;
+			}
+	}
+	
+	return true;
+}
+
+template<typename Scalar>
+static inline bool isSame(const CGProj::Math::CGMat3<Scalar>& cm, const glm::mat3& gm)
+{
+	for (int i = 0; i < 3; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+			if (CGScalarUtil::abs(cm[i][j] - gm[i][j]) > CGScalarUtil::epsilon())
+			{
+				return false;
+			}
+	}
+
+	return true;
+}
+
+
 void CGProj::CollisionTestBed::initImgui()
 {
+	GPED::Random ran(20191215);
 
+	CGVec4 cv[4]; 
+	CGVec4 cv2[4];
+	CGVec3 cv3[3];
+	CGVec3 cv32[3];
+	for (int i = 0; i < 4; ++i)
+	{
+		cv[i] = CGVec4(ran.randomBits(), ran.randomBits(), ran.randomBits(), ran.randomBits());
+		cv2[i] = CGVec4(ran.randomBits(), ran.randomBits(), ran.randomBits(), ran.randomBits());
+		
+	}
+
+	for (int i = 0; i < 3; ++i)
+	{
+		cv3[i] = CGVec3(ran.randomBits(), ran.randomBits(), ran.randomBits());
+		cv32[i] = CGVec3(ran.randomBits(), ran.randomBits(), ran.randomBits());
+	}
+
+	CGMat4 cm(cv[0], cv[1], cv[2], cv[3]);
+	CGMat4 cm2(cv2[0], cv2[1], cv2[2], cv2[3]);
+	CGMat3 cm3(cv3[0], cv3[1], cv3[2]);
+	CGMat3 cm32(cv32[0], cv32[1], cv32[2]);
+	glm::mat4 gm, gm2;
+	glm::mat3 gm3, gm32;
+
+	size_t cgmat4 = sizeof(CGMat4);
+	size_t cgmat3 = sizeof(CGMat3);
+	memcpy(&gm, &cm, sizeof(CGMat4));
+	memcpy(&gm2, &cm2, sizeof(CGMat4));
+	memcpy(&gm3, &cm3, sizeof(CGMat3));
+	memcpy(&gm32, &cm32, sizeof(CGMat3));
+
+	CG_DEBUG_ASSERT(isSame(cm, gm));
+	CG_DEBUG_ASSERT(isSame(cm2, gm2));
+	std::cout.precision(25);
+
+	CGMat4 cr = cm * cm2;
+	glm::mat4 gr = gm * gm2;
+
+	CGMat3 cr3 = cm3 * cm32;
+	glm::mat3 gr3 = gm3 * gm32;
+
+	CG_DEBUG_ASSERT(isSame(cr, gr));
+	CG_DEBUG_ASSERT(isSame(cr3, gr3));
+	CG_DEBUG_ASSERT(isSame(CGProj::Math::Transpose(cr), glm::transpose(gr)));
+	CG_DEBUG_ASSERT(isSame(CGProj::Math::Transpose(cr3), glm::transpose(gr3)));
+
+	cv[0] = CGVec4( 5, 2, 6, 2 );
+	cv[1] = CGVec4(6, 2, 6, 3);
+	cv[2] = CGVec4(6, 2, 2, 6);
+	cv[3] = CGVec4(8, 8, 8, 7);
+	cm = CGMat4(cv->data());
+	for (int i = 0; i < 4; ++i)
+		for (int j = 0; j < 4; ++j)
+			gm[i][j] = cm[i][j];
+
+	cv3[0] = CGVec3(1, 2, 3);
+	cv3[1] = CGVec3(0, 1, 4);
+	cv3[2] = CGVec3(5, 6, 0);
+	cm3 = CGMat3(cv3->data());
+	memcpy(&gm3, &cm3, sizeof(CGMat3));
+
+	CGScalar cDet = CGProj::Math::Determinant(cm);
+	float gDet = glm::determinant(gm);
+	CG_DEBUG_ASSERT(CGScalarUtil::abs(cDet - gDet) < CGScalarUtil::epsilon());
+
+	CGScalar cDet3 = CGProj::Math::Determinant(cm3);
+	float gDet3 = glm::determinant(gm3);
+	CG_DEBUG_ASSERT(CGScalarUtil::abs(cDet3 - gDet3) < CGScalarUtil::epsilon());
+
+	CGMat4 inverseCR = CGProj::Math::Inverse(cm);
+	glm::mat4 inverseGR = glm::inverse(gm);
+	CG_DEBUG_ASSERT(isSame(inverseCR, inverseGR));
+
+	CGMat3 inverseCR3 = CGProj::Math::Inverse(cm3);
+	glm::mat3 inverseGR3 = glm::inverse(gm3);
+	CG_DEBUG_ASSERT(isSame(inverseCR3, inverseGR3));
 }
 
 void CGProj::CollisionTestBed::deinit()

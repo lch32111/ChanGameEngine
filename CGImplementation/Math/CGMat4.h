@@ -1,5 +1,5 @@
-#ifndef __CG_MAT3_H__
-#define __CG_MAT3_H__
+#ifndef __CG_MAT4_H__
+#define __CG_MAT4_H__
 
 #include <Math/CGVector4.h>
 
@@ -12,14 +12,17 @@ namespace CGProj
 		{
 		public:
 			CGMat4() { }
-			explicit CGMat4(Scalar s00, Scalar s10, Scalar s20, Scalar s30,
-				Scalar s01, Scalar s11, Scalar s21, Scalar s31,
-				Scalar s02, Scalar s12, Scalar s22, Scalar s32, 
-				Scalar s03, Scalar s13, Scalar s23, Scalar s33)
-				: m_col[0]{ s00, s10, s20, s30 },
-				m_col[1]{ s01, s11, s21, s31 },
-				m_col[2]{ s02, s12, s22, s32 },
-				m_col[3]{ s03, s13, s23, s33 } { }
+			
+			explicit CGMat4(Scalar s)
+				: m_col{ s, 0, 0, 0,
+				0, s, 0, 0, 
+				0, 0, s, 0, 
+				0, 0, 0, s} { }
+
+			explicit CGMat4(const Scalar* colMatArray)
+			{
+				memcpy(m_col->data(), colMatArray, sizeof(Scalar) * 16);
+			}
 
 			explicit CGMat4(const CGVector4<Scalar>& col1,
 				const CGVector4<Scalar>& col2,
@@ -27,8 +30,8 @@ namespace CGProj
 				const CGVector4<Scalar>& col4)
 				: m_col{ col1, col2, col3, col4 } { }
 
-			explicit CGMat4(const CGMat4<Scalar>& m)
-				: m_col{ m.m_col[0], m.m_col[1], m.m_col[2] } { }
+			CGMat4(const CGMat4<Scalar>& m)
+				: m_col{ m.m_col[0], m.m_col[1], m.m_col[2], m.m_col[3] } { }
 
 			CGMat4<Scalar>& operator=(const CGMat4<Scalar>& m)
 			{
@@ -222,8 +225,8 @@ namespace CGProj
 				return m_col[i];
 			}
 
-			Scalar* data() { return m_col; }
-			const Scalar* data() const { return m_col; }
+			Scalar* data() { return m_col->data(); }
+			const Scalar* data() const { return m_col->data(); }
 
 			CGVector4<Scalar> m_col[4];
 		};
@@ -257,78 +260,93 @@ namespace CGProj
 		template<typename Scalar>
 		inline CGMat4<Scalar> operator*(const CGMat4<Scalar>& a, const CGMat4<Scalar>& b)
 		{
-			const Scalar s00 = a.m_col[0][0] * b.m_col[0][0] +
+			CGMat4<Scalar> r;
+			
+			// 00
+			r.m_col[0][0] = a.m_col[0][0] * b.m_col[0][0] +
 				a.m_col[1][0] * b.m_col[0][1] +
 				a.m_col[2][0] * b.m_col[0][2] +
 				a.m_col[3][0] * b.m_col[0][3];
-			const Scalar s10 = a.m_col[0][1] * b.m_col[0][0] +
+			// 10
+			r.m_col[0][1] = a.m_col[0][1] * b.m_col[0][0] +
 				a.m_col[1][1] * b.m_col[0][1] +
 				a.m_col[2][1] * b.m_col[0][2] +
 				a.m_col[3][1] * b.m_col[0][3];
-			const Scalar s20 = a.m_col[0][2] * b.m_col[0][0] +
+			// 20
+			r.m_col[0][2] = a.m_col[0][2] * b.m_col[0][0] +
 				a.m_col[1][2] * b.m_col[0][1] +
 				a.m_col[2][2] * b.m_col[0][2] +
 				a.m_col[3][2] * b.m_col[0][3];
-			const Scalar s30 = a.m_col[0][3] * b.m_col[0][0] +
+			// 30
+			r.m_col[0][3] = a.m_col[0][3] * b.m_col[0][0] +
 				a.m_col[1][3] * b.m_col[0][1] +
 				a.m_col[2][3] * b.m_col[0][2] +
 				a.m_col[3][3] * b.m_col[0][3];
-
-			const Scalar s01 = a.m_col[0][0] * b.m_col[1][0] +
+			
+			// 01
+			r.m_col[1][0] = a.m_col[0][0] * b.m_col[1][0] +
 				a.m_col[1][0] * b.m_col[1][1] +
 				a.m_col[2][0] * b.m_col[1][2] +
 				a.m_col[3][0] * b.m_col[1][3];
-			const Scalar s11 = a.m_col[0][1] * b.m_col[1][0] +
+			// 11
+			r.m_col[1][1] = a.m_col[0][1] * b.m_col[1][0] +
 				a.m_col[1][1] * b.m_col[1][1] +
 				a.m_col[2][1] * b.m_col[1][2] +
 				a.m_col[3][1] * b.m_col[1][3];
-			const Scalar s21 = a.m_col[0][2] * b.m_col[1][0] +
+			// 21
+			r.m_col[1][2] = a.m_col[0][2] * b.m_col[1][0] +
 				a.m_col[1][2] * b.m_col[1][1] +
 				a.m_col[2][2] * b.m_col[1][2] +
 				a.m_col[3][2] * b.m_col[1][3];
-			const Scalar s31 = a.m_col[0][3] * b.m_col[1][0] +
+			// 31
+			r.m_col[1][3] = a.m_col[0][3] * b.m_col[1][0] +
 				a.m_col[1][3] * b.m_col[1][1] +
 				a.m_col[2][3] * b.m_col[1][2] +
 				a.m_col[3][3] * b.m_col[1][3];
 
-			const Scalar s02 = a.m_col[0][0] * b.m_col[2][0] +
+			// 02
+			r.m_col[2][0] = a.m_col[0][0] * b.m_col[2][0] +
 				a.m_col[1][0] * b.m_col[2][1] +
 				a.m_col[2][0] * b.m_col[2][2] +
-				a.m_col[3][0] * b.m_col[3][2];
-			const Scalar s12 = a.m_col[0][1] * b.m_col[2][0] +
+				a.m_col[3][0] * b.m_col[2][3];
+			// 12
+			r.m_col[2][1] = a.m_col[0][1] * b.m_col[2][0] +
 				a.m_col[1][1] * b.m_col[2][1] +
 				a.m_col[2][1] * b.m_col[2][2] +
 				a.m_col[3][1] * b.m_col[2][3];
-			const Scalar s22 = a.m_col[0][2] * b.m_col[2][0] +
+			// 22
+			r.m_col[2][2] = a.m_col[0][2] * b.m_col[2][0] +
 				a.m_col[1][2] * b.m_col[2][1] +
 				a.m_col[2][2] * b.m_col[2][2] +
 				a.m_col[3][2] * b.m_col[2][3];
-			const Scalar s32 = a.m_col[0][3] * b.m_col[2][0] +
+			// 32
+			r.m_col[2][3] = a.m_col[0][3] * b.m_col[2][0] +
 				a.m_col[1][3] * b.m_col[2][1] +
 				a.m_col[2][3] * b.m_col[2][2] +
 				a.m_col[3][3] * b.m_col[2][3];
 
-			const Scalar s03 = a.m_col[0][0] * b.m_col[3][0] +
+			// 03
+			r.m_col[3][0] = a.m_col[0][0] * b.m_col[3][0] +
 				a.m_col[1][0] * b.m_col[3][1] +
 				a.m_col[2][0] * b.m_col[3][2] +
 				a.m_col[3][0] * b.m_col[3][3];
-			const Scalar s13 = a.m_col[0][1] * b.m_col[3][0] +
+			// 13
+			r.m_col[3][1] = a.m_col[0][1] * b.m_col[3][0] +
 				a.m_col[1][1] * b.m_col[3][1] +
 				a.m_col[2][1] * b.m_col[3][2] +
 				a.m_col[3][1] * b.m_col[3][3];
-			const Scalar s23 = a.m_col[0][2] * b.m_col[3][0] +
+			// 23
+			r.m_col[3][2] = a.m_col[0][2] * b.m_col[3][0] +
 				a.m_col[1][2] * b.m_col[3][1] +
 				a.m_col[2][2] * b.m_col[3][2] +
 				a.m_col[3][2] * b.m_col[3][3];
-			const Scalar s33 = a.m_col[0][3] * b.m_col[3][0] +
+			// 33
+			r.m_col[3][3] = a.m_col[0][3] * b.m_col[3][0] +
 				a.m_col[1][3] * b.m_col[3][1] +
 				a.m_col[2][3] * b.m_col[3][2] +
 				a.m_col[3][3] * b.m_col[3][3];
 
-			return CGMat4<Scalar>(s00, s10, s20, s30,
-				s01, s11, s21, s31,
-				s02, s12 ,s22, s32,
-				s03, s13, s23, s33);
+			return r;
 		}
 
 		template<typename Scalar>
@@ -359,10 +377,24 @@ namespace CGProj
 		template<typename Scalar>
 		inline CGMat4<Scalar> Transpose(const CGMat4<Scalar>& m)
 		{
-			return CGMat4<Scalar>(m.m_col[0][0], m.m_col[1][0], m.m_col[2][0], m.m_col[3][0],
-				m.m_col[0][1], m.m_col[1][1], m.m_col[2][1], m.m_col[3][1],
-				m.m_col[0][2], m.m_col[1][2], m.m_col[2][2], m.m_col[3][2],
-				m.m_col[0][3], m.m_col[1][3], m.m_col[2][3], m.m_col[3][3]);
+			CGMat4<Scalar> r;
+			r.m_col[0][0] = m[0][0];
+			r.m_col[0][1] = m[1][0];
+			r.m_col[0][2] = m[2][0];
+			r.m_col[0][3] = m[3][0];
+			r.m_col[1][0] = m[0][1];
+			r.m_col[1][1] = m[1][1];
+			r.m_col[1][2] = m[2][1];
+			r.m_col[1][3] = m[3][1];
+			r.m_col[2][0] = m[0][2];
+			r.m_col[2][1] = m[1][2];
+			r.m_col[2][2] = m[2][2];
+			r.m_col[2][3] = m[3][2];
+			r.m_col[3][0] = m[0][3];
+			r.m_col[3][1] = m[1][3];
+			r.m_col[3][2] = m[2][3];
+			r.m_col[3][3] = m[3][3];
+			return r;
 		}
 
 		template<typename Scalar>
@@ -378,10 +410,10 @@ namespace CGProj
 			const Scalar A0223 = m[0][2] * m[2][3] - m[2][2] * m[0][3];
 			const Scalar A0123 = m[0][2] * m[1][3] - m[1][2] * m[0][3];
 
-			return m[0][0] * (m.m[1][1] * A2323 - m.m[2][1] * A1323 + m.m[3][1] * A1223)
-				- m[1][0] * (m.m[0][1] * A2323 - m.m[2][1] * A0323 + m.m[3][1] * A0223)
-				+ m[2][0] * (m.m[0][1] * A1323 - m.m[1][1] * A0323 + m.m[3][1] * A0123)
-				- m[3][0] * (m.m[0][1] * A1223 - m.m[1][1] * A0223 + m.m[2][1] * A0123);
+			return m[0][0] * (m[1][1] * A2323 - m[2][1] * A1323 + m[3][1] * A1223)
+				- m[1][0] * (m[0][1] * A2323 - m[2][1] * A0323 + m[3][1] * A0223)
+				+ m[2][0] * (m[0][1] * A1323 - m[1][1] * A0323 + m[3][1] * A0123)
+				- m[3][0] * (m[0][1] * A1223 - m[1][1] * A0223 + m[2][1] * A0123);
 		}
 
 		template<typename Scalar>
@@ -408,14 +440,14 @@ namespace CGProj
 			const Scalar A0212 = m[0][1] * m[2][2] - m[2][1] * m[0][2];
 			const Scalar A0113 = m[0][1] * m[1][3] - m[1][1] * m[0][3];
 			const Scalar A0112 = m[0][1] * m[1][2] - m[1][1] * m[0][2];
-
-			CGMat4<Scalar> r;
 			const Scalar oneOverDeterminant = static_cast<Scalar>(1) /
-				m[0][0] * (m.m[1][1] * A2323 - m.m[2][1] * A1323 + m.m[3][1] * A1223)
-				- m[1][0] * (m.m[0][1] * A2323 - m.m[2][1] * A0323 + m.m[3][1] * A0223)
-				+ m[2][0] * (m.m[0][1] * A1323 - m.m[1][1] * A0323 + m.m[3][1] * A0123)
-				- m[3][0] * (m.m[0][1] * A1223 - m.m[1][1] * A0223 + m.m[2][1] * A0123);
-
+				(
+					m[0][0] * (m[1][1] * A2323 - m[2][1] * A1323 + m[3][1] * A1223)
+					- m[1][0] * (m[0][1] * A2323 - m[2][1] * A0323 + m[3][1] * A0223)
+					+ m[2][0] * (m[0][1] * A1323 - m[1][1] * A0323 + m[3][1] * A0123)
+					- m[3][0] * (m[0][1] * A1223 - m[1][1] * A0223 + m[2][1] * A0123)
+				);
+			CGMat4<Scalar> r;
 			r[0][0] = (m[1][1] * A2323 - m[2][1] * A1323 + m[3][1] * A1223) * oneOverDeterminant;
 			r[0][1] = -(m[0][1] * A2323 - m[2][1] * A0323 + m[3][1] * A0223) * oneOverDeterminant;
 			r[0][2] = (m[0][1] * A1323 - m[1][1] * A0323 + m[3][1] * A0123) * oneOverDeterminant;

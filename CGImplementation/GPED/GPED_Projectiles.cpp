@@ -50,7 +50,7 @@ void GPEDProjectile::fire()
 
 	proj.particle.setPosition(0.f, 1.5f, 0.f);
 	proj.type = currentShotType;
-	proj.startTime = glfwGetTime();
+	proj.startTime = (unsigned int)glfwGetTime();
 
 	// Clear the force accumulators
 	proj.particle.clearAccumulator();

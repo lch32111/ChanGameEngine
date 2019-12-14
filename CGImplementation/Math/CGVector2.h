@@ -13,7 +13,7 @@ namespace CGProj
 		public:
 			CGVector2() { }
 			explicit CGVector2(Scalar _x, Scalar _y) : m_value{ _x, _y} { }
-			explicit CGVector2(const CGVector2<Scalar>& v) : m_value{ v.m_value[0], v.m_value[1] } { }
+			CGVector2(const CGVector2<Scalar>& v) : m_value{ v.m_value[0], v.m_value[1] } { }
 
 			CGVector2<Scalar>& operator=(const CGVector2<Scalar>& v)
 			{
@@ -109,15 +109,15 @@ namespace CGProj
 				return *this;
 			}
 
-			Scalar operator[](unsigned i) const
+			template<typename IndexType>
+			Scalar operator[](IndexType i) const
 			{
-				CG_DEBUG_BREAK(i >= 0 && i <= 1);
 				return m_value[i];
 			}
 
-			Scalar& operator[](unsigned i)
+			template<typename IndexType>
+			Scalar& operator[](IndexType i)
 			{
-				CG_DEBUG_ASSERT(i >= 0 && i <= 1);
 				return m_value[i];
 			}
 
@@ -130,13 +130,13 @@ namespace CGProj
 		template <typename Scalar>
 		inline CGVector2<Scalar> operator*(const CGVector2<Scalar>& v, const Scalar& scalar)
 		{
-			return CGVector3<Scalar>(v.m_value[0] * scalar, v.m_value[1] * scalar);
+			return CGVector2<Scalar>(v.m_value[0] * scalar, v.m_value[1] * scalar);
 		}
 
 		template <typename Scalar>
 		inline CGVector2<Scalar> operator*(const Scalar& scalar, const CGVector2<Scalar>& v)
 		{
-			return CGVector3<Scalar>(scalar * v.m_value[0], scalar * v.m_value[1]);
+			return CGVector2<Scalar>(scalar * v.m_value[0], scalar * v.m_value[1]);
 		}
 
 		template <typename Scalar>

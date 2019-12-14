@@ -590,6 +590,15 @@
     <ClInclude Include="Demo\CollisionTestBedDemo.h">
       <Filter>Demo\CollisionDetection Demo\CDFirstExperiment</Filter>
     </ClInclude>
+    <ClInclude Include="Math\CGVector4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\CGVector2.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\CGMat2.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderFolder\DeferredFirst.fs">

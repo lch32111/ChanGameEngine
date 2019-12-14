@@ -12,7 +12,8 @@ namespace CGProj
 		{
 		public:
 			CGVector3() { }
-			CGVector3(Scalar _x, Scalar _y, Scalar _z) : m_value{ _x, _y,_z } { }
+			explicit CGVector3(Scalar _x, Scalar _y, Scalar _z) : m_value{ _x, _y,_z } { }
+			explicit CGVector3(const CGVector3<Scalar>& v) : m_value{v.m_value[0], v.m_value[1], v.m_value[2] } { }
 
 			CGVector3<Scalar>& operator=(const CGVector3<Scalar>& v)
 			{
@@ -27,43 +28,105 @@ namespace CGProj
 				return CGVector3<Scalar>(-m_value[0], -m_value[1], -m_value[2]);
 			}
 
-			void operator +=(const CGVector3<Scalar>& v)
+			CGVector3<Scalar>& operator +=(const CGVector3<Scalar>& v)
 			{
 				m_value[0] += v.m_value[0];
 				m_value[1] += v.m_value[1];
 				m_value[2] += v.m_value[2];
+				return *this;
 			}
 
-			void operator -=(const CGVector3<Scalar>& v)
+			CGVector3<Scalar>& operator -=(const CGVector3<Scalar>& v)
 			{
 				m_value[0] -= v.m_value[0];
 				m_value[1] -= v.m_value[1];
 				m_value[2] -= v.m_value[2];
+				return *this;
 			}
 
-			void operator *=(const CGVector3<Scalar>& v)
+			CGVector3<Scalar>& operator *=(const CGVector3<Scalar>& v)
 			{
 				m_value[0] *= v.m_value[0];
 				m_value[1] *= v.m_value[1];
 				m_value[2] *= v.m_value[2];
+				return *this;
 			}
 
-			void operator /=(const CGVector3<Scalar>& v)
+			CGVector3<Scalar>& operator /=(const CGVector3<Scalar>& v)
 			{
 				m_value[0] /= v.m_value[0];
 				m_value[1] /= v.m_value[1];
 				m_value[2] /= v.m_value[2];
+				return *this;
+			}
+
+			CGVector3<Scalar>& operator +=(Scalar s)
+			{
+				m_value[0] += s;
+				m_value[1] += s;
+				m_value[2] += s;
+				return *this;
+			}
+
+			CGVector3<Scalar>& operator -=(Scalar s)
+			{
+				m_value[0] -= s;
+				m_value[1] -= s;
+				m_value[2] -= s;
+				return *this;
+			}
+
+			CGVector3<Scalar>& operator *=(Scalar s)
+			{
+				m_value[0] *= s;
+				m_value[1] *= s;
+				m_value[2] *= s;
+				return *this;
+			}
+
+			CGVector3<Scalar>& operator /=(Scalar s)
+			{
+				m_value[0] /= s;
+				m_value[1] /= s;
+				m_value[2] /= s;
+				return *this;
+			}
+
+			CGVector3<Scalar>& operator++()
+			{
+				++m_value[0]; ++m_value[1]; ++m_value[2];
+				return *this;
+			}
+
+			CGVector3<Scalar>& operator--()
+			{
+				--m_value[0]; --m_value[1]; --m_value[2];
+				return *this;
+			}
+
+			CGVector3<Scalar> operator++(int) // postfix
+			{
+				CGVector3<Scalar> r(*this);
+				++m_value[0]; ++m_value[1]; ++m_value[2];
+				return *this;
+			}
+
+			CGVector3<Scalar> operator--(int) // postfix
+			{
+				CGVector3<Scalar> r(*this);
+				--m_value[0]; --m_value[1]; --m_value[2];
+				return *this;
 			}
 
 			Scalar operator[](unsigned i) const
 			{
-				CG_DEBUG_BREAK(i >= 0 && i < 2);
+				CG_DEBUG_BREAK(i >= 0 && i <= 2);
 				return m_value[i];
 			}
 
 			Scalar& operator[](unsigned i)
 			{
-				CG_DEBUG_ASSERT(i >= 0 && i < 2);
+				CG_DEBUG_ASSERT(i >= 0 && i <= 2);
 				return m_value[i];
 			}
 
@@ -110,15 +173,45 @@ namespace CGProj
 		}
 
 		template <typename Scalar>
+		inline bool operator==(const CGVector3<Scalar> &a, const CGVector3<Scalar>& b)
+		{
+			return a.m_value[0] == b.m_value[0] &&
+				a.m_value[1] == b.m_value[1] &&
+				a.m_value[2] == b.m_value[2];
+		}
+
+		template <typename Scalar>
+		inline bool operator!=(const CGVector3<Scalar> &a, const CGVector3<Scalar>& b)
+		{
+			return a.m_value[0] != b.m_value[0] ||
+				a.m_value[1] != b.m_value[1] ||
+				a.m_value[2] != b.m_value[2];
+		}
+
+		template <typename Scalar>
 		inline Scalar Dot(const CGVector3<Scalar>& a, const CGVector3<Scalar>& b)
 		{
 			return a.m_value[0] * b.m_value[0] + a.m_value[1] * b.m_value[1] + a.m_value[2] * b.m_value[2];
 		}
 
 		template <typename Scalar>
+		inline CGVector3<Scalar> Cross(const CGVector3<Scalar>& a, const CGVector3<Scalar>& b)
+		{
+			return CGVector3<Scalar>(a.m_value[1] * b.m_value[2] - a.m_value[2] * b.m_value[1],
+				a.m_value[2] * b.m_value[0] - a.m_value[0] * b.m_value[2],
+				a.m_value[0] * b.m_value[1] - a.m_value[1] * b.m_value[0]);
+		}
+
+		template <typename Scalar>
 		inline Scalar Length(const CGVector3<Scalar>& v)
 		{
 			return Scalar_traits<Scalar>::sqrt(v.m_value[0] * v.m_value[0] + v.m_value[1] * v.m_value[1] + v.m_value[2] * v.m_value[2]);
+		}
+
+		template<typename Scalar>
+		inline Scalar Distance(const CGVector3<Scalar>& a, const CGVector3<Scalar>& b)
+		{
+			return Length(a - b);
 		}
 
 		template <typename Scalar>

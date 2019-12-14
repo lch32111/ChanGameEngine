@@ -285,11 +285,14 @@
     <ClInclude Include="Imgui\imstb_rectpack.h" />
     <ClInclude Include="Imgui\imstb_textedit.h" />
     <ClInclude Include="Imgui\imstb_truetype.h" />
+    <ClInclude Include="Math\CGMat2.h" />
     <ClInclude Include="Math\CGMat3.h" />
     <ClInclude Include="Math\CGMat4.h" />
     <ClInclude Include="Math\CGMathConfig.h" />
     <ClInclude Include="Math\CGMathHeader.h" />
+    <ClInclude Include="Math\CGVector2.h" />
     <ClInclude Include="Math\CGVector3.h" />
+    <ClInclude Include="Math\CGVector4.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Terrain\CGPerlinNoise.h" />
     <ClInclude Include="Terrain\CGTerrain.h" />

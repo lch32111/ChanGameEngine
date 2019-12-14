@@ -1,9 +1,10 @@
 # Don't Include .vs Folder, since the size of the folder will be large
 .vs/  
 
-# Don't Include Debug Folder, It's not appropriate to share
+# Don't Include Debug/Resource Folder, It's not appropriate to share
 # The 'Debug/' will ignore Root/Debug/ and also Root/CGImplementation/Debug
 Debug/
+Release/
 
 # Don't Include Resource Folder
 # Don't Include Image Folder. We will share the design resources on other platform

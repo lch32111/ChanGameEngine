@@ -62,6 +62,7 @@ namespace CGProj
 		bool mouseClick = false;
 
 		bool isSphereCollided = false;
+		CollisionDetection::CGCollisionContact sphereContact;
 		CollisionDetection::CGCollisionSphere aSphere;
 		CollisionDetection::CGCollisionSphere bSphere;
 	};

@@ -7,6 +7,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <Graphics/Shader.h>
+#include <Math/CGVector3.h>
+#include <Math/CGVector4.h>
 
 namespace CGProj
 {
@@ -20,6 +22,9 @@ namespace CGProj
 		CGSizableRenderLine(CGAssetManager& am, unsigned maxLineNumb);
 		void initialize(Shader* shader, unsigned maxLineNumb);
 		void destroy();
+
+		void insertLine(const Math::CGVector3<float>& From, const Math::CGVector3<float>& To,
+			const Math::CGVector4<float>& Color = Math::CGVector4<float>(1.0));
 
 		void insertLine(const glm::vec3& From, const glm::vec3& To,
 			const glm::vec4& Color = glm::vec4(1.0));

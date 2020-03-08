@@ -48,6 +48,19 @@ void CGProj::CGSizableRenderLine::destroy()
 	glDeleteBuffers(2, m_VBO);
 }
 
+void CGProj::CGSizableRenderLine::insertLine(const Math::CGVector3<float>& From, const Math::CGVector3<float>& To, const Math::CGVector4<float>& Color)
+{
+	assert(m_count < m_bufferSize);
+	m_vertices[m_count] = glm::vec3(From.m_value[0], From.m_value[1], From.m_value[2]);
+	m_colors[m_count] = glm::vec4(Color[0], Color[1], Color[2], Color[3]);
+	++m_count;
+
+	assert(m_count < m_bufferSize);
+	m_vertices[m_count] = glm::vec3(To[0], To[1], To[2]);
+	m_colors[m_count] = glm::vec4(Color[0], Color[1], Color[2], Color[3]);
+	++m_count;
+}
+
 void CGProj::CGSizableRenderLine::insertLine(const glm::vec3 & From, const glm::vec3 & To, const glm::vec4 & Color)
 {
 	assert(m_count < m_bufferSize);

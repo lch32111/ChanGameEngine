@@ -10,6 +10,7 @@ namespace CGProj
 	namespace CollisionDetection
 	{
 		bool intersect(const CGCollisionSphere& a, const CGCollisionSphere& b);
+		bool intersect(const CGCollisionSphere& a, const CGCollisionSphere& b, CGCollisionContact& c);
 
 		bool intersect(const CGCollisionSphere& sphere, const CGCollisionRay& ray);
 

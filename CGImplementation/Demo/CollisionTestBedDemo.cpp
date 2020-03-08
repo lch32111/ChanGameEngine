@@ -12,6 +12,8 @@
 
 #include <GPED/GPED_random.h>
 
+using namespace CGProj::CollisionDetection;
+
 /****************************************************************************************/
 /* ### Collision Demo ### */
 const char* CGProj::CollisionDemo::getTitle()
@@ -99,6 +101,7 @@ void CGProj::CollisionDemo::resize(int width, int height)
 static CGProj::CGAssetManager s_AssetManager;
 static CGProj::Shader* s_simpleColorShader;
 static CGProj::CGSizableRenderLine* gridRenderer;
+static CGProj::CGSizableRenderLine* AllLineRenderer;
 void CGProj::CollisionTestBed::initGraphics(int width, int height)
 {
 	s_AssetManager.assetInit();
@@ -125,7 +128,9 @@ void CGProj::CollisionTestBed::initGraphics(int width, int height)
 		// horizontal
 		gridRenderer->insertLine(glm::vec3(gridLeft, gridY, i), glm::vec3(gridRight, gridY, i), lineColor);
 	}
-	
+
+	AllLineRenderer = new CGSizableRenderLine(s_AssetManager, 300);
+	AllLineRenderer->setFlush(true);
 
 	aSphere.m_radius = 1.0f;
 	aSphere.m_pos = CGVec3(-1.f, 1.f, 0.f);
@@ -134,127 +139,9 @@ void CGProj::CollisionTestBed::initGraphics(int width, int height)
 	bSphere.m_pos = CGVec3(1.f, 1.f, 0.f);
 }
 
-template<typename Scalar>
-static inline bool isSame(const CGProj::Math::CGMat4<Scalar>& cm, const glm::mat4& gm)
-{
-	for (int i = 0; i < 4; ++i)
-	{
-		for(int j = 0; j < 4; ++j)
-			if (CGScalarUtil::abs(cm[i][j] - gm[i][j]) > CGScalarUtil::epsilon())
-			{
-				return false;
-			}
-	}
-	
-	return true;
-}
-
-template<typename Scalar>
-static inline bool isSame(const CGProj::Math::CGMat3<Scalar>& cm, const glm::mat3& gm)
-{
-	for (int i = 0; i < 3; ++i)
-	{
-		for (int j = 0; j < 3; ++j)
-			if (CGScalarUtil::abs(cm[i][j] - gm[i][j]) > CGScalarUtil::epsilon())
-			{
-				return false;
-			}
-	}
-
-	return true;
-}
-
-
 void CGProj::CollisionTestBed::initImgui()
 {
-	std::cout.precision(30);
-	GPED::Random ran(20191215);
-	const int TEST_NUMB = 2000;
-	CGMat4 tCGMat4[TEST_NUMB];
-	CGMat4 tOppositeCGMat4[TEST_NUMB];
-	glm::mat4 gMat4[TEST_NUMB];
-	glm::mat4 gOppositeMat4[TEST_NUMB];
-	for (int i = 0; i < TEST_NUMB; ++i)
-	{
-		CGScalar s[16];
-		CGScalar s2[16];
-		for (int j = 0; j < 16; ++j)
-		{
-			s[j] = ran.randomReal(-10, 10);
-			s2[j] = ran.randomReal(-10, 10);;
-		}
-
-		memcpy(&tCGMat4[i], s, sizeof(CGMat4));
-		memcpy(&gMat4[i], s, sizeof(CGMat4));
-		memcpy(&tOppositeCGMat4[i], s2, sizeof(CGMat4));
-		memcpy(&gOppositeMat4[i], s2, sizeof(CGMat4));
-	}
-
-	CGMat4 tCGMat4R[TEST_NUMB];
-
-	double startT = glfwGetTime();
-	for (int i = 0; i < TEST_NUMB; ++i)
-	{
-		tCGMat4R[i] = tCGMat4[i] * tOppositeCGMat4[i];
-	}
-	double endT = glfwGetTime();
-	double term = (endT - startT);
-	std::cout << "my * : " << term << '\n';
-
-	glm::mat4 gMat4R[TEST_NUMB];
 	
-	startT = glfwGetTime();
-	for (int i = 0; i < TEST_NUMB; ++i)
-	{
-		gMat4R[i] = gMat4[i] * gOppositeMat4[i];
-	}
-	endT = glfwGetTime();
-	term = (endT - startT);
-	std::cout << "glm * : " << term << '\n';
-
-	CGScalar tCGDetV[TEST_NUMB];
-	CGScalar tCGDetV2[TEST_NUMB];
-	startT = glfwGetTime();
-	for (int i = 0; i < TEST_NUMB; ++i)
-	{
-		tCGDetV[i] = CGProj::Math::Determinant(tCGMat4[i]);
-		tCGDetV2[i] = CGProj::Math::Determinant(tOppositeCGMat4[i]);
-	}
-	endT = glfwGetTime();
-	term = (endT - startT);
-	std::cout << "my det : " << term << '\n';
-
-	float gDetV[TEST_NUMB];
-	float gDetV2[TEST_NUMB];
-	startT = glfwGetTime();
-	for (int i = 0; i < TEST_NUMB; ++i)
-	{
-		gDetV[i] = glm::determinant(gMat4[i]);
-		gDetV2[i] = glm::determinant(gOppositeMat4[i]);
-	}
-	endT = glfwGetTime();
-	term = (endT - startT);
-	std::cout << "glm det : " << term << '\n';
-
-	startT = glfwGetTime();
-	for (int i = 0; i < TEST_NUMB; ++i)
-	{
-		tCGMat4R[i] = CGProj::Math::Inverse(tCGMat4[i]);
-		tCGMat4R[i] = CGProj::Math::Inverse(tOppositeCGMat4[i]);
-	}
-	endT = glfwGetTime();
-	term = (endT - startT);
-	std::cout << "my Inverse : " << term << '\n';
-
-	startT = glfwGetTime();
-	for (int i = 0; i < TEST_NUMB; ++i)
-	{
-		gMat4R[i] = glm::inverse(gMat4[i]);
-		gMat4R[i] = glm::inverse(gOppositeMat4[i]);
-	}
-	endT = glfwGetTime();
-	term = (endT - startT);
-	std::cout << "glm Inverse : " << term << '\n';
 }
 
 void CGProj::CollisionTestBed::deinit()
@@ -281,7 +168,7 @@ void CGProj::CollisionTestBed::updateImgui()
 
 void CGProj::CollisionTestBed::updateSimulation(float dletaTime, float lastTime)
 {
-	isSphereCollided = CollisionDetection::intersect(aSphere, bSphere);
+	isSphereCollided = CollisionDetection::intersect(aSphere, bSphere, sphereContact);
 }
 
 void CGProj::CollisionTestBed::display(int width, int height)
@@ -334,6 +221,15 @@ void CGProj::CollisionTestBed::display(int width, int height)
 			s_simpleColorShader->setVec3("Color", color);
 		}
 		renderSphere();
+
+		// Sphere Contact
+		{
+			if (isSphereCollided)
+			{
+				AllLineRenderer->insertLine(aSphere.m_pos, sphereContact.position, CGVec4(0.2f, 0.765f, 0.432f, 1.f));
+				AllLineRenderer->renderLine(view, projection);
+			}
+		}
 
 		// render grid
 		gridRenderer->renderLine(view, projection);

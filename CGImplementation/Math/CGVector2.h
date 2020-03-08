@@ -13,6 +13,7 @@ namespace CGProj
 		public:
 			CGVector2() { }
 			explicit CGVector2(Scalar _x, Scalar _y) : m_value{ _x, _y} { }
+			explicit CGVector2(Scalar fill) : m_value{ fill, fill } { }
 			CGVector2(const CGVector2<Scalar>& v) : m_value{ v.m_value[0], v.m_value[1] } { }
 
 			CGVector2<Scalar>& operator=(const CGVector2<Scalar>& v)

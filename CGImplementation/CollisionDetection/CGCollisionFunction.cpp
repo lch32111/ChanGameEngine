@@ -16,12 +16,29 @@ bool CGProj::CollisionDetection::intersect(const CGCollisionSphere& a, const CGC
 	CGVec3 ba = a.m_pos - b.m_pos;
 	CGScalar radiSum = a.m_radius + b.m_radius;
 
-	float sqDistance = (radiSum * radiSum) - Dot(ba, ba);
-	if (sqDistance < CGScalar(0.0)) return false;
-		
-	c.penetration = CGScalarUtil::sqrt(sqDistance);
-	c.normal = Math::Normalize(ba);
-	c.position = b.m_pos + c.normal * c.penetration;
+	CGScalar sqDist = Dot(ba, ba);
+	CGScalar sqRadisum = radiSum * radiSum;
+	if (sqDist > sqRadisum) return false;
+	
+	// for concentric spheres
+	if (sqDist < CGScalarUtil::epsilon())
+	{
+		ba = CGVec3(CGScalar(1.0), CGScalar(0.0), CGScalar(0.0));
+		sqDist = CGScalar(1.0);
+
+		c.penetration = 0;
+		c.normal = ba;
+	}
+	// for normal case
+	else
+	{
+		sqDist = CGScalarUtil::sqrt(sqDist);
+		c.penetration = radiSum - sqDist;
+		c.normal = ba * (CGScalar(1.0) / sqDist);
+	}
+	
+	c.position = a.m_pos - c.normal * a.m_radius; // The witness point of Sphere A
+
 	return true;
 }
 

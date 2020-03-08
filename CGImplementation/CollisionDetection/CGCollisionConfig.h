@@ -45,7 +45,7 @@ namespace CGProj
 
 		struct CGCollisionContact
 		{
-			float penetration;
+			CGScalar penetration;
 			CGVec3 normal;
 			CGVec3 position;
 		};

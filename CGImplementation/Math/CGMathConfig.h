@@ -62,6 +62,18 @@ namespace CGProj
 		static double log(double x) { return ::log(x); }
 		static double pow(double x, double y) { return ::pow(x, y); }
 	};
+
+	template<typename T>
+	T Max(const T& A, const T& B)
+	{
+		return A > B ? A : B;
+	}
+
+	template<typename T>
+	T Min(const T& A, const T& B)
+	{
+		return A < B ? A : B;
+	}
 }
 
 #endif

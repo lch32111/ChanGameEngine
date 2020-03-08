@@ -44,14 +44,34 @@ bool CGProj::CollisionDetection::intersect(const CGCollisionSphere& a, const CGC
 
 // Collision Detection in Interactive 3D Environments by Gino van den Bergen
 // From Section 3.1.2
-// x = s + a * r
-// norm(x) = radius
 bool CGProj::CollisionDetection::intersect(const CGCollisionSphere& sphere, const CGCollisionRay& ray)
 {
-	CGVec3 r = ray.m_target - ray.m_source;
-	CGScalar r_length2 = Dot(r, r);
+	// Translate Ray into the sphere local space;
+	CGCollisionRay tRay;
+	tRay.m_source = ray.m_source - sphere.m_pos;
+	tRay.m_target = ray.m_target - sphere.m_pos;
 
-	return true;
+	// Then Calculate the early exit for ray-sphere intersection
+	CGScalar sourceSqLength = Dot(tRay.m_source, tRay.m_source);
+	CGVec3 r = tRay.m_target - tRay.m_source;
+	CGScalar rSqLength = Dot(r, r);
+
+	CGScalar projectedLength = Dot(tRay.m_source, r);
+
+	CGScalar EarlyExit = projectedLength * projectedLength -
+		rSqLength * rSqLength * (sourceSqLength * sourceSqLength - sphere.m_radius * sphere.m_radius);
+
+	if (EarlyExit < 0) return false;
+
+	CGScalar lambdaEnter = (-projectedLength - CGScalarUtil::sqrt(EarlyExit)) / (rSqLength * rSqLength);
+	CGScalar lambdaExit = (-projectedLength + CGScalarUtil::sqrt(EarlyExit)) / (rSqLength * rSqLength);
+
+	if (lambdaEnter <= CGScalar(1.0) && lambdaExit >= CGScalar(0.0))
+	{
+		return true;
+	}
+
+	return false;
 }
 
 bool CGProj::CollisionDetection::intersect(const CGCollisionSphere& sphere, const CGCollisionLineSegment& segment)

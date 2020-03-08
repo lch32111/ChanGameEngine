@@ -43,6 +43,7 @@ namespace CGProj
 		typedef CGProj::Math::CGMat4<CGDScalar> CGDMat4;
 		typedef CGProj::Scalar_traits<CGDScalar> CGDScalarUtil;
 
+		// TODO : do more progresses Collision Contact Info
 		struct CGCollisionContact
 		{
 			CGScalar penetration;

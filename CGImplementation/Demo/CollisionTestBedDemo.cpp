@@ -11,6 +11,7 @@
 #include <CollisionDetection/CGCollisionFunction.h>
 
 #include <GPED/GPED_random.h>
+#include <GPED/CGPhysicsUtil.h>
 
 using namespace CGProj::CollisionDetection;
 
@@ -199,6 +200,10 @@ void CGProj::CollisionTestBed::display(int width, int height)
 			if (isSphereCollided)
 				color = glm::vec3(0.5, 0.5, 0.5);
 
+			if (isRaySphereCollided)
+				color = glm::vec3(0.32, 0.112, 0.78);
+
+
 			s_simpleColorShader->setMat4("model", modelA);
 			s_simpleColorShader->setVec3("Color", color);
 		}
@@ -341,6 +346,15 @@ void CGProj::CollisionTestBed::mouseButton(GLFWwindow * app_window,
 			glfwGetCursorPos(app_window, &x, &y);
 
 			// TODO : Ray Casting Collision Detection
+			glm::vec3 rayFrom = camera.Position;
+			glm::vec3 rayTo = GetRayTo((int)x, (int)y, &camera, screen_width, screen_height);
+			rayTo /= 10.f;
+
+			CGCollisionRay r;
+			r.m_source = CGVec3(rayFrom.x, rayFrom.y, rayFrom.z);
+			r.m_target = CGVec3(rayTo.x, rayTo.y, rayTo.z);
+
+			isRaySphereCollided = CollisionDetection::intersect(aSphere, r);
 		}
 	}
 

@@ -53,17 +53,21 @@ bool CGProj::CollisionDetection::intersect(const CGCollisionSphere& sphere, cons
 
 	// Then Calculate the early exit for ray-sphere intersection
 	CGScalar sourceSqLength = Dot(tRay.m_source, tRay.m_source);
-	CGVec3 r = tRay.m_target - tRay.m_source;
+	CGVec3 r = tRay.m_target - tRay.m_source;	
 	CGScalar rSqLength = Dot(r, r);
 
 	CGScalar projectedLength = Dot(tRay.m_source, r);
 
 	CGScalar EarlyExit = projectedLength * projectedLength -
-		rSqLength * rSqLength * (sourceSqLength * sourceSqLength - sphere.m_radius * sphere.m_radius);
+		rSqLength * (sourceSqLength - sphere.m_radius * sphere.m_radius);
 
-	if (EarlyExit < 0) return false;
+	if (EarlyExit >= 0)
+		return true;
 
+	// entry point is max(lambdaEnter, 0)
 	CGScalar lambdaEnter = (-projectedLength - CGScalarUtil::sqrt(EarlyExit)) / (rSqLength * rSqLength);
+	
+	// exit point is min(lambdaExit, 1)
 	CGScalar lambdaExit = (-projectedLength + CGScalarUtil::sqrt(EarlyExit)) / (rSqLength * rSqLength);
 
 	if (lambdaEnter <= CGScalar(1.0) && lambdaExit >= CGScalar(0.0))

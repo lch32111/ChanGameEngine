@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "GPED_Fireworks.h"
 #include <glad/glad.h>
 using namespace GPED;

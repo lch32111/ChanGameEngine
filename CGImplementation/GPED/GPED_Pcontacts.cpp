@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "GPED_Pcontacts.h"
 using namespace GPED;
 

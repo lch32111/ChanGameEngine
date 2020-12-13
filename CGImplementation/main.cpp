@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "CG_Application.h"
 #include <Imgui/imgui_impl_glfw.h>
 

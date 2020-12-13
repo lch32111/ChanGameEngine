@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "GPED_random.h"
 #include <cstdlib>
 #include <ctime>

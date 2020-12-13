@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <Graphics/CGRenderLine.h>
 
 #include <Graphics/CGAssetManager.h>

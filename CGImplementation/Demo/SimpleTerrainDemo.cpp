@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "SimpleTerrainDemo.h"
 
 #include <Imgui/imgui.h>

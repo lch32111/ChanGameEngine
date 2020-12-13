@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "GPED_ContactResolver.h"
 
 GPED::ContactResolver::ContactResolver()

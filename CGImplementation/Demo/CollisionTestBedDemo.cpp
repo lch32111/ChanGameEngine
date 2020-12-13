@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "CollisionTestBedDemo.h"
 
 #include <string>

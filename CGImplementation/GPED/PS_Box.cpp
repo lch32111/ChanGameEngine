@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "PS_Box.h"
 
 void Box::setState(GPED::real x, GPED::real y, GPED::real z)

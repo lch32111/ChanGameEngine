@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <Graphics/CGBloomEffect.h>
 
 #include <CGErrorLogger.h>

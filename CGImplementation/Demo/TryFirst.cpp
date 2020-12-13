@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "TryFirst.h"
 
 #include <vector>

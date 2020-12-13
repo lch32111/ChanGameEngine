@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "PS_AmmoRound.h"
 #include <GLFW/glfw3.h>
 #include <vector>

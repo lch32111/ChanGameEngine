@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <Graphics/CGEditDirLight.h>
 
 #include <Imgui/imgui.h>

@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <GPED/CGContactManager.h>
 #include "CGContactManager.h"
 

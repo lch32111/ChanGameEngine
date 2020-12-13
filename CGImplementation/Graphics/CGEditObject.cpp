@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <Graphics/CGEditObject.h>
 #include <Graphics/GLPrimitiveUtil.h>
 #include <Graphics/CGAssetManager.h>

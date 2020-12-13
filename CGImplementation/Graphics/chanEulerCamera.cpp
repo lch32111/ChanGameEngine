@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "chanEulerCamera.h"
 
 chanEulerCamera::chanEulerCamera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)

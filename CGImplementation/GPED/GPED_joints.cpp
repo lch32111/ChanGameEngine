@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "GPED_joints.h"
 using namespace GPED;
 

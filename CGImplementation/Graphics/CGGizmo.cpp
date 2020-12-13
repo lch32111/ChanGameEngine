@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <Graphics/CGGizmo.h>
 
 #include <Graphics/chanQuatCamera.h>

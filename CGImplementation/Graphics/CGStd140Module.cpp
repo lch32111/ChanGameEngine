@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <Graphics/CGStd140Module.h>
 
 #include <glm/gtc/type_ptr.hpp>

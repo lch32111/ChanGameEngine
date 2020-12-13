@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "GPED_world.h"
 using namespace GPED;
 

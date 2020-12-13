@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "GPED_Projectiles.h"
 #include <GLFW/glfw3.h>
 

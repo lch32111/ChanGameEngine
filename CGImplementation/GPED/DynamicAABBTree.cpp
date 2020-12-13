@@ -1,4 +1,6 @@
+#include <CGPrecompiled.h>
 #include "DynamicAABBTree.h"
+#include <Math/CGMathConfig.h>
 
 CGProj::DynamicAABBTree::DynamicAABBTree()
 {
@@ -330,7 +332,7 @@ void CGProj::DynamicAABBTree::InsertLeaf(int leaf)
 		assert(left != Node_Null);
 		assert(right != Node_Null);
 
-		m_nodes[index].height = 1 + GPED::rMax(m_nodes[left].height, m_nodes[right].height);
+		m_nodes[index].height = 1 + CGProj::Max(m_nodes[left].height, m_nodes[right].height);
 		m_nodes[index].aabb.Combine(m_nodes[left].aabb, m_nodes[right].aabb);
 
 		index = m_nodes[index].parent;
@@ -377,7 +379,7 @@ void CGProj::DynamicAABBTree::RemoveLeaf(int leaf)
 			int right = m_nodes[index].right;
 
 			m_nodes[index].aabb.Combine(m_nodes[left].aabb, m_nodes[right].aabb);
-			m_nodes[index].height = 1 + GPED::rMax(m_nodes[left].height, m_nodes[right].height);
+			m_nodes[index].height = 1 + CGProj::Max(m_nodes[left].height, m_nodes[right].height);
 
 			index = m_nodes[index].parent;
 		}
@@ -478,7 +480,7 @@ void CGProj::DynamicAABBTree::ValidateMetrics(int index) const
 	int height1 = m_nodes[left].height;
 	int height2 = m_nodes[right].height;
 	int height;
-	height = 1 + GPED::rMax(height1, height2);
+	height = 1 + CGProj::Max(height1, height2);
 	assert(node->height == height);
 
 	GPED::c3AABB aabb;
@@ -491,7 +493,7 @@ void CGProj::DynamicAABBTree::ValidateMetrics(int index) const
 	ValidateMetrics(right);
 }
 
-GPED::real CGProj::DynamicAABBTree::ComputeHeight(int nodeId) const
+s32 CGProj::DynamicAABBTree::ComputeHeight(int nodeId) const
 {
 	assert(0 <= nodeId && nodeId < m_nodeCapacity);
 	TreeNode* node = m_nodes + nodeId;
@@ -501,13 +503,13 @@ GPED::real CGProj::DynamicAABBTree::ComputeHeight(int nodeId) const
 		return 0;
 	}
 
-	int height1 = ComputeHeight(node->left);
-	int height2 = ComputeHeight(node->right);
-	return 1 + GPED::rMax(height1, height2);
+	s32 height1 = ComputeHeight(node->left);
+	s32 height2 = ComputeHeight(node->right);
+	return 1 + CGProj::Max(height1, height2);
 }
 
-int CGProj::DynamicAABBTree::ComputeHeight() const
+s32 CGProj::DynamicAABBTree::ComputeHeight() const
 {
-	int height = ComputeHeight(m_root);
+	s32 height = ComputeHeight(m_root);
 	return height;
 }

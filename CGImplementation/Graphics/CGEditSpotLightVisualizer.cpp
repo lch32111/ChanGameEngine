@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <Graphics/CGEditSpotLightVisualizer.h>
 #include <glad/glad.h>
 

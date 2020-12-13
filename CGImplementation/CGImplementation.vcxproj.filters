@@ -85,6 +85,9 @@
     <Filter Include="Demo\Culling Demo">
       <UniqueIdentifier>{5448ea48-d10e-416f-9847-9ed23f93cc02}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Demo\RayTracer Demo">
+      <UniqueIdentifier>{2bdbd6ff-fcbb-4c30-ba79-843258abc8b1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -299,6 +302,9 @@
     </ClCompile>
     <ClCompile Include="Graphics\CGOctree.cpp">
       <Filter>Graphics Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Demo\RayTracerDemo.cpp">
+      <Filter>Demo\RayTracer Demo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -613,6 +619,9 @@
     </ClInclude>
     <ClInclude Include="Graphics\CGOctree.h">
       <Filter>Graphics Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Demo\RayTracerDemo.h">
+      <Filter>Demo\RayTracer Demo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

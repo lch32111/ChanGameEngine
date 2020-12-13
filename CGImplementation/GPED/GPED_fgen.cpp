@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "GPED_fgen.h"
 using namespace GPED;
 

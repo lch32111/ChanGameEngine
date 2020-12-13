@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <Graphics/CGDirShadowFrustumVisualizer.h>
 
 #include <GPED/CGPhysicsUtil.h>

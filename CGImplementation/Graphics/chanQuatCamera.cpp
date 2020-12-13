@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "chanQuatCamera.h"
 
 CGProj::chanQuatCamera::chanQuatCamera(glm::vec3 position, glm::vec3 up)

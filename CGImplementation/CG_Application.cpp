@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "CG_Application.h"
 #include <Imgui/imgui.h>
 #include <Imgui/imgui_impl_glfw.h>
@@ -8,6 +9,7 @@
 #include <Demo/DeferredRenderer.h>
 #include <Demo/SimpleTerrainDemo.h>
 #include <Demo/CollisionTestBedDemo.h>
+#include <Demo/RayTracerDemo.h>
 
 /* ### Application ### */
 void CGProj::Application::Initialize(bool shouldBaseInit)
@@ -178,6 +180,12 @@ namespace CGProj
 						m_app = new CollisionDemo();
 						openApp(m_app);
 					}
+
+					if (ImGui::Button("New RayTracer Demo Working"))
+					{
+						m_app = new RayTracerDemo();
+						openApp(m_app);
+					}
 				}
 				ImGui::End();
 			}
@@ -245,7 +253,6 @@ namespace CGProj
 		{
 			Application::m_width = width;
 			Application::m_height = height;
-			glViewport(0, 0, width, height);
 
 			if (m_appSelected)
 			{

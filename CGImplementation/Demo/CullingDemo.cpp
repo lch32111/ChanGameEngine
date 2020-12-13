@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "CullingDemo.h"
 
 #include <string>

@@ -21,7 +21,7 @@ namespace CGProj
 		typedef CGProj::Math::CGMat2<CGScalar> CGMat2;
 		typedef CGProj::Math::CGMat3<CGScalar> CGMat3;
 		typedef CGProj::Math::CGMat4<CGScalar> CGMat4;
-		typedef CGProj::Scalar_traits<CGScalar> CGScalarUtil;
+		typedef CGProj::ScalarOp<CGScalar> CGScalarUtil;
 
 		// For specifying float scalar
 		typedef float CGFScalar;
@@ -31,7 +31,7 @@ namespace CGProj
 		typedef CGProj::Math::CGMat2<CGFScalar> CGFMat2;
 		typedef CGProj::Math::CGMat3<CGFScalar> CGFMat3;
 		typedef CGProj::Math::CGMat4<CGFScalar> CGFMat4;
-		typedef CGProj::Scalar_traits<CGFScalar> CGFScalarUtil;
+		typedef CGProj::ScalarOp<CGFScalar> CGFScalarUtil;
 
 		// For specifying double scalar
 		typedef double CGDScalar;
@@ -41,7 +41,7 @@ namespace CGProj
 		typedef CGProj::Math::CGMat2<CGDScalar> CGDMat2;
 		typedef CGProj::Math::CGMat3<CGDScalar> CGDMat3;
 		typedef CGProj::Math::CGMat4<CGDScalar> CGDMat4;
-		typedef CGProj::Scalar_traits<CGDScalar> CGDScalarUtil;
+		typedef CGProj::ScalarOp<CGDScalar> CGDScalarUtil;
 
 		// TODO : do more progresses Collision Contact Info
 		struct CGCollisionContact

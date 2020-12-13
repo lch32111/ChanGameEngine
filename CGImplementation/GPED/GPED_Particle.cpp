@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <assert.h>
 #include "GPED_Particle.h"
 

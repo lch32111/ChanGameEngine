@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <Terrain/CGTerrain.h>
 
 #include <stb_image.h>

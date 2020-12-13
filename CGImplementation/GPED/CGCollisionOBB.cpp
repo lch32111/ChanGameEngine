@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <GPED/CGCollisionOBB.h>
 
 CGProj::CGCollisionOBB::CGCollisionOBB()

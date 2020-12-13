@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "CGEditDirLightVisualizer.h"
 #include <Graphics/GLPrimitiveUtil.h>
 

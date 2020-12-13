@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <Graphics/CGModelMesh.h>
 
 #include <glad/glad.h>

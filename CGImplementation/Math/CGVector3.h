@@ -206,7 +206,7 @@ namespace CGProj
 		template <typename Scalar>
 		inline Scalar Length(const CGVector3<Scalar>& v)
 		{
-			return Scalar_traits<Scalar>::sqrt(v.m_value[0] * v.m_value[0] + v.m_value[1] * v.m_value[1] + v.m_value[2] * v.m_value[2]);
+			return ScalarOp<Scalar>::Sqrt(v.m_value[0] * v.m_value[0] + v.m_value[1] * v.m_value[1] + v.m_value[2] * v.m_value[2]);
 		}
 
 		template<typename Scalar>

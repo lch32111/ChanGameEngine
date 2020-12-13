@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "GPED_collide_coarse.h"
 using namespace GPED;
 

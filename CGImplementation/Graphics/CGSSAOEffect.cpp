@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <Graphics/CGSSAOEffect.h>
 
 #include <random> 

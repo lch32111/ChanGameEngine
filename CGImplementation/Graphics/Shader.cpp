@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "Shader.h"
 CGProj::Shader::Shader() { }
 

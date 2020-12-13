@@ -3,8 +3,6 @@
 
 // Referred to the https://github.com/PolygonTek/BlueshiftEngine/blob/master/Source/Runtime/Precompiled.h
 
-
-
 // detect x86 32 bit platform
 #if defined(__i386__) || defined(_M_IX86)
 	#if !defined(__X86__)
@@ -64,5 +62,7 @@ typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
 typedef uint64_t u64;
+
+typedef double float64;
 
 #endif

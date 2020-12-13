@@ -85,6 +85,9 @@
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
@@ -134,6 +137,7 @@
     <ClCompile Include="CollisionDetection\CGCollisionFunction.cpp" />
     <ClCompile Include="Demo\CollisionTestBedDemo.cpp" />
     <ClCompile Include="Demo\CullingDemo.cpp" />
+    <ClCompile Include="Demo\RayTracerDemo.cpp" />
     <ClCompile Include="Graphics\CGBloomEffect.cpp" />
     <ClCompile Include="CG_Application.cpp" />
     <ClCompile Include="Demo\DeferredRenderer.cpp" />
@@ -214,6 +218,7 @@
     <ClInclude Include="CollisionDetection\CGCollisionSphere.h" />
     <ClInclude Include="Demo\CollisionTestBedDemo.h" />
     <ClInclude Include="Demo\CullingDemo.h" />
+    <ClInclude Include="Demo\RayTracerDemo.h" />
     <ClInclude Include="Graphics\CGBloomEffect.h" />
     <ClInclude Include="CGErrorLogger.h" />
     <ClInclude Include="CG_Application.h" />

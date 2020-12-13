@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <GPED/CGCollisionSphere.h>
 
 CGProj::CGCollisionSphere::CGCollisionSphere()

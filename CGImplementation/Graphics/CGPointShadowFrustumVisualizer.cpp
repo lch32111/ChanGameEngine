@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <Graphics/CGPointShadowFrustumVisualizer.h>
 
 #include <Graphics/GLPrimitiveUtil.h>

@@ -33,8 +33,8 @@ namespace CGProj
 		virtual void OnInitialize() = 0;
 		virtual void OnFinalize() = 0;
 
-		int m_width = 800;
-		int m_height = 600;
+		s32 m_width = 800;
+		s32 m_height = 600;
 
 		float m_deltaTime = 0.f;
 		float m_lastFrame = 0.f;

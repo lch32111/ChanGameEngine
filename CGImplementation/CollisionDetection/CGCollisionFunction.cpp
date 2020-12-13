@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <CollisionDetection/CGCollisionFunction.h>
 
 using namespace CGProj;
@@ -21,7 +22,7 @@ bool CGProj::CollisionDetection::intersect(const CGCollisionSphere& a, const CGC
 	if (sqDist > sqRadisum) return false;
 	
 	// for concentric spheres
-	if (sqDist < CGScalarUtil::epsilon())
+	if (sqDist < CGScalarUtil::Epsilon())
 	{
 		ba = CGVec3(CGScalar(1.0), CGScalar(0.0), CGScalar(0.0));
 		sqDist = CGScalar(1.0);
@@ -32,7 +33,7 @@ bool CGProj::CollisionDetection::intersect(const CGCollisionSphere& a, const CGC
 	// for normal case
 	else
 	{
-		sqDist = CGScalarUtil::sqrt(sqDist);
+		sqDist = CGScalarUtil::Sqrt(sqDist);
 		c.penetration = radiSum - sqDist;
 		c.normal = ba * (CGScalar(1.0) / sqDist);
 	}
@@ -65,10 +66,10 @@ bool CGProj::CollisionDetection::intersect(const CGCollisionSphere& sphere, cons
 		return true;
 
 	// entry point is max(lambdaEnter, 0)
-	CGScalar lambdaEnter = (-projectedLength - CGScalarUtil::sqrt(EarlyExit)) / (rSqLength * rSqLength);
+	CGScalar lambdaEnter = (-projectedLength - CGScalarUtil::Sqrt(EarlyExit)) / (rSqLength * rSqLength);
 	
 	// exit point is min(lambdaExit, 1)
-	CGScalar lambdaExit = (-projectedLength + CGScalarUtil::sqrt(EarlyExit)) / (rSqLength * rSqLength);
+	CGScalar lambdaExit = (-projectedLength + CGScalarUtil::Sqrt(EarlyExit)) / (rSqLength * rSqLength);
 
 	if (lambdaEnter <= CGScalar(1.0) && lambdaExit >= CGScalar(0.0))
 	{

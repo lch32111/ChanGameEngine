@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <GPED/CGCollisionNarrow.h>
 #include <GPED/CGCollisionEarlyExit.h>
 #include <GPED/CGCollisionUtil.h>
@@ -636,9 +637,9 @@ unsigned CGProj::CGCollisionNarrow::MeshAndOBB(
 	mesh.getQuantizedGridPoints(boxAABB, mR);
 
 	unsigned collisionHit = 0;
-	for (unsigned j = mR.startZ; j < mR.EndZ; ++j)
+	for (unsigned j = (unsigned)mR.startZ; j < (unsigned)mR.EndZ; ++j)
 	{
-		for (unsigned i = mR.startX; i < mR.EndX; ++i)
+		for (unsigned i = (unsigned)mR.startX; i < (unsigned)mR.EndX; ++i)
 		{
 			// First Triangle
 			CGCollisionTriangle triangle;

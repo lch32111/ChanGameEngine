@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <GPED/CGCollisionMesh.h>
 #include <GPED/CGPhysicsUtil.h>
 #include <iostream>

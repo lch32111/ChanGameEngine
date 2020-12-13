@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "CGBroadPhase.h"
 #include <Graphics/GLPrimitiveUtil.h>
 

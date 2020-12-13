@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include <Graphics/CGAssetTexture.h>
 #include <Graphics/GLTextureUtility.h>
 #include <CGErrorLogger.h>

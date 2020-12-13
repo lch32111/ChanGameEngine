@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "DeferredRenderer.h"
 
 #include <Imgui/imgui.h>

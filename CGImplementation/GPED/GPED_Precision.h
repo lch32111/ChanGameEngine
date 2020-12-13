@@ -131,8 +131,8 @@ namespace GPED
 		So, I also referred to the Box2D Code.
 		I made the code work with our project code
 	*/
-#define aabbExtension 0.01
-#define aabbMultiplier 2.0
+#define aabbExtension 0.01f
+#define aabbMultiplier 2.0f
 	struct c3AABB // CG Project 3-dimenstional AABB
 	{
 		glm::vec3 min;

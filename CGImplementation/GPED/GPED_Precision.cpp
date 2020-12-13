@@ -1,3 +1,4 @@
+#include <CGPrecompiled.h>
 #include "GPED_Precision.h"
 #include <GPED/CGCollisionPrimitive.h>
 using namespace GPED;

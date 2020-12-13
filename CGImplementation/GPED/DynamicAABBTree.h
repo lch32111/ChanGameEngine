@@ -91,8 +91,8 @@ namespace CGProj
 		void ValidateStructure(int index) const;
 		void ValidateMetrics(int index) const;
 		
-		GPED::real ComputeHeight(int nodeId) const;
-		int ComputeHeight() const;
+		s32 ComputeHeight(int nodeId) const;
+		s32 ComputeHeight() const;
 	};
 
 	template<typename T>

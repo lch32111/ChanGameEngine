@@ -98,12 +98,13 @@ namespace CGProj
 
 		ApplicationSelector()
 			: m_app(nullptr)
-			, m_appSelected(false)
+			, m_app_selected(false)
+			, m_window_open(true)
 		{}
 
 		~ApplicationSelector()
 		{
-			if (m_appSelected)
+			if (m_app_selected)
 			{
 				m_app->Finalize();
 				delete m_app;
@@ -112,7 +113,7 @@ namespace CGProj
 
 		virtual void Execute() override
 		{
-			while (!glfwWindowShouldClose(app_window))
+			while (!glfwWindowShouldClose(app_window) && m_window_open == true)
 			{
 				float currentFrame = (float)glfwGetTime();
 				m_deltaTime = currentFrame - m_lastFrame;
@@ -139,17 +140,17 @@ namespace CGProj
 
 		virtual void Update(float deltaTime, float lastFrame) override
 		{
-			if (m_appSelected == true)
+			if (m_app_selected == true)
 			{
 				m_app->Update(deltaTime, lastFrame);
 			}
 			else
 			{
-				bool appNotSelected = !m_appSelected;
+				bool appNotSelected = !m_app_selected;
 
 				auto openApp = [&](Application* app)
 				{
-					m_appSelected = true;
+					m_app_selected = true;
 					m_app->app_window = this->app_window;
 					m_app->Initialize(false);
 					m_app->ResizeWindowCallback(m_width, m_height);
@@ -193,7 +194,7 @@ namespace CGProj
 
 		virtual void Display() override
 		{
-			if (m_appSelected == true)
+			if (m_app_selected == true)
 			{
 				m_app->Display();
 			}
@@ -206,20 +207,36 @@ namespace CGProj
 
 		virtual void KeyCallback(int key, int scancode, int action, int mods)
 		{
+			auto closeApp = [&]()
+			{
+				m_app->Finalize();
+				delete m_app;
+				m_app = nullptr;
+				m_app_selected = false;
+				glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			};
+
 			if (key == GLFW_KEY_B && mods == GLFW_MOD_CONTROL)
 			{
-				if (m_appSelected == true)
+				if (m_app_selected == true)
 				{
-					m_app->Finalize();
-					delete m_app;
-					m_app = nullptr;
-					m_appSelected = false;
-
-					glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+					closeApp();
 				}
 			}
 
-			if (m_appSelected == true)
+			if (key == GLFW_KEY_ESCAPE)
+			{
+				if (m_app_selected)
+				{
+					closeApp();
+				}
+				else
+				{
+					m_window_open = false;
+				}
+			}
+
+			if (m_app_selected == true)
 			{
 				m_app->KeyCallback(key, scancode, action, mods);
 			}
@@ -227,7 +244,7 @@ namespace CGProj
 
 		virtual void MouseMoveCallback(double xpos, double ypos)
 		{
-			if (m_appSelected)
+			if (m_app_selected)
 			{
 				m_app->MouseMoveCallback(xpos, ypos);
 			}
@@ -235,7 +252,7 @@ namespace CGProj
 
 		virtual void MouseButtonCallback(int button, int action, int mods)
 		{
-			if (m_appSelected)
+			if (m_app_selected)
 			{
 				m_app->MouseButtonCallback(button, action, mods);
 			}
@@ -243,7 +260,7 @@ namespace CGProj
 
 		virtual void MouseDragCallback(double xpos, double ypos)
 		{
-			if (m_appSelected)
+			if (m_app_selected)
 			{
 				m_app->MouseDragCallback(xpos, ypos);
 			}
@@ -254,7 +271,7 @@ namespace CGProj
 			Application::m_width = width;
 			Application::m_height = height;
 
-			if (m_appSelected)
+			if (m_app_selected)
 			{
 				m_app->ResizeWindowCallback(width, height);
 			}
@@ -262,7 +279,7 @@ namespace CGProj
 
 		virtual void ScrollCallback(double yoffset)
 		{
-			if (m_appSelected)
+			if (m_app_selected)
 			{
 				m_app->ScrollCallback(yoffset);
 			}
@@ -270,7 +287,8 @@ namespace CGProj
 
 	private:
 		CGProj::Application* m_app;
-		bool m_appSelected;
+		bool m_app_selected;
+		bool m_window_open;
 	};
 }
 

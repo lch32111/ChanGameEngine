@@ -4,6 +4,7 @@
 
 #include <CG_Application.h>
 #include <Math/CGVector3.h>
+#include <Graphics/CGAssetManager.h>
 
 namespace CGProj
 {
@@ -46,6 +47,8 @@ namespace CGProj
 
 	private:
 		RayTracerCamera m_camera;
+		CGAssetManager m_asset_manager;
+		Shader* m_simple_shader;
 	};
 }
 

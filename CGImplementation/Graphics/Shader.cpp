@@ -253,6 +253,11 @@ void CGProj::Shader::setMat4(const std::string& name, const glm::mat4& mat) cons
 	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
+void CGProj::Shader::SetMat4(const char* name, const CGProj::Math::CGMat4<float>& mat) const
+{
+	glUniformMatrix4fv(glGetUniformLocation(ID, name), 1, GL_FALSE, mat.data());
+}
+
 bool CGProj::Shader::checkCompileErrors(GLuint shader, std::string type)
 {
 	GLint success;

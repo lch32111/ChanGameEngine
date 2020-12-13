@@ -116,16 +116,16 @@ namespace CGProj
 
 			CGVector4<Scalar> operator++(int) // postfix
 			{
-				CGVector3<Scalar> r(*this);
+				CGVector4<Scalar> r(*this);
 				++m_value[0]; ++m_value[1]; ++m_value[2]; ++m_value[3];
-				return *this;
+				return r;
 			}
 
 			CGVector4<Scalar> operator--(int) // postfix
 			{
-				CGVector3<Scalar> r(*this);
+				CGVector4<Scalar> r(*this);
 				--m_value[0]; --m_value[1]; --m_value[2]; --m_value[3];
-				return *this;
+				return r;
 			}
 
 			template<typename indexType>
@@ -161,25 +161,25 @@ namespace CGProj
 		template <typename Scalar>
 		inline CGVector4<Scalar> operator+(const CGVector4<Scalar>& a, const CGVector4<Scalar>& b)
 		{
-			return CGVector3<Scalar>(a.m_value[0] + b.m_value[0], a.m_value[1] + b.m_value[1], a.m_value[2] + b.m_value[2], a.m_value[3] + b.m_value[3]);
+			return CGVector4<Scalar>(a.m_value[0] + b.m_value[0], a.m_value[1] + b.m_value[1], a.m_value[2] + b.m_value[2], a.m_value[3] + b.m_value[3]);
 		}
 
 		template <typename Scalar>
 		inline CGVector4<Scalar> operator-(const CGVector4<Scalar>& a, const CGVector4<Scalar>& b)
 		{
-			return CGVector3<Scalar>(a.m_value[0] - b.m_value[0], a.m_value[1] - b.m_value[1], a.m_value[2] - b.m_value[2], a.m_value[3] - b.m_value[3]);
+			return CGVector4<Scalar>(a.m_value[0] - b.m_value[0], a.m_value[1] - b.m_value[1], a.m_value[2] - b.m_value[2], a.m_value[3] - b.m_value[3]);
 		}
 
 		template <typename Scalar>
 		inline CGVector4<Scalar> operator*(const CGVector4<Scalar>& a, const CGVector4<Scalar>& b)
 		{
-			return CGVector3<Scalar>(a.m_value[0] * b.m_value[0], a.m_value[1] * b.m_value[1], a.m_value[2] * b.m_value[2], a.m_value[3] * b.m_value[3]);
+			return CGVector4<Scalar>(a.m_value[0] * b.m_value[0], a.m_value[1] * b.m_value[1], a.m_value[2] * b.m_value[2], a.m_value[3] * b.m_value[3]);
 		}
 
 		template <typename Scalar>
 		inline CGVector4<Scalar> operator/(const CGVector4<Scalar>& a, const CGVector4<Scalar>& b)
 		{
-			return CGVector3<Scalar>(a.m_value[0] / b.m_value[0], a.m_value[1] / b.m_value[1], a.m_value[2] / b.m_value[2], a.m_value[3] / b.m_value[3]);
+			return CGVector4<Scalar>(a.m_value[0] / b.m_value[0], a.m_value[1] / b.m_value[1], a.m_value[2] / b.m_value[2], a.m_value[3] / b.m_value[3]);
 		}
 
 		template <typename Scalar>

@@ -14,10 +14,12 @@ namespace CGProj
 			CGMat4() { }
 			
 			explicit CGMat4(Scalar s)
-				: m_col{ s, 0, 0, 0,
-				0, s, 0, 0, 
-				0, 0, s, 0, 
-				0, 0, 0, s} { }
+			{
+				m_col[0] = { s, 0, 0, 0 };
+				m_col[1] = { 0, s, 0, 0 };
+				m_col[2] = { 0, 0, s, 0 };
+				m_col[3] = { 0, 0, 0, s };
+			}
 
 			explicit CGMat4(const Scalar* colMatArray)
 			{
@@ -352,7 +354,7 @@ namespace CGProj
 		template<typename Scalar>
 		inline CGMat4<Scalar> operator/(const CGMat4<Scalar>& a, const CGMat4<Scalar>& b)
 		{
-			return CGMat3<Scalar>(a.m_col[0] / b.m_col[0], a.m_col[1] / b.m_col[1], 
+			return CGMat4<Scalar>(a.m_col[0] / b.m_col[0], a.m_col[1] / b.m_col[1],
 				a.m_col[2] / b.m_col[2], a.m_col[3] / b.m_col[3]);
 		}
 

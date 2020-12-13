@@ -231,7 +231,7 @@ namespace CGProj
 
 		// Check if P in edge region of AC, if so return projection of P onto AC
 		GPED::real vb = d5 * d2 - d1 * d6;
-		if (vb <= GPED::real(0.0) && d2 >= GPED::real(0.0) & d6 <= GPED::real(0.0))
+		if (vb <= GPED::real(0.0) && d2 >= GPED::real(0.0) && d6 <= GPED::real(0.0))
 		{
 			GPED::real w = d2 / (d2 - d6);
 			return triangle.m_points[0] + w * ac; // barycentric coordinates (1-w, 0, w)
@@ -291,7 +291,7 @@ namespace CGProj
 
 		// Check if P in edge region of AC, if so return projection of P onto AC
 		GPED::real vb = d5 * d2 - d1 * d6;
-		if (vb <= GPED::real(0.0) && d2 >= GPED::real(0.0) & d6 <= GPED::real(0.0))
+		if (vb <= GPED::real(0.0) && d2 >= GPED::real(0.0) && d6 <= GPED::real(0.0))
 		{
 			GPED::real w = d2 / (d2 - d6);
 			return triangle.m_points[0] + w * ac; // barycentric coordinates (1-w, 0, w)

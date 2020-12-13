@@ -1,22 +1,20 @@
 #pragma once
-#ifndef __COLLISION_TEST_BED_DEMO_H__
-#define __COLLISION_TEST_BED_DEMO_H__
+#ifndef __CULLING_DEMO_H__
+#define __CULLING_DEMO_H__
 
 #include <CG_Application.h>
 
 #include <Graphics/chanQuatCamera.h>
 
-#include <CollisionDetection/CGCollisionSphere.h>
-
 namespace CGProj
 {
-	class CollisionTestBed;
-	class CollisionDemo : public Application
+	class CullingTestBed;
+	class CullingDemo : public Application
 	{
 	public:
 		virtual void Update(float deltaTime, float lastFrame);
 		virtual void Display();
-		
+
 		virtual void KeyCallback(int key, int scancode, int action, int mods) {}
 		virtual void MouseMoveCallback(double xpos, double ypos);
 		virtual void MouseButtonCallback(int button, int action, int mods);
@@ -27,10 +25,10 @@ namespace CGProj
 		virtual void OnInitialize();
 		virtual void OnFinalize();
 	private:
-		CollisionTestBed* demo;
+		CullingTestBed* demo;
 	};
 
-	class CollisionTestBed
+	class CullingTestBed
 	{
 	public:
 		void initGraphics(int width, int height);
@@ -58,12 +56,6 @@ namespace CGProj
 		bool UIControl = false;
 		bool GameControl = true;
 		bool mouseClick = false;
-
-		bool isSphereCollided = false;
-		bool isRaySphereCollided = false;
-		CollisionDetection::CGCollisionContact sphereContact;
-		CollisionDetection::CGCollisionSphere aSphere;
-		CollisionDetection::CGCollisionSphere bSphere;
 	};
 }
 

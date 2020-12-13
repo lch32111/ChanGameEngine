@@ -82,6 +82,9 @@
     <Filter Include="Demo\CollisionDetection Demo\CDFirstExperiment">
       <UniqueIdentifier>{86c7187a-d3e6-4b4c-8d02-64443d1a10a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Demo\Culling Demo">
+      <UniqueIdentifier>{5448ea48-d10e-416f-9847-9ed23f93cc02}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -290,6 +293,12 @@
     </ClCompile>
     <ClCompile Include="Demo\CollisionTestBedDemo.cpp">
       <Filter>Demo\CollisionDetection Demo\CDFirstExperiment</Filter>
+    </ClCompile>
+    <ClCompile Include="Demo\CullingDemo.cpp">
+      <Filter>Demo\Culling Demo</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\CGOctree.cpp">
+      <Filter>Graphics Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -598,6 +607,12 @@
     </ClInclude>
     <ClInclude Include="Math\CGMat2.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Demo\CullingDemo.h">
+      <Filter>Demo\Culling Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CGOctree.h">
+      <Filter>Graphics Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

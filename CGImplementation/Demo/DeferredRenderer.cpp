@@ -14,78 +14,58 @@
 
 /****************************************************************************************/
 /* ### Graphics Demo ### */
-const char * CGProj::GraphicsDemo::getTitle()
+void CGProj::GraphicsDemo::OnInitialize()
 {
-	std::string str = Application::getTitle();
-	str += " > GraphicsDemo";
-	return str.c_str();
-}
-
-void CGProj::GraphicsDemo::initGraphics()
-{
-	Application::initGraphics();
 	glfwSwapInterval(0); // Turn off Vsync and measure the FPS
 	glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
 	test2 = new DeferredRenderer();
-	test2->initGraphics(width, height);
-}
-
-void CGProj::GraphicsDemo::initImgui()
-{
-	Application::initImgui();
-
+	test2->initGraphics(m_width, m_height);
 	test2->initImgui();
 }
 
-void CGProj::GraphicsDemo::setView()
+void CGProj::GraphicsDemo::OnFinalize()
 {
-}
-
-void CGProj::GraphicsDemo::deinit()
-{
-	Application::deinit();
-
 	test2->deinit();
 	delete test2;
 }
 
-void CGProj::GraphicsDemo::update(float deltaTime, float lastFrame)
+void CGProj::GraphicsDemo::Update(float deltaTime, float lastFrame)
 {
 	test2->key(app_window, deltaTime);
 	test2->updateImgui();
 	test2->updateSimulation(deltaTime, lastFrame);
 }
 
-void CGProj::GraphicsDemo::display()
+void CGProj::GraphicsDemo::Display()
 {
-	Application::display();
-
-	test2->display(width, height);
+	test2->display(m_width, m_height);
 }
 
-void CGProj::GraphicsDemo::mouse(double xpos, double ypos)
+void CGProj::GraphicsDemo::MouseMoveCallback(double xpos, double ypos)
 {
 	test2->mouse(xpos, ypos);
 }
 
-void CGProj::GraphicsDemo::mouseButton(int button, int action, int mods)
+void CGProj::GraphicsDemo::MouseButtonCallback(int button, int action, int mods)
 {
 	// Application::mouseButton(button, action, mods);
 
-	test2->mouseButton(app_window, button, action, mods, width, height);
+	test2->mouseButton(app_window, button, action, mods, m_width, m_height);
 }
 
-void CGProj::GraphicsDemo::scroll(double yoffset)
+void CGProj::GraphicsDemo::ScrollCallback(double yoffset)
 {
 	test2->scroll(yoffset);
 }
 
-void CGProj::GraphicsDemo::resize(int width, int height)
+void CGProj::GraphicsDemo::ResizeWindowCallback(int width, int height)
 {
-	Application::resize(width, height);
+	Application::m_width = width;
+	Application::m_height = height;
+	glViewport(0, 0, width, height);
 
 	test2->resize(width, height);
 }
@@ -133,7 +113,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	pGamma = 2.2f; Deferred_Post_Shader->setFloat("gamma", pGamma);
 	pExposure = 1.0; Deferred_Post_Shader->setFloat("exposure", pExposure);
 	
-	isBloom = true;
+	isBloom = false;
 	Shader* tempBlurInit = assetManager.getShader(SHADER_GAUSSIAN_BLUR);
 	tempBlurInit->use();
 	tempBlurInit->setInt("image", 0);
@@ -141,7 +121,7 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	myBloom.m_BrightnessExtractor = glm::vec3(0.2126, 0.7152, 0.0722);
 	myBloom.m_BrightnessThreShold = 1.f;
 
-	isSSAO = true;
+	isSSAO = false;
 	isSSAODebug = false;
 	Shader* tempSSAOInit = assetManager.getShader(SHADER_SSAO_EFFECT);
 	tempSSAOInit->use();
@@ -491,6 +471,9 @@ void CGProj::DeferredRenderer::updateSimulation(float deltaTime, float lastFrame
 
 void CGProj::DeferredRenderer::display(int width, int height)
 {
+	glClearColor(0.11f, 0.11f, 0.11f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glm::mat4 view = camera.GetViewMatrix();
 	glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 1000.f);
 	glm::mat4 model(1.0);

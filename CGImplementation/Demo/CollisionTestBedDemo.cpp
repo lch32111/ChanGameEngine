@@ -17,81 +17,56 @@ using namespace CGProj::CollisionDetection;
 
 /****************************************************************************************/
 /* ### Collision Demo ### */
-const char* CGProj::CollisionDemo::getTitle()
+void CGProj::CollisionDemo::OnInitialize()
 {
-	std::string str = Application::getTitle();
-	str += " > CollisionDemo";
-	return str.c_str();
-}
-
-void CGProj::CollisionDemo::initGraphics()
-{
-	Application::initGraphics();
 	glfwSwapInterval(0);
 	glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
 	demo = new CollisionTestBed();
-	demo->initGraphics(width, height);
-}
-
-void CGProj::CollisionDemo::initImgui()
-{
-	Application::initImgui();
-
+	demo->initGraphics(m_width, m_height);
 	demo->initImgui();
 }
 
-void CGProj::CollisionDemo::setView()
+void CGProj::CollisionDemo::OnFinalize()
 {
-	
-}
-
-void CGProj::CollisionDemo::deinit()
-{
-	Application::deinit();
-
 	demo->deinit();
 	delete demo;
 }
 
-void CGProj::CollisionDemo::update(float deltaTime, float lastFrame)
+void CGProj::CollisionDemo::Update(float deltaTime, float lastFrame)
 {
-	Application::update(deltaTime, lastFrame);
-
 	demo->key(app_window, deltaTime);
 	demo->updateImgui();
 	demo->updateSimulation(deltaTime, lastFrame);
 }
 
-void CGProj::CollisionDemo::display()
+void CGProj::CollisionDemo::Display()
 {
-	// TODO : change this kind of use to take care of what the base class is doing into
-	// the structure that split the behavior of application with its child.
-	Application::display();
-
-	demo->display(width, height);
+	demo->display(m_width, m_height);
 }
 
-void CGProj::CollisionDemo::mouse(double xpos, double ypos)
+void CGProj::CollisionDemo::MouseMoveCallback(double xpos, double ypos)
 {
 	demo->mouse(xpos, ypos);
 }
 
-void CGProj::CollisionDemo::mouseButton(int button, int action, int mods)
+void CGProj::CollisionDemo::MouseButtonCallback(int button, int action, int mods)
 {
-	demo->mouseButton(app_window, button, action, mods, width, height);
+	demo->mouseButton(app_window, button, action, mods, m_width, m_height);
 }
 
-void CGProj::CollisionDemo::scroll(double yoffset)
+void CGProj::CollisionDemo::ScrollCallback(double yoffset)
 {
 	demo->scroll(yoffset);
 }
 
-void CGProj::CollisionDemo::resize(int width, int height)
+void CGProj::CollisionDemo::ResizeWindowCallback(int width, int height)
 {
-	Application::resize(width, height);
+	Application::m_width = width;
+	Application::m_height = height;
+	glViewport(0, 0, width, height);
 
 	demo->resize(width, height);
 }
@@ -174,6 +149,9 @@ void CGProj::CollisionTestBed::updateSimulation(float dletaTime, float lastTime)
 
 void CGProj::CollisionTestBed::display(int width, int height)
 {
+	glClearColor(0.11f, 0.11f, 0.11f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glm::mat4 view; camera.GetViewMatrix(view);
 	glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 1000.f);
 

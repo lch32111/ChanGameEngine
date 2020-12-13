@@ -10,17 +10,9 @@
 #include <Graphics/GLTextureUtility.h>
 
 /* ### Physics Demo ### */
-const char * CGProj::PhysicsDemo::getTitle()
-{
-	std::string str = Application::getTitle();
-	str += " > PhysicsDemo";
-	return str.c_str();
-}
 
-void CGProj::PhysicsDemo::initGraphics()
+void CGProj::PhysicsDemo::OnInitialize()
 {
-	Application::initGraphics();
-
 	glfwSwapInterval(0); // Turn off Vsync and measure the FPS
 	// glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
@@ -30,60 +22,45 @@ void CGProj::PhysicsDemo::initGraphics()
 	test1->initGraphics();
 }
 
-void CGProj::PhysicsDemo::initImgui()
+void CGProj::PhysicsDemo::OnFinalize()
 {
-	Application::initImgui();
-}
-
-void CGProj::PhysicsDemo::setView()
-{
-	// Application::setView();
-}
-
-void CGProj::PhysicsDemo::deinit()
-{
-	Application::deinit();
-
 	test1->deinit();
 	delete test1;
 }
 
-void CGProj::PhysicsDemo::update(float deltaTime, float lastFrame)
+void CGProj::PhysicsDemo::Update(float deltaTime, float lastFrame)
 {
-	// Application::update(deltaTime, lastFrame);
-
 	test1->key(app_window, deltaTime);
 	test1->updateImgui();
 	test1->updateSimulation(deltaTime, lastFrame);
 }
 
-void CGProj::PhysicsDemo::display()
+void CGProj::PhysicsDemo::Display()
 {
-	Application::display();
-
-	test1->display(width, height);
+	test1->display(m_width, m_height);
 }
 
-void CGProj::PhysicsDemo::mouse(double xpos, double ypos)
+void CGProj::PhysicsDemo::MouseMoveCallback(double xpos, double ypos)
 {
-	// Application::mouse(xpos, ypos);
-
 	test1->mouse(xpos, ypos);
 }
 
-void CGProj::PhysicsDemo::mouseButton(int button, int action, int mods)
+void CGProj::PhysicsDemo::MouseButtonCallback(int button, int action, int mods)
 {
-	// Application::mouseButton(button, action, mods)
-
-	test1->mouseButton(app_window, button, action, mods, width, height);
+	test1->mouseButton(app_window, button, action, mods, m_width, m_height);
 }
 
 
-void CGProj::PhysicsDemo::scroll(double yoffset)
+void CGProj::PhysicsDemo::ScrollCallback(double yoffset)
 {
-	// Application::scroll(yoffset);
-
 	test1->scroll(yoffset);
+}
+
+void CGProj::PhysicsDemo::ResizeWindowCallback(int width, int height)
+{
+	Application::m_width = width;
+	Application::m_height = height;
+	glViewport(0, 0, width, height);
 }
 
 /* ### Physics Demo ### */
@@ -205,6 +182,9 @@ void CGProj::TryFirst::updateSimulation(float deltaTime, float lastFrame)
 
 void CGProj::TryFirst::display(int width, int height)
 {
+	glClearColor(0.11f, 0.11f, 0.11f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glm::mat4 view = camera.GetViewMatrix();
 	glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 1000.f);
 	glm::mat4 model(1.0);

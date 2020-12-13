@@ -6,78 +6,57 @@
 
 /****************************************************************************************/
 /* ### Terrain Demo ### */
-const char * CGProj::TerrainDemo::getTitle()
-{
-	std::string str = Application::getTitle();
-	str += " > TerrainDemo";
-	return str.c_str();
-}
 
-void CGProj::TerrainDemo::initGraphics()
+void CGProj::TerrainDemo::OnInitialize()
 {
-	Application::initGraphics();
 	glfwSwapInterval(0); // Turn off Vsync and measure the FPS
 	glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
 	test3 = new SimpleTerrainDemo();
-	test3->initGraphics(width, height);
-}
-
-void CGProj::TerrainDemo::initImgui()
-{
-	Application::initImgui();
-
+	test3->initGraphics(m_width, m_height);
 	test3->initImgui();
 }
 
-void CGProj::TerrainDemo::setView()
+void CGProj::TerrainDemo::OnFinalize()
 {
-}
-
-void CGProj::TerrainDemo::deinit()
-{
-	Application::deinit();
-
 	test3->deinit();
 	delete test3;
 }
 
-void CGProj::TerrainDemo::update(float deltaTime, float lastFrame)
+void CGProj::TerrainDemo::Update(float deltaTime, float lastFrame)
 {
 	test3->key(app_window, deltaTime);
 	test3->updateImgui();
 	test3->updateSimulation(deltaTime, lastFrame);
 }
 
-void CGProj::TerrainDemo::display()
+void CGProj::TerrainDemo::Display()
 {
-	Application::display();
-
-	test3->display(width, height);
+	test3->display(m_width, m_height);
 }
 
-void CGProj::TerrainDemo::mouse(double xpos, double ypos)
+void CGProj::TerrainDemo::MouseMoveCallback(double xpos, double ypos)
 {
 	test3->mouse(xpos, ypos);
 }
 
-void CGProj::TerrainDemo::mouseButton(int button, int action, int mods)
+void CGProj::TerrainDemo::MouseButtonCallback(int button, int action, int mods)
 {
-	// Application::mouseButton(button, action, mods);
-
-	test3->mouseButton(app_window, button, action, mods, width, height);
+	test3->mouseButton(app_window, button, action, mods, m_width, m_height);
 }
 
-void CGProj::TerrainDemo::scroll(double yoffset)
+void CGProj::TerrainDemo::ScrollCallback(double yoffset)
 {
 	test3->scroll(yoffset);
 }
 
-void CGProj::TerrainDemo::resize(int width, int height)
+void CGProj::TerrainDemo::ResizeWindowCallback(int width, int height)
 {
-	Application::resize(width, height);
+	Application::m_width = width;
+	Application::m_height = height;
+	glViewport(0, 0, width, height);
 
 	test3->resize(width, height);
 }
@@ -182,6 +161,9 @@ void CGProj::SimpleTerrainDemo::updateSimulation(float deltaTime, float lastFram
 
 void CGProj::SimpleTerrainDemo::display(int width, int height)
 {
+	glClearColor(0.11f, 0.11f, 0.11f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glm::mat4 view = camera.GetViewMatrix();
 	glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 1000.f);
 	glm::mat4 model;

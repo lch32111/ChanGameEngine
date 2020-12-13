@@ -434,22 +434,22 @@ unsigned CGProj::CGCollisionNarrow::OBBAndSphere(
 		{
 			closestPt.x = closestPt.x > 0 ? box.halfSize.x : -box.halfSize.x;
 			// Epsilon for the case that the sphere center is the vertex position of the box
-			closestPt.y += 0.006;
-			closestPt.z += 0.006;
+			closestPt.y += 0.006f;
+			closestPt.z += 0.006f;
 		}
 		else if (distY < distX && distY < distZ)
 		{
 			closestPt.y = closestPt.y > 0 ? box.halfSize.y : -box.halfSize.y;
 			// Epsilon for the case that the sphere center is the vertex position of the box
-			closestPt.x += 0.006;
-			closestPt.z += 0.006;
+			closestPt.x += 0.006f;
+			closestPt.z += 0.006f;
 		}
 		else
 		{
 			closestPt.z = closestPt.z > 0 ? box.halfSize.z : -box.halfSize.z;
 			// Epsilon for the case that the sphere center is the vertex position of the box
-			closestPt.x += 0.006;
-			closestPt.y += 0.006;
+			closestPt.x += 0.006f;
+			closestPt.y += 0.006f;
 		}
 	}
 

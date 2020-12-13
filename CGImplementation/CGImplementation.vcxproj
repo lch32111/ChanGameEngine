@@ -22,32 +22,32 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{792F3151-E667-41A8-A222-CF178CF2FC13}</ProjectGuid>
     <RootNamespace>CGImplementation</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -133,6 +133,7 @@
   <ItemGroup>
     <ClCompile Include="CollisionDetection\CGCollisionFunction.cpp" />
     <ClCompile Include="Demo\CollisionTestBedDemo.cpp" />
+    <ClCompile Include="Demo\CullingDemo.cpp" />
     <ClCompile Include="Graphics\CGBloomEffect.cpp" />
     <ClCompile Include="CG_Application.cpp" />
     <ClCompile Include="Demo\DeferredRenderer.cpp" />
@@ -182,6 +183,7 @@
     <ClCompile Include="Graphics\CGGizmo.cpp" />
     <ClCompile Include="Graphics\CGModel.cpp" />
     <ClCompile Include="Graphics\CGModelMesh.cpp" />
+    <ClCompile Include="Graphics\CGOctree.cpp" />
     <ClCompile Include="Graphics\CGPointShadowFrustumVisualizer.cpp" />
     <ClCompile Include="Graphics\CGRenderLine.cpp" />
     <ClCompile Include="Graphics\CGSizableRenderLine.cpp" />
@@ -211,6 +213,7 @@
     <ClInclude Include="CollisionDetection\CGCollisionShape.h" />
     <ClInclude Include="CollisionDetection\CGCollisionSphere.h" />
     <ClInclude Include="Demo\CollisionTestBedDemo.h" />
+    <ClInclude Include="Demo\CullingDemo.h" />
     <ClInclude Include="Graphics\CGBloomEffect.h" />
     <ClInclude Include="CGErrorLogger.h" />
     <ClInclude Include="CG_Application.h" />
@@ -270,6 +273,7 @@
     <ClInclude Include="Graphics\CGModel.h" />
     <ClInclude Include="Graphics\CGModelMesh.h" />
     <ClInclude Include="Graphics\CGModelUtils.h" />
+    <ClInclude Include="Graphics\CGOctree.h" />
     <ClInclude Include="Graphics\CGPointShadowFrustumVisualizer.h" />
     <ClInclude Include="Graphics\CGRenderLine.h" />
     <ClInclude Include="Graphics\CGSizableRenderLine.h" />

@@ -33,18 +33,20 @@ namespace CGProj
 	public:
 		~PhysicsDemo() { }
 
-		virtual const char* getTitle();
-		virtual void initGraphics();
-		virtual void initImgui();
-		virtual void setView();
-		virtual void deinit();
+		virtual void Update(float deltaTime, float lastFrame);
+		virtual void Display();
 
-		virtual void update(float deltaTime, float lastFrame);
-		virtual void display();
+		virtual void KeyCallback(int key, int scancode, int action, int mods) {}
+		virtual void MouseMoveCallback(double xpos, double ypos);
+		virtual void MouseButtonCallback(int button, int action, int mods);
+		virtual void MouseDragCallback(double xpos, double ypos) {}
+		virtual void ScrollCallback(double yoffset);
+		virtual void ResizeWindowCallback(int width, int height);
 
-		virtual void mouse(double xpos, double ypos);
-		virtual void mouseButton(int button, int action, int mods);
-		virtual void scroll(double yoffset);
+	protected:
+		virtual void OnInitialize();
+		virtual void OnFinalize();
+
 	private:
 		TryFirst* test1;
 	};

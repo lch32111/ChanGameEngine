@@ -3,6 +3,8 @@
 
 // Referred to the https://github.com/PolygonTek/BlueshiftEngine/blob/master/Source/Runtime/Precompiled.h
 
+
+
 // detect x86 32 bit platform
 #if defined(__i386__) || defined(_M_IX86)
 	#if !defined(__X86__)
@@ -48,6 +50,19 @@
 #define CG_DEBUG_BREAK(x)
 #endif
 
+#include <stdint.h>
+
 #include <cmath>
+#include <cstdint>
+
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
+typedef int64_t s64;
+
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
 
 #endif

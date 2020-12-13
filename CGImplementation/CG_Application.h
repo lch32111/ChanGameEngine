@@ -10,31 +10,36 @@ namespace CGProj
 	class Application
 	{
 	public:
-		virtual const char* getTitle();
-		virtual void initGraphics();
-		virtual void initImgui();
-		virtual void setView();
-		virtual void deinit();
-		
-		virtual void execute();
-		virtual void update(float deltaTime, float lastFrame);
-		virtual void display();
-		virtual void key();
-		virtual void mouse(double xpos, double ypos);
-		virtual void mouseButton(int button, int action, int mods);
-		virtual void mousdDrag(double xpos, double ypos);
-		virtual void resize(int width, int height);
-		virtual void scroll(double yoffset);
-
-		void renderText(int xpos, int ypos, const char* text); // will be implemented later
+		virtual ~Application() {}
 		GLFWwindow* app_window;
-	protected:
-		int width = 800;
-		int height = 600;
-		bool canDisplay = true;
 
-		float deltaTime = 0;
-		float lastFrame = 0;
+		void Initialize(bool shouldBaseInit = true);
+		void Finalize();
+		virtual void Execute();
+
+	public:
+		virtual void Update(float deltaTime, float lastFrame) = 0;
+		virtual void Display() = 0;
+
+		virtual void KeyCallback(int key, int scancode, int action, int mods) = 0;
+		virtual void MouseMoveCallback(double xpos, double ypos) = 0;
+		virtual void MouseButtonCallback(int button, int action, int mods) = 0;
+		virtual void MouseDragCallback(double xpos, double ypos) = 0;
+		virtual void ScrollCallback(double yoffset) = 0;
+		virtual void ResizeWindowCallback(int width, int height) = 0;
+
+	protected:
+		
+		virtual void OnInitialize() = 0;
+		virtual void OnFinalize() = 0;
+
+		int m_width = 800;
+		int m_height = 600;
+
+		float m_deltaTime = 0.f;
+		float m_lastFrame = 0.f;
+
+		bool m_isBaseInit = false;
 	};
 }
 

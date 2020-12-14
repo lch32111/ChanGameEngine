@@ -1,8 +1,8 @@
 #ifndef __CG_COLLISION_LINE_SEGMENT
 #define __CG_COLLISION_LINE_SEGMENT
 
-#include <CollisionDetection/CGConfig.h>
-#include <CollisionDetection/CGConvex.h>
+#include <Geometry/CGConfig.h>
+#include <Geometry/CGConvex.h>
 
 namespace CG
 {

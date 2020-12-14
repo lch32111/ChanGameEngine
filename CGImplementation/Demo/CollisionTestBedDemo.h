@@ -6,7 +6,7 @@
 
 #include <Graphics/chanQuatCamera.h>
 
-#include <CollisionDetection/CGSphere.h>
+#include <Geometry/CGSphere.h>
 
 namespace CG
 {

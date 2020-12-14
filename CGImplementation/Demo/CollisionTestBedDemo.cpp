@@ -9,7 +9,7 @@
 #include <Graphics/CGSizableRenderLine.h>
 #include <Graphics/GLPrimitiveUtil.h>
 
-#include <CollisionDetection/CGCollisionFunction.h>
+#include <Geometry/CGCollisionFunction.h>
 
 #include <GPED/GPED_random.h>
 #include <GPED/CGPhysicsUtil.h>

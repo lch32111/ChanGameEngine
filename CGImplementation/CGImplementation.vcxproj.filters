@@ -67,17 +67,8 @@
     <Filter Include="Demo\CollisionDetection Demo">
       <UniqueIdentifier>{4b477c2f-0a49-453a-b0ec-5d6e9b7d321e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="CollisionDetection">
-      <UniqueIdentifier>{3f934dfe-e199-4fff-adca-5e3b91e309a1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Math">
       <UniqueIdentifier>{d7e902a4-9e93-452b-8057-9131722b7fa0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CollisionDetection\Header">
-      <UniqueIdentifier>{ec8d8188-9c95-4de2-b35b-4222c7bdb1d4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CollisionDetection\Source">
-      <UniqueIdentifier>{6c628e4f-f51e-4080-a539-d12717c2d534}</UniqueIdentifier>
     </Filter>
     <Filter Include="Demo\CollisionDetection Demo\CDFirstExperiment">
       <UniqueIdentifier>{86c7187a-d3e6-4b4c-8d02-64443d1a10a2}</UniqueIdentifier>
@@ -87,6 +78,15 @@
     </Filter>
     <Filter Include="Demo\RayTracer Demo">
       <UniqueIdentifier>{2bdbd6ff-fcbb-4c30-ba79-843258abc8b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Geometry">
+      <UniqueIdentifier>{3f934dfe-e199-4fff-adca-5e3b91e309a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Geometry\Header">
+      <UniqueIdentifier>{ec8d8188-9c95-4de2-b35b-4222c7bdb1d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Geometry\Source">
+      <UniqueIdentifier>{6c628e4f-f51e-4080-a539-d12717c2d534}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -291,9 +291,6 @@
     <ClCompile Include="Graphics\CGStd140Module.cpp">
       <Filter>Graphics Source</Filter>
     </ClCompile>
-    <ClCompile Include="CollisionDetection\CGCollisionFunction.cpp">
-      <Filter>CollisionDetection\Source</Filter>
-    </ClCompile>
     <ClCompile Include="Demo\CollisionTestBedDemo.cpp">
       <Filter>Demo\CollisionDetection Demo\CDFirstExperiment</Filter>
     </ClCompile>
@@ -305,6 +302,9 @@
     </ClCompile>
     <ClCompile Include="Demo\RayTracerDemo.cpp">
       <Filter>Demo\RayTracer Demo</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry\CGCollisionFunction.cpp">
+      <Filter>Geometry\Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -572,9 +572,6 @@
     <ClInclude Include="Math\CGMathHeader.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionDetection\CGCollisionFunction.h">
-      <Filter>CollisionDetection\Header</Filter>
-    </ClInclude>
     <ClInclude Include="CGPrecompiled.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -605,23 +602,26 @@
     <ClInclude Include="Demo\RayTracerDemo.h">
       <Filter>Demo\RayTracer Demo</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionDetection\CGShape.h">
-      <Filter>CollisionDetection\Header</Filter>
+    <ClInclude Include="Geometry\CGCollisionFunction.h">
+      <Filter>Geometry\Header</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionDetection\CGConvex.h">
-      <Filter>CollisionDetection\Header</Filter>
+    <ClInclude Include="Geometry\CGConfig.h">
+      <Filter>Geometry\Header</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionDetection\CGConfig.h">
-      <Filter>CollisionDetection\Header</Filter>
+    <ClInclude Include="Geometry\CGConvex.h">
+      <Filter>Geometry\Header</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionDetection\CGSphere.h">
-      <Filter>CollisionDetection\Header</Filter>
+    <ClInclude Include="Geometry\CGLineSegment.h">
+      <Filter>Geometry\Header</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionDetection\CGRay.h">
-      <Filter>CollisionDetection\Header</Filter>
+    <ClInclude Include="Geometry\CGRay.h">
+      <Filter>Geometry\Header</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionDetection\CGLineSegment.h">
-      <Filter>CollisionDetection\Header</Filter>
+    <ClInclude Include="Geometry\CGShape.h">
+      <Filter>Geometry\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\CGSphere.h">
+      <Filter>Geometry\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

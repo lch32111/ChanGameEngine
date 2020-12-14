@@ -1,5 +1,5 @@
 #include <CGPrecompiled.h>
-#include <CollisionDetection/CGCollisionFunction.h>
+#include <Geometry/CGCollisionFunction.h>
 
 using namespace CG;
 

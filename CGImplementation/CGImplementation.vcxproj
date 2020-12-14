@@ -134,10 +134,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CollisionDetection\CGCollisionFunction.cpp" />
     <ClCompile Include="Demo\CollisionTestBedDemo.cpp" />
     <ClCompile Include="Demo\CullingDemo.cpp" />
     <ClCompile Include="Demo\RayTracerDemo.cpp" />
+    <ClCompile Include="Geometry\CGCollisionFunction.cpp" />
     <ClCompile Include="Graphics\CGBloomEffect.cpp" />
     <ClCompile Include="CG_Application.cpp" />
     <ClCompile Include="Demo\DeferredRenderer.cpp" />
@@ -209,16 +209,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CGPrecompiled.h" />
-    <ClInclude Include="CollisionDetection\CGConfig.h" />
-    <ClInclude Include="CollisionDetection\CGConvex.h" />
-    <ClInclude Include="CollisionDetection\CGCollisionFunction.h" />
-    <ClInclude Include="CollisionDetection\CGLineSegment.h" />
-    <ClInclude Include="CollisionDetection\CGRay.h" />
-    <ClInclude Include="CollisionDetection\CGShape.h" />
-    <ClInclude Include="CollisionDetection\CGSphere.h" />
     <ClInclude Include="Demo\CollisionTestBedDemo.h" />
     <ClInclude Include="Demo\CullingDemo.h" />
     <ClInclude Include="Demo\RayTracerDemo.h" />
+    <ClInclude Include="Geometry\CGCollisionFunction.h" />
+    <ClInclude Include="Geometry\CGConfig.h" />
+    <ClInclude Include="Geometry\CGConvex.h" />
+    <ClInclude Include="Geometry\CGLineSegment.h" />
+    <ClInclude Include="Geometry\CGRay.h" />
+    <ClInclude Include="Geometry\CGShape.h" />
+    <ClInclude Include="Geometry\CGSphere.h" />
     <ClInclude Include="Graphics\CGBloomEffect.h" />
     <ClInclude Include="CGErrorLogger.h" />
     <ClInclude Include="CG_Application.h" />

@@ -1,9 +1,9 @@
 #ifndef __CG_COLLISION_FUNCTION_H__
 #define __CG_COLLISION_FUNCTION_H__
 
-#include <CollisionDetection/CGSphere.h>
-#include <CollisionDetection/CGRay.h>
-#include <CollisionDetection/CGLineSegment.h>
+#include <Geometry/CGSphere.h>
+#include <Geometry/CGRay.h>
+#include <Geometry/CGLineSegment.h>
 
 namespace CG
 {

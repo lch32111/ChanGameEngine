@@ -605,9 +605,6 @@
     <ClInclude Include="Geometry\CGCollisionFunction.h">
       <Filter>Geometry\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\CGConfig.h">
-      <Filter>Geometry\Header</Filter>
-    </ClInclude>
     <ClInclude Include="Geometry\CGConvex.h">
       <Filter>Geometry\Header</Filter>
     </ClInclude>
@@ -621,6 +618,9 @@
       <Filter>Geometry\Header</Filter>
     </ClInclude>
     <ClInclude Include="Geometry\CGSphere.h">
+      <Filter>Geometry\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\CGGeometryConfig.h">
       <Filter>Geometry\Header</Filter>
     </ClInclude>
   </ItemGroup>

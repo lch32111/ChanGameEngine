@@ -213,7 +213,7 @@
     <ClInclude Include="Demo\CullingDemo.h" />
     <ClInclude Include="Demo\RayTracerDemo.h" />
     <ClInclude Include="Geometry\CGCollisionFunction.h" />
-    <ClInclude Include="Geometry\CGConfig.h" />
+    <ClInclude Include="Geometry\CGGeometryConfig.h" />
     <ClInclude Include="Geometry\CGConvex.h" />
     <ClInclude Include="Geometry\CGLineSegment.h" />
     <ClInclude Include="Geometry\CGRay.h" />

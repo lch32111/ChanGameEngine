@@ -1,7 +1,7 @@
 #ifndef __CG_COLLISION_LINE_SEGMENT
 #define __CG_COLLISION_LINE_SEGMENT
 
-#include <Geometry/CGConfig.h>
+#include <Geometry/CGGeometryConfig.h>
 #include <Geometry/CGConvex.h>
 
 namespace CG

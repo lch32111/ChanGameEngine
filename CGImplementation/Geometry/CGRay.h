@@ -1,7 +1,7 @@
 #ifndef __CG_RAY_H__
 #define __CG_RAY_H__
 
-#include <Geometry/CGConfig.h>
+#include <Geometry/CGGeometryConfig.h>
 #include <Geometry/CGConvex.h>
 
 namespace CG

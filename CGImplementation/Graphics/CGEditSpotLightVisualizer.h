@@ -7,7 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <Graphics/Shader.h>
 
-namespace CGProj
+namespace CG
 {
 	class CGEditSpotLightVisualizer
 	{

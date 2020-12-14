@@ -8,7 +8,7 @@
 #include <stb_image.h>
 #include <glad/glad.h>
 
-unsigned int CGProj::TextureFromFile(const std::string file, bool gamma_correct)
+unsigned int CG::TextureFromFile(const std::string file, bool gamma_correct)
 {
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
@@ -54,7 +54,7 @@ unsigned int CGProj::TextureFromFile(const std::string file, bool gamma_correct)
 	return textureID;
 }
 
-unsigned int CGProj::loadCubeMap(const std::vector<std::string>& faces)
+unsigned int CG::loadCubeMap(const std::vector<std::string>& faces)
 {
 	unsigned int textureID;
 	glGenTextures(1, &textureID);

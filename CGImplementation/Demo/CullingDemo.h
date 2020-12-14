@@ -6,7 +6,7 @@
 
 #include <Graphics/chanQuatCamera.h>
 
-namespace CGProj
+namespace CG
 {
 	class CullingTestBed;
 	class CullingDemo : public Application

@@ -17,7 +17,7 @@ I added a little thing to this with my taste
 
 #include <Math/CGMat4.h>
 
-namespace CGProj
+namespace CG
 {
 	class Shader
 	{
@@ -56,7 +56,7 @@ namespace CGProj
 		void setMat4(const std::string& name, const glm::mat4& mat) const;
 
 
-		void SetMat4(const char* name, const CGProj::Math::CGMat4<float>& mat) const;
+		void SetMat4(const char* name, const CG::CGMat4<float>& mat) const;
 	private:
 		std::string m_vertexPath, m_geometryPath, m_fragmentPath;
 		bool checkCompileErrors(GLuint shader, std::string type);

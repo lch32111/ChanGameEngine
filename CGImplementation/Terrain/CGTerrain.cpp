@@ -6,7 +6,7 @@
 
 #include <Graphics/CGAssetManager.h>
 
-CGProj::CGTerrain::CGTerrain()
+CG::CGTerrain::CGTerrain()
 	: 
 	m_terrainWidth(64), m_terrainHeight(5), m_terrainDepth(64), // Manual Setting
 	m_terrainSubWidth(63), m_terrainSubDepth(63), 
@@ -19,7 +19,7 @@ CGProj::CGTerrain::CGTerrain()
 	// the last term is for the degenerate case of triangle_strip
 }
 
-void CGProj::CGTerrain::initialize(bool imageOrGenerator, CGAssetManager& am)
+void CG::CGTerrain::initialize(bool imageOrGenerator, CGAssetManager& am)
 {
 	// Graphics Init
 	imageOrGenerator ? initializeWithImage(am) : initializeWithGenerator(am);
@@ -28,7 +28,7 @@ void CGProj::CGTerrain::initialize(bool imageOrGenerator, CGAssetManager& am)
 	initializePhysics();
 }
 
-void CGProj::CGTerrain::destroy()
+void CG::CGTerrain::destroy()
 {
 	glDeleteVertexArrays(1, &m_VAO);
 	glDeleteBuffers(3, m_VBO);
@@ -38,7 +38,7 @@ void CGProj::CGTerrain::destroy()
 }
 
 
-void CGProj::CGTerrain::render(const glm::mat4 & view, const glm::mat4 & proj, const glm::vec3& campos)
+void CG::CGTerrain::render(const glm::mat4 & view, const glm::mat4 & proj, const glm::vec3& campos)
 {
 	glm::mat4 model(1.0);
 	m_terrainShader->use();
@@ -53,32 +53,32 @@ void CGProj::CGTerrain::render(const glm::mat4 & view, const glm::mat4 & proj, c
 	glBindVertexArray(0);
 }
 
-unsigned CGProj::CGTerrain::getProxyId()
+unsigned CG::CGTerrain::getProxyId()
 {
 	return m_proxyId;
 }
 
-void CGProj::CGTerrain::setProxyId(unsigned id)
+void CG::CGTerrain::setProxyId(unsigned id)
 {
 	m_proxyId = id;
 }
 
-GPED::c3AABB CGProj::CGTerrain::getAABB()
+GPED::c3AABB CG::CGTerrain::getAABB()
 {
 	return m_localAABB;
 }
 
-void CGProj::CGTerrain::getAABB(GPED::c3AABB & out)
+void CG::CGTerrain::getAABB(GPED::c3AABB & out)
 {
 	out = m_localAABB;
 }
 
-CGProj::CGCollisionMesh * CGProj::CGTerrain::getCollisioPrimitivePtr()
+CG::CGCollisionMesh * CG::CGTerrain::getCollisioPrimitivePtr()
 {
 	return &m_collisionPrimitive;
 }
 
-void CGProj::CGTerrain::initializeWithImage(CGAssetManager & am)
+void CG::CGTerrain::initializeWithImage(CGAssetManager & am)
 {
 	m_terrainShader = am.getShader(SHADER_SIMPLE_TERRAIN);
 	m_terrainShader->use();
@@ -203,7 +203,7 @@ void CGProj::CGTerrain::initializeWithImage(CGAssetManager & am)
 	stbi_image_free(data);
 }
 
-void CGProj::CGTerrain::initializeWithGenerator(CGAssetManager & am)
+void CG::CGTerrain::initializeWithGenerator(CGAssetManager & am)
 {
 	m_terrainShader = am.getShader(SHADER_SIMPLE_TERRAIN);
 	m_terrainShader->use();
@@ -305,7 +305,7 @@ void CGProj::CGTerrain::initializeWithGenerator(CGAssetManager & am)
 	delete[] vertices;
 }
 
-void CGProj::CGTerrain::initializePhysics()
+void CG::CGTerrain::initializePhysics()
 {
 	m_localAABB.min = glm::vec3(m_terrainWidth * -0.5, 0, m_terrainDepth * -0.5);
 	m_localAABB.max = m_localAABB.min * -1.f;
@@ -335,7 +335,7 @@ void CGProj::CGTerrain::initializePhysics()
 	m_collisionPrimitive.m_heightDataNumb = m_gridVertexCount;
 }
 
-float CGProj::CGTerrain::getHeight(unsigned x, unsigned z)
+float CG::CGTerrain::getHeight(unsigned x, unsigned z)
 {
 	return m_HeightData[x + (m_terrainSubWidth + 1) * z];
 }

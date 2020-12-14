@@ -4,23 +4,23 @@
 #include <GPED/CGPhysicsUtil.h>
 #include <Graphics/CGAssetManager.h>
 
-CGProj::CGDirShadowFrustumVisualizer::CGDirShadowFrustumVisualizer()
+CG::CGDirShadowFrustumVisualizer::CGDirShadowFrustumVisualizer()
 {
 }
 
-CGProj::CGDirShadowFrustumVisualizer::CGDirShadowFrustumVisualizer(CGAssetManager & am)
+CG::CGDirShadowFrustumVisualizer::CGDirShadowFrustumVisualizer(CGAssetManager & am)
 {
 	m_lineShader = am.getShader(SHADER_CG_LINE);
 	prepareData();
 }
 
-void CGProj::CGDirShadowFrustumVisualizer::setShader(Shader * shader)
+void CG::CGDirShadowFrustumVisualizer::setShader(Shader * shader)
 {
 	m_lineShader = shader;
 	prepareData();
 }
 
-void CGProj::CGDirShadowFrustumVisualizer::render(
+void CG::CGDirShadowFrustumVisualizer::render(
 	const glm::mat4& view, const glm::mat4& proj,
 	const glm::vec3 & position, const glm::vec3 & direction,
 	float fov, float aspect, float nearP, float farP
@@ -111,7 +111,7 @@ void CGProj::CGDirShadowFrustumVisualizer::render(
 	renderLine(view, proj);
 }
 
-void CGProj::CGDirShadowFrustumVisualizer::render(
+void CG::CGDirShadowFrustumVisualizer::render(
 	const glm::mat4& view, const glm::mat4& proj,
 	const glm::vec3 & position, const glm::vec3 & direction, 
 	float l, float r, float b, float t, float nearP, float farP)
@@ -191,7 +191,7 @@ void CGProj::CGDirShadowFrustumVisualizer::render(
 	renderLine(view, proj);
 }
 
-void CGProj::CGDirShadowFrustumVisualizer::prepareData()
+void CG::CGDirShadowFrustumVisualizer::prepareData()
 {
 	glGenVertexArrays(1, &m_VAO);
 	glGenBuffers(2, m_VBO);
@@ -216,7 +216,7 @@ void CGProj::CGDirShadowFrustumVisualizer::prepareData()
 	m_count = 0;
 }
 
-void CGProj::CGDirShadowFrustumVisualizer::insertLine(const glm::vec3 & From, const glm::vec3 & To, const glm::vec4 & Color)
+void CG::CGDirShadowFrustumVisualizer::insertLine(const glm::vec3 & From, const glm::vec3 & To, const glm::vec4 & Color)
 {
 	assert(m_count < e_maxVertices);
 	m_vertices[m_count] = From;
@@ -229,7 +229,7 @@ void CGProj::CGDirShadowFrustumVisualizer::insertLine(const glm::vec3 & From, co
 	++m_count;
 }
 
-void CGProj::CGDirShadowFrustumVisualizer::renderLine(const glm::mat4 & view, const glm::mat4 & proj, const float lineWidth)
+void CG::CGDirShadowFrustumVisualizer::renderLine(const glm::mat4 & view, const glm::mat4 & proj, const float lineWidth)
 {
 	if (m_count == 0) return;
 

@@ -7,7 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 // Forward Declaration 
-namespace CGProj { class CGCollisionPrimitive; }
+namespace CG { class CGCollisionPrimitive; }
 
 namespace GPED
 {
@@ -203,7 +203,7 @@ namespace GPED
 
 	/// The method to enable GPED Object to interact with CGBroadPhase 
 	/// which uses dynamicAABB tree
-	void convertFromCollisionPrimitive(const CGProj::CGCollisionPrimitive& primitive, GPED::c3AABB& outAABB);
+	void convertFromCollisionPrimitive(const CG::CGCollisionPrimitive& primitive, GPED::c3AABB& outAABB);
 	GPED::c3AABB makeAABB(const glm::vec3& position, const glm::vec3& halfExtents); // from AABB
 	GPED::c3AABB makeAABB(const glm::mat3& orientation, const glm::vec3& position, const glm::vec3& halfExtents); // from OBB
 	GPED::c3AABB makeAABB(const glm::vec3& position, const GPED::real radius); // from Sphere

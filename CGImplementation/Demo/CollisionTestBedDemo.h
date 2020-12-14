@@ -6,9 +6,9 @@
 
 #include <Graphics/chanQuatCamera.h>
 
-#include <CollisionDetection/CGCollisionSphere.h>
+#include <CollisionDetection/CGSphere.h>
 
-namespace CGProj
+namespace CG
 {
 	class CollisionTestBed;
 	class CollisionDemo : public Application
@@ -61,9 +61,9 @@ namespace CGProj
 
 		bool isSphereCollided = false;
 		bool isRaySphereCollided = false;
-		CollisionDetection::CGCollisionContact sphereContact;
-		CollisionDetection::CGCollisionSphere aSphere;
-		CollisionDetection::CGCollisionSphere bSphere;
+		CGContact sphereContact;
+		CGSphere aSphere;
+		CGSphere bSphere;
 	};
 }
 

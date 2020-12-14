@@ -4,22 +4,22 @@
 #include <Graphics/GLPrimitiveUtil.h>
 #include <Graphics/CGAssetManager.h>
 
-CGProj::CGPointShadowFrustumVisualizer::CGPointShadowFrustumVisualizer()
+CG::CGPointShadowFrustumVisualizer::CGPointShadowFrustumVisualizer()
 {
 
 }
 
-CGProj::CGPointShadowFrustumVisualizer::CGPointShadowFrustumVisualizer(CGAssetManager& am)
+CG::CGPointShadowFrustumVisualizer::CGPointShadowFrustumVisualizer(CGAssetManager& am)
 {
 	m_shader = am.getShader(SHADER_SIMPLE_COLOR_RENDER);
 }
 
-void CGProj::CGPointShadowFrustumVisualizer::setShader(Shader* shader)
+void CG::CGPointShadowFrustumVisualizer::setShader(Shader* shader)
 {
 	m_shader = shader;
 }
 
-void CGProj::CGPointShadowFrustumVisualizer::render(
+void CG::CGPointShadowFrustumVisualizer::render(
 	const glm::mat4& view, const glm::mat4& proj,
 	const glm::vec3& position,
 	const float nearP, const float farP)

@@ -10,7 +10,7 @@
 #include <Math/CGVector3.h>
 #include <Math/CGVector4.h>
 
-namespace CGProj
+namespace CG
 {
 	// Forward Declaration
 	class CGAssetManager;
@@ -23,8 +23,8 @@ namespace CGProj
 		void initialize(Shader* shader, unsigned maxLineNumb);
 		void destroy();
 
-		void insertLine(const Math::CGVector3<float>& From, const Math::CGVector3<float>& To,
-			const Math::CGVector4<float>& Color = Math::CGVector4<float>(1.0));
+		void insertLine(const CGVector3<float>& From, const CGVector3<float>& To,
+			const CGVector4<float>& Color = CGVector4<float>(1.0));
 
 		void insertLine(const glm::vec3& From, const glm::vec3& To,
 			const glm::vec4& Color = glm::vec4(1.0));

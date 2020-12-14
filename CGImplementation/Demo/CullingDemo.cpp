@@ -8,7 +8,7 @@
 /****************************************************************************************/
 /* ### Collision Demo ### */
 
-void CGProj::CullingDemo::OnInitialize()
+void CG::CullingDemo::OnInitialize()
 {
 	glfwSwapInterval(0);
 	glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -20,40 +20,40 @@ void CGProj::CullingDemo::OnInitialize()
 	demo->initImgui();
 }
 
-void CGProj::CullingDemo::OnFinalize()
+void CG::CullingDemo::OnFinalize()
 {
 	demo->deinit();
 	delete demo;
 }
 
-void CGProj::CullingDemo::Update(float deltaTime, float lastFrame)
+void CG::CullingDemo::Update(float deltaTime, float lastFrame)
 {
 	demo->key(app_window, deltaTime);
 	demo->updateImgui();
 	demo->updateSimulation(deltaTime, lastFrame);
 }
 
-void CGProj::CullingDemo::Display()
+void CG::CullingDemo::Display()
 {
 	demo->display(m_width, m_height);
 }
 
-void CGProj::CullingDemo::MouseMoveCallback(double xpos, double ypos)
+void CG::CullingDemo::MouseMoveCallback(double xpos, double ypos)
 {
 	demo->mouse(xpos, ypos);
 }
 
-void CGProj::CullingDemo::MouseButtonCallback(int button, int action, int mods)
+void CG::CullingDemo::MouseButtonCallback(int button, int action, int mods)
 {
 	demo->mouseButton(app_window, button, action, mods, m_width, m_height);
 }
 
-void CGProj::CullingDemo::ScrollCallback(double yoffset)
+void CG::CullingDemo::ScrollCallback(double yoffset)
 {
 	demo->scroll(yoffset);
 }
 
-void CGProj::CullingDemo::ResizeWindowCallback(int width, int height)
+void CG::CullingDemo::ResizeWindowCallback(int width, int height)
 {
 	Application::m_width = width;
 	Application::m_height = height;
@@ -65,22 +65,22 @@ void CGProj::CullingDemo::ResizeWindowCallback(int width, int height)
 /* ### Collision Demo ### */
 /****************************************************************************************/
 
-void CGProj::CullingTestBed::initGraphics(int width, int height)
+void CG::CullingTestBed::initGraphics(int width, int height)
 {
 }
 
 
-void CGProj::CullingTestBed::initImgui()
+void CG::CullingTestBed::initImgui()
 {
 
 }
 
-void CGProj::CullingTestBed::deinit()
+void CG::CullingTestBed::deinit()
 {
 }
 
 
-void CGProj::CullingTestBed::updateImgui()
+void CG::CullingTestBed::updateImgui()
 {
 	ImGui::Begin("Collision Test Bed");
 	{
@@ -94,12 +94,12 @@ void CGProj::CullingTestBed::updateImgui()
 	ImGui::End();
 }
 
-void CGProj::CullingTestBed::updateSimulation(float dletaTime, float lastTime)
+void CG::CullingTestBed::updateSimulation(float dletaTime, float lastTime)
 {
 
 }
 
-void CGProj::CullingTestBed::display(int width, int height)
+void CG::CullingTestBed::display(int width, int height)
 {
 	glClearColor(0.11f, 0.11f, 0.11f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -113,7 +113,7 @@ void CGProj::CullingTestBed::display(int width, int height)
 	
 }
 
-void CGProj::CullingTestBed::key(GLFWwindow* app_window, float deltaTime)
+void CG::CullingTestBed::key(GLFWwindow* app_window, float deltaTime)
 {
 	if (GameControl)
 	{
@@ -160,7 +160,7 @@ void CGProj::CullingTestBed::key(GLFWwindow* app_window, float deltaTime)
 	}
 }
 
-void CGProj::CullingTestBed::mouse(double xpos, double ypos)
+void CG::CullingTestBed::mouse(double xpos, double ypos)
 {
 	if (GameControl)
 	{
@@ -191,7 +191,7 @@ void CGProj::CullingTestBed::mouse(double xpos, double ypos)
 	}
 }
 
-void CGProj::CullingTestBed::mouseButton(GLFWwindow * app_window,
+void CG::CullingTestBed::mouseButton(GLFWwindow * app_window,
 	int button, int action, int mods,
 	int screen_width, int screen_height)
 {
@@ -216,7 +216,7 @@ void CGProj::CullingTestBed::mouseButton(GLFWwindow * app_window,
 	}
 }
 
-void CGProj::CullingTestBed::scroll(double yoffset)
+void CG::CullingTestBed::scroll(double yoffset)
 {
 	// Exit out if mouse clicks on Imgui GUI
 	if (ImGui::IsMouseHoveringAnyWindow()) return;
@@ -224,7 +224,7 @@ void CGProj::CullingTestBed::scroll(double yoffset)
 	camera.ProcessMouseScroll((float)yoffset);
 }
 
-void CGProj::CullingTestBed::resize(int width, int height)
+void CG::CullingTestBed::resize(int width, int height)
 {
 
 }

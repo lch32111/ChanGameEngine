@@ -6,7 +6,7 @@
 #include <iostream>
 #include <glad/glad.h>
 
-namespace CGProj
+namespace CG
 {
 	class GLErrorChecker
 	{

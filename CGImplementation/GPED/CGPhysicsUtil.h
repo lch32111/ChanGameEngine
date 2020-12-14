@@ -5,7 +5,7 @@
 #include <GPED/GPED_Precision.h>
 #include <Graphics/chanQuatCamera.h>
 
-namespace CGProj
+namespace CG
 {
 	static glm::vec3 safeNormalize(const glm::vec3& vec)
 	{

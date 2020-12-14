@@ -4,7 +4,7 @@
 #include <GPED/GPED_body.h>
 
 // Forward Declaration for accessing the Contact
-namespace CGProj { class CGContactManager; }
+namespace CG { class CGContactManager; }
 
 namespace GPED
 {
@@ -41,7 +41,7 @@ namespace GPED
 		 * set and effect the contact.
 		 */
 		friend class ContactResolver;
-		friend class CGProj::CGContactManager;
+		friend class CG::CGContactManager;
 
 	public:
 		/**

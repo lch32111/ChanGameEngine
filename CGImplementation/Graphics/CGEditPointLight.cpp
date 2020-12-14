@@ -9,7 +9,7 @@
 #include <Graphics/CGAssetManager.h>
 #include <Graphics/CGEditProxyObject.h>
 
-CGProj::CGEditPointLight::CGEditPointLight()
+CG::CGEditPointLight::CGEditPointLight()
 {
 	m_lightFactors = nullptr;
 	
@@ -26,7 +26,7 @@ CGProj::CGEditPointLight::CGEditPointLight()
 	m_shadowBias = 0.005f;
 }
 
-void CGProj::CGEditPointLight::initialize(CGAssetManager & am, CGEditLightCommonFactor * factor)
+void CG::CGEditPointLight::initialize(CGAssetManager & am, CGEditLightCommonFactor * factor)
 {
 	m_lightFactors = factor;
 
@@ -62,7 +62,7 @@ void CGProj::CGEditPointLight::initialize(CGAssetManager & am, CGEditLightCommon
 	// Shadow Map Initialization
 }
 
-void CGProj::CGEditPointLight::debugDepthMapRender(const glm::mat4& view, const glm::mat4& proj)
+void CG::CGEditPointLight::debugDepthMapRender(const glm::mat4& view, const glm::mat4& proj)
 {
 	// Refer to CGPointDepthMapDebugRender Shader
 	m_DebugDepthMapShader->use();
@@ -79,7 +79,7 @@ void CGProj::CGEditPointLight::debugDepthMapRender(const glm::mat4& view, const 
 	renderCube();
 }
 
-void CGProj::CGEditPointLight::UIrenderForCommon()
+void CG::CGEditPointLight::UIrenderForCommon()
 {
 	ImGui::PushItemWidth(50);
 	if(ImGui::InputFloat("Light Radius", &m_lightFactors->AttnRadius)) setShadowFarPlane(m_lightFactors->AttnRadius);
@@ -102,7 +102,7 @@ void CGProj::CGEditPointLight::UIrenderForCommon()
 	}
 }
 
-void CGProj::CGEditPointLight::UIrenderForShadow()
+void CG::CGEditPointLight::UIrenderForShadow()
 {
 	int wharr = m_shadowWidth;
 	if (ImGui::InputInt("shadow width & height", &wharr))
@@ -113,7 +113,7 @@ void CGProj::CGEditPointLight::UIrenderForShadow()
 	ImGui::InputFloat("Shadow Bias", &m_shadowBias);
 }
 
-void CGProj::CGEditPointLight::setLightPropertyOnShader(Shader * shader, 
+void CG::CGEditPointLight::setLightPropertyOnShader(Shader * shader, 
 	const std::string & sLightIndex, const std::string & sShadowIndex, const unsigned shadowIndex)
 {
 	shader->setVec3("pointLights[" + sLightIndex + "].Position", m_lightFactors->lightPosition);
@@ -140,7 +140,7 @@ void CGProj::CGEditPointLight::setLightPropertyOnShader(Shader * shader,
 	}
 }
 
-void CGProj::CGEditPointLight::renderShadowMap(std::vector<CGEditProxyObject>& objects)
+void CG::CGEditPointLight::renderShadowMap(std::vector<CGEditProxyObject>& objects)
 {
 	// Light Space Setting
 	m_shadowLightProjection = glm::perspective(m_perFOV, m_perAspect, m_shadowNearPlane, m_shadowFarPlane);
@@ -198,17 +198,17 @@ void CGProj::CGEditPointLight::renderShadowMap(std::vector<CGEditProxyObject>& o
 	renderQuad();
 }
 
-float CGProj::CGEditPointLight::getShadowFarPlane()
+float CG::CGEditPointLight::getShadowFarPlane()
 {
 	return m_shadowFarPlane;
 }
 
-float CGProj::CGEditPointLight::getShadowNearPlane()
+float CG::CGEditPointLight::getShadowNearPlane()
 {
 	return m_shadowNearPlane;
 }
 
-void CGProj::CGEditPointLight::updateRadius()
+void CG::CGEditPointLight::updateRadius()
 {
 	// the diffuse color of light is used for the max component of light
 	// You need to keep in mind that the radius will be bigger if the m_lightFactors.lightDiffuse will be bigger
@@ -227,7 +227,7 @@ void CGProj::CGEditPointLight::updateRadius()
 		(2 * m_lightFactors->AttnQuadratic);
 }
 
-void CGProj::CGEditPointLight::setShadowWidthHeight(unsigned wh)
+void CG::CGEditPointLight::setShadowWidthHeight(unsigned wh)
 {
 	m_shadowWidth = wh;
 	m_shadowHeight = wh;
@@ -245,7 +245,7 @@ void CGProj::CGEditPointLight::setShadowWidthHeight(unsigned wh)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void CGProj::CGEditPointLight::setShadowFarPlane(float farP)
+void CG::CGEditPointLight::setShadowFarPlane(float farP)
 {
 	m_shadowFarPlane = farP;
 }

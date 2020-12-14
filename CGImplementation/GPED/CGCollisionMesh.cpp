@@ -3,13 +3,13 @@
 #include <GPED/CGPhysicsUtil.h>
 #include <iostream>
 
-CGProj::CGCollisionMesh::CGCollisionMesh()
+CG::CGCollisionMesh::CGCollisionMesh()
 {
 	CGCollisionPrimitive::m_primitiveType = COLLISION_PRIMITIVE_MESH;
 }
 
 void
-CGProj::CGCollisionMesh::getQuantizedGridPoints(
+CG::CGCollisionMesh::getQuantizedGridPoints(
 	const GPED::c3AABB & aabbFromDynamicObjects, Mesh_QuantizedGridRange& outRange) const
 {
 	// Mesh Setting
@@ -56,7 +56,7 @@ CGProj::CGCollisionMesh::getQuantizedGridPoints(
 		outRange.EndZ = quantizedAABBmax[2];
 }
 
-void CGProj::CGCollisionMesh::getVertex(unsigned gridX, unsigned gridZ, glm::vec3 & outVertex) const
+void CG::CGCollisionMesh::getVertex(unsigned gridX, unsigned gridZ, glm::vec3 & outVertex) const
 {
 	outVertex.x = m_meshWidth * (gridX * (1.f / m_meshSubWidth) - 0.5f);
 	outVertex.z = m_meshDepth * (gridZ * (1.f / m_meshSubDepth) - 0.5f);
@@ -65,7 +65,7 @@ void CGProj::CGCollisionMesh::getVertex(unsigned gridX, unsigned gridZ, glm::vec
 	outVertex += m_meshOrigin;
 }
 
-int CGProj::CGCollisionMesh::getQuantized(float n) const
+int CG::CGCollisionMesh::getQuantized(float n) const
 {
 	if (n < 0.0)
 	{

@@ -5,7 +5,7 @@
 #include <GPED/CGBroadPhase.h>
 #include <Graphics/CGEditPrimitive.h>
 
-namespace CGProj
+namespace CG
 {
 	// Forward Declaration
 	class CGAssetManager;

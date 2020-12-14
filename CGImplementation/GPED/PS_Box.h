@@ -3,7 +3,7 @@
 
 #include <GPED/CGCollisionOBB.h>
 
-class Box : public CGProj::CGCollisionOBB
+class Box : public CG::CGCollisionOBB
 {
 public:
 	int proxyId;

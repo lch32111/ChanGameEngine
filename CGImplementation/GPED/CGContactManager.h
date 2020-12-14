@@ -4,7 +4,7 @@
 
 #include <GPED/GPED_contacts.h>
 #include <iostream>
-namespace CGProj
+namespace CG
 {
 	/* 181119 Chanhaeng Lee
 	* This class is the similar one as the CollisionData class in GPED.

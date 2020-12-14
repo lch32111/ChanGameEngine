@@ -13,7 +13,7 @@
 
 
 
-namespace CGProj
+namespace CG
 {
 	static unsigned cubeVAO;
 	static unsigned cubeVBO;

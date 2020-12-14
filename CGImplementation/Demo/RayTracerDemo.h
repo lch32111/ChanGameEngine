@@ -6,7 +6,7 @@
 #include <Math/CGVector3.h>
 #include <Graphics/CGAssetManager.h>
 
-namespace CGProj
+namespace CG
 {
 	// The whole ray tracer is from https://graphicscodex.com/
 	class RayTracerCamera
@@ -14,12 +14,19 @@ namespace CGProj
 	public:
 
 		void GetPrimaryRay(float x, float y, int width, int height,
-			CGProj::Math::CGVector3<float>& position,
-			CGProj::Math::CGVector3<float>& w) const;
+			CGVector3<float>& position,
+			CGVector3<float>& w) const;
 
 		float m_near;
 		float m_far;
 		float m_fov_in_radian;
+	};
+
+	class Surfel
+	{
+	public:
+		CGVector3<float> m_position;
+		CGVector3<float> m_normal;
 	};
 
 	class RayTracerDemo : public Application
@@ -39,14 +46,18 @@ namespace CGProj
 		virtual void OnFinalize();
 	private:
 		void RayTrace();
+		CGVector3<float> ComputeLight(CGVector3<float> pos, CGVector3<float> normalizedRay);
+		const Surfel* FindIntersection(CGVector3<float> pos, CGVector3<float> normalizedRay);
+
 
 		u32 m_image_width;
 		u32 m_image_height;
-		CGProj::Math::CGVector3<float>* m_image_buffer;
+		CGVector3<float>* m_image_buffer;
 		GLuint m_gl_image_tex;
 
-	private:
 		RayTracerCamera m_camera;
+
+	private:
 		CGAssetManager m_asset_manager;
 		Shader* m_simple_shader;
 	};

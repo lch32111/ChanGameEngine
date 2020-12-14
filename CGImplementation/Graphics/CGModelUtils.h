@@ -7,7 +7,7 @@
 #include <string>
 #include <CGErrorLogger.h>
 
-namespace CGProj
+namespace CG
 {
 	/* 19-01-16 Chanhaeng Lee
 	 * I made this util header file to support mesh rendering process.

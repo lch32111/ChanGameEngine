@@ -33,7 +33,7 @@ void GPED::ContactResolver::setEpsilon(real velocityEpsilon, real positionEpsilo
 	ContactResolver::positionEpsilon = positionEpsilon;
 }
 
-void GPED::ContactResolver::resolveContacts(CGProj::CGContactManager * CM, real duration)
+void GPED::ContactResolver::resolveContacts(CG::CGContactManager * CM, real duration)
 {
 	// Make sure we have something to do
 	if (CM->GetNodeCount() == 0) return;
@@ -49,12 +49,12 @@ void GPED::ContactResolver::resolveContacts(CGProj::CGContactManager * CM, real 
 	adjustVelocities(CM, duration);
 }
 
-void GPED::ContactResolver::prepareContacts(CGProj::CGContactManager * CM, real duration)
+void GPED::ContactResolver::prepareContacts(CG::CGContactManager * CM, real duration)
 {
 	CM->AllcalculateInternals(duration);
 }
 
-void GPED::ContactResolver::adjustPositions(CGProj::CGContactManager * CM, real duration)
+void GPED::ContactResolver::adjustPositions(CG::CGContactManager * CM, real duration)
 {
 	glm::vec3 linearChange[2], angularChange[2];
 
@@ -82,7 +82,7 @@ void GPED::ContactResolver::adjustPositions(CGProj::CGContactManager * CM, real 
 	}
 }
 
-void GPED::ContactResolver::adjustVelocities(CGProj::CGContactManager * CM, real duration)
+void GPED::ContactResolver::adjustVelocities(CG::CGContactManager * CM, real duration)
 {
 	glm::vec3 velocityChange[2], rotationChange[2];
 	

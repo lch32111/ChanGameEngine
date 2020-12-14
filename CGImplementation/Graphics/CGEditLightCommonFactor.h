@@ -4,7 +4,7 @@
 
 #include <glm/common.hpp>
 
-namespace CGProj
+namespace CG
 {
 	/** 2018-12-19, Chanhaeng Lee
 	 * This structure should help communicate 

@@ -1,12 +1,12 @@
 #include <CGPrecompiled.h>
 #include <GPED/CGCollisionOBB.h>
 
-CGProj::CGCollisionOBB::CGCollisionOBB()
+CG::CGCollisionOBB::CGCollisionOBB()
 {
 	CGCollisionPrimitive::m_primitiveType = COLLISION_PRIMITIVE_OBB;
 }
 
-void CGProj::CGCollisionOBB::getAABB(GPED::c3AABB& outAABB) const
+void CG::CGCollisionOBB::getAABB(GPED::c3AABB& outAABB) const
 {
 	glm::mat3 AbsRotate;
 	for (unsigned i = 0; i < 3; ++i)

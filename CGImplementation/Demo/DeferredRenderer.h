@@ -24,7 +24,7 @@
 
 #include <vector>
 
-namespace CGProj
+namespace CG
 {
 	// Forward Declaration
 	class DeferredRenderer;

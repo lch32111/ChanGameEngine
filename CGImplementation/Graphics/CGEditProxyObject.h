@@ -5,7 +5,7 @@
 #include <Graphics/CGEditObject.h>
 #include <Graphics/CGModel.h>
 
-namespace CGProj
+namespace CG
 {
 	// Forward Declaration
 	enum EditProxyType

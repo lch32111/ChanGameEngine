@@ -4,7 +4,7 @@
 
 #include <GPED/GPED_Precision.h>
 
-namespace CGProj
+namespace CG
 {
 	enum EditPrimitiveType // this enum is used to represent object collider
 	{

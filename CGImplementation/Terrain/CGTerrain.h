@@ -10,7 +10,7 @@
 #include <GPED/GPED_Precision.h>
 #include <GPED/CGCollisionMesh.h>
 
-namespace CGProj
+namespace CG
 {
 	// Forward Declaration
 	class CGAssetManager;

@@ -9,7 +9,7 @@
 
 #include <Terrain/CGTerrainUtil.h>
 
-namespace CGProj
+namespace CG
 {
 	class CGPerlinNoise
 	{

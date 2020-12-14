@@ -11,7 +11,7 @@
 #include <GPED/CGCollisionTriangle.h>
 
 
-namespace CGProj
+namespace CG
 {
 	/**
 	* A wrapper class that holds the fine grained collision detection

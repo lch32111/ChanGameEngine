@@ -125,7 +125,7 @@ void AmmoRound::setState(ShotType shotType, glm::vec3 Position, glm::vec3 Veloci
 	calculateInternals();
 }
 
-void AmmoRound::setState(ShotType shotType, const CGProj::chanQuatCamera& camera)
+void AmmoRound::setState(ShotType shotType, const CG::chanQuatCamera& camera)
 {
 	m_shotType = shotType;
 

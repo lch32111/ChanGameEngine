@@ -13,7 +13,7 @@
 #include <GPED/CGCollisionNarrow.h>
 #include <Graphics/Shader.h>
 
-namespace CGProj
+namespace CG
 {
 	struct cgPair
 	{

@@ -20,7 +20,7 @@
 #include <Graphics/CGEditSpotLightVisualizer.h>
 #include <Graphics/CGSpotShadowFrustumVisualizer.h>
 
-namespace CGProj
+namespace CG
 {
 	enum EditLightType
 	{

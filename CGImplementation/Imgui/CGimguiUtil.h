@@ -4,7 +4,7 @@
 
 #include <Imgui/imgui.h>
 
-namespace CGProj
+namespace CG
 {
 	// Helper to display a little (?) mark which shows a tooltip when hovered.
 	static inline void ShowHelpMarker(const char* desc)

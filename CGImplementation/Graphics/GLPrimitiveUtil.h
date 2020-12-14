@@ -8,7 +8,7 @@
 
 #include <glm/gtc/constants.hpp>
 
-namespace CGProj
+namespace CG
 {
 	static inline void renderCube()
 	{

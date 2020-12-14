@@ -159,7 +159,7 @@ void GPED::FireworksDemo::update(float duration)
 	}
 }
 
-void GPED::FireworksDemo::render(CGProj::Shader * shader, glm::mat4& view, glm::mat4& proj)
+void GPED::FireworksDemo::render(CG::Shader * shader, glm::mat4& view, glm::mat4& proj)
 {
 	shader->use();
 	shader->setMat4("view", view);

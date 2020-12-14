@@ -5,10 +5,10 @@
 #include <Graphics/CGAssetManager.h>
 #include <Graphics/GLPrimitiveUtil.h>
 
-CGProj::CGBloomEffect::CGBloomEffect()
+CG::CGBloomEffect::CGBloomEffect()
 { }
 
-void CGProj::CGBloomEffect::Initialize(CGAssetManager & am, int width, int height, unsigned iteration)
+void CG::CGBloomEffect::Initialize(CGAssetManager & am, int width, int height, unsigned iteration)
 { 
 	m_GaussianShaer = am.getShader(SHADER_GAUSSIAN_BLUR);
 	m_iteration = iteration;
@@ -33,13 +33,13 @@ void CGProj::CGBloomEffect::Initialize(CGAssetManager & am, int width, int heigh
 	}
 }
 
-void CGProj::CGBloomEffect::Destroy()
+void CG::CGBloomEffect::Destroy()
 {
 	glDeleteTextures(2, m_ColorBuffer);
 	glDeleteFramebuffers(2, m_FBO);
 }
 
-void CGProj::CGBloomEffect::setTextureDimension(int width, int height)
+void CG::CGBloomEffect::setTextureDimension(int width, int height)
 {
 	for (unsigned i = 0; i < 2; ++i)
 	{
@@ -52,23 +52,23 @@ void CGProj::CGBloomEffect::setTextureDimension(int width, int height)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void CGProj::CGBloomEffect::setIteration(unsigned num)
+void CG::CGBloomEffect::setIteration(unsigned num)
 {
 	m_iteration = num;
 }
 
-unsigned CGProj::CGBloomEffect::getIteration()
+unsigned CG::CGBloomEffect::getIteration()
 {
 	return m_iteration;
 }
 
-unsigned CGProj::CGBloomEffect::getBloomedTexture(unsigned brightTexture)
+unsigned CG::CGBloomEffect::getBloomedTexture(unsigned brightTexture)
 {
 	GaussianBlur(brightTexture);
 	return m_ColorBuffer[!m_horizontal];
 }
 
-void CGProj::CGBloomEffect::GaussianBlur(unsigned firstTex)
+void CG::CGBloomEffect::GaussianBlur(unsigned firstTex)
 {
 	m_GaussianShaer->use();
 	m_horizontal = true;

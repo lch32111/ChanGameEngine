@@ -5,7 +5,7 @@
 #include <string>
 #include <glm/glm.hpp>
 
-namespace CGProj
+namespace CG
 {
 	// Forward Declaration
 	class Shader;

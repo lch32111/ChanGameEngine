@@ -2,7 +2,7 @@
 #include <Graphics/CGAssetManager.h>
 #include <CGErrorLogger.h>
 
-CGProj::Shader * CGProj::CGAssetManager::getShader(CG_SHADER_ENUM _shaderEnum)
+CG::Shader * CG::CGAssetManager::getShader(CG_SHADER_ENUM _shaderEnum)
 {
 	if (m_shaders[_shaderEnum].isloadad == false)
 	{
@@ -17,7 +17,7 @@ CGProj::Shader * CGProj::CGAssetManager::getShader(CG_SHADER_ENUM _shaderEnum)
 	return &m_shaders[_shaderEnum];
 }
 
-CGProj::Shader CGProj::CGAssetManager::getShader(CG_SHADER_ENUM _shaderEnum, char none = 0)
+CG::Shader CG::CGAssetManager::getShader(CG_SHADER_ENUM _shaderEnum, char none = 0)
 {
 	if (m_shaders[_shaderEnum].isloadad == false)
 	{
@@ -32,7 +32,7 @@ CGProj::Shader CGProj::CGAssetManager::getShader(CG_SHADER_ENUM _shaderEnum, cha
 	return m_shaders[_shaderEnum];
 }
 
-CGProj::Shader * CGProj::CGAssetManager::getGeoShader(CG_GEO_SHADER_ENUM _shaderEnum)
+CG::Shader * CG::CGAssetManager::getGeoShader(CG_GEO_SHADER_ENUM _shaderEnum)
 {
 	if (m_geoShaders[_shaderEnum].isloadad == false)
 	{
@@ -47,7 +47,7 @@ CGProj::Shader * CGProj::CGAssetManager::getGeoShader(CG_GEO_SHADER_ENUM _shader
 	return &m_geoShaders[_shaderEnum];
 }
 
-CGProj::Shader CGProj::CGAssetManager::getGeoShader(CG_GEO_SHADER_ENUM _shaderEnum, char none = 0)
+CG::Shader CG::CGAssetManager::getGeoShader(CG_GEO_SHADER_ENUM _shaderEnum, char none = 0)
 {
 	if (m_geoShaders[_shaderEnum].isloadad == false)
 	{
@@ -62,7 +62,7 @@ CGProj::Shader CGProj::CGAssetManager::getGeoShader(CG_GEO_SHADER_ENUM _shaderEn
 	return m_geoShaders[_shaderEnum];
 }
 
-unsigned CGProj::CGAssetManager::getTexture(CG_TEXTURE_ENUM _textureEnum, bool gamma)
+unsigned CG::CGAssetManager::getTexture(CG_TEXTURE_ENUM _textureEnum, bool gamma)
 {
 	// TODO: make texture class for on-demand process. CGAssetTexture() is just loading the image...
 	if (gamma)
@@ -93,7 +93,7 @@ unsigned CGProj::CGAssetManager::getTexture(CG_TEXTURE_ENUM _textureEnum, bool g
 	return -1;
 }
 
-CGProj::CGModel* CGProj::CGAssetManager::getModelData(CG_MODEL_ENUM _modelEnum, unsigned maxInstanceNumb)
+CG::CGModel* CG::CGAssetManager::getModelData(CG_MODEL_ENUM _modelEnum, unsigned maxInstanceNumb)
 {
 	if (m_models[_modelEnum].m_isLoaded == false)
 	{
@@ -109,7 +109,7 @@ CGProj::CGModel* CGProj::CGAssetManager::getModelData(CG_MODEL_ENUM _modelEnum, 
 }
 
 // Manaual Setting
-void CGProj::CGAssetManager::assetInit()
+void CG::CGAssetManager::assetInit()
 {
 	m_shaders[SHADER_DEFERRED_FIRST] = Shader("ShaderFolder/DeferredFirst.vs", "ShaderFolder/DeferredFirst.fs");
 	m_shaders[SHADER_DEFERRED_SECOND] = Shader("ShaderFolder/DeferredSecond.vs", "ShaderFolder/DeferredSecond.fs");
@@ -188,7 +188,7 @@ void CGProj::CGAssetManager::assetInit()
 	m_models[MODEL_OLD_HOUSE] = CGModel("ResourceFolder/ModelFolder/old_house/house_01.obj");
 }
 
-void CGProj::CGAssetManager::destroy()
+void CG::CGAssetManager::destroy()
 {
 	for (unsigned i = 0; i < (unsigned)NUM_CG_MODEL_ENUM; ++i)
 		m_models[i].destroy();

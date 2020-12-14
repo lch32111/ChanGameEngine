@@ -5,15 +5,15 @@
 #include <Graphics/Shader.h>
 #include <Graphics/GLTextureUtility.h>
 
-CGProj::CGModel::CGModel()
+CG::CGModel::CGModel()
 	: m_isLoaded(false), m_directory("")
 { }
 
-CGProj::CGModel::CGModel(const char * path)
+CG::CGModel::CGModel(const char * path)
 	: m_isLoaded(false), m_directory(path)
 { }
 
-void CGProj::CGModel::destroy()
+void CG::CGModel::destroy()
 {
 	if (m_isLoaded)
 	{
@@ -23,7 +23,7 @@ void CGProj::CGModel::destroy()
 }
 
 
-bool CGProj::CGModel::loadModel(unsigned maxInstancNumb)
+bool CG::CGModel::loadModel(unsigned maxInstancNumb)
 {
 	m_maxInstancingNumb = maxInstancNumb;
 
@@ -51,7 +51,7 @@ bool CGProj::CGModel::loadModel(unsigned maxInstancNumb)
 	return true;
 }
 
-void CGProj::CGModel::setInstanceData(const std::vector<glm::mat4>& model, const std::vector<glm::mat4>& worldNormal)
+void CG::CGModel::setInstanceData(const std::vector<glm::mat4>& model, const std::vector<glm::mat4>& worldNormal)
 {
 	for (unsigned i = 0; i < m_meshes.size(); ++i)
 	{
@@ -59,7 +59,7 @@ void CGProj::CGModel::setInstanceData(const std::vector<glm::mat4>& model, const
 	}
 }
 
-void CGProj::CGModel::setInstanceData(const std::vector<glm::mat4>& model)
+void CG::CGModel::setInstanceData(const std::vector<glm::mat4>& model)
 {
 	for (unsigned i = 0; i < m_meshes.size(); ++i)
 	{
@@ -68,7 +68,7 @@ void CGProj::CGModel::setInstanceData(const std::vector<glm::mat4>& model)
 }
 
 
-void CGProj::CGModel::deferredFirstRender(Shader* shader, unsigned instanceNumb)
+void CG::CGModel::deferredFirstRender(Shader* shader, unsigned instanceNumb)
 {
 	for (unsigned i = 0; i < m_meshes.size(); ++i)
 	{
@@ -76,7 +76,7 @@ void CGProj::CGModel::deferredFirstRender(Shader* shader, unsigned instanceNumb)
 	}
 }
 
-void CGProj::CGModel::shadowFirstRender()
+void CG::CGModel::shadowFirstRender()
 {
 	for (unsigned i = 0; i < m_meshes.size(); ++i)
 	{
@@ -84,12 +84,12 @@ void CGProj::CGModel::shadowFirstRender()
 	}
 }
 
-unsigned CGProj::CGModel::getMaxInstanceNumb()
+unsigned CG::CGModel::getMaxInstanceNumb()
 {
 	return m_maxInstancingNumb;
 }
 
-void CGProj::CGModel::processNode(aiNode * node, const aiScene * scene)
+void CG::CGModel::processNode(aiNode * node, const aiScene * scene)
 {
 	// process all the node's meshes (if any)
 	for (unsigned int i = 0; i < node->mNumMeshes; ++i)
@@ -103,7 +103,7 @@ void CGProj::CGModel::processNode(aiNode * node, const aiScene * scene)
 		processNode(node->mChildren[i], scene);
 }
 
-CGProj::CGModelMesh CGProj::CGModel::processMesh(aiMesh * mesh, const aiScene * scene)
+CG::CGModelMesh CG::CGModel::processMesh(aiMesh * mesh, const aiScene * scene)
 {
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
@@ -181,7 +181,7 @@ CGProj::CGModelMesh CGProj::CGModel::processMesh(aiMesh * mesh, const aiScene * 
 	return CGModelMesh(vertices, indices, textures, m_maxInstancingNumb);
 }
 
-std::vector<CGProj::Texture> CGProj::CGModel::loadMaterialTextures(aiMaterial * mat, aiTextureType type, std::string typeName)
+std::vector<CG::Texture> CG::CGModel::loadMaterialTextures(aiMaterial * mat, aiTextureType type, std::string typeName)
 {
 	std::vector<Texture> textures;
 

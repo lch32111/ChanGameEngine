@@ -4,7 +4,7 @@
 
 #include <GPED/GPED_Precision.h>
 
-namespace CGProj
+namespace CG
 {
 	/**
 	* The plane is not a primitive: it doesn't represent another

@@ -10,7 +10,7 @@
 #include <cstdlib>
 #include <cfloat>
 
-namespace CGProj
+namespace CG
 {
 	template <typename Scalar>
 	struct ScalarOp {};

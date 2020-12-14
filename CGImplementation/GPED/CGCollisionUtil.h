@@ -5,7 +5,7 @@
 #include <GPED/GPED_Precision.h>
 #include <GPED/CGCollisionOBB.h>
 
-namespace CGProj
+namespace CG
 {
 	inline GPED::real transformToAxis(
 		const CGCollisionOBB& box,

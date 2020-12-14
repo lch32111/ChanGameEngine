@@ -14,7 +14,7 @@
 
 #include <GPED/CGPhysicsUtil.h>
 
-CGProj::CGEditSpotLight::CGEditSpotLight()
+CG::CGEditSpotLight::CGEditSpotLight()
 {
 	m_lightFactors = nullptr;
 
@@ -39,7 +39,7 @@ CGProj::CGEditSpotLight::CGEditSpotLight()
 	m_shadowLightSpaceMatrix = glm::mat4(1.0);
 }
 
-void CGProj::CGEditSpotLight::initialize(CGAssetManager & am, CGEditLightCommonFactor * factor)
+void CG::CGEditSpotLight::initialize(CGAssetManager & am, CGEditLightCommonFactor * factor)
 {
 	m_lightFactors = factor;
 	setShadowFarPlane(m_lightFactors->AttnRadius);
@@ -69,7 +69,7 @@ void CGProj::CGEditSpotLight::initialize(CGAssetManager & am, CGEditLightCommonF
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void CGProj::CGEditSpotLight::debugDepthMapRender(const glm::mat4 & view, const glm::mat4 & proj)
+void CG::CGEditSpotLight::debugDepthMapRender(const glm::mat4 & view, const glm::mat4 & proj)
 {
 	m_DebugDepthMapShader->use();
 	m_DebugDepthMapShader->setMat4("view", view);
@@ -87,7 +87,7 @@ void CGProj::CGEditSpotLight::debugDepthMapRender(const glm::mat4 & view, const 
 	renderCube();
 }
 
-void CGProj::CGEditSpotLight::UIrenderForCommon(CGEditSpotLightVisualizer& spotVis)
+void CG::CGEditSpotLight::UIrenderForCommon(CGEditSpotLightVisualizer& spotVis)
 {
 	// Light Direction
 	float t_dir[3] = { m_lightFactors->lightDirection.x, m_lightFactors->lightDirection.y, m_lightFactors->lightDirection.z };
@@ -140,7 +140,7 @@ void CGProj::CGEditSpotLight::UIrenderForCommon(CGEditSpotLightVisualizer& spotV
 	}
 }
 
-void CGProj::CGEditSpotLight::UIrenderForShadow()
+void CG::CGEditSpotLight::UIrenderForShadow()
 {
 	int wharr = m_shadowWidth;
 	if (ImGui::InputInt("shadow width & height", &wharr))
@@ -151,7 +151,7 @@ void CGProj::CGEditSpotLight::UIrenderForShadow()
 	ImGui::InputFloat("shadow bias", &m_shadowBias);
 }
 
-void CGProj::CGEditSpotLight::setLightPropertyOnShader(Shader * shader, const std::string & sLightIndex, const std::string & sShadowIndex, const unsigned shadowIndex)
+void CG::CGEditSpotLight::setLightPropertyOnShader(Shader * shader, const std::string & sLightIndex, const std::string & sShadowIndex, const unsigned shadowIndex)
 {
 	shader->setVec3("spotLights[" + sLightIndex + "].Position", m_lightFactors->lightPosition);
 	shader->setVec3("spotLights[" + sLightIndex + "].Direction", m_lightFactors->lightDirection);
@@ -181,7 +181,7 @@ void CGProj::CGEditSpotLight::setLightPropertyOnShader(Shader * shader, const st
 	}
 }
 
-void CGProj::CGEditSpotLight::renderShadowMap(std::vector<CGEditProxyObject>& objects)
+void CG::CGEditSpotLight::renderShadowMap(std::vector<CGEditProxyObject>& objects)
 {
 	// Light Space Setting
 	m_shadowLightView = safeLookAt(
@@ -220,38 +220,38 @@ void CGProj::CGEditSpotLight::renderShadowMap(std::vector<CGEditProxyObject>& ob
 	// Shadow Mapping Pass
 }
 
-void CGProj::CGEditSpotLight::setInnerCutOffInDegree(const float degree)
+void CG::CGEditSpotLight::setInnerCutOffInDegree(const float degree)
 {
 	// Notice the measure of angle
 	m_SpotInnerCutOff = glm::cos(glm::radians(degree));
 }
 
-void CGProj::CGEditSpotLight::setInnerCutoffInRadian(const float radian)
+void CG::CGEditSpotLight::setInnerCutoffInRadian(const float radian)
 {
 	m_SpotInnerCutOff = glm::cos(radian);
 }
 
-float CGProj::CGEditSpotLight::getInnerCutOff()
+float CG::CGEditSpotLight::getInnerCutOff()
 {
 	return m_SpotInnerCutOff;
 }
 
-void CGProj::CGEditSpotLight::setOuterCutOffInDegree(const float degree)
+void CG::CGEditSpotLight::setOuterCutOffInDegree(const float degree)
 {
 	m_SpotOuterCutOff = glm::cos(glm::radians(degree));
 }
 
-void CGProj::CGEditSpotLight::setOuterCutOffInRadian(const float radian)
+void CG::CGEditSpotLight::setOuterCutOffInRadian(const float radian)
 {
 	m_SpotOuterCutOff = glm::cos(radian);
 }
 
-float CGProj::CGEditSpotLight::getOuterCutOff()
+float CG::CGEditSpotLight::getOuterCutOff()
 {
 	return m_SpotOuterCutOff;
 }
 
-CGProj::CGPerFrustum CGProj::CGEditSpotLight::getPerFrustum()
+CG::CGPerFrustum CG::CGEditSpotLight::getPerFrustum()
 {
 	CGPerFrustum f;
 	f.fov = m_perFOV;
@@ -262,7 +262,7 @@ CGProj::CGPerFrustum CGProj::CGEditSpotLight::getPerFrustum()
 	return f;
 }
 
-void CGProj::CGEditSpotLight::updateRadius()
+void CG::CGEditSpotLight::updateRadius()
 {
 	// the diffuse color of light is used for the max component of light
 	// You need to keep in mind that the radius will be bigger if the m_lightFactors.lightDiffuse will be bigger
@@ -281,7 +281,7 @@ void CGProj::CGEditSpotLight::updateRadius()
 		(2 * m_lightFactors->AttnQuadratic);
 }
 
-void CGProj::CGEditSpotLight::setShadowWidthHeight(unsigned wh)
+void CG::CGEditSpotLight::setShadowWidthHeight(unsigned wh)
 {
 	m_shadowWidth = wh;
 	m_shadowHeight = wh;
@@ -298,7 +298,7 @@ void CGProj::CGEditSpotLight::setShadowWidthHeight(unsigned wh)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void CGProj::CGEditSpotLight::setShadowFarPlane(float farP)
+void CG::CGEditSpotLight::setShadowFarPlane(float farP)
 {
 	m_shadowFarPlane = farP;
 }

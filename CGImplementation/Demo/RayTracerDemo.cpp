@@ -5,11 +5,9 @@
 #include <Math/CGMat4.h>
 
 
-using namespace CGProj::Math;
-
 /****************************************************************************************/
 /* ### RayTracerDemo Demo ### */
-void CGProj::RayTracerDemo::OnInitialize()
+void CG::RayTracerDemo::OnInitialize()
 {
 	glfwSwapInterval(0);
 	glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -40,18 +38,18 @@ void CGProj::RayTracerDemo::OnInitialize()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
-void CGProj::RayTracerDemo::OnFinalize()
+void CG::RayTracerDemo::OnFinalize()
 {
 	glDeleteTextures(1, &m_gl_image_tex);
 	m_asset_manager.destroy();
 	delete[] m_image_buffer;
 }
 
-void CGProj::RayTracerDemo::Update(float deltaTime, float lastFrame)
+void CG::RayTracerDemo::Update(float deltaTime, float lastFrame)
 {
 }
 
-void CGProj::RayTracerDemo::Display()
+void CG::RayTracerDemo::Display()
 {
 	glClearColor(0.1f, 0.1f, 0.1f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -69,52 +67,70 @@ void CGProj::RayTracerDemo::Display()
 	renderScreenQuad();
 }
 
-void CGProj::RayTracerDemo::MouseMoveCallback(double xpos, double ypos)
+void CG::RayTracerDemo::MouseMoveCallback(double xpos, double ypos)
 {
 }
 
-void CGProj::RayTracerDemo::MouseButtonCallback(int button, int action, int mods)
+void CG::RayTracerDemo::MouseButtonCallback(int button, int action, int mods)
 {
 }
 
-void CGProj::RayTracerDemo::ScrollCallback(double yoffset)
+void CG::RayTracerDemo::ScrollCallback(double yoffset)
 {
 }
 
-void CGProj::RayTracerDemo::ResizeWindowCallback(int width, int height)
+void CG::RayTracerDemo::ResizeWindowCallback(int width, int height)
 {
 	Application::m_width = width;
 	Application::m_height = height;
 	glViewport(0, 0, width, height);
 }
 
-void CGProj::RayTracerDemo::RayTrace()
+void CG::RayTracerDemo::RayTrace()
 {
 	for (u32 y = 0; y < m_image_height; ++y)
 	{
 		for (u32 x = 0; x < m_image_width; ++x)
 		{
-			/*
 			CGVector3<float> p;
 			CGVector3<float> w;
-			*/
-
-
-			CGVector3<float> color;
-			color.m_value[0] = 1.f;
-			color.m_value[1] = 1.f;
-			color.m_value[2] = 1.f;
-
-			m_image_buffer[y * m_image_width + x] = color;
+			m_camera.GetPrimaryRay((float)x + 0.5f, (float)y + 0.5f, (s32)m_image_width, (s32)m_image_height, p, w);
+			m_image_buffer[y * m_image_width + x] = ComputeLight(p, w);
 		}
 	}
+}
+
+CG::CGVector3<float> CG::RayTracerDemo::ComputeLight(CGVector3<float> pos, CGVector3<float> normalizedRay)
+{
+	const CG::Surfel* surfel = FindIntersection(pos, normalizedRay);
+
+	CGVector3<float> color;
+	if (surfel != nullptr)
+	{
+		color[0] = 1.f;
+		color[1] = 1.f;
+		color[2] = 1.f;
+	}
+	else
+	{
+		color[0] = 0.f;
+		color[1] = 0.f;
+		color[2] = 0.f;
+	}
+	
+	return color;
+}
+
+const CG::Surfel* CG::RayTracerDemo::FindIntersection(CGVector3<float> pos, CGVector3<float> normalizedRay)
+{
+	return nullptr;
 }
 
 /* ### RayTracerDemo Demo ### */
 /****************************************************************************************/
 
 
-void CGProj::RayTracerCamera::GetPrimaryRay(float x, float y, int width, int height, CGProj::Math::CGVector3<float>& position, CGProj::Math::CGVector3<float>& w) const
+void CG::RayTracerCamera::GetPrimaryRay(float x, float y, int width, int height, CGVector3<float>& position, CGVector3<float>& w) const
 {
 	const float side = -2.f * tan(m_fov_in_radian / 2.f);
 
@@ -124,3 +140,4 @@ void CGProj::RayTracerCamera::GetPrimaryRay(float x, float y, int width, int hei
 
 	w = Normalize(position);
 }
+

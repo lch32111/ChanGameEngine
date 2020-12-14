@@ -2,7 +2,7 @@
 #include <Graphics/CGEditSpotLightVisualizer.h>
 #include <glad/glad.h>
 
-void CGProj::CGEditSpotLightVisualizer::setInnerConeInRadians(float inner_radian, float radius)
+void CG::CGEditSpotLightVisualizer::setInnerConeInRadians(float inner_radian, float radius)
 {
 	m_count = cutArray[2];
 
@@ -57,7 +57,7 @@ void CGProj::CGEditSpotLightVisualizer::setInnerConeInRadians(float inner_radian
 	glBindVertexArray(0);
 }
 
-void CGProj::CGEditSpotLightVisualizer::setOuterConeInRadians(float outer_radian, float radius)
+void CG::CGEditSpotLightVisualizer::setOuterConeInRadians(float outer_radian, float radius)
 {
 	m_count = 0;
 
@@ -113,7 +113,7 @@ void CGProj::CGEditSpotLightVisualizer::setOuterConeInRadians(float outer_radian
 	glBindVertexArray(0);
 }
 
-void CGProj::CGEditSpotLightVisualizer::render(const glm::mat4& view, const glm::mat4& proj, 
+void CG::CGEditSpotLightVisualizer::render(const glm::mat4& view, const glm::mat4& proj, 
 	const glm::vec3& position, const glm::vec3& direction)
 {
 	glm::mat4 mvpMatrix = glm::mat4_cast(glm::quat(m_localDirection, direction)); // rotation
@@ -137,7 +137,7 @@ void CGProj::CGEditSpotLightVisualizer::render(const glm::mat4& view, const glm:
 	glBindVertexArray(0);
 }
 
-void CGProj::CGEditSpotLightVisualizer::prepareData(Shader* shader)
+void CG::CGEditSpotLightVisualizer::prepareData(Shader* shader)
 {
 	m_shader = shader;
 

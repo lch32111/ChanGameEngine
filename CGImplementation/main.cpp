@@ -2,8 +2,8 @@
 #include "CG_Application.h"
 #include <Imgui/imgui_impl_glfw.h>
 
-extern CGProj::Application* getApplication();
-CGProj::Application* app = getApplication();
+extern CG::Application* getApplication();
+CG::Application* app = getApplication();
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {

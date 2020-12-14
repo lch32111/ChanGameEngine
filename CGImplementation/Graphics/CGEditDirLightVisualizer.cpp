@@ -2,7 +2,7 @@
 #include "CGEditDirLightVisualizer.h"
 #include <Graphics/GLPrimitiveUtil.h>
 
-void CGProj::CGEditDirLightVisualizer::prepareData(Shader * shader)
+void CG::CGEditDirLightVisualizer::prepareData(Shader * shader)
 {
 	m_shader = shader;
 
@@ -39,7 +39,7 @@ void CGProj::CGEditDirLightVisualizer::prepareData(Shader * shader)
 	glBindVertexArray(0);
 }
 
-void CGProj::CGEditDirLightVisualizer::setCylinderDimension(float height, float tRadius, float bRadius)
+void CG::CGEditDirLightVisualizer::setCylinderDimension(float height, float tRadius, float bRadius)
 {
 	m_cylinderTopRadius = tRadius;
 	m_cylinderBottomRadius = bRadius;
@@ -58,7 +58,7 @@ void CGProj::CGEditDirLightVisualizer::setCylinderDimension(float height, float 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void CGProj::CGEditDirLightVisualizer::setConeDimension(float height, float tRadius, float bRadius)
+void CG::CGEditDirLightVisualizer::setConeDimension(float height, float tRadius, float bRadius)
 {
 	m_coneTopRadius = tRadius;
 	m_coneBottomRadius = bRadius;
@@ -76,7 +76,7 @@ void CGProj::CGEditDirLightVisualizer::setConeDimension(float height, float tRad
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void CGProj::CGEditDirLightVisualizer::render(const glm::mat4 & view, const glm::mat4 & proj,
+void CG::CGEditDirLightVisualizer::render(const glm::mat4 & view, const glm::mat4 & proj,
 	const glm::vec3 & position, const glm::vec3 & direction)
 {
 	glm::mat4 model = glm::mat4_cast(glm::quat(m_localDirection, direction));

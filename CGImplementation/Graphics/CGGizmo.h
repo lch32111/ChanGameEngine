@@ -5,7 +5,7 @@
 #include <Graphics/CGRenderLine.h>
 #include <Graphics/CGEditObject.h>
 
-namespace CGProj
+namespace CG
 {
 	// Forward Declaration
 	class CGAssetManager;

@@ -11,12 +11,12 @@
 
 // =================================================================
 /*** CG Light Object  ***/
-CGProj::CGEditLightObject::CGEditLightObject()
+CG::CGEditLightObject::CGEditLightObject()
 {
 
 }
 
-void CGProj::CGEditLightObject::initialize(CGAssetManager & am)
+void CG::CGEditLightObject::initialize(CGAssetManager & am)
 {
 	// Basic Shader Setup 
 	// Note that you should initialize the shader before
@@ -73,12 +73,12 @@ void CGProj::CGEditLightObject::initialize(CGAssetManager & am)
 	// Spot Light Init
 }
 
-void CGProj::CGEditLightObject::setForwardShader(Shader * shader)
+void CG::CGEditLightObject::setForwardShader(Shader * shader)
 {
 	m_forwardShader = shader;
 }
 
-void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm::mat4 & proj)
+void CG::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm::mat4 & proj)
 {
 	// Refer to the simpleColorRender Shader!
 	// Edit Object Render
@@ -181,7 +181,7 @@ void CGProj::CGEditLightObject::forwardRender(const glm::mat4 & view, const glm:
 	}
 }
 
-void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
+void CG::CGEditLightObject::UIrender(CGAssetManager & am)
 {
 	// CGEditObject::UIrender(am);
 	ImGui::Begin("Edit Object");
@@ -282,24 +282,24 @@ void CGProj::CGEditLightObject::UIrender(CGAssetManager & am)
 	ImGui::End();
 }
 
-void CGProj::CGEditLightObject::setLightType(EditLightType e)
+void CG::CGEditLightObject::setLightType(EditLightType e)
 {
 	m_LightType = e;
 }
 
-CGProj::EditLightType CGProj::CGEditLightObject::getLightType()
+CG::EditLightType CG::CGEditLightObject::getLightType()
 {
 	return m_LightType;
 }
 
-void CGProj::CGEditLightObject::setPosition(const glm::vec3 & p)
+void CG::CGEditLightObject::setPosition(const glm::vec3 & p)
 {
 	CGEditObject::setPosition(p); // set Edit Object Position 
 
 	m_CommonlightFactors.lightPosition = p;
 }
 
-void CGProj::CGEditLightObject::setPosition(const GPED::real x, const GPED::real y, const GPED::real z)
+void CG::CGEditLightObject::setPosition(const GPED::real x, const GPED::real y, const GPED::real z)
 {
 	CGEditObject::setPosition(x, y, z);
 
@@ -308,205 +308,205 @@ void CGProj::CGEditLightObject::setPosition(const GPED::real x, const GPED::real
 	m_CommonlightFactors.lightPosition.z = z;
 }
 
-void CGProj::CGEditLightObject::setXposition(const GPED::real x)
+void CG::CGEditLightObject::setXposition(const GPED::real x)
 {
 	CGEditObject::setXposition(x);
 	m_CommonlightFactors.lightPosition.x = x;
 }
 
-void CGProj::CGEditLightObject::setYposition(const GPED::real y)
+void CG::CGEditLightObject::setYposition(const GPED::real y)
 {
 	CGEditObject::setYposition(y);
 	m_CommonlightFactors.lightPosition.y = y;
 }
 
-void CGProj::CGEditLightObject::setZposition(const GPED::real z)
+void CG::CGEditLightObject::setZposition(const GPED::real z)
 {
 	CGEditObject::setZposition(z);
 	m_CommonlightFactors.lightPosition.z = z;
 }
 
-glm::vec3 CGProj::CGEditLightObject::getPosition()
+glm::vec3 CG::CGEditLightObject::getPosition()
 {
 	// You can get the edit object position 
 	// However I will return the light position for the Obect-Oriented Programming(OOP)
 	return m_CommonlightFactors.lightPosition;
 }
 
-void CGProj::CGEditLightObject::setLightDirection(const glm::vec3 & d)
+void CG::CGEditLightObject::setLightDirection(const glm::vec3 & d)
 {
 	// Notice the direction should be normalized
 	m_CommonlightFactors.lightDirection = glm::normalize(d);
 }
 
-void CGProj::CGEditLightObject::setLightDirection(const GPED::real x, const GPED::real y, const GPED::real z)
+void CG::CGEditLightObject::setLightDirection(const GPED::real x, const GPED::real y, const GPED::real z)
 {
 	m_CommonlightFactors.lightDirection = glm::normalize(glm::vec3(x, y, z));
 }
 
-void CGProj::CGEditLightObject::setLightXdirection(const GPED::real x)
+void CG::CGEditLightObject::setLightXdirection(const GPED::real x)
 {
 	m_CommonlightFactors.lightDirection.x = x;
 	m_CommonlightFactors.lightDirection = glm::normalize(m_CommonlightFactors.lightDirection);
 }
 
-void CGProj::CGEditLightObject::setLightYdirection(const GPED::real y)
+void CG::CGEditLightObject::setLightYdirection(const GPED::real y)
 {
 	m_CommonlightFactors.lightDirection.y = y;
 	m_CommonlightFactors.lightDirection = glm::normalize(m_CommonlightFactors.lightDirection);
 }
 
-void CGProj::CGEditLightObject::setLightZdirection(const GPED::real z)
+void CG::CGEditLightObject::setLightZdirection(const GPED::real z)
 {
 	m_CommonlightFactors.lightDirection.z = z;
 	m_CommonlightFactors.lightDirection = glm::normalize(m_CommonlightFactors.lightDirection);
 }
 
-glm::vec3 CGProj::CGEditLightObject::getLightDirection()
+glm::vec3 CG::CGEditLightObject::getLightDirection()
 {
 	return m_CommonlightFactors.lightDirection;
 }
 
-void CGProj::CGEditLightObject::setAmbientColor(const glm::vec3 & ac)
+void CG::CGEditLightObject::setAmbientColor(const glm::vec3 & ac)
 {
 	m_CommonlightFactors.lightAmbient = ac;
 }
 
-void CGProj::CGEditLightObject::setAmbientColor(const GPED::real r, const GPED::real g, const GPED::real b)
+void CG::CGEditLightObject::setAmbientColor(const GPED::real r, const GPED::real g, const GPED::real b)
 {
 	m_CommonlightFactors.lightAmbient.r = r;
 	m_CommonlightFactors.lightAmbient.g = g;
 	m_CommonlightFactors.lightAmbient.b = b;
 }
 
-void CGProj::CGEditLightObject::setAmbientRedColor(const GPED::real r)
+void CG::CGEditLightObject::setAmbientRedColor(const GPED::real r)
 {
 	m_CommonlightFactors.lightAmbient.r = r;
 }
 
-void CGProj::CGEditLightObject::setAmbientGreenColor(const GPED::real g)
+void CG::CGEditLightObject::setAmbientGreenColor(const GPED::real g)
 {
 	m_CommonlightFactors.lightAmbient.g = g;
 }
 
-void CGProj::CGEditLightObject::setAmbientBlueColor(const GPED::real b)
+void CG::CGEditLightObject::setAmbientBlueColor(const GPED::real b)
 {
 	m_CommonlightFactors.lightAmbient.b = b;
 }
 
-glm::vec3 CGProj::CGEditLightObject::getAmbientColor()
+glm::vec3 CG::CGEditLightObject::getAmbientColor()
 {
 	return m_CommonlightFactors.lightAmbient;
 }
 
-void CGProj::CGEditLightObject::setDiffuseColor(const glm::vec3 & dc)
+void CG::CGEditLightObject::setDiffuseColor(const glm::vec3 & dc)
 {
 	m_CommonlightFactors.lightDiffuse = dc;
 }
 
-void CGProj::CGEditLightObject::setDiffuseColor(const GPED::real r, const GPED::real g, const GPED::real b)
+void CG::CGEditLightObject::setDiffuseColor(const GPED::real r, const GPED::real g, const GPED::real b)
 {
 	m_CommonlightFactors.lightDiffuse.r = r;
 	m_CommonlightFactors.lightDiffuse.g = g;
 	m_CommonlightFactors.lightDiffuse.b = b;
 }
 
-void CGProj::CGEditLightObject::setDiffuseRedColor(const GPED::real r)
+void CG::CGEditLightObject::setDiffuseRedColor(const GPED::real r)
 {
 	m_CommonlightFactors.lightDiffuse.r = r;
 }
 
-void CGProj::CGEditLightObject::setDiffuseGreenColor(const GPED::real g)
+void CG::CGEditLightObject::setDiffuseGreenColor(const GPED::real g)
 {
 	m_CommonlightFactors.lightDiffuse.g = g;
 }
 
-void CGProj::CGEditLightObject::setDiffuseBlueColor(const GPED::real b)
+void CG::CGEditLightObject::setDiffuseBlueColor(const GPED::real b)
 {
 	m_CommonlightFactors.lightDiffuse.b = b;
 }
 
-glm::vec3 CGProj::CGEditLightObject::getDiffuseColor()
+glm::vec3 CG::CGEditLightObject::getDiffuseColor()
 {
 	return m_CommonlightFactors.lightDiffuse;
 }
 
-void CGProj::CGEditLightObject::setSpecularColor(const glm::vec3 & sc)
+void CG::CGEditLightObject::setSpecularColor(const glm::vec3 & sc)
 {
 	m_CommonlightFactors.lightSpecular = sc;
 }
 
-void CGProj::CGEditLightObject::setSpecularColor(const GPED::real r, const GPED::real g, const GPED::real b)
+void CG::CGEditLightObject::setSpecularColor(const GPED::real r, const GPED::real g, const GPED::real b)
 {
 	m_CommonlightFactors.lightSpecular.r = r;
 	m_CommonlightFactors.lightSpecular.g = g;
 	m_CommonlightFactors.lightSpecular.b = b;
 }
 
-void CGProj::CGEditLightObject::setSpecularRedColor(const GPED::real r)
+void CG::CGEditLightObject::setSpecularRedColor(const GPED::real r)
 {
 	m_CommonlightFactors.lightSpecular.r = r;
 }
 
-void CGProj::CGEditLightObject::setSpecularGreenColor(const GPED::real g)
+void CG::CGEditLightObject::setSpecularGreenColor(const GPED::real g)
 {
 	m_CommonlightFactors.lightSpecular.g = g;
 }
 
-void CGProj::CGEditLightObject::setSpecularBlueColor(const GPED::real b)
+void CG::CGEditLightObject::setSpecularBlueColor(const GPED::real b)
 {
 	m_CommonlightFactors.lightSpecular.b = b;
 }
 
-glm::vec3 CGProj::CGEditLightObject::getSpecularColor()
+glm::vec3 CG::CGEditLightObject::getSpecularColor()
 {
 	return m_CommonlightFactors.lightSpecular;
 }
 
-void CGProj::CGEditLightObject::setAttnConstant(const float c)
+void CG::CGEditLightObject::setAttnConstant(const float c)
 {
 	m_CommonlightFactors.AttnConstant = c;
 	updateRadius();
 }
 
-float CGProj::CGEditLightObject::getAttnConsant()
+float CG::CGEditLightObject::getAttnConsant()
 {
 	return m_CommonlightFactors.AttnConstant;
 }
 
-void CGProj::CGEditLightObject::setAttnLinear(const float l)
+void CG::CGEditLightObject::setAttnLinear(const float l)
 {
 	m_CommonlightFactors.AttnLinear = l;
 	updateRadius();
 }
 
-float CGProj::CGEditLightObject::getAttnLinear()
+float CG::CGEditLightObject::getAttnLinear()
 {
 	return m_CommonlightFactors.AttnLinear;
 }
 
-void CGProj::CGEditLightObject::setAttnQuadratic(const float q)
+void CG::CGEditLightObject::setAttnQuadratic(const float q)
 {
 	m_CommonlightFactors.AttnQuadratic = q;
 	updateRadius();
 }
 
-float CGProj::CGEditLightObject::getAttnQuadratic()
+float CG::CGEditLightObject::getAttnQuadratic()
 {
 	return m_CommonlightFactors.AttnQuadratic;
 }
 
-void CGProj::CGEditLightObject::setLightIntensity(const float i)
+void CG::CGEditLightObject::setLightIntensity(const float i)
 {
 	m_CommonlightFactors.lightIntensity = i;
 }
 
-float CGProj::CGEditLightObject::getLightRadius()
+float CG::CGEditLightObject::getLightRadius()
 {
 	return m_CommonlightFactors.AttnRadius;
 }
 
-void CGProj::CGEditLightObject::updateRadius()
+void CG::CGEditLightObject::updateRadius()
 {
 	// the diffuse color of light is used for the max component of light
 	// You need to keep in mind that the radius will be bigger if the m_CommonlightFactors.lightDiffuse will be bigger
@@ -525,7 +525,7 @@ void CGProj::CGEditLightObject::updateRadius()
 		(2 * m_CommonlightFactors.AttnQuadratic);
 }
 
-void CGProj::CGEditLightObject::setLightPropertyOnShader(unsigned lightIndex, unsigned shadowIndex, const glm::vec3& cameraPos)
+void CG::CGEditLightObject::setLightPropertyOnShader(unsigned lightIndex, unsigned shadowIndex, const glm::vec3& cameraPos)
 {
 	// TODO : STL string do the dynamic allocation. Replace it with c-style string for performance.
 	std::string sLightIndex = std::to_string(lightIndex);
@@ -558,17 +558,17 @@ void CGProj::CGEditLightObject::setLightPropertyOnShader(unsigned lightIndex, un
 	}
 }
 
-void CGProj::CGEditLightObject::setIsShadowRender(bool shadow)
+void CG::CGEditLightObject::setIsShadowRender(bool shadow)
 {
 	m_CommonlightFactors.isShadow = shadow;
 }
 
-bool CGProj::CGEditLightObject::getIsShadowRender()
+bool CG::CGEditLightObject::getIsShadowRender()
 {
 	return m_CommonlightFactors.isShadow;
 }
 
-void CGProj::CGEditLightObject::renderShadowMap(std::vector<CGEditProxyObject>& objects)
+void CG::CGEditLightObject::renderShadowMap(std::vector<CGEditProxyObject>& objects)
 {
 	// glCullFace(GL_FRONT);
 	switch (m_LightType)

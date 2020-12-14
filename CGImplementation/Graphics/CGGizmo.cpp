@@ -9,19 +9,19 @@
 
 #include <GPED/CGBroadPhase.h>
 
-CGProj::CGGizmo::CGGizmo()
+CG::CGGizmo::CGGizmo()
 {
 	m_editObject = nullptr;
 	m_hitBox = GIZMO_BOX_NONE;
 	updateAABBs();
 }
 
-void CGProj::CGGizmo::initGizmo(CGAssetManager& am)
+void CG::CGGizmo::initGizmo(CGAssetManager& am)
 {
 	m_lineRenderer.setShader(am.getShader(SHADER_CG_LINE));
 }
 
-void CGProj::CGGizmo::renderGizmo(const glm::mat4& view, const glm::mat4& proj)
+void CG::CGGizmo::renderGizmo(const glm::mat4& view, const glm::mat4& proj)
 {
 	m_lineRenderer.insertLine(center, center + worldXAxis * m_axisLengthScale, xAxisColor);
 	m_lineRenderer.insertLine(center, center + worldYAxis * m_axisLengthScale, yAxisColor);
@@ -33,7 +33,7 @@ void CGProj::CGGizmo::renderGizmo(const glm::mat4& view, const glm::mat4& proj)
 	glEnable(GL_DEPTH_TEST);
 }
 
-void CGProj::CGGizmo::renderGizmoBox(const glm::mat4& view, const glm::mat4& proj)
+void CG::CGGizmo::renderGizmoBox(const glm::mat4& view, const glm::mat4& proj)
 {
 	insertAABBwithLine(m_xAxisBox, xAxisColor);
 	insertAABBwithLine(m_yAxisBox, yAxisColor);
@@ -45,17 +45,17 @@ void CGProj::CGGizmo::renderGizmoBox(const glm::mat4& view, const glm::mat4& pro
 	glEnable(GL_DEPTH_TEST);
 }
 
-void CGProj::CGGizmo::setAxisWidth(float width)
+void CG::CGGizmo::setAxisWidth(float width)
 {
 	m_axisWidth = width;
 }
 
-void CGProj::CGGizmo::setAxisLength(float length)
+void CG::CGGizmo::setAxisLength(float length)
 {
 	m_axisLengthScale = length;
 }
 
-void CGProj::CGGizmo::setEditObject(CGEditObject * object)
+void CG::CGGizmo::setEditObject(CGEditObject * object)
 {
 	if (object == nullptr)
 	{
@@ -81,7 +81,7 @@ void CGProj::CGGizmo::setEditObject(CGEditObject * object)
 	}
 }
 
-bool CGProj::CGGizmo::rayOverlapBoxes(const GPED::c3RayInput & rayInput)
+bool CG::CGGizmo::rayOverlapBoxes(const GPED::c3RayInput & rayInput)
 {
 	bool OverlapResult = false;
 	GPED::c3RayOutput rayOutput;
@@ -117,7 +117,7 @@ bool CGProj::CGGizmo::rayOverlapBoxes(const GPED::c3RayInput & rayInput)
 	return OverlapResult;
 }
 
-void CGProj::CGGizmo::translate(float xoffset, float yoffset, const chanQuatCamera& camera)
+void CG::CGGizmo::translate(float xoffset, float yoffset, const chanQuatCamera& camera)
 {
 	assert(m_editObject != nullptr);
 
@@ -178,17 +178,17 @@ void CGProj::CGGizmo::translate(float xoffset, float yoffset, const chanQuatCame
 	updateAABBs();
 }
 
-bool CGProj::CGGizmo::isActivated()
+bool CG::CGGizmo::isActivated()
 {
 	return (m_editObject != nullptr);
 }
 
-bool CGProj::CGGizmo::isHitActivated()
+bool CG::CGGizmo::isHitActivated()
 {
 	return (m_hitBox != GIZMO_BOX_NONE);
 }
 
-void CGProj::CGGizmo::updateAABBs()
+void CG::CGGizmo::updateAABBs()
 {
 	float temp = m_axisWidth;
 	m_axisWidth *= m_axisWidthScale;
@@ -211,7 +211,7 @@ void CGProj::CGGizmo::updateAABBs()
 	m_axisWidth = temp;
 }
 
-void CGProj::CGGizmo::insertAABBwithLine(const GPED::c3AABB & aabb, glm::vec4 color)
+void CG::CGGizmo::insertAABBwithLine(const GPED::c3AABB & aabb, glm::vec4 color)
 {
 	glm::vec3 extents = aabb.max - aabb.min;
 

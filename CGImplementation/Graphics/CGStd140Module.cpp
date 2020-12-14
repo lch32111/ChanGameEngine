@@ -8,11 +8,11 @@
 
 
 
-CGProj::CGStd140Module::CGStd140Module()
+CG::CGStd140Module::CGStd140Module()
 {
 }
 
-void CGProj::CGStd140Module::initialize(const std::string & bufferName)
+void CG::CGStd140Module::initialize(const std::string & bufferName)
 {
 	m_bufferName = bufferName;
 	glGenBuffers(1, &m_uboBlock);
@@ -24,12 +24,12 @@ void CGProj::CGStd140Module::initialize(const std::string & bufferName)
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void CGProj::CGStd140Module::Destroy()
+void CG::CGStd140Module::Destroy()
 {
 	glDeleteBuffers(1, &m_uboBlock);
 }
 
-void CGProj::CGStd140Module::addShader(Shader * shader)
+void CG::CGStd140Module::addShader(Shader * shader)
 {
 	unsigned index = glGetUniformBlockIndex(shader->ID, m_bufferName.c_str());
 	// Only use 0 block;
@@ -39,7 +39,7 @@ void CGProj::CGStd140Module::addShader(Shader * shader)
 	glCheckError();
 }
 
-void CGProj::CGStd140Module::populateBuffer(const glm::mat4 & view, const glm::mat4 & proj)
+void CG::CGStd140Module::populateBuffer(const glm::mat4 & view, const glm::mat4 & proj)
 {
 	glBindBuffer(GL_UNIFORM_BUFFER, m_uboBlock);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(view));

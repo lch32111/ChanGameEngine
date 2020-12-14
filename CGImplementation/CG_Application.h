@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-namespace CGProj
+namespace CG
 {
 	class Application
 	{

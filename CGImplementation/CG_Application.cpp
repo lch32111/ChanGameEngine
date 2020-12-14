@@ -12,7 +12,7 @@
 #include <Demo/RayTracerDemo.h>
 
 /* ### Application ### */
-void CGProj::Application::Initialize(bool shouldBaseInit)
+void CG::Application::Initialize(bool shouldBaseInit)
 {
 	m_isBaseInit = shouldBaseInit;
 
@@ -53,7 +53,7 @@ void CGProj::Application::Initialize(bool shouldBaseInit)
 	OnInitialize();
 }
 
-void CGProj::Application::Finalize()
+void CG::Application::Finalize()
 {
 	OnFinalize();
 
@@ -63,7 +63,7 @@ void CGProj::Application::Finalize()
 	}
 }
 
-void CGProj::Application::Execute()
+void CG::Application::Execute()
 {
 	while (!glfwWindowShouldClose(app_window))
 	{
@@ -90,9 +90,9 @@ void CGProj::Application::Execute()
 /* ### Application ### */
 /****************************************************************************************/
 
-namespace CGProj
+namespace CG
 {
-	class ApplicationSelector : public CGProj::Application
+	class ApplicationSelector : public CG::Application
 	{
 	public:
 
@@ -286,13 +286,13 @@ namespace CGProj
 		}
 
 	private:
-		CGProj::Application* m_app;
+		CG::Application* m_app;
 		bool m_app_selected;
 		bool m_window_open;
 	};
 }
 
-CGProj::Application* getApplication()
+CG::Application* getApplication()
 {
-	return new CGProj::ApplicationSelector();
+	return new CG::ApplicationSelector();
 }

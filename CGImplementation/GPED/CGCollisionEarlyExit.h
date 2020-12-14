@@ -8,7 +8,7 @@
 #include <GPED/CGCollisionPlane.h>
 #include <GPED/CGCollisionTriangle.h>
 
-namespace CGProj
+namespace CG
 {
 	/**
 	* A wrapper class that holds fast intersection tests. These

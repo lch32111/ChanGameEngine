@@ -4,23 +4,23 @@
 #include <GPED/CGPhysicsUtil.h>
 #include <Graphics/CGAssetManager.h>
 
-CGProj::CGSpotShadowFrustumVisualizer::CGSpotShadowFrustumVisualizer()
+CG::CGSpotShadowFrustumVisualizer::CGSpotShadowFrustumVisualizer()
 {
 }
 
-CGProj::CGSpotShadowFrustumVisualizer::CGSpotShadowFrustumVisualizer(CGAssetManager & am)
+CG::CGSpotShadowFrustumVisualizer::CGSpotShadowFrustumVisualizer(CGAssetManager & am)
 {
 	m_lineShader = am.getShader(SHADER_CG_LINE);
 	prepareData();
 }
 
-void CGProj::CGSpotShadowFrustumVisualizer::setShader(Shader * shader)
+void CG::CGSpotShadowFrustumVisualizer::setShader(Shader * shader)
 {
 	m_lineShader = shader;
 	prepareData();
 }
 
-void CGProj::CGSpotShadowFrustumVisualizer::render(
+void CG::CGSpotShadowFrustumVisualizer::render(
 	const glm::mat4 & view, const glm::mat4 & proj,
 	const glm::vec3 & position, const glm::vec3 & direction, 
 	float fov, float aspect, float nearP, float farP)
@@ -110,7 +110,7 @@ void CGProj::CGSpotShadowFrustumVisualizer::render(
 	renderLine(view, proj);
 }
 
-void CGProj::CGSpotShadowFrustumVisualizer::prepareData()
+void CG::CGSpotShadowFrustumVisualizer::prepareData()
 {
 	glGenVertexArrays(1, &m_VAO);
 	glGenBuffers(2, m_VBO);
@@ -135,7 +135,7 @@ void CGProj::CGSpotShadowFrustumVisualizer::prepareData()
 	m_count = 0;
 }
 
-void CGProj::CGSpotShadowFrustumVisualizer::insertLine(const glm::vec3 & From, const glm::vec3 & To, const glm::vec4 & Color)
+void CG::CGSpotShadowFrustumVisualizer::insertLine(const glm::vec3 & From, const glm::vec3 & To, const glm::vec4 & Color)
 {
 	assert(m_count < e_maxVertices);
 	m_vertices[m_count] = From;
@@ -148,7 +148,7 @@ void CGProj::CGSpotShadowFrustumVisualizer::insertLine(const glm::vec3 & From, c
 	++m_count;
 }
 
-void CGProj::CGSpotShadowFrustumVisualizer::renderLine(const glm::mat4 & view, const glm::mat4 & proj, const float lineWidth)
+void CG::CGSpotShadowFrustumVisualizer::renderLine(const glm::mat4 & view, const glm::mat4 & proj, const float lineWidth)
 {
 	if (m_count == 0) return;
 

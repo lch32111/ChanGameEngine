@@ -19,7 +19,7 @@
 #include <GPED/CGPhysicsUtil.h>
 
 
-CGProj::CGEditDirLight::CGEditDirLight()
+CG::CGEditDirLight::CGEditDirLight()
 {
 	m_lightFactors = nullptr;
 
@@ -49,7 +49,7 @@ CGProj::CGEditDirLight::CGEditDirLight()
 	m_shadowLightSpaceMatrix = glm::mat4(1.f);
 }
 
-void CGProj::CGEditDirLight::initialize(CGAssetManager & am, CGEditLightCommonFactor * factor)
+void CG::CGEditDirLight::initialize(CGAssetManager & am, CGEditLightCommonFactor * factor)
 {
 	m_lightFactors = factor;
 
@@ -83,7 +83,7 @@ void CGProj::CGEditDirLight::initialize(CGAssetManager & am, CGEditLightCommonFa
 	// Shadow Map Initialization
 }
 
-void CGProj::CGEditDirLight::debugDepthMapRender(const glm::mat4& view, const glm::mat4& proj)
+void CG::CGEditDirLight::debugDepthMapRender(const glm::mat4& view, const glm::mat4& proj)
 {
 	m_DebugDepthMapShader->use();
 	m_DebugDepthMapShader->setMat4("view", view);
@@ -102,7 +102,7 @@ void CGProj::CGEditDirLight::debugDepthMapRender(const glm::mat4& view, const gl
 	renderCube();
 }
 
-void CGProj::CGEditDirLight::UIrenderForCommon()
+void CG::CGEditDirLight::UIrenderForCommon()
 {
 	// Light Direction
 	float t_dir[3] = { m_lightFactors->lightDirection.x, m_lightFactors->lightDirection.y, m_lightFactors->lightDirection.z };
@@ -111,7 +111,7 @@ void CGProj::CGEditDirLight::UIrenderForCommon()
 	m_lightFactors->lightDirection = glm::normalize(m_lightFactors->lightDirection);
 }
 
-void CGProj::CGEditDirLight::UIrenderForShadow()
+void CG::CGEditDirLight::UIrenderForShadow()
 {
 	ImGui::Checkbox("Shadow Projection", &m_shadowProjection);
 	ImGui::SameLine(); ShowHelpMarker("Check -> Perspective, NonCheck -> Orthographic");
@@ -142,7 +142,7 @@ void CGProj::CGEditDirLight::UIrenderForShadow()
 	ImGui::InputFloat("shadow bias", &m_shadowBias);
 }
 
-void CGProj::CGEditDirLight::setLightPropertyOnShader(Shader* shader, 
+void CG::CGEditDirLight::setLightPropertyOnShader(Shader* shader, 
 	const std::string & sLightIndex, const std::string & sShadowIndex, const unsigned shadowIndex)
 {
 	shader->setVec3("dirLights[" + sLightIndex + "].Direction", m_lightFactors->lightDirection);
@@ -165,7 +165,7 @@ void CGProj::CGEditDirLight::setLightPropertyOnShader(Shader* shader,
 	}
 }
 
-void CGProj::CGEditDirLight::renderShadowMap(std::vector<CGEditProxyObject>& objects)
+void CG::CGEditDirLight::renderShadowMap(std::vector<CGEditProxyObject>& objects)
 {
 	// Light Space Setting
 	m_shadowLightView = safeLookAt(
@@ -217,12 +217,12 @@ void CGProj::CGEditDirLight::renderShadowMap(std::vector<CGEditProxyObject>& obj
 	CGInstancePrimitiveUtil::renderQuad();
 }
 
-bool CGProj::CGEditDirLight::getShadowProjection()
+bool CG::CGEditDirLight::getShadowProjection()
 {
 	return m_shadowProjection;
 }
 
-CGProj::CGOrthoFrustum CGProj::CGEditDirLight::getOrthoFrustum()
+CG::CGOrthoFrustum CG::CGEditDirLight::getOrthoFrustum()
 {
 	CGOrthoFrustum f;
 	f.left = m_orthoLeft;
@@ -235,7 +235,7 @@ CGProj::CGOrthoFrustum CGProj::CGEditDirLight::getOrthoFrustum()
 	return f;
 }
 
-CGProj::CGPerFrustum CGProj::CGEditDirLight::getPerFrustum()
+CG::CGPerFrustum CG::CGEditDirLight::getPerFrustum()
 {
 	CGPerFrustum f;
 	f.fov = m_perFOV;
@@ -246,7 +246,7 @@ CGProj::CGPerFrustum CGProj::CGEditDirLight::getPerFrustum()
 	return f;
 }
 
-void CGProj::CGEditDirLight::setShadowWidthHeight(unsigned w, unsigned h)
+void CG::CGEditDirLight::setShadowWidthHeight(unsigned w, unsigned h)
 {
 	m_shadowWidth = w;
 	m_shadowHeight = h;

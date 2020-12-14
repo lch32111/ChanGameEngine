@@ -15,7 +15,7 @@
 
 /****************************************************************************************/
 /* ### Graphics Demo ### */
-void CGProj::GraphicsDemo::OnInitialize()
+void CG::GraphicsDemo::OnInitialize()
 {
 	glfwSwapInterval(0); // Turn off Vsync and measure the FPS
 	glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -27,42 +27,42 @@ void CGProj::GraphicsDemo::OnInitialize()
 	test2->initImgui();
 }
 
-void CGProj::GraphicsDemo::OnFinalize()
+void CG::GraphicsDemo::OnFinalize()
 {
 	test2->deinit();
 	delete test2;
 }
 
-void CGProj::GraphicsDemo::Update(float deltaTime, float lastFrame)
+void CG::GraphicsDemo::Update(float deltaTime, float lastFrame)
 {
 	test2->key(app_window, deltaTime);
 	test2->updateImgui();
 	test2->updateSimulation(deltaTime, lastFrame);
 }
 
-void CGProj::GraphicsDemo::Display()
+void CG::GraphicsDemo::Display()
 {
 	test2->display(m_width, m_height);
 }
 
-void CGProj::GraphicsDemo::MouseMoveCallback(double xpos, double ypos)
+void CG::GraphicsDemo::MouseMoveCallback(double xpos, double ypos)
 {
 	test2->mouse(xpos, ypos);
 }
 
-void CGProj::GraphicsDemo::MouseButtonCallback(int button, int action, int mods)
+void CG::GraphicsDemo::MouseButtonCallback(int button, int action, int mods)
 {
 	// Application::mouseButton(button, action, mods);
 
 	test2->mouseButton(app_window, button, action, mods, m_width, m_height);
 }
 
-void CGProj::GraphicsDemo::ScrollCallback(double yoffset)
+void CG::GraphicsDemo::ScrollCallback(double yoffset)
 {
 	test2->scroll(yoffset);
 }
 
-void CGProj::GraphicsDemo::ResizeWindowCallback(int width, int height)
+void CG::GraphicsDemo::ResizeWindowCallback(int width, int height)
 {
 	Application::m_width = width;
 	Application::m_height = height;
@@ -74,7 +74,7 @@ void CGProj::GraphicsDemo::ResizeWindowCallback(int width, int height)
 /* ### Graphics Demo ### */
 /****************************************************************************************/
 
-void CGProj::DeferredRenderer::initGraphics(int width, int height)
+void CG::DeferredRenderer::initGraphics(int width, int height)
 {
 	assetManager.assetInit();
 	camera.Position = glm::vec3(10, 10, 10);
@@ -367,11 +367,11 @@ void CGProj::DeferredRenderer::initGraphics(int width, int height)
 	// Gizmo Setting
 }
 
-void CGProj::DeferredRenderer::initImgui()
+void CG::DeferredRenderer::initImgui()
 {
 }
 
-void CGProj::DeferredRenderer::deinit()
+void CG::DeferredRenderer::deinit()
 {
 	assetManager.destroy();
 	myBloom.Destroy();
@@ -393,7 +393,7 @@ void CGProj::DeferredRenderer::deinit()
 	glDeleteFramebuffers(1, &dSecondFBO);
 }
 
-void CGProj::DeferredRenderer::updateImgui()
+void CG::DeferredRenderer::updateImgui()
 {
 	GLFWwindow* app_window = (GLFWwindow*)ImGui::GetIO().ClipboardUserData;
 
@@ -465,12 +465,12 @@ void CGProj::DeferredRenderer::updateImgui()
 	}
 }
 
-void CGProj::DeferredRenderer::updateSimulation(float deltaTime, float lastFrame)
+void CG::DeferredRenderer::updateSimulation(float deltaTime, float lastFrame)
 {
 
 }
 
-void CGProj::DeferredRenderer::display(int width, int height)
+void CG::DeferredRenderer::display(int width, int height)
 {
 	glClearColor(0.11f, 0.11f, 0.11f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -718,7 +718,7 @@ void CGProj::DeferredRenderer::display(int width, int height)
 	// Debug Drawing and UI Render like forward processing
 }
 
-void CGProj::DeferredRenderer::key(GLFWwindow * app_window, float deltaTime)
+void CG::DeferredRenderer::key(GLFWwindow * app_window, float deltaTime)
 {
 	if (GameControl)
 	{
@@ -766,7 +766,7 @@ void CGProj::DeferredRenderer::key(GLFWwindow * app_window, float deltaTime)
 	
 }
 
-void CGProj::DeferredRenderer::mouse(double xpos, double ypos)
+void CG::DeferredRenderer::mouse(double xpos, double ypos)
 {
 	if (GameControl)
 	{
@@ -801,7 +801,7 @@ void CGProj::DeferredRenderer::mouse(double xpos, double ypos)
 	}
 }
 
-void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window, 
+void CG::DeferredRenderer::mouseButton(GLFWwindow * app_window, 
 	int button, int action, int mods, 
 	int screen_width, int screen_height)
 {
@@ -865,7 +865,7 @@ void CGProj::DeferredRenderer::mouseButton(GLFWwindow * app_window,
 	}
 }
 
-void CGProj::DeferredRenderer::scroll(double yoffset)
+void CG::DeferredRenderer::scroll(double yoffset)
 {
 	// Exit out if mouse clicks on Imgui GUI
 	if (ImGui::IsMouseHoveringAnyWindow()) return;
@@ -873,7 +873,7 @@ void CGProj::DeferredRenderer::scroll(double yoffset)
 	camera.ProcessMouseScroll((float)yoffset);
 }
 
-void CGProj::DeferredRenderer::resize(int width, int height)
+void CG::DeferredRenderer::resize(int width, int height)
 {
 	if (width <= 0 || height <= 0) return; // Ignore window minimization case
 

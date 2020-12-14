@@ -3,24 +3,24 @@
 
 #include <Graphics/CGAssetManager.h>
 
-CGProj::CGRenderLine::CGRenderLine()
+CG::CGRenderLine::CGRenderLine()
 {
 
 }
 
-CGProj::CGRenderLine::CGRenderLine(CGAssetManager & am)
+CG::CGRenderLine::CGRenderLine(CGAssetManager & am)
 {
 	m_lineShader = am.getShader(SHADER_CG_LINE);
 	prepareData();
 }
 
-void CGProj::CGRenderLine::setShader(Shader * shader)
+void CG::CGRenderLine::setShader(Shader * shader)
 {
 	m_lineShader = shader;
 	prepareData();
 }
 
-void CGProj::CGRenderLine::insertLine(const glm::vec3 & From, const glm::vec3 & To, const glm::vec4 & Color)
+void CG::CGRenderLine::insertLine(const glm::vec3 & From, const glm::vec3 & To, const glm::vec4 & Color)
 {
 	assert(m_count < e_maxVertices);
 	m_vertices[m_count] = From;
@@ -33,7 +33,7 @@ void CGProj::CGRenderLine::insertLine(const glm::vec3 & From, const glm::vec3 & 
 	++m_count;
 }
 
-void CGProj::CGRenderLine::renderLine(const glm::mat4 & view, const glm::mat4 & proj, const float lineWidth)
+void CG::CGRenderLine::renderLine(const glm::mat4 & view, const glm::mat4 & proj, const float lineWidth)
 {
 	if (m_count == 0) return;
 
@@ -61,7 +61,7 @@ void CGProj::CGRenderLine::renderLine(const glm::mat4 & view, const glm::mat4 & 
 	m_count = 0;
 }
 
-void CGProj::CGRenderLine::prepareData()
+void CG::CGRenderLine::prepareData()
 {
 	glGenVertexArrays(1, &m_VAO);
 	glGenBuffers(2, m_VBO);

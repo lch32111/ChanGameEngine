@@ -14,11 +14,9 @@
 #include <GPED/GPED_random.h>
 #include <GPED/CGPhysicsUtil.h>
 
-using namespace CGProj::CollisionDetection;
-
 /****************************************************************************************/
 /* ### Collision Demo ### */
-void CGProj::CollisionDemo::OnInitialize()
+void CG::CollisionDemo::OnInitialize()
 {
 	glfwSwapInterval(0);
 	glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -30,40 +28,40 @@ void CGProj::CollisionDemo::OnInitialize()
 	demo->initImgui();
 }
 
-void CGProj::CollisionDemo::OnFinalize()
+void CG::CollisionDemo::OnFinalize()
 {
 	demo->deinit();
 	delete demo;
 }
 
-void CGProj::CollisionDemo::Update(float deltaTime, float lastFrame)
+void CG::CollisionDemo::Update(float deltaTime, float lastFrame)
 {
 	demo->key(app_window, deltaTime);
 	demo->updateImgui();
 	demo->updateSimulation(deltaTime, lastFrame);
 }
 
-void CGProj::CollisionDemo::Display()
+void CG::CollisionDemo::Display()
 {
 	demo->display(m_width, m_height);
 }
 
-void CGProj::CollisionDemo::MouseMoveCallback(double xpos, double ypos)
+void CG::CollisionDemo::MouseMoveCallback(double xpos, double ypos)
 {
 	demo->mouse(xpos, ypos);
 }
 
-void CGProj::CollisionDemo::MouseButtonCallback(int button, int action, int mods)
+void CG::CollisionDemo::MouseButtonCallback(int button, int action, int mods)
 {
 	demo->mouseButton(app_window, button, action, mods, m_width, m_height);
 }
 
-void CGProj::CollisionDemo::ScrollCallback(double yoffset)
+void CG::CollisionDemo::ScrollCallback(double yoffset)
 {
 	demo->scroll(yoffset);
 }
 
-void CGProj::CollisionDemo::ResizeWindowCallback(int width, int height)
+void CG::CollisionDemo::ResizeWindowCallback(int width, int height)
 {
 	Application::m_width = width;
 	Application::m_height = height;
@@ -75,11 +73,11 @@ void CGProj::CollisionDemo::ResizeWindowCallback(int width, int height)
 /* ### Collision Demo ### */
 /****************************************************************************************/
 
-static CGProj::CGAssetManager s_AssetManager;
-static CGProj::Shader* s_simpleColorShader;
-static CGProj::CGSizableRenderLine* gridRenderer;
-static CGProj::CGSizableRenderLine* AllLineRenderer;
-void CGProj::CollisionTestBed::initGraphics(int width, int height)
+static CG::CGAssetManager s_AssetManager;
+static CG::Shader* s_simpleColorShader;
+static CG::CGSizableRenderLine* gridRenderer;
+static CG::CGSizableRenderLine* AllLineRenderer;
+void CG::CollisionTestBed::initGraphics(int width, int height)
 {
 	s_AssetManager.assetInit();
 
@@ -116,12 +114,12 @@ void CGProj::CollisionTestBed::initGraphics(int width, int height)
 	bSphere.m_pos = CGVec3(1.f, 1.f, 0.f);
 }
 
-void CGProj::CollisionTestBed::initImgui()
+void CG::CollisionTestBed::initImgui()
 {
 	
 }
 
-void CGProj::CollisionTestBed::deinit()
+void CG::CollisionTestBed::deinit()
 {
 	s_AssetManager.destroy();
 
@@ -129,7 +127,7 @@ void CGProj::CollisionTestBed::deinit()
 }
 
 
-void CGProj::CollisionTestBed::updateImgui()
+void CG::CollisionTestBed::updateImgui()
 {
 	ImGui::Begin("Collision Test Bed");
 	{
@@ -143,12 +141,12 @@ void CGProj::CollisionTestBed::updateImgui()
 	ImGui::End();
 }
 
-void CGProj::CollisionTestBed::updateSimulation(float dletaTime, float lastTime)
+void CG::CollisionTestBed::updateSimulation(float dletaTime, float lastTime)
 {
-	isSphereCollided = CollisionDetection::intersect(aSphere, bSphere, sphereContact);
+	isSphereCollided = Intersect(aSphere, bSphere, sphereContact);
 }
 
-void CGProj::CollisionTestBed::display(int width, int height)
+void CG::CollisionTestBed::display(int width, int height)
 {
 	glClearColor(0.11f, 0.11f, 0.11f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -220,7 +218,7 @@ void CGProj::CollisionTestBed::display(int width, int height)
 	}
 }
 
-void CGProj::CollisionTestBed::key(GLFWwindow* app_window, float deltaTime)
+void CG::CollisionTestBed::key(GLFWwindow* app_window, float deltaTime)
 {
 	if (GameControl)
 	{
@@ -278,7 +276,7 @@ void CGProj::CollisionTestBed::key(GLFWwindow* app_window, float deltaTime)
 	}
 }
 
-void CGProj::CollisionTestBed::mouse(double xpos, double ypos)
+void CG::CollisionTestBed::mouse(double xpos, double ypos)
 {
 	if (GameControl)
 	{
@@ -309,7 +307,7 @@ void CGProj::CollisionTestBed::mouse(double xpos, double ypos)
 	}
 }
 
-void CGProj::CollisionTestBed::mouseButton(GLFWwindow * app_window,
+void CG::CollisionTestBed::mouseButton(GLFWwindow * app_window,
 	int button, int action, int mods,
 	int screen_width, int screen_height)
 {
@@ -329,11 +327,11 @@ void CGProj::CollisionTestBed::mouseButton(GLFWwindow * app_window,
 			glm::vec3 rayTo = GetRayTo((int)x, (int)y, &camera, screen_width, screen_height);
 			rayTo /= 10.f;
 
-			CGCollisionRay r;
+			CGRay r;
 			r.m_source = CGVec3(rayFrom.x, rayFrom.y, rayFrom.z);
 			r.m_target = CGVec3(rayTo.x, rayTo.y, rayTo.z);
 
-			isRaySphereCollided = CollisionDetection::intersect(aSphere, r);
+			isRaySphereCollided = Intersect(aSphere, r);
 		}
 	}
 
@@ -343,7 +341,7 @@ void CGProj::CollisionTestBed::mouseButton(GLFWwindow * app_window,
 	}
 }
 
-void CGProj::CollisionTestBed::scroll(double yoffset)
+void CG::CollisionTestBed::scroll(double yoffset)
 {
 	// Exit out if mouse clicks on Imgui GUI
 	if (ImGui::IsMouseHoveringAnyWindow()) return;
@@ -351,7 +349,7 @@ void CGProj::CollisionTestBed::scroll(double yoffset)
 	camera.ProcessMouseScroll((float)yoffset);
 }
 
-void CGProj::CollisionTestBed::resize(int width, int height)
+void CG::CollisionTestBed::resize(int width, int height)
 {
 
 }

@@ -1,7 +1,7 @@
 #include <CGPrecompiled.h>
 #include "chanQuatCamera.h"
 
-CGProj::chanQuatCamera::chanQuatCamera(glm::vec3 position, glm::vec3 up)
+CG::chanQuatCamera::chanQuatCamera(glm::vec3 position, glm::vec3 up)
 	:
 	MovementSpeed(QUAT_SPEED),
 	MouseSensitivity(QUAT_SENSITIVITY),
@@ -16,7 +16,7 @@ CGProj::chanQuatCamera::chanQuatCamera(glm::vec3 position, glm::vec3 up)
 	updateCameraVectors();
 }
 
-CGProj::chanQuatCamera::chanQuatCamera(float posX, float posY, float posZ)
+CG::chanQuatCamera::chanQuatCamera(float posX, float posY, float posZ)
 	: 
 	MovementSpeed(QUAT_SPEED), 
 	MouseSensitivity(QUAT_SENSITIVITY), 
@@ -31,7 +31,7 @@ CGProj::chanQuatCamera::chanQuatCamera(float posX, float posY, float posZ)
 	updateCameraVectors();
 }
 
-glm::mat4 CGProj::chanQuatCamera::GetViewMatrix()
+glm::mat4 CG::chanQuatCamera::GetViewMatrix()
 {
 	// You should know the camera move reversely relative to the user input.
 	// That's the point of Graphics Camera!
@@ -43,7 +43,7 @@ glm::mat4 CGProj::chanQuatCamera::GetViewMatrix()
 	return View;
 }
 
-void CGProj::chanQuatCamera::GetViewMatrix(glm::mat4 & View)
+void CG::chanQuatCamera::GetViewMatrix(glm::mat4 & View)
 {
 	// You should know the camera move reversely relative to the user input.
 	// That's the point of Graphics Camera!
@@ -53,7 +53,7 @@ void CGProj::chanQuatCamera::GetViewMatrix(glm::mat4 & View)
 	View[3][2] = -(View[0][2] * Position.x + View[1][2] * Position.y + View[2][2] * Position.z);
 }
 
-void CGProj::chanQuatCamera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
+void CG::chanQuatCamera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
 {
 	float velocity = MovementSpeed * deltaTime;
 
@@ -70,7 +70,7 @@ void CGProj::chanQuatCamera::ProcessKeyboard(Camera_Movement direction, float de
 		Position += Right * velocity;
 }
 
-void CGProj::chanQuatCamera::ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch)
+void CG::chanQuatCamera::ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch)
 {
 	xoffset *= MouseSensitivity;
 	yoffset *= MouseSensitivity;
@@ -81,7 +81,7 @@ void CGProj::chanQuatCamera::ProcessMouseMovement(float xoffset, float yoffset, 
 	updateCameraVectors();
 }
 
-void CGProj::chanQuatCamera::ProcessMouseScroll(float yoffset)
+void CG::chanQuatCamera::ProcessMouseScroll(float yoffset)
 {
 	if (Zoom >= 1.f && Zoom <= 45.f)
 		Zoom -= yoffset;
@@ -93,7 +93,7 @@ void CGProj::chanQuatCamera::ProcessMouseScroll(float yoffset)
 		Zoom = 45.f;
 }
 
-void CGProj::chanQuatCamera::updateCameraVectors()
+void CG::chanQuatCamera::updateCameraVectors()
 {
 	// Yaw
 	glm::quat aroundY = glm::angleAxis(glm::radians(-RightAngle), glm::vec3(0, 1, 0));

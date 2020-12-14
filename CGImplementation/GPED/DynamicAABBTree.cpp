@@ -2,7 +2,7 @@
 #include "DynamicAABBTree.h"
 #include <Math/CGMathConfig.h>
 
-CGProj::DynamicAABBTree::DynamicAABBTree()
+CG::DynamicAABBTree::DynamicAABBTree()
 {
 	m_root = Node_Null;
 
@@ -25,7 +25,7 @@ CGProj::DynamicAABBTree::DynamicAABBTree()
 	m_insertionCount = 0;
 }
 
-CGProj::DynamicAABBTree::DynamicAABBTree(int nodeCapacity)
+CG::DynamicAABBTree::DynamicAABBTree(int nodeCapacity)
 {
 	m_root = Node_Null;
 
@@ -48,7 +48,7 @@ CGProj::DynamicAABBTree::DynamicAABBTree(int nodeCapacity)
 	m_insertionCount = 0;
 }
 
-CGProj::DynamicAABBTree::~DynamicAABBTree()
+CG::DynamicAABBTree::~DynamicAABBTree()
 {
 	delete[] m_nodes;
 	m_nodes = nullptr;
@@ -57,7 +57,7 @@ CGProj::DynamicAABBTree::~DynamicAABBTree()
 // Create a proxy in the tree as a leaf node. We return the index
 // of the node instead of a pointer so that we can grow
 // the node pool
-int CGProj::DynamicAABBTree::CreateProxy(const GPED::c3AABB & aabb, void * userData)
+int CG::DynamicAABBTree::CreateProxy(const GPED::c3AABB & aabb, void * userData)
 {
 	int proxyId = AllocateNode();
 
@@ -73,7 +73,7 @@ int CGProj::DynamicAABBTree::CreateProxy(const GPED::c3AABB & aabb, void * userD
 	return proxyId;
 }
 
-void CGProj::DynamicAABBTree::DestroyProxy(int proxyId)
+void CG::DynamicAABBTree::DestroyProxy(int proxyId)
 {
 	assert(0 <= proxyId && proxyId < m_nodeCapacity);
 	assert(m_nodes[proxyId].isLeaf());
@@ -83,7 +83,7 @@ void CGProj::DynamicAABBTree::DestroyProxy(int proxyId)
 }
 
 // For moving object
-bool CGProj::DynamicAABBTree::UpdateProxy(int proxyId, const GPED::c3AABB & aabb, const glm::vec3 displacement)
+bool CG::DynamicAABBTree::UpdateProxy(int proxyId, const GPED::c3AABB & aabb, const glm::vec3 displacement)
 {
 	assert(0 <= proxyId && proxyId < m_nodeCapacity);
 	assert(m_nodes[proxyId].isLeaf());
@@ -117,7 +117,7 @@ bool CGProj::DynamicAABBTree::UpdateProxy(int proxyId, const GPED::c3AABB & aabb
 	return true;
 }
 
-bool CGProj::DynamicAABBTree::UpdateProxy(int proxyId, const GPED::c3AABB & aabb)
+bool CG::DynamicAABBTree::UpdateProxy(int proxyId, const GPED::c3AABB & aabb)
 {
 	assert(0 <= proxyId && proxyId < m_nodeCapacity);
 	assert(m_nodes[proxyId].isLeaf());
@@ -138,19 +138,19 @@ bool CGProj::DynamicAABBTree::UpdateProxy(int proxyId, const GPED::c3AABB & aabb
 	return true;
 }
 
-void * CGProj::DynamicAABBTree::GetUserData(int proxyId) const
+void * CG::DynamicAABBTree::GetUserData(int proxyId) const
 {
 	assert(0 <= proxyId && proxyId < m_nodeCapacity);
 	return m_nodes[proxyId].userdata;
 }
 
-const GPED::c3AABB& CGProj::DynamicAABBTree::GetFatAABB(int proxyId) const
+const GPED::c3AABB& CG::DynamicAABBTree::GetFatAABB(int proxyId) const
 {
 	assert(0 <= proxyId && proxyId < m_nodeCapacity);
 	return m_nodes[proxyId].aabb;
 }
 
-int CGProj::DynamicAABBTree::GetHeight() const
+int CG::DynamicAABBTree::GetHeight() const
 {
 	if(m_root == Node_Null)
 		return 0;
@@ -159,7 +159,7 @@ int CGProj::DynamicAABBTree::GetHeight() const
 }
 
 // Allocate a node from the pool. Grow the pool if necessary
-int CGProj::DynamicAABBTree::AllocateNode()
+int CG::DynamicAABBTree::AllocateNode()
 {
 	// Expand the node pool as needed.
 	if (m_freeList == Node_Null)
@@ -199,7 +199,7 @@ int CGProj::DynamicAABBTree::AllocateNode()
 }
 
 // Return a node to the pool
-void CGProj::DynamicAABBTree::FreeNode(int nodeId)
+void CG::DynamicAABBTree::FreeNode(int nodeId)
 {
 	assert(0 <= nodeId && nodeId < m_nodeCapacity);
 	assert(0 < m_nodeCount);
@@ -209,7 +209,7 @@ void CGProj::DynamicAABBTree::FreeNode(int nodeId)
 	--m_nodeCount;
 }
 
-void CGProj::DynamicAABBTree::InsertLeaf(int leaf)
+void CG::DynamicAABBTree::InsertLeaf(int leaf)
 {
 	++m_insertionCount;
 
@@ -332,7 +332,7 @@ void CGProj::DynamicAABBTree::InsertLeaf(int leaf)
 		assert(left != Node_Null);
 		assert(right != Node_Null);
 
-		m_nodes[index].height = 1 + CGProj::Max(m_nodes[left].height, m_nodes[right].height);
+		m_nodes[index].height = 1 + CG::Max(m_nodes[left].height, m_nodes[right].height);
 		m_nodes[index].aabb.Combine(m_nodes[left].aabb, m_nodes[right].aabb);
 
 		index = m_nodes[index].parent;
@@ -341,7 +341,7 @@ void CGProj::DynamicAABBTree::InsertLeaf(int leaf)
 	// Validate();
 }
 
-void CGProj::DynamicAABBTree::RemoveLeaf(int leaf)
+void CG::DynamicAABBTree::RemoveLeaf(int leaf)
 {
 	if (leaf == m_root)
 	{
@@ -379,7 +379,7 @@ void CGProj::DynamicAABBTree::RemoveLeaf(int leaf)
 			int right = m_nodes[index].right;
 
 			m_nodes[index].aabb.Combine(m_nodes[left].aabb, m_nodes[right].aabb);
-			m_nodes[index].height = 1 + CGProj::Max(m_nodes[left].height, m_nodes[right].height);
+			m_nodes[index].height = 1 + CG::Max(m_nodes[left].height, m_nodes[right].height);
 
 			index = m_nodes[index].parent;
 		}
@@ -395,12 +395,12 @@ void CGProj::DynamicAABBTree::RemoveLeaf(int leaf)
 	// Validate();
 }
 
-int CGProj::DynamicAABBTree::Balance(int index)
+int CG::DynamicAABBTree::Balance(int index)
 {
 	return 0;
 }
 
-void CGProj::DynamicAABBTree::Validate()
+void CG::DynamicAABBTree::Validate()
 {
 	ValidateStructure(m_root);
 	ValidateMetrics(m_root);
@@ -419,7 +419,7 @@ void CGProj::DynamicAABBTree::Validate()
 	assert(m_nodeCount + freeCount == m_nodeCapacity);
 }
 
-void CGProj::DynamicAABBTree::ValidateStructure(int index) const
+void CG::DynamicAABBTree::ValidateStructure(int index) const
 {
 	if (index == Node_Null)
 	{
@@ -454,7 +454,7 @@ void CGProj::DynamicAABBTree::ValidateStructure(int index) const
 	ValidateStructure(right);
 }
 
-void CGProj::DynamicAABBTree::ValidateMetrics(int index) const
+void CG::DynamicAABBTree::ValidateMetrics(int index) const
 {
 	if (index == Node_Null)
 	{
@@ -480,7 +480,7 @@ void CGProj::DynamicAABBTree::ValidateMetrics(int index) const
 	int height1 = m_nodes[left].height;
 	int height2 = m_nodes[right].height;
 	int height;
-	height = 1 + CGProj::Max(height1, height2);
+	height = 1 + CG::Max(height1, height2);
 	assert(node->height == height);
 
 	GPED::c3AABB aabb;
@@ -493,7 +493,7 @@ void CGProj::DynamicAABBTree::ValidateMetrics(int index) const
 	ValidateMetrics(right);
 }
 
-s32 CGProj::DynamicAABBTree::ComputeHeight(int nodeId) const
+s32 CG::DynamicAABBTree::ComputeHeight(int nodeId) const
 {
 	assert(0 <= nodeId && nodeId < m_nodeCapacity);
 	TreeNode* node = m_nodes + nodeId;
@@ -505,10 +505,10 @@ s32 CGProj::DynamicAABBTree::ComputeHeight(int nodeId) const
 
 	s32 height1 = ComputeHeight(node->left);
 	s32 height2 = ComputeHeight(node->right);
-	return 1 + CGProj::Max(height1, height2);
+	return 1 + CG::Max(height1, height2);
 }
 
-s32 CGProj::DynamicAABBTree::ComputeHeight() const
+s32 CG::DynamicAABBTree::ComputeHeight() const
 {
 	s32 height = ComputeHeight(m_root);
 	return height;

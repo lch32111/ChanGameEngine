@@ -572,32 +572,14 @@
     <ClInclude Include="Math\CGMathHeader.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionDetection\CGCollisionSphere.h">
-      <Filter>CollisionDetection\Header</Filter>
-    </ClInclude>
     <ClInclude Include="CollisionDetection\CGCollisionFunction.h">
-      <Filter>CollisionDetection\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionDetection\CGCollisionRay.h">
       <Filter>CollisionDetection\Header</Filter>
     </ClInclude>
     <ClInclude Include="CGPrecompiled.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionDetection\CGCollisionLineSegment.h">
-      <Filter>CollisionDetection\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionDetection\CGCollisionConvex.h">
-      <Filter>CollisionDetection\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionDetection\CGCollisionShape.h">
-      <Filter>CollisionDetection\Header</Filter>
-    </ClInclude>
     <ClInclude Include="Math\CGMat4.h">
       <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionDetection\CGCollisionConfig.h">
-      <Filter>CollisionDetection\Header</Filter>
     </ClInclude>
     <ClInclude Include="Math\CGMat3.h">
       <Filter>Math</Filter>
@@ -622,6 +604,24 @@
     </ClInclude>
     <ClInclude Include="Demo\RayTracerDemo.h">
       <Filter>Demo\RayTracer Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetection\CGShape.h">
+      <Filter>CollisionDetection\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetection\CGConvex.h">
+      <Filter>CollisionDetection\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetection\CGConfig.h">
+      <Filter>CollisionDetection\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetection\CGSphere.h">
+      <Filter>CollisionDetection\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetection\CGRay.h">
+      <Filter>CollisionDetection\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetection\CGLineSegment.h">
+      <Filter>CollisionDetection\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

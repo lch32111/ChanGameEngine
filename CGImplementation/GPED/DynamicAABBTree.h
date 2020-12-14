@@ -4,7 +4,7 @@
 
 #include <GPED/GPED_Precision.h>
 
-namespace CGProj
+namespace CG
 {
 #define Node_Null -1
 	struct TreeNode

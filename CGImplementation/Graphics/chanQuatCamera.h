@@ -10,7 +10,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-namespace CGProj
+namespace CG
 {
 	// Default camera values
 	const float QUAT_SPEED = 10.0f;

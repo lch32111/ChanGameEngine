@@ -2,7 +2,7 @@
 #include "CGBroadPhase.h"
 #include <Graphics/GLPrimitiveUtil.h>
 
-CGProj::CGBroadPhase::CGBroadPhase()
+CG::CGBroadPhase::CGBroadPhase()
 {
 	m_proxyCount = 0;
 
@@ -15,7 +15,7 @@ CGProj::CGBroadPhase::CGBroadPhase()
 	m_moveBuffer = new int[m_moveCapacity];
 }
 
-CGProj::CGBroadPhase::~CGBroadPhase()
+CG::CGBroadPhase::~CGBroadPhase()
 {
 	delete[] m_moveBuffer;
 	delete[] m_pairBuffer;
@@ -23,7 +23,7 @@ CGProj::CGBroadPhase::~CGBroadPhase()
 	m_pairBuffer = nullptr;
 }
 
-int CGProj::CGBroadPhase::CreateProxy(const GPED::c3AABB & aabb, void * userData)
+int CG::CGBroadPhase::CreateProxy(const GPED::c3AABB & aabb, void * userData)
 {
 	int proxyId = m_tree.CreateProxy(aabb, userData);
 	++m_proxyCount;
@@ -31,21 +31,21 @@ int CGProj::CGBroadPhase::CreateProxy(const GPED::c3AABB & aabb, void * userData
 	return proxyId;
 }
 
-void CGProj::CGBroadPhase::DestroyProxy(int proxyId)
+void CG::CGBroadPhase::DestroyProxy(int proxyId)
 {
 	UnBufferMove(proxyId);
 	--m_proxyCount;
 	m_tree.DestroyProxy(proxyId);
 }
 
-void CGProj::CGBroadPhase::UpdateProxy(int proxyId, const GPED::c3AABB & aabb, const glm::vec3 & displacement)
+void CG::CGBroadPhase::UpdateProxy(int proxyId, const GPED::c3AABB & aabb, const glm::vec3 & displacement)
 {
 	bool buffer = m_tree.UpdateProxy(proxyId, aabb, displacement);
 	if (buffer)
 		BufferMove(proxyId);
 }
 
-void CGProj::CGBroadPhase::UpdateProxy(int proxyId, const GPED::c3AABB & aabb)
+void CG::CGBroadPhase::UpdateProxy(int proxyId, const GPED::c3AABB & aabb)
 {
 	bool buffer = m_tree.UpdateProxy(proxyId, aabb);
 	if (buffer)
@@ -53,7 +53,7 @@ void CGProj::CGBroadPhase::UpdateProxy(int proxyId, const GPED::c3AABB & aabb)
 }
 
 // This is called from DynamicTrees::query when we are gathering pairs
-bool CGProj::CGBroadPhase::QueryCallback(int proxyId)
+bool CG::CGBroadPhase::QueryCallback(int proxyId)
 {
 	// A proxy cannot form a pair with itself
 	if (proxyId == m_queryProxyId)
@@ -77,7 +77,7 @@ bool CGProj::CGBroadPhase::QueryCallback(int proxyId)
 	return true;
 }
 
-void CGProj::CGBroadPhase::BufferMove(int proxyId)
+void CG::CGBroadPhase::BufferMove(int proxyId)
 {
 	if (m_moveCount == m_moveCapacity)
 	{
@@ -93,7 +93,7 @@ void CGProj::CGBroadPhase::BufferMove(int proxyId)
 	++m_moveCount;
 }
 
-void CGProj::CGBroadPhase::UnBufferMove(int proxyId)
+void CG::CGBroadPhase::UnBufferMove(int proxyId)
 {
 	for (int i = 0; i < m_moveCount; ++i)
 	{
@@ -103,24 +103,24 @@ void CGProj::CGBroadPhase::UnBufferMove(int proxyId)
 }
 
 
-void * CGProj::CGBroadPhase::GetUserData(int proxyId) const
+void * CG::CGBroadPhase::GetUserData(int proxyId) const
 {
 	return m_tree.GetUserData(proxyId);
 }
 
-bool CGProj::CGBroadPhase::TestOverlap(int proxyIdA, int proxyIdB)
+bool CG::CGBroadPhase::TestOverlap(int proxyIdA, int proxyIdB)
 {
 	const GPED::c3AABB& aabbA = m_tree.GetFatAABB(proxyIdA);
 	const GPED::c3AABB& aabbB = m_tree.GetFatAABB(proxyIdB);
 	return GPED::aabbOverlap(aabbA, aabbB);
 }
 
-int CGProj::CGBroadPhase::GetProxyCount() const
+int CG::CGBroadPhase::GetProxyCount() const
 {
 	return m_proxyCount;
 }
 
-void CGProj::BroadRendererWrapper::draw(Shader* shader, glm::mat4* proj, glm::mat4* view)
+void CG::BroadRendererWrapper::draw(Shader* shader, glm::mat4* proj, glm::mat4* view)
 {
 	m_shader = shader;
 	m_projection = proj;
@@ -133,7 +133,7 @@ void CGProj::BroadRendererWrapper::draw(Shader* shader, glm::mat4* proj, glm::ma
 		recursiveDraw(m_tree->m_root);
 }
 
-void CGProj::BroadRendererWrapper::recursiveDraw(int index)
+void CG::BroadRendererWrapper::recursiveDraw(int index)
 {
 	if (m_tree->m_nodes[index].isLeaf() == false)
 		render(m_tree->m_nodes[index].aabb, branchColor, branchWidth);
@@ -150,7 +150,7 @@ void CGProj::BroadRendererWrapper::recursiveDraw(int index)
 		recursiveDraw(right);
 }
 
-void CGProj::BroadRendererWrapper::render(const GPED::c3AABB& aabb, const glm::vec3& Color, float lineWidth)
+void CG::BroadRendererWrapper::render(const GPED::c3AABB& aabb, const glm::vec3& Color, float lineWidth)
 {
 	glm::mat4 model = glm::mat4(1.0);
 	glm::vec3 halfextents = (aabb.max - aabb.min) / 2.f;

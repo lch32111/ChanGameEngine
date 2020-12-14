@@ -10,7 +10,7 @@
 // =================================================================
 /*** CG EDIT Proxy Object  ***/
 
-CGProj::CGEditProxyObject::CGEditProxyObject(CGAssetManager& am)
+CG::CGEditProxyObject::CGEditProxyObject(CGAssetManager& am)
 {
 	setProxyType(EDIT_PROXY_STATIC);
 
@@ -20,7 +20,7 @@ CGProj::CGEditProxyObject::CGEditProxyObject(CGAssetManager& am)
 	// other member variables of this class should be in the class header declaration!
 }
 
-void CGProj::CGEditProxyObject::setInstanceData(const std::vector<glm::mat4>& model, const std::vector<glm::mat4>& worldNormal)
+void CG::CGEditProxyObject::setInstanceData(const std::vector<glm::mat4>& model, const std::vector<glm::mat4>& worldNormal)
 {
 	m_instanceNumb = model.size();
 
@@ -50,7 +50,7 @@ void CGProj::CGEditProxyObject::setInstanceData(const std::vector<glm::mat4>& mo
 	}
 }
 
-void CGProj::CGEditProxyObject::render(const glm::vec3& cameraPos)
+void CG::CGEditProxyObject::render(const glm::vec3& cameraPos)
 {
 	// CGEditObject::render(view, proj);
 	m_DefShader->use();
@@ -112,7 +112,7 @@ void CGProj::CGEditProxyObject::render(const glm::vec3& cameraPos)
 		renderOneInstancePrimitive();
 }
 
-void CGProj::CGEditProxyObject::renderOneInstancePrimitive()
+void CG::CGEditProxyObject::renderOneInstancePrimitive()
 {
 	switch (m_PrimitiveType)
 	{
@@ -129,7 +129,7 @@ void CGProj::CGEditProxyObject::renderOneInstancePrimitive()
 	}
 }
 
-void CGProj::CGEditProxyObject::shadowMapRender()
+void CG::CGEditProxyObject::shadowMapRender()
 {
 	if (m_useModelData)
 		m_Model->shadowFirstRender();
@@ -137,7 +137,7 @@ void CGProj::CGEditProxyObject::shadowMapRender()
 		renderOneInstancePrimitive();
 }
 
-void CGProj::CGEditProxyObject::UIrender(CGAssetManager& am)
+void CG::CGEditProxyObject::UIrender(CGAssetManager& am)
 {
 	// CGEditObject::UIrender(am);
 
@@ -246,132 +246,132 @@ void CGProj::CGEditProxyObject::UIrender(CGAssetManager& am)
 	ImGui::End();
 }
 
-bool CGProj::CGEditProxyObject::getCMorLM()
+bool CG::CGEditProxyObject::getCMorLM()
 {
 	return CGEditProxyObject::m_CMorLM;
 }
 
-void CGProj::CGEditProxyObject::setCMorLM(bool flag)
+void CG::CGEditProxyObject::setCMorLM(bool flag)
 {
 	CGEditProxyObject::m_CMorLM = flag;
 }
 
-bool CGProj::CGEditProxyObject::isDiffuseOn()
+bool CG::CGEditProxyObject::isDiffuseOn()
 {
 	return CGEditProxyObject::m_isLMdiffuse;
 }
 
-void CGProj::CGEditProxyObject::setDiffuseFlag(bool flag)
+void CG::CGEditProxyObject::setDiffuseFlag(bool flag)
 {
 	CGEditProxyObject::m_isLMdiffuse = flag;
 }
 
-void CGProj::CGEditProxyObject::setDiffuseTexture(unsigned texId)
+void CG::CGEditProxyObject::setDiffuseTexture(unsigned texId)
 {
 	CGEditProxyObject::m_diffuseTexture = texId;
 }
 
-bool CGProj::CGEditProxyObject::isSpecularOn()
+bool CG::CGEditProxyObject::isSpecularOn()
 {
 	return CGEditProxyObject::m_isLMspecular;
 }
 
-void CGProj::CGEditProxyObject::setSpecularFlag(bool flag)
+void CG::CGEditProxyObject::setSpecularFlag(bool flag)
 {
 	CGEditProxyObject::m_isLMspecular = flag;
 }
 
-void CGProj::CGEditProxyObject::setSpecularTexture(unsigned texId)
+void CG::CGEditProxyObject::setSpecularTexture(unsigned texId)
 {
 	CGEditProxyObject::m_specularTexture = texId;
 }
 
-bool CGProj::CGEditProxyObject::isEmissiveOn()
+bool CG::CGEditProxyObject::isEmissiveOn()
 {
 	return CGEditProxyObject::m_isLMemissive;
 }
 
-void CGProj::CGEditProxyObject::setEmissiveFlag(bool flag)
+void CG::CGEditProxyObject::setEmissiveFlag(bool flag)
 {
 	CGEditProxyObject::m_isLMemissive = flag;
 }
 
-void CGProj::CGEditProxyObject::setEmissiveTexture(unsigned texId)
+void CG::CGEditProxyObject::setEmissiveTexture(unsigned texId)
 {
 	CGEditProxyObject::m_emissiveTexture = texId;
 }
 
-bool CGProj::CGEditProxyObject::isNormalMapOn()
+bool CG::CGEditProxyObject::isNormalMapOn()
 {
 	return m_isNormalMap;
 }
 
-void CGProj::CGEditProxyObject::setNormalMapFlag(bool flag)
+void CG::CGEditProxyObject::setNormalMapFlag(bool flag)
 {
 	m_isNormalMap = flag;
 }
 
-void CGProj::CGEditProxyObject::setNormalMapTexture(unsigned texId)
+void CG::CGEditProxyObject::setNormalMapTexture(unsigned texId)
 {
 	m_normalMapTexture = texId;
 }
 
-bool CGProj::CGEditProxyObject::isDepthMapon()
+bool CG::CGEditProxyObject::isDepthMapon()
 {
 	return m_isDepthMap;
 }
 
-void CGProj::CGEditProxyObject::setDepthMapFalg(bool flag)
+void CG::CGEditProxyObject::setDepthMapFalg(bool flag)
 {
 	m_isDepthMap = flag;
 }
 
-void CGProj::CGEditProxyObject::setDepthMapTexture(unsigned texId)
+void CG::CGEditProxyObject::setDepthMapTexture(unsigned texId)
 {
 	m_depthMapTexture = texId;
 }
 
-void CGProj::CGEditProxyObject::setCMambinet(const glm::vec3 & ambient)
+void CG::CGEditProxyObject::setCMambinet(const glm::vec3 & ambient)
 {
 	CGEditProxyObject::m_CMambient = ambient;
 }
 
-void CGProj::CGEditProxyObject::setCMdiffuse(const glm::vec3 & diffuse)
+void CG::CGEditProxyObject::setCMdiffuse(const glm::vec3 & diffuse)
 {
 	CGEditProxyObject::m_CMdiffuse = diffuse;
 }
 
-void CGProj::CGEditProxyObject::setCMspecular(const glm::vec3 & specular)
+void CG::CGEditProxyObject::setCMspecular(const glm::vec3 & specular)
 {
 	CGEditProxyObject::m_CMspecular = specular;
 }
 
-void CGProj::CGEditProxyObject::setCMshininess(float s)
+void CG::CGEditProxyObject::setCMshininess(float s)
 {
 	CGEditProxyObject::m_CMshininess = s;
 }
 
-bool CGProj::CGEditProxyObject::isModelData()
+bool CG::CGEditProxyObject::isModelData()
 {
 	return m_useModelData;
 }
 
-void CGProj::CGEditProxyObject::setModelData(bool m)
+void CG::CGEditProxyObject::setModelData(bool m)
 {
 	m_useModelData = m;
 }
 
-void CGProj::CGEditProxyObject::setModel(CGModel * model)
+void CG::CGEditProxyObject::setModel(CGModel * model)
 {
 	m_Model = model;
 }
 
-void CGProj::CGEditProxyObject::setProxyType(EditProxyType e)
+void CG::CGEditProxyObject::setProxyType(EditProxyType e)
 {
 	CGEditProxyObject::m_ProxyType = e;
 }
 
-CGProj::EditProxyType CGProj::CGEditProxyObject::getProxyType()
+CG::EditProxyType CG::CGEditProxyObject::getProxyType()
 {
 	return m_ProxyType;
 }

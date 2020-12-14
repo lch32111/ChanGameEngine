@@ -209,13 +209,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CGPrecompiled.h" />
-    <ClInclude Include="CollisionDetection\CGCollisionConfig.h" />
-    <ClInclude Include="CollisionDetection\CGCollisionConvex.h" />
+    <ClInclude Include="CollisionDetection\CGConfig.h" />
+    <ClInclude Include="CollisionDetection\CGConvex.h" />
     <ClInclude Include="CollisionDetection\CGCollisionFunction.h" />
-    <ClInclude Include="CollisionDetection\CGCollisionLineSegment.h" />
-    <ClInclude Include="CollisionDetection\CGCollisionRay.h" />
-    <ClInclude Include="CollisionDetection\CGCollisionShape.h" />
-    <ClInclude Include="CollisionDetection\CGCollisionSphere.h" />
+    <ClInclude Include="CollisionDetection\CGLineSegment.h" />
+    <ClInclude Include="CollisionDetection\CGRay.h" />
+    <ClInclude Include="CollisionDetection\CGShape.h" />
+    <ClInclude Include="CollisionDetection\CGSphere.h" />
     <ClInclude Include="Demo\CollisionTestBedDemo.h" />
     <ClInclude Include="Demo\CullingDemo.h" />
     <ClInclude Include="Demo\RayTracerDemo.h" />

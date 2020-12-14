@@ -2,12 +2,12 @@
 #include <Graphics/CGEditPointLightVisualizer.h>
 #include <Graphics/GLPrimitiveUtil.h>
 
-void CGProj::CGEditPointLightVisualizer::prepareData(Shader * shader)
+void CG::CGEditPointLightVisualizer::prepareData(Shader * shader)
 {
 	m_shader = shader;
 }
 
-void CGProj::CGEditPointLightVisualizer::render(const glm::mat4 & view, const glm::mat4 & proj, 
+void CG::CGEditPointLightVisualizer::render(const glm::mat4 & view, const glm::mat4 & proj, 
 	const glm::vec3 & position, const float scale)
 {
 	glm::mat4 vp = proj * view;

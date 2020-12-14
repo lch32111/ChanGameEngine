@@ -12,7 +12,7 @@
 
 /* ### Physics Demo ### */
 
-void CGProj::PhysicsDemo::OnInitialize()
+void CG::PhysicsDemo::OnInitialize()
 {
 	glfwSwapInterval(0); // Turn off Vsync and measure the FPS
 	// glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -23,41 +23,41 @@ void CGProj::PhysicsDemo::OnInitialize()
 	test1->initGraphics();
 }
 
-void CGProj::PhysicsDemo::OnFinalize()
+void CG::PhysicsDemo::OnFinalize()
 {
 	test1->deinit();
 	delete test1;
 }
 
-void CGProj::PhysicsDemo::Update(float deltaTime, float lastFrame)
+void CG::PhysicsDemo::Update(float deltaTime, float lastFrame)
 {
 	test1->key(app_window, deltaTime);
 	test1->updateImgui();
 	test1->updateSimulation(deltaTime, lastFrame);
 }
 
-void CGProj::PhysicsDemo::Display()
+void CG::PhysicsDemo::Display()
 {
 	test1->display(m_width, m_height);
 }
 
-void CGProj::PhysicsDemo::MouseMoveCallback(double xpos, double ypos)
+void CG::PhysicsDemo::MouseMoveCallback(double xpos, double ypos)
 {
 	test1->mouse(xpos, ypos);
 }
 
-void CGProj::PhysicsDemo::MouseButtonCallback(int button, int action, int mods)
+void CG::PhysicsDemo::MouseButtonCallback(int button, int action, int mods)
 {
 	test1->mouseButton(app_window, button, action, mods, m_width, m_height);
 }
 
 
-void CGProj::PhysicsDemo::ScrollCallback(double yoffset)
+void CG::PhysicsDemo::ScrollCallback(double yoffset)
 {
 	test1->scroll(yoffset);
 }
 
-void CGProj::PhysicsDemo::ResizeWindowCallback(int width, int height)
+void CG::PhysicsDemo::ResizeWindowCallback(int width, int height)
 {
 	Application::m_width = width;
 	Application::m_height = height;
@@ -66,7 +66,7 @@ void CGProj::PhysicsDemo::ResizeWindowCallback(int width, int height)
 
 /* ### Physics Demo ### */
 
-void CGProj::TryFirst::initGraphics()
+void CG::TryFirst::initGraphics()
 {
 	simpleShader = Shader("ShaderFolder/simpleRender.vs", "ShaderFolder/simpleRender.fs");
 	simpleShader.loadShader();
@@ -105,17 +105,17 @@ void CGProj::TryFirst::initGraphics()
 	lineRen.setShader(&lineShader);
 }
 
-void CGProj::TryFirst::initImgui()
+void CG::TryFirst::initImgui()
 {
 
 }
 
-void CGProj::TryFirst::deinit()
+void CG::TryFirst::deinit()
 {
 }
 
 
-void CGProj::TryFirst::updateImgui()
+void CG::TryFirst::updateImgui()
 {
 	GLFWwindow* app_window = (GLFWwindow*)ImGui::GetIO().ClipboardUserData;
 
@@ -160,7 +160,7 @@ void CGProj::TryFirst::updateImgui()
 	ImGui::End();
 }
 
-void CGProj::TryFirst::updateSimulation(float deltaTime, float lastFrame)
+void CG::TryFirst::updateSimulation(float deltaTime, float lastFrame)
 {
 	if (start)
 	{
@@ -181,7 +181,7 @@ void CGProj::TryFirst::updateSimulation(float deltaTime, float lastFrame)
 	}
 }
 
-void CGProj::TryFirst::display(int width, int height)
+void CG::TryFirst::display(int width, int height)
 {
 	glClearColor(0.11f, 0.11f, 0.11f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -247,7 +247,7 @@ void CGProj::TryFirst::display(int width, int height)
 	lineRen.renderLine(view, projection);
 }
 
-void CGProj::TryFirst::key(GLFWwindow* app_window, float deltaTime)
+void CG::TryFirst::key(GLFWwindow* app_window, float deltaTime)
 {
 	if (GameControl)
 	{
@@ -305,7 +305,7 @@ void CGProj::TryFirst::key(GLFWwindow* app_window, float deltaTime)
 	}
 }
 
-void CGProj::TryFirst::mouse(double xpos, double ypos)
+void CG::TryFirst::mouse(double xpos, double ypos)
 {
 	if (GameControl)
 	{
@@ -326,7 +326,7 @@ void CGProj::TryFirst::mouse(double xpos, double ypos)
 	
 }
 
-void CGProj::TryFirst::mouseButton(GLFWwindow* app_window, 
+void CG::TryFirst::mouseButton(GLFWwindow* app_window, 
 	int button, int action, int mods,
 	int screen_width, int screen_height)
 {
@@ -376,7 +376,7 @@ void CGProj::TryFirst::mouseButton(GLFWwindow* app_window,
 	}
 }
 
-void CGProj::TryFirst::scroll(double yoffset)
+void CG::TryFirst::scroll(double yoffset)
 {
 	if (GameControl)
 	{
@@ -384,7 +384,7 @@ void CGProj::TryFirst::scroll(double yoffset)
 	}
 }
 
-void CGProj::TryFirst::updateObjects(float duration, float lastFrame)
+void CG::TryFirst::updateObjects(float duration, float lastFrame)
 {
 	for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; ++shot)
 	{
@@ -420,7 +420,7 @@ void CGProj::TryFirst::updateObjects(float duration, float lastFrame)
 
 // After integration of rigid bodies,
 // Sync the body AABBs in broad phase
-void CGProj::TryFirst::SyncAndUpdate()
+void CG::TryFirst::SyncAndUpdate()
 {
 	GPED::c3AABB broadAABB;
 	glm::vec3 displacement;
@@ -441,7 +441,7 @@ void CGProj::TryFirst::SyncAndUpdate()
 }
 
 // Update Broad Phase Pairs
-void CGProj::TryFirst::broadPhase()
+void CG::TryFirst::broadPhase()
 {
 	firstResult.vPairs.clear();
 	// Perform Tree Queries for all moving proxies
@@ -451,7 +451,7 @@ void CGProj::TryFirst::broadPhase()
 }
 
 // narrow phase
-void CGProj::TryFirst::generateContacts(CGContactManager& cData)
+void CG::TryFirst::generateContacts(CGContactManager& cData)
 {
 	CGCollisionPlane planeGround;
 	planeGround.direction = glm::vec3(0, 1, 0);
@@ -485,7 +485,7 @@ void CGProj::TryFirst::generateContacts(CGContactManager& cData)
 	}
 }
 
-void CGProj::TryFirst::fire()
+void CG::TryFirst::fire()
 {
 	int shotIndex = 0;
 	for (int i = 0; i < ammoRounds; ++i)
@@ -506,7 +506,7 @@ void CGProj::TryFirst::fire()
 	ammo[shotIndex].proxyId = FirstBroadPhase.CreateProxy(broadAABB, &ammo[shotIndex]);
 }
 
-void CGProj::TryFirst::totalFire()
+void CG::TryFirst::totalFire()
 {
 	int index = 0;
 	for (int i = 0; i < ammoRounds; ++i)
@@ -541,7 +541,7 @@ void CGProj::TryFirst::totalFire()
 	}
 }
 
-void CGProj::TryFirst::reset()
+void CG::TryFirst::reset()
 {
 	GPED::Random ranGen((unsigned)glfwGetTime());
 	for (Box *box = boxData; box < boxData + boxes; box++)

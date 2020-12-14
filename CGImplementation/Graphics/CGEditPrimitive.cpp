@@ -3,7 +3,7 @@
 
 // =================================================================
 /*** CG EDIT BOX    ***/
-CGProj::CGEditBox::CGEditBox()
+CG::CGEditBox::CGEditBox()
 	:
 	m_BoxType(EDIT_PRIMITIVE_AABB),
 	m_position(glm::vec3(0)),
@@ -13,7 +13,7 @@ CGProj::CGEditBox::CGEditBox()
 	updateAABB();
 }
 
-CGProj::CGEditBox::CGEditBox(
+CG::CGEditBox::CGEditBox(
 	const glm::vec3& pos, const glm::vec3& halfExtents, const glm::quat& m_orient)
 	: m_position(pos), m_halfExtents(halfExtents), m_orientation(m_orient)
 {
@@ -23,13 +23,13 @@ CGProj::CGEditBox::CGEditBox(
 	updateAABB();
 }
 
-void CGProj::CGEditBox::setPosition(const glm::vec3 & p)
+void CG::CGEditBox::setPosition(const glm::vec3 & p)
 {
 	CGEditBox::m_position = p;
 	updateAABB();
 }
 
-void CGProj::CGEditBox::setPosition(const GPED::real x, const GPED::real y, const GPED::real z)
+void CG::CGEditBox::setPosition(const GPED::real x, const GPED::real y, const GPED::real z)
 {
 	m_position.x = x;
 	m_position.y = y;
@@ -37,82 +37,82 @@ void CGProj::CGEditBox::setPosition(const GPED::real x, const GPED::real y, cons
 	updateAABB();
 }
 
-void CGProj::CGEditBox::setXposition(const GPED::real x)
+void CG::CGEditBox::setXposition(const GPED::real x)
 {
 	m_position.x = x;
 	updateAABB();
 }
 
-void CGProj::CGEditBox::setYposition(const GPED::real y)
+void CG::CGEditBox::setYposition(const GPED::real y)
 {
 	m_position.y = y;
 	updateAABB();
 }
 
-void CGProj::CGEditBox::setZposition(const GPED::real z)
+void CG::CGEditBox::setZposition(const GPED::real z)
 {
 	m_position.z = z;
 	updateAABB();
 }
 
-glm::vec3 CGProj::CGEditBox::getPosition()
+glm::vec3 CG::CGEditBox::getPosition()
 {
 	return m_position;
 }
 
-void CGProj::CGEditBox::setHalfSize(const glm::vec3 & h)
+void CG::CGEditBox::setHalfSize(const glm::vec3 & h)
 {
 	m_halfExtents = h;
 	updateAABB();
 }
 
-void CGProj::CGEditBox::setHalfSize(const GPED::real x, GPED::real y, GPED::real z)
+void CG::CGEditBox::setHalfSize(const GPED::real x, GPED::real y, GPED::real z)
 {
 	m_halfExtents = glm::vec3(x, y, z);
 	updateAABB();
 }
 
-void CGProj::CGEditBox::setXHalfSize(const GPED::real x)
+void CG::CGEditBox::setXHalfSize(const GPED::real x)
 {
 	m_halfExtents.x = x;
 	updateAABB();
 }
 
-void CGProj::CGEditBox::setYHalfSize(const GPED::real y)
+void CG::CGEditBox::setYHalfSize(const GPED::real y)
 {
 	m_halfExtents.y = y;
 	updateAABB();
 }
 
-void CGProj::CGEditBox::setZHalfSize(const GPED::real z)
+void CG::CGEditBox::setZHalfSize(const GPED::real z)
 {
 	m_halfExtents.z = z;
 	updateAABB();
 }
 
-glm::vec3 CGProj::CGEditBox::getHalfSize()
+glm::vec3 CG::CGEditBox::getHalfSize()
 {
 	return m_halfExtents;
 }
 
-GPED::c3AABB CGProj::CGEditBox::getFitAABB()
+GPED::c3AABB CG::CGEditBox::getFitAABB()
 {
 	return m_fitAABB;
 }
 
-void CGProj::CGEditBox::setPrimitiveType(EditPrimitiveType e)
+void CG::CGEditBox::setPrimitiveType(EditPrimitiveType e)
 {
 	assert(e == EDIT_PRIMITIVE_AABB || e == EDIT_PRIMITIVE_OBB);
 	m_BoxType = e;
 	updateAABB();
 }
 
-CGProj::EditPrimitiveType CGProj::CGEditBox::getPrimitiveType()
+CG::EditPrimitiveType CG::CGEditBox::getPrimitiveType()
 {
 	return m_BoxType;
 }
 
-void CGProj::CGEditBox::updateAABB()
+void CG::CGEditBox::updateAABB()
 {
 	switch (m_BoxType)
 	{
@@ -132,7 +132,7 @@ void CGProj::CGEditBox::updateAABB()
 
 // =================================================================
 /*** CG EDIT Sphere  ***/
-CGProj::CGEditSpere::CGEditSpere()
+CG::CGEditSpere::CGEditSpere()
 	:
 	m_position(glm::vec3(0)),
 	m_radius(1)
@@ -140,20 +140,20 @@ CGProj::CGEditSpere::CGEditSpere()
 	updateAABB();
 }
 
-CGProj::CGEditSpere::CGEditSpere(const glm::vec3 & pos, const GPED::real radius)
+CG::CGEditSpere::CGEditSpere(const glm::vec3 & pos, const GPED::real radius)
 	: m_position(pos), m_radius(radius)
 {
 	assert(radius > 0);
 	updateAABB();
 }
 
-void CGProj::CGEditSpere::setPosition(const glm::vec3 & p)
+void CG::CGEditSpere::setPosition(const glm::vec3 & p)
 {
 	CGEditSpere::m_position = p;
 	updateAABB();
 }
 
-void CGProj::CGEditSpere::setPosition(const GPED::real x, const GPED::real y, const GPED::real z)
+void CG::CGEditSpere::setPosition(const GPED::real x, const GPED::real y, const GPED::real z)
 {
 	m_position.x = x;
 	m_position.y = y;
@@ -161,46 +161,46 @@ void CGProj::CGEditSpere::setPosition(const GPED::real x, const GPED::real y, co
 	updateAABB();
 }
 
-void CGProj::CGEditSpere::setXposition(const GPED::real x)
+void CG::CGEditSpere::setXposition(const GPED::real x)
 {
 	m_position.x = x;
 	updateAABB();
 }
 
-void CGProj::CGEditSpere::setYposition(const GPED::real y)
+void CG::CGEditSpere::setYposition(const GPED::real y)
 {
 	m_position.y = y;
 	updateAABB();
 }
 
-void CGProj::CGEditSpere::setZposition(const GPED::real z)
+void CG::CGEditSpere::setZposition(const GPED::real z)
 {
 	m_position.z = z;
 	updateAABB();
 }
 
-glm::vec3 CGProj::CGEditSpere::getPosition()
+glm::vec3 CG::CGEditSpere::getPosition()
 {
 	return m_position;
 }
 
-void CGProj::CGEditSpere::setRaidus(GPED::real r)
+void CG::CGEditSpere::setRaidus(GPED::real r)
 {
 	CGEditSpere::m_radius = r;
 	updateAABB();
 }
 
-GPED::real CGProj::CGEditSpere::getRadius()
+GPED::real CG::CGEditSpere::getRadius()
 {
 	return m_radius;
 }
 
-GPED::c3AABB CGProj::CGEditSpere::getFitAABB()
+GPED::c3AABB CG::CGEditSpere::getFitAABB()
 {
 	return m_fitAABB;
 }
 
-void CGProj::CGEditSpere::updateAABB()
+void CG::CGEditSpere::updateAABB()
 {
 	m_fitAABB = GPED::makeAABB(m_position, m_radius);
 }

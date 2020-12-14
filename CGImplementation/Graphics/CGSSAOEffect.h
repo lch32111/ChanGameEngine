@@ -4,7 +4,7 @@
 
 #include <Graphics/Shader.h>
 
-namespace CGProj
+namespace CG
 {
 	// Forward Declaration
 	class CGAssetManager;

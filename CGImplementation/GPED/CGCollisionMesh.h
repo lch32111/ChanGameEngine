@@ -5,7 +5,7 @@
 #include <GPED/CGCollisionPrimitive.h>
 #include <GPED/CGCollisionTriangle.h>
 
-namespace CGProj
+namespace CG
 {
 	class CGCollisionMesh : public CGCollisionPrimitive
 	{

@@ -5,7 +5,7 @@
 #include <GPED/GPED_random.h>
 #include <Terrain/CGTerrainUtil.h>
 
-namespace CGProj
+namespace CG
 {
 	class CGValueNoise1D
 	{

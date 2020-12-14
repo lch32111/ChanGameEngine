@@ -20,7 +20,7 @@
 #include <GPED/PS_AmmoRound.h>
 #include <GPED/PS_Box.h>
 
-namespace CGProj
+namespace CG
 {
 	// Forward Decalration
 	class SimpleTerrainDemo;

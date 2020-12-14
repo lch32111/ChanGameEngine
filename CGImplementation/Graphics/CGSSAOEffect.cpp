@@ -12,11 +12,11 @@
 #include <Graphics/CGDefSecondUtil.h>
 
 
-CGProj::CGSSAOEffect::CGSSAOEffect()
+CG::CGSSAOEffect::CGSSAOEffect()
 { }
 
 #define quickLerp(a, b, c) ((1.f - (c)) * (a) + (c) * (b))
-void CGProj::CGSSAOEffect::Initialize(CGAssetManager & am, unsigned seed, 
+void CG::CGSSAOEffect::Initialize(CGAssetManager & am, unsigned seed, 
 	unsigned noiseNum, float radius, float bias, float power,
 	int width, int height)
 {
@@ -110,7 +110,7 @@ void CGProj::CGSSAOEffect::Initialize(CGAssetManager & am, unsigned seed,
 }
 #undef quickLerp
 
-void CGProj::CGSSAOEffect::Destroy()
+void CG::CGSSAOEffect::Destroy()
 {
 	delete[] m_ssaoKernal;
 	delete[] m_ssaoNoise;
@@ -123,7 +123,7 @@ void CGProj::CGSSAOEffect::Destroy()
 	glDeleteFramebuffers(1, &m_ssaoBlurFBO);
 }
 
-unsigned CGProj::CGSSAOEffect::getSSAOTexture(
+unsigned CG::CGSSAOEffect::getSSAOTexture(
 	unsigned gPosition, unsigned gNormal,
 	const glm::mat4& view, const glm::mat4& proj)
 {
@@ -170,7 +170,7 @@ unsigned CGProj::CGSSAOEffect::getSSAOTexture(
 	return m_ssaoRawTexture;
 }
 
-void CGProj::CGSSAOEffect::setTextureDimension(int width, int height)
+void CG::CGSSAOEffect::setTextureDimension(int width, int height)
 {
 	m_screenWidth = width;
 	m_screenHeight = height;
@@ -188,37 +188,37 @@ void CGProj::CGSSAOEffect::setTextureDimension(int width, int height)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void CGProj::CGSSAOEffect::setRadius(float radius)
+void CG::CGSSAOEffect::setRadius(float radius)
 {
 	m_ssaoRadius = radius;
 }
 
-float CGProj::CGSSAOEffect::getRadius()
+float CG::CGSSAOEffect::getRadius()
 {
 	return m_ssaoRadius;
 }
 
-void CGProj::CGSSAOEffect::setBias(float bias)
+void CG::CGSSAOEffect::setBias(float bias)
 {
 	m_ssaoBias = bias;
 }
 
-float CGProj::CGSSAOEffect::getBias()
+float CG::CGSSAOEffect::getBias()
 {
 	return m_ssaoBias;
 }
 
-void CGProj::CGSSAOEffect::setPower(float power)
+void CG::CGSSAOEffect::setPower(float power)
 {
 	m_ssaoPower = power;
 }
 
-float CGProj::CGSSAOEffect::getPower()
+float CG::CGSSAOEffect::getPower()
 {
 	return m_ssaoPower;
 }
 
-void CGProj::CGSSAOEffect::setNoiseNum(unsigned noiseNum)
+void CG::CGSSAOEffect::setNoiseNum(unsigned noiseNum)
 {
 	glm::vec3* oldNoise = m_ssaoNoise;
 	m_ssaoNoise = new glm::vec3[noiseNum];
@@ -256,17 +256,17 @@ void CGProj::CGSSAOEffect::setNoiseNum(unsigned noiseNum)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-unsigned CGProj::CGSSAOEffect::getNoiseNum()
+unsigned CG::CGSSAOEffect::getNoiseNum()
 {
 	return m_noiseNum * m_noiseNum;
 }
 
-void CGProj::CGSSAOEffect::setBlurState(bool b)
+void CG::CGSSAOEffect::setBlurState(bool b)
 {
 	m_useBlur = b;
 }
 
-bool CGProj::CGSSAOEffect::getBlurState()
+bool CG::CGSSAOEffect::getBlurState()
 {
 	return m_useBlur;
 }

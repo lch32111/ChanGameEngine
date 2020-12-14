@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace CGProj
+namespace CG
 {
 	/**
 	 * Get Texture Image with stbi library. if you pass 'true' boolean,

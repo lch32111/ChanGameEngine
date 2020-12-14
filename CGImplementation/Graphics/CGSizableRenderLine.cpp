@@ -3,12 +3,12 @@
 
 #include <Graphics/CGAssetManager.h>
 
-CGProj::CGSizableRenderLine::CGSizableRenderLine()
+CG::CGSizableRenderLine::CGSizableRenderLine()
 {
 
 }
 
-CGProj::CGSizableRenderLine::CGSizableRenderLine(CGAssetManager & am, unsigned maxLineNumb)
+CG::CGSizableRenderLine::CGSizableRenderLine(CGAssetManager & am, unsigned maxLineNumb)
 {
 	m_lineShader = am.getShader(SHADER_CG_LINE);
 	
@@ -24,7 +24,7 @@ CGProj::CGSizableRenderLine::CGSizableRenderLine(CGAssetManager & am, unsigned m
 	prepareData();
 }
 
-void CGProj::CGSizableRenderLine::initialize(Shader * shader, unsigned maxLineNumb)
+void CG::CGSizableRenderLine::initialize(Shader * shader, unsigned maxLineNumb)
 {
 	m_lineShader = shader;
 
@@ -40,7 +40,7 @@ void CGProj::CGSizableRenderLine::initialize(Shader * shader, unsigned maxLineNu
 	prepareData();
 }
 
-void CGProj::CGSizableRenderLine::destroy()
+void CG::CGSizableRenderLine::destroy()
 {
 	delete[] m_vertices;
 	delete[] m_colors;
@@ -49,7 +49,7 @@ void CGProj::CGSizableRenderLine::destroy()
 	glDeleteBuffers(2, m_VBO);
 }
 
-void CGProj::CGSizableRenderLine::insertLine(const Math::CGVector3<float>& From, const Math::CGVector3<float>& To, const Math::CGVector4<float>& Color)
+void CG::CGSizableRenderLine::insertLine(const CGVector3<float>& From, const CGVector3<float>& To, const CGVector4<float>& Color)
 {
 	assert(m_count < m_bufferSize);
 	m_vertices[m_count] = glm::vec3(From.m_value[0], From.m_value[1], From.m_value[2]);
@@ -62,7 +62,7 @@ void CGProj::CGSizableRenderLine::insertLine(const Math::CGVector3<float>& From,
 	++m_count;
 }
 
-void CGProj::CGSizableRenderLine::insertLine(const glm::vec3 & From, const glm::vec3 & To, const glm::vec4 & Color)
+void CG::CGSizableRenderLine::insertLine(const glm::vec3 & From, const glm::vec3 & To, const glm::vec4 & Color)
 {
 	assert(m_count < m_bufferSize);
 	m_vertices[m_count] = From;
@@ -75,7 +75,7 @@ void CGProj::CGSizableRenderLine::insertLine(const glm::vec3 & From, const glm::
 	++m_count;
 }
 
-void CGProj::CGSizableRenderLine::renderLine(const glm::mat4 & view, const glm::mat4 & proj, const float lineWidth)
+void CG::CGSizableRenderLine::renderLine(const glm::mat4 & view, const glm::mat4 & proj, const float lineWidth)
 {
 	if (m_count == 0) return;
 
@@ -104,12 +104,12 @@ void CGProj::CGSizableRenderLine::renderLine(const glm::mat4 & view, const glm::
 		m_count = 0;
 }
 
-void CGProj::CGSizableRenderLine::setFlush(bool f)
+void CG::CGSizableRenderLine::setFlush(bool f)
 {
 	m_isFlush = f;
 }
 
-void CGProj::CGSizableRenderLine::prepareData()
+void CG::CGSizableRenderLine::prepareData()
 {
 	glGenVertexArrays(1, &m_VAO);
 	glGenBuffers(2, m_VBO);

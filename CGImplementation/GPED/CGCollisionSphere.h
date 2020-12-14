@@ -4,7 +4,7 @@
 
 #include <GPED/CGCollisionPrimitive.h>
 
-namespace CGProj
+namespace CG
 {
 	/**
 	* Represents a rigid body that can be treated as a sphere

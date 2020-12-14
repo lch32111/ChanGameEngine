@@ -8,7 +8,7 @@
 #include <vector>
 
 
-namespace CGProj
+namespace CG
 {
 	class Shader;
 	struct Vertex

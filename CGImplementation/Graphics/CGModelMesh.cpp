@@ -7,7 +7,7 @@
 #include <Graphics/Shader.h>
 #include <Graphics/CGModelUtils.h>
 
-CGProj::CGModelMesh::CGModelMesh(
+CG::CGModelMesh::CGModelMesh(
 	std::vector<Vertex>& vertices, 
 	std::vector<unsigned int>& indices, 
 	std::vector<Texture>& textures,
@@ -22,7 +22,7 @@ CGProj::CGModelMesh::CGModelMesh(
 	setupInstancing();
 }
 
-void CGProj::CGModelMesh::destroy()
+void CG::CGModelMesh::destroy()
 {
 	glDeleteBuffers(1, &m_instanceModelVBO);
 	glDeleteBuffers(1, &m_instanceWorldNormalVBO);
@@ -33,7 +33,7 @@ void CGProj::CGModelMesh::destroy()
 	glDeleteVertexArrays(1, &m_VAO);
 }
 
-void CGProj::CGModelMesh::setInstanceData(const std::vector<glm::mat4>& model, const std::vector<glm::mat4>& worldNormal)
+void CG::CGModelMesh::setInstanceData(const std::vector<glm::mat4>& model, const std::vector<glm::mat4>& worldNormal)
 {
 	m_currentInstanceNumb = model.size();
 
@@ -44,14 +44,14 @@ void CGProj::CGModelMesh::setInstanceData(const std::vector<glm::mat4>& model, c
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * m_currentInstanceNumb, glm::value_ptr(worldNormal[0]));
 }
 
-void CGProj::CGModelMesh::setInstanceData(const std::vector<glm::mat4>& model)
+void CG::CGModelMesh::setInstanceData(const std::vector<glm::mat4>& model)
 {
 	m_currentInstanceNumb = model.size();
 	glBindBuffer(GL_ARRAY_BUFFER, m_instanceModelVBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * m_currentInstanceNumb, glm::value_ptr(model[0]));
 }
 
-void CGProj::CGModelMesh::deferredFirstRender(Shader* shader, unsigned instanceNumb)
+void CG::CGModelMesh::deferredFirstRender(Shader* shader, unsigned instanceNumb)
 {
 	// Deferred First Pass Shader already set the texture unit number
 	// CGModel class already set the transform matrix before this scope
@@ -92,7 +92,7 @@ void CGProj::CGModelMesh::deferredFirstRender(Shader* shader, unsigned instanceN
 
 	glBindVertexArray(0);
 }
-void CGProj::CGModelMesh::shadowFirstRender()
+void CG::CGModelMesh::shadowFirstRender()
 {
 	// Draw Mesh
 	glBindVertexArray(m_VAO);
@@ -102,7 +102,7 @@ void CGProj::CGModelMesh::shadowFirstRender()
 }
 
 
-void CGProj::CGModelMesh::setupMesh()
+void CG::CGModelMesh::setupMesh()
 {
 	size_t stride = sizeof(Vertex);
 
@@ -140,7 +140,7 @@ void CGProj::CGModelMesh::setupMesh()
 	glCheckError();
 }
 
-void CGProj::CGModelMesh::setupInstancing()
+void CG::CGModelMesh::setupInstancing()
 {
 	glBindVertexArray(m_VAO);
 

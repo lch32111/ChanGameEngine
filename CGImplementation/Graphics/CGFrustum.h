@@ -2,7 +2,7 @@
 #ifndef __CG_FRUSTUM_H__
 #define __CG_FRUSTUM_H__
 
-namespace CGProj
+namespace CG
 {
 	struct CGOrthoFrustum
 	{

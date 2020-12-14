@@ -2,7 +2,7 @@
 #include <GPED/CGCollisionEarlyExit.h>
 #include <GPED/CGCollisionUtil.h>
 
-bool CGProj::CGCollisionEarlyExit::sphereAndHalfSpace(const CGCollisionSphere & sphere, const CGCollisionPlane & plane)
+bool CG::CGCollisionEarlyExit::sphereAndHalfSpace(const CGCollisionSphere & sphere, const CGCollisionPlane & plane)
 {
 	// Find the distance from the origin
 	GPED::real ballDistance = glm::dot(plane.direction, sphere.getAxis(3)) - sphere.radius;
@@ -11,7 +11,7 @@ bool CGProj::CGCollisionEarlyExit::sphereAndHalfSpace(const CGCollisionSphere & 
 	return ballDistance <= plane.offset;
 }
 
-bool CGProj::CGCollisionEarlyExit::sphereAndSphere(const CGCollisionSphere & one, const CGCollisionSphere & two)
+bool CG::CGCollisionEarlyExit::sphereAndSphere(const CGCollisionSphere & one, const CGCollisionSphere & two)
 {
 	// Find the vector between the objects
 	glm::vec3 midline = one.getAxis(3) - two.getAxis(3);
@@ -23,7 +23,7 @@ bool CGProj::CGCollisionEarlyExit::sphereAndSphere(const CGCollisionSphere & one
 // This preprocessor definition is only used as a convenience
 // in the boxAndBox intersection method
 #define TEST_OVERLAP(axis) overlapOnAxis(one, two, (axis), toCentre)
-bool CGProj::CGCollisionEarlyExit::OBBAndOBB(const CGCollisionOBB & one, const CGCollisionOBB & two)
+bool CG::CGCollisionEarlyExit::OBBAndOBB(const CGCollisionOBB & one, const CGCollisionOBB & two)
 {
 	// Find the vector between the two centres
 	glm::vec3 toCentre = two.getAxis(3) - one.getAxis(3);
@@ -54,7 +54,7 @@ bool CGProj::CGCollisionEarlyExit::OBBAndOBB(const CGCollisionOBB & one, const C
 }
 #undef TEST_OVERLAP
 
-bool CGProj::CGCollisionEarlyExit::OBBAndHalfSpace(const CGCollisionOBB & box, const CGCollisionPlane & plane)
+bool CG::CGCollisionEarlyExit::OBBAndHalfSpace(const CGCollisionOBB & box, const CGCollisionPlane & plane)
 {
 	// Work out the projected radius of the box onto the plane direction
 	GPED::real projectedRadius = transformToAxis(box, plane.direction);
@@ -68,7 +68,7 @@ bool CGProj::CGCollisionEarlyExit::OBBAndHalfSpace(const CGCollisionOBB & box, c
 
 // This Code is from BulletPhysics : conservative test for overlap between triangle and aabb
 // The process is like making the aabb from triangle points and then do the aabb/aabb test
-bool CGProj::CGCollisionEarlyExit::TriangleAndAABB(const CGCollisionTriangle& triangle, const GPED::c3AABB & aabb)
+bool CG::CGCollisionEarlyExit::TriangleAndAABB(const CGCollisionTriangle& triangle, const GPED::c3AABB & aabb)
 {
 	const glm::vec3 &p1 = triangle.m_points[0];
 	const glm::vec3 &p2 = triangle.m_points[1];

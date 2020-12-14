@@ -8,7 +8,7 @@
 /****************************************************************************************/
 /* ### Terrain Demo ### */
 
-void CGProj::TerrainDemo::OnInitialize()
+void CG::TerrainDemo::OnInitialize()
 {
 	glfwSwapInterval(0); // Turn off Vsync and measure the FPS
 	glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -20,40 +20,40 @@ void CGProj::TerrainDemo::OnInitialize()
 	test3->initImgui();
 }
 
-void CGProj::TerrainDemo::OnFinalize()
+void CG::TerrainDemo::OnFinalize()
 {
 	test3->deinit();
 	delete test3;
 }
 
-void CGProj::TerrainDemo::Update(float deltaTime, float lastFrame)
+void CG::TerrainDemo::Update(float deltaTime, float lastFrame)
 {
 	test3->key(app_window, deltaTime);
 	test3->updateImgui();
 	test3->updateSimulation(deltaTime, lastFrame);
 }
 
-void CGProj::TerrainDemo::Display()
+void CG::TerrainDemo::Display()
 {
 	test3->display(m_width, m_height);
 }
 
-void CGProj::TerrainDemo::MouseMoveCallback(double xpos, double ypos)
+void CG::TerrainDemo::MouseMoveCallback(double xpos, double ypos)
 {
 	test3->mouse(xpos, ypos);
 }
 
-void CGProj::TerrainDemo::MouseButtonCallback(int button, int action, int mods)
+void CG::TerrainDemo::MouseButtonCallback(int button, int action, int mods)
 {
 	test3->mouseButton(app_window, button, action, mods, m_width, m_height);
 }
 
-void CGProj::TerrainDemo::ScrollCallback(double yoffset)
+void CG::TerrainDemo::ScrollCallback(double yoffset)
 {
 	test3->scroll(yoffset);
 }
 
-void CGProj::TerrainDemo::ResizeWindowCallback(int width, int height)
+void CG::TerrainDemo::ResizeWindowCallback(int width, int height)
 {
 	Application::m_width = width;
 	Application::m_height = height;
@@ -65,7 +65,7 @@ void CGProj::TerrainDemo::ResizeWindowCallback(int width, int height)
 /* ### Terrain Demo ### */
 /****************************************************************************************/
 
-void CGProj::SimpleTerrainDemo::initGraphics(int width, int height)
+void CG::SimpleTerrainDemo::initGraphics(int width, int height)
 {
 	assetManager.assetInit();
 	camera.Position = glm::vec3(0, 0, 0);
@@ -107,16 +107,16 @@ void CGProj::SimpleTerrainDemo::initGraphics(int width, int height)
 	// Graphics Init
 }
 
-void CGProj::SimpleTerrainDemo::initImgui()
+void CG::SimpleTerrainDemo::initImgui()
 {
 }
 
-void CGProj::SimpleTerrainDemo::deinit()
+void CG::SimpleTerrainDemo::deinit()
 {
 	myTerrain.destroy();
 }
 
-void CGProj::SimpleTerrainDemo::updateImgui()
+void CG::SimpleTerrainDemo::updateImgui()
 {
 	GLFWwindow* app_window = (GLFWwindow*)ImGui::GetIO().ClipboardUserData;
 
@@ -139,7 +139,7 @@ void CGProj::SimpleTerrainDemo::updateImgui()
 	ImGui::End();
 }
 
-void CGProj::SimpleTerrainDemo::updateSimulation(float deltaTime, float lastFrame)
+void CG::SimpleTerrainDemo::updateSimulation(float deltaTime, float lastFrame)
 {
 	if (start)
 	{
@@ -160,7 +160,7 @@ void CGProj::SimpleTerrainDemo::updateSimulation(float deltaTime, float lastFram
 	}
 }
 
-void CGProj::SimpleTerrainDemo::display(int width, int height)
+void CG::SimpleTerrainDemo::display(int width, int height)
 {
 	glClearColor(0.11f, 0.11f, 0.11f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -205,7 +205,7 @@ void CGProj::SimpleTerrainDemo::display(int width, int height)
 		bRender.draw(wireShader, &projection, &view);
 }
 
-void CGProj::SimpleTerrainDemo::key(GLFWwindow * app_window, float deltaTime)
+void CG::SimpleTerrainDemo::key(GLFWwindow * app_window, float deltaTime)
 {
 	if (GameControl)
 	{
@@ -263,7 +263,7 @@ void CGProj::SimpleTerrainDemo::key(GLFWwindow * app_window, float deltaTime)
 	}
 }
 
-void CGProj::SimpleTerrainDemo::mouse(double xpos, double ypos)
+void CG::SimpleTerrainDemo::mouse(double xpos, double ypos)
 {
 	if (GameControl)
 	{
@@ -283,20 +283,20 @@ void CGProj::SimpleTerrainDemo::mouse(double xpos, double ypos)
 	}
 }
 
-void CGProj::SimpleTerrainDemo::mouseButton(GLFWwindow * app_window, int button, int action, int mods, int screen_width, int screen_height)
+void CG::SimpleTerrainDemo::mouseButton(GLFWwindow * app_window, int button, int action, int mods, int screen_width, int screen_height)
 {
 }
 
-void CGProj::SimpleTerrainDemo::scroll(double yoffset)
+void CG::SimpleTerrainDemo::scroll(double yoffset)
 {
 	camera.ProcessMouseScroll((float)yoffset);
 }
 
-void CGProj::SimpleTerrainDemo::resize(int width, int height)
+void CG::SimpleTerrainDemo::resize(int width, int height)
 {
 }
 
-void CGProj::SimpleTerrainDemo::updateObjects(float duration, float lastFrame)
+void CG::SimpleTerrainDemo::updateObjects(float duration, float lastFrame)
 {
 	for (AmmoRound* shot = ammo; shot < ammo + ammoRounds; ++shot)
 	{
@@ -330,7 +330,7 @@ void CGProj::SimpleTerrainDemo::updateObjects(float duration, float lastFrame)
 	}
 }
 
-void CGProj::SimpleTerrainDemo::SyncAndUpdate(float duration)
+void CG::SimpleTerrainDemo::SyncAndUpdate(float duration)
 {
 	GPED::c3AABB broadAABB;
 	glm::vec3 displacement;
@@ -351,7 +351,7 @@ void CGProj::SimpleTerrainDemo::SyncAndUpdate(float duration)
 		}
 }
 
-void CGProj::SimpleTerrainDemo::broadPhase()
+void CG::SimpleTerrainDemo::broadPhase()
 {
 	SecondResult.vPairs.clear();
 	// Perform Tree Queries for all moving proxies
@@ -360,7 +360,7 @@ void CGProj::SimpleTerrainDemo::broadPhase()
 	SecondBroadPhase.UpdatePairs(&SecondResult);
 }
 
-void CGProj::SimpleTerrainDemo::generateContacts(CGContactManager & cData)
+void CG::SimpleTerrainDemo::generateContacts(CGContactManager & cData)
 {
 	// Manual Plane
 	CGCollisionPlane planeGround;
@@ -390,7 +390,7 @@ void CGProj::SimpleTerrainDemo::generateContacts(CGContactManager & cData)
 	}
 }
 
-void CGProj::SimpleTerrainDemo::fire()
+void CG::SimpleTerrainDemo::fire()
 {
 	int shotIndex = 0;
 	for (int i = 0; i < ammoRounds; ++i)

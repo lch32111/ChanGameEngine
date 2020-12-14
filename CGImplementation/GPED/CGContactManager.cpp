@@ -2,7 +2,7 @@
 #include <GPED/CGContactManager.h>
 #include "CGContactManager.h"
 
-CGProj::CGContactManager::CGContactManager()
+CG::CGContactManager::CGContactManager()
 {
 	m_root = NODE_NULL;
 
@@ -24,7 +24,7 @@ CGProj::CGContactManager::CGContactManager()
 	m_freeList = 0;
 }
 
-CGProj::CGContactManager::CGContactManager(int nodeCapacity)
+CG::CGContactManager::CGContactManager(int nodeCapacity)
 {
 	m_root = NODE_NULL;
 
@@ -46,20 +46,20 @@ CGProj::CGContactManager::CGContactManager(int nodeCapacity)
 	m_freeList = 0;
 }
 
-CGProj::CGContactManager::~CGContactManager()
+CG::CGContactManager::~CGContactManager()
 {
 	delete[] m_nodes;
 	m_nodes = nullptr;
 }
 
-int CGProj::CGContactManager::GetEmptyContactNode()
+int CG::CGContactManager::GetEmptyContactNode()
 {
 	int nodeId = AllocateNode();
 	InsertNode(nodeId);
 	return nodeId;
 }
 
-void CGProj::CGContactManager::setBodyData(int nodeId, GPED::RigidBody * one, GPED::RigidBody * two)
+void CG::CGContactManager::setBodyData(int nodeId, GPED::RigidBody * one, GPED::RigidBody * two)
 {
 	GPED::Contact* theContact = &m_nodes[nodeId];
 	theContact->body[0] = one;
@@ -109,7 +109,7 @@ void CGProj::CGContactManager::setBodyData(int nodeId, GPED::RigidBody * one, GP
 	}
 }
 
-GPED::Contact * CGProj::CGContactManager::GetMaxPenetration()
+GPED::Contact * CG::CGContactManager::GetMaxPenetration()
 {
 	int move = m_root;
 	int index = m_root;
@@ -126,7 +126,7 @@ GPED::Contact * CGProj::CGContactManager::GetMaxPenetration()
 	return &(m_nodes[index]);
 }
 
-GPED::Contact * CGProj::CGContactManager::GetMaxVelocity()
+GPED::Contact * CG::CGContactManager::GetMaxVelocity()
 {
 	int move = m_root;
 	int index = m_root;
@@ -143,7 +143,7 @@ GPED::Contact * CGProj::CGContactManager::GetMaxVelocity()
 	return &(m_nodes[index]);
 }
 
-void CGProj::CGContactManager::AllcalculateInternals(GPED::real duration)
+void CG::CGContactManager::AllcalculateInternals(GPED::real duration)
 {
 	int move = m_root;
 	while (move != NODE_NULL)
@@ -153,17 +153,17 @@ void CGProj::CGContactManager::AllcalculateInternals(GPED::real duration)
 	}
 }
 
-GPED::Contact * CGProj::CGContactManager::GetFirstContact()
+GPED::Contact * CG::CGContactManager::GetFirstContact()
 {
 	return &m_nodes[m_root];
 }
 
-int CGProj::CGContactManager::GetNodeCount()
+int CG::CGContactManager::GetNodeCount()
 {
 	return m_nodeCount;
 }
 
-void CGProj::CGContactManager::reset()
+void CG::CGContactManager::reset()
 {
 	int move = m_root;
 	while (move != NODE_NULL)
@@ -174,7 +174,7 @@ void CGProj::CGContactManager::reset()
 	}
 }
 
-int CGProj::CGContactManager::AllocateNode()
+int CG::CGContactManager::AllocateNode()
 {
 	if (m_freeList == NODE_NULL)
 	{
@@ -214,7 +214,7 @@ int CGProj::CGContactManager::AllocateNode()
 	return nodeId;
 }
 
-void CGProj::CGContactManager::FreeNode(int nodeId)
+void CG::CGContactManager::FreeNode(int nodeId)
 {
 	assert(0 <= nodeId && nodeId < m_nodeCapacity);
 	assert(0 < m_nodeCount);
@@ -232,7 +232,7 @@ void CGProj::CGContactManager::FreeNode(int nodeId)
 	--m_nodeCount;
 }
 
-void CGProj::CGContactManager::InsertNode(int nodeId)
+void CG::CGContactManager::InsertNode(int nodeId)
 {
 	if (m_root == NODE_NULL)
 	{
@@ -251,7 +251,7 @@ void CGProj::CGContactManager::InsertNode(int nodeId)
 	m_root = nodeId;
 }
 
-void CGProj::CGContactManager::DeleteNode(int nodeId)
+void CG::CGContactManager::DeleteNode(int nodeId)
 {
 	int prevId = m_nodes[nodeId].prev;
 	int nextId = m_nodes[nodeId].next;

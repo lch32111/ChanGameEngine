@@ -6,7 +6,7 @@
 #include <GPED/CGCollisionNarrow.h>
 #include <GPED/CGContactManager.h>
 
-namespace CGProj
+namespace CG
 {
 	/** 2019-01-03 Chanhaeng Lee
 	 * This class is used to find the proper algorithm for each primitive type

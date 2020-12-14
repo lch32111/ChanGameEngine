@@ -5,7 +5,7 @@
 
 // =================================================================
 /*** CG EDIT Object  ***/
-CGProj::CGEditObject::CGEditObject()
+CG::CGEditObject::CGEditObject()
 {
 	m_EditPrimitiveDraw = false;
 
@@ -18,28 +18,28 @@ CGProj::CGEditObject::CGEditObject()
 	setEditShape(EDIT_PRIMITIVE_AABB);
 }
 
-void CGProj::CGEditObject::connectBroadPhase(CGBroadPhase * broad)
+void CG::CGEditObject::connectBroadPhase(CGBroadPhase * broad)
 {
 	assert(broad != nullptr);
 	m_BroadPhase = broad;
 }
 
-void CGProj::CGEditObject::setBroadPhaseId(int id)
+void CG::CGEditObject::setBroadPhaseId(int id)
 {
 	m_BroadPhaseId = id;
 }
 
-int CGProj::CGEditObject::getBroadPhaseId()
+int CG::CGEditObject::getBroadPhaseId()
 {
 	return m_BroadPhaseId;
 }
 
-void CGProj::CGEditObject::setDefShader(Shader * shader)
+void CG::CGEditObject::setDefShader(Shader * shader)
 {
 	m_DefShader = shader;
 }
 
-void CGProj::CGEditObject::setEditShape(EditPrimitiveType e)
+void CG::CGEditObject::setEditShape(EditPrimitiveType e)
 {
 	m_PrimitiveType = e;
 
@@ -52,12 +52,12 @@ void CGProj::CGEditObject::setEditShape(EditPrimitiveType e)
 	updateBroadPhaseProxy();
 }
 
-CGProj::EditPrimitiveType CGProj::CGEditObject::getEditShape()
+CG::EditPrimitiveType CG::CGEditObject::getEditShape()
 {
 	return m_PrimitiveType;
 }
 
-void CGProj::CGEditObject::setPosition(const glm::vec3 & p)
+void CG::CGEditObject::setPosition(const glm::vec3 & p)
 {
 	switch (m_PrimitiveType)
 	{
@@ -76,7 +76,7 @@ void CGProj::CGEditObject::setPosition(const glm::vec3 & p)
 	updateBroadPhaseProxy();
 }
 
-void CGProj::CGEditObject::setPosition(const GPED::real x, const GPED::real y, const GPED::real z)
+void CG::CGEditObject::setPosition(const GPED::real x, const GPED::real y, const GPED::real z)
 {
 	switch (m_PrimitiveType)
 	{
@@ -95,7 +95,7 @@ void CGProj::CGEditObject::setPosition(const GPED::real x, const GPED::real y, c
 	updateBroadPhaseProxy();
 }
 
-void CGProj::CGEditObject::setXposition(const GPED::real x)
+void CG::CGEditObject::setXposition(const GPED::real x)
 {
 	switch (m_PrimitiveType)
 	{
@@ -114,7 +114,7 @@ void CGProj::CGEditObject::setXposition(const GPED::real x)
 	updateBroadPhaseProxy();
 }
 
-void CGProj::CGEditObject::setYposition(const GPED::real y)
+void CG::CGEditObject::setYposition(const GPED::real y)
 {
 	switch (m_PrimitiveType)
 	{
@@ -133,7 +133,7 @@ void CGProj::CGEditObject::setYposition(const GPED::real y)
 	updateBroadPhaseProxy();
 }
 
-void CGProj::CGEditObject::setZposition(const GPED::real z)
+void CG::CGEditObject::setZposition(const GPED::real z)
 {
 	switch (m_PrimitiveType)
 	{
@@ -152,7 +152,7 @@ void CGProj::CGEditObject::setZposition(const GPED::real z)
 	updateBroadPhaseProxy();
 }
 
-glm::vec3 CGProj::CGEditObject::getPosition()
+glm::vec3 CG::CGEditObject::getPosition()
 {
 	switch (m_PrimitiveType)
 	{
@@ -169,7 +169,7 @@ glm::vec3 CGProj::CGEditObject::getPosition()
 	return glm::vec3();
 }
 
-void CGProj::CGEditObject::setScale(float scale)
+void CG::CGEditObject::setScale(float scale)
 {
 	switch (m_PrimitiveType)
 	{
@@ -188,7 +188,7 @@ void CGProj::CGEditObject::setScale(float scale)
 	updateBroadPhaseProxy();
 }
 
-glm::vec3 CGProj::CGEditObject::getScale()
+glm::vec3 CG::CGEditObject::getScale()
 {
 	switch (m_PrimitiveType)
 	{
@@ -205,7 +205,7 @@ glm::vec3 CGProj::CGEditObject::getScale()
 	return glm::vec3();
 }
 
-GPED::c3AABB CGProj::CGEditObject::getFitAABB()
+GPED::c3AABB CG::CGEditObject::getFitAABB()
 {
 	switch (m_PrimitiveType)
 	{
@@ -222,7 +222,7 @@ GPED::c3AABB CGProj::CGEditObject::getFitAABB()
 	return GPED::c3AABB();
 }
 
-void CGProj::CGEditObject::setHalfSize(const glm::vec3 & h)
+void CG::CGEditObject::setHalfSize(const glm::vec3 & h)
 {
 	switch (m_PrimitiveType)
 	{
@@ -238,7 +238,7 @@ void CGProj::CGEditObject::setHalfSize(const glm::vec3 & h)
 	updateBroadPhaseProxy();
 }
 
-void CGProj::CGEditObject::setHalfSize(const GPED::real x, GPED::real y, GPED::real z)
+void CG::CGEditObject::setHalfSize(const GPED::real x, GPED::real y, GPED::real z)
 {
 	switch (m_PrimitiveType)
 	{
@@ -254,7 +254,7 @@ void CGProj::CGEditObject::setHalfSize(const GPED::real x, GPED::real y, GPED::r
 	updateBroadPhaseProxy();
 }
 
-void CGProj::CGEditObject::setXHalfSize(const GPED::real x)
+void CG::CGEditObject::setXHalfSize(const GPED::real x)
 {
 	switch (m_PrimitiveType)
 	{
@@ -270,7 +270,7 @@ void CGProj::CGEditObject::setXHalfSize(const GPED::real x)
 	updateBroadPhaseProxy();
 }
 
-void CGProj::CGEditObject::setYHalfSize(const GPED::real y)
+void CG::CGEditObject::setYHalfSize(const GPED::real y)
 {
 	switch (m_PrimitiveType)
 	{
@@ -286,7 +286,7 @@ void CGProj::CGEditObject::setYHalfSize(const GPED::real y)
 	updateBroadPhaseProxy();
 }
 
-void CGProj::CGEditObject::setZHalfSize(const GPED::real z)
+void CG::CGEditObject::setZHalfSize(const GPED::real z)
 {
 	switch (m_PrimitiveType)
 	{
@@ -302,7 +302,7 @@ void CGProj::CGEditObject::setZHalfSize(const GPED::real z)
 	updateBroadPhaseProxy();
 }
 
-glm::vec3 CGProj::CGEditObject::getHalfSize()
+glm::vec3 CG::CGEditObject::getHalfSize()
 {
 	switch (m_PrimitiveType)
 	{
@@ -317,7 +317,7 @@ glm::vec3 CGProj::CGEditObject::getHalfSize()
 	return glm::vec3();
 }
 
-void CGProj::CGEditObject::setRaidus(GPED::real r)
+void CG::CGEditObject::setRaidus(GPED::real r)
 {
 	switch (m_PrimitiveType)
 	{
@@ -332,7 +332,7 @@ void CGProj::CGEditObject::setRaidus(GPED::real r)
 	updateBroadPhaseProxy();
 }
 
-GPED::real CGProj::CGEditObject::getRadius()
+GPED::real CG::CGEditObject::getRadius()
 {
 	switch (m_PrimitiveType)
 	{
@@ -346,32 +346,32 @@ GPED::real CGProj::CGEditObject::getRadius()
 	return GPED::real(0);
 }
 
-void CGProj::CGEditObject::render(const glm::mat4 & view, const glm::mat4 & proj)
+void CG::CGEditObject::render(const glm::mat4 & view, const glm::mat4 & proj)
 {
 
 }
 
-void CGProj::CGEditObject::UIrender(CGAssetManager & am)
+void CG::CGEditObject::UIrender(CGAssetManager & am)
 {
 }
 
-CGProj::EditObjectType CGProj::CGEditObject::getObjectType()
+CG::EditObjectType CG::CGEditObject::getObjectType()
 {
 	return m_ObjectType;
 }
 
-void CGProj::CGEditObject::setObjectType(EditObjectType e)
+void CG::CGEditObject::setObjectType(EditObjectType e)
 {
 	m_ObjectType = e;
 }
 
-void CGProj::CGEditObject::updateBroadPhaseProxy()
+void CG::CGEditObject::updateBroadPhaseProxy()
 {
 	if (m_BroadPhaseId != Node_Null)
 		m_BroadPhase->UpdateProxy(m_BroadPhaseId, getFitAABB());
 }
 
-void CGProj::CGEditObject::renderPrimitive()
+void CG::CGEditObject::renderPrimitive()
 {
 	switch (m_PrimitiveType)
 	{

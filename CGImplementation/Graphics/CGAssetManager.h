@@ -8,7 +8,7 @@
 #include <Graphics/CGModel.h>
 #include <Graphics/CGAssetTexture.h>
 
-namespace CGProj
+namespace CG
 {
 	/** 2018-11-27 Chanhaeng Lee 
 	 * This class manages all of assets such as model, shader, texture and so on.

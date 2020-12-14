@@ -3,7 +3,7 @@
 #include <GPED/CGCollisionEarlyExit.h>
 #include <GPED/CGCollisionUtil.h>
 
-unsigned CGProj::CGCollisionNarrow::RayCollisionCallback(
+unsigned CG::CGCollisionNarrow::RayCollisionCallback(
 	GPED::c3RayOutput & output, const GPED::c3RayInput & input, const CGCollisionPrimitive * primitive)
 {
 	assert(primitive);
@@ -21,7 +21,7 @@ unsigned CGProj::CGCollisionNarrow::RayCollisionCallback(
 	}
 }
 
-unsigned CGProj::CGCollisionNarrow::sphereAndHalfSpace(
+unsigned CG::CGCollisionNarrow::sphereAndHalfSpace(
 	const CGCollisionSphere & sphere, const CGCollisionPlane & plane, CGContactManager * data)
 {
 	// Cache the sphere position
@@ -42,7 +42,7 @@ unsigned CGProj::CGCollisionNarrow::sphereAndHalfSpace(
 	return 1;
 }
 
-unsigned CGProj::CGCollisionNarrow::sphereAndTruePlane(
+unsigned CG::CGCollisionNarrow::sphereAndTruePlane(
 	const CGCollisionSphere & sphere, const CGCollisionPlane & plane, CGContactManager * data)
 {
 	// Cache the sphere position
@@ -78,7 +78,7 @@ unsigned CGProj::CGCollisionNarrow::sphereAndTruePlane(
 	return 1;
 }
 
-unsigned CGProj::CGCollisionNarrow::sphereAndSphere(
+unsigned CG::CGCollisionNarrow::sphereAndSphere(
 	const CGCollisionSphere & one, const CGCollisionSphere & two, CGContactManager * data)
 {
 	// Cache the sphere positions
@@ -109,7 +109,7 @@ unsigned CGProj::CGCollisionNarrow::sphereAndSphere(
 	return 1;
 }
 
-unsigned CGProj::CGCollisionNarrow::sphereAndTriangle(
+unsigned CG::CGCollisionNarrow::sphereAndTriangle(
 	const CGCollisionSphere & sphere, const CGCollisionTriangle & triangle, CGContactManager * data)
 {
 	glm::vec3 sphereCenter = sphere.getAxis(3);
@@ -129,7 +129,7 @@ unsigned CGProj::CGCollisionNarrow::sphereAndTriangle(
 	return 1;
 }
 
-unsigned CGProj::CGCollisionNarrow::OBBAndHalfSpace(
+unsigned CG::CGCollisionNarrow::OBBAndHalfSpace(
 	const CGCollisionOBB & box, const CGCollisionPlane & plane, CGContactManager * data)
 {
 	// Check for intersection
@@ -183,7 +183,7 @@ unsigned CGProj::CGCollisionNarrow::OBBAndHalfSpace(
 // in the boxAndBox contact generation method
 #define CHECK_OVERLAP(axis, index) \
 	if(!tryAxis(one, two, (axis), toCentre, (index), pen, best)) return 0;
-unsigned CGProj::CGCollisionNarrow::OBBAndOBB(
+unsigned CG::CGCollisionNarrow::OBBAndOBB(
 	const CGCollisionOBB & one, const CGCollisionOBB & two, CGContactManager * data)
 {
 	// if(!IntersectionTest::boxAndBox(one, two)) return 0;
@@ -301,7 +301,7 @@ unsigned CGProj::CGCollisionNarrow::OBBAndOBB(
 }
 #undef CHECK_OVERLAP
 
-unsigned CGProj::CGCollisionNarrow::OBBAndPoint(
+unsigned CG::CGCollisionNarrow::OBBAndPoint(
 	const CGCollisionOBB & box, const glm::vec3 & point, CGContactManager * data)
 {
 	// Transform the point into box coordinates
@@ -347,7 +347,7 @@ unsigned CGProj::CGCollisionNarrow::OBBAndPoint(
 	return 1;
 }
 
-void CGProj::CGCollisionNarrow::fillPointFaceBoxBox(
+void CG::CGCollisionNarrow::fillPointFaceBoxBox(
 	const CGCollisionOBB & one, const CGCollisionOBB & two, 
 	const glm::vec3 & toCentre, CGContactManager * data, unsigned best, GPED::real pen)
 {
@@ -378,7 +378,7 @@ void CGProj::CGCollisionNarrow::fillPointFaceBoxBox(
 	data->setBodyData(contactId, one.body, two.body);
 }
 
-unsigned CGProj::CGCollisionNarrow::OBBAndSphere(
+unsigned CG::CGCollisionNarrow::OBBAndSphere(
 	const CGCollisionOBB & box, const CGCollisionSphere & sphere, CGContactManager * data)
 {
 	// Transform the centre of the sphere into box coordinates
@@ -480,7 +480,7 @@ unsigned CGProj::CGCollisionNarrow::OBBAndSphere(
 
 #define CHECK_OVERLAP(axis, index) \
 	if(!tryAxis(box, (axis), v[0], v[1], v[2], (index), pen, best)) return 0;
-unsigned CGProj::CGCollisionNarrow::OBBAndTriangle(
+unsigned CG::CGCollisionNarrow::OBBAndTriangle(
 	const CGCollisionOBB & box, const CGCollisionTriangle & triangle, CGContactManager * data)
 {
 	//glm::vec3 boxOrigin = box.body->getPosition();
@@ -584,7 +584,7 @@ unsigned CGProj::CGCollisionNarrow::OBBAndTriangle(
 }
 #undef CHECK_OVERLAP
 
-unsigned CGProj::CGCollisionNarrow::MeshAndSphere(
+unsigned CG::CGCollisionNarrow::MeshAndSphere(
 	const CGCollisionMesh & mesh, const CGCollisionSphere & sphere, CGContactManager * data)
 {
 	GPED::c3AABB sphereAABB;
@@ -627,7 +627,7 @@ unsigned CGProj::CGCollisionNarrow::MeshAndSphere(
 	return collisionHit;
 }
 
-unsigned CGProj::CGCollisionNarrow::MeshAndOBB(
+unsigned CG::CGCollisionNarrow::MeshAndOBB(
 	const CGCollisionMesh & mesh, const CGCollisionOBB & box, CGContactManager * data)
 {
 	GPED::c3AABB boxAABB;
@@ -670,14 +670,14 @@ unsigned CGProj::CGCollisionNarrow::MeshAndOBB(
 	return collisionHit;
 }
 
-unsigned CGProj::CGCollisionNarrow::MeshandMesh(
+unsigned CG::CGCollisionNarrow::MeshandMesh(
 	const CGCollisionMesh & meshA, const CGCollisionMesh & meshB, CGContactManager * data)
 {
 	return 1;
 }
 
 // Intersection between ray and OBB
-unsigned CGProj::CGCollisionNarrow::rayAndOBB(
+unsigned CG::CGCollisionNarrow::rayAndOBB(
 	GPED::c3RayOutput & output, const GPED::c3RayInput & input, const CGCollisionOBB & box)
 {
 	GPED::real tMin = -REAL_MAX;
@@ -719,7 +719,7 @@ unsigned CGProj::CGCollisionNarrow::rayAndOBB(
 }
 
 // RTCD 178p ~ 179p.
-unsigned CGProj::CGCollisionNarrow::rayAndSphere(
+unsigned CG::CGCollisionNarrow::rayAndSphere(
 	GPED::c3RayOutput & output, const GPED::c3RayInput & input, const CGCollisionSphere & sphere)
 {
 	glm::vec3 m = input.startPoint - sphere.getAxis(3);

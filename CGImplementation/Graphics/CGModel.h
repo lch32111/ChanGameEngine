@@ -8,7 +8,7 @@
 
 #include <Graphics/CGModelMesh.h>
 
-namespace CGProj
+namespace CG
 {
 	// Forward Declaration
 	class Shader;

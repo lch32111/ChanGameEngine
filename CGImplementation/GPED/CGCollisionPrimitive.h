@@ -4,7 +4,7 @@
 
 #include <GPED/GPED_body.h>
 
-namespace CGProj
+namespace CG
 {
 	// Forward declarations of primitive friends
 	class CGCollisionEarlyExit;

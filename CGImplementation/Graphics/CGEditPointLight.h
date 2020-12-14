@@ -7,7 +7,7 @@
 #include <Graphics/Shader.h>
 #include <Graphics/CGEditLightCommonFactor.h>
 
-namespace CGProj
+namespace CG
 {
 	// Forward Declartion
 	class CGAssetManager;

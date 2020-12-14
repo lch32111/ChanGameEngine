@@ -1,21 +1,16 @@
 #ifndef __CG_COLLISION_FUNCTION_H__
 #define __CG_COLLISION_FUNCTION_H__
 
-#include <CollisionDetection/CGCollisionSphere.h>
-#include <CollisionDetection/CGCollisionRay.h>
-#include <CollisionDetection/CGCollisionLineSegment.h>
+#include <CollisionDetection/CGSphere.h>
+#include <CollisionDetection/CGRay.h>
+#include <CollisionDetection/CGLineSegment.h>
 
-namespace CGProj
+namespace CG
 {
-	namespace CollisionDetection
-	{
-		bool intersect(const CGCollisionSphere& a, const CGCollisionSphere& b);
-		bool intersect(const CGCollisionSphere& a, const CGCollisionSphere& b, CGCollisionContact& c);
-
-		bool intersect(const CGCollisionSphere& sphere, const CGCollisionRay& ray);
-
-		bool intersect(const CGCollisionSphere& sphere, const CGCollisionLineSegment& segment);
-	}
+	bool Intersect(const CGSphere& a, const CGSphere& b);
+	bool Intersect(const CGSphere& a, const CGSphere& b, CGContact& c);
+	bool Intersect(const CGSphere& sphere, const CGRay& ray);
+	bool Intersect(const CGSphere& sphere, const CGLineSegment& segment);
 }
 
 #endif

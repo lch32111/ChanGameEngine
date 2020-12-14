@@ -1,18 +1,16 @@
 #include <CGPrecompiled.h>
 #include <CollisionDetection/CGCollisionFunction.h>
 
-using namespace CGProj;
-using namespace CGProj::Math;
-using namespace CGProj::CollisionDetection;
+using namespace CG;
 
-bool CGProj::CollisionDetection::intersect(const CGCollisionSphere& a, const CGCollisionSphere& b)
+bool CG::Intersect(const CGSphere& a, const CGSphere& b)
 {
 	CGVec3 ba = a.m_pos - b.m_pos;
 	CGScalar radiSum = a.m_radius + b.m_radius;
 	return Dot(ba, ba) <= (radiSum * radiSum);
 }
 
-bool CGProj::CollisionDetection::intersect(const CGCollisionSphere& a, const CGCollisionSphere& b, CGCollisionContact& c)
+bool CG::Intersect(const CGSphere& a, const CGSphere& b, CGContact& c)
 {
 	CGVec3 ba = a.m_pos - b.m_pos;
 	CGScalar radiSum = a.m_radius + b.m_radius;
@@ -45,10 +43,10 @@ bool CGProj::CollisionDetection::intersect(const CGCollisionSphere& a, const CGC
 
 // Collision Detection in Interactive 3D Environments by Gino van den Bergen
 // From Section 3.1.2
-bool CGProj::CollisionDetection::intersect(const CGCollisionSphere& sphere, const CGCollisionRay& ray)
+bool CG::Intersect(const CGSphere& sphere, const CGRay& ray)
 {
 	// Translate Ray into the sphere local space;
-	CGCollisionRay tRay;
+	CGRay tRay;
 	tRay.m_source = ray.m_source - sphere.m_pos;
 	tRay.m_target = ray.m_target - sphere.m_pos;
 
@@ -79,7 +77,7 @@ bool CGProj::CollisionDetection::intersect(const CGCollisionSphere& sphere, cons
 	return false;
 }
 
-bool CGProj::CollisionDetection::intersect(const CGCollisionSphere& sphere, const CGCollisionLineSegment& segment)
+bool CG::Intersect(const CGSphere& sphere, const CGLineSegment& segment)
 {
 	CGVec3 segmentDir = segment.GetDirection();
 

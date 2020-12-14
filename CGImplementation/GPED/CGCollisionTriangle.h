@@ -4,7 +4,7 @@
 
 #include <glm/glm.hpp>
 
-namespace CGProj
+namespace CG
 {
 	class CGCollisionTriangle
 	{

@@ -1,19 +1,19 @@
 #include <CGPrecompiled.h>
 #include "Shader.h"
-CGProj::Shader::Shader() { }
+CG::Shader::Shader() { }
 
-CGProj::Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath)
+CG::Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath)
 	: m_vertexPath(vertexPath), m_fragmentPath(fragmentPath)
 {
 
 }
 
-CGProj::Shader::Shader(const GLchar * vertexPath, const GLchar * geometryPath, const GLchar * fragmentPath)
+CG::Shader::Shader(const GLchar * vertexPath, const GLchar * geometryPath, const GLchar * fragmentPath)
 	: m_vertexPath(vertexPath), m_geometryPath(geometryPath), m_fragmentPath(fragmentPath)
 {
 }
 
-bool CGProj::Shader::loadShader()
+bool CG::Shader::loadShader()
 {
 	// 1. retrieve the vertex/fragment source code from filePath
 	std::string vertexCode;
@@ -87,7 +87,7 @@ bool CGProj::Shader::loadShader()
 	return true;
 }
 
-bool CGProj::Shader::loadShaderWithGeo()
+bool CG::Shader::loadShaderWithGeo()
 {
 	// 1. retrieve the vertex/fragment source code from filePath
 	std::string vertexCode;
@@ -181,84 +181,84 @@ bool CGProj::Shader::loadShaderWithGeo()
 	return true;
 }
 
-void CGProj::Shader::use()
+void CG::Shader::use()
 {
 	glUseProgram(ID);
 }
 
-void CGProj::Shader::setBool(const std::string& name, bool value) const
+void CG::Shader::setBool(const std::string& name, bool value) const
 {
 	glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
 }
 
-void CGProj::Shader::setUInt(const std::string & name, unsigned int value) const
+void CG::Shader::setUInt(const std::string & name, unsigned int value) const
 {
 	glUniform1ui(glGetUniformLocation(ID, name.c_str()), value);
 }
 
-void CGProj::Shader::setInt(const std::string& name, int value) const
+void CG::Shader::setInt(const std::string& name, int value) const
 {
 	glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
 
-void CGProj::Shader::setFloat(const std::string& name, float value) const
+void CG::Shader::setFloat(const std::string& name, float value) const
 {
 	glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
 }
 
-void CGProj::Shader::setFloat4(const std::string& name, float value[4]) const
+void CG::Shader::setFloat4(const std::string& name, float value[4]) const
 {
 	glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, value);
 }
 
-void CGProj::Shader::setVec2(const std::string& name, const glm::vec2& value) const
+void CG::Shader::setVec2(const std::string& name, const glm::vec2& value) const
 {
 	glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
 }
-void CGProj::Shader::setVec2(const std::string& name, float x, float y) const
+void CG::Shader::setVec2(const std::string& name, float x, float y) const
 {
 	glUniform2f(glGetUniformLocation(ID, name.c_str()), x, y);
 }
 // ------------------------------------------------------------------------
-void CGProj::Shader::setVec3(const std::string& name, const glm::vec3& value) const
+void CG::Shader::setVec3(const std::string& name, const glm::vec3& value) const
 {
 	glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
 }
-void CGProj::Shader::setVec3(const std::string& name, float x, float y, float z) const
+void CG::Shader::setVec3(const std::string& name, float x, float y, float z) const
 {
 	glUniform3f(glGetUniformLocation(ID, name.c_str()), x, y, z);
 }
 // ------------------------------------------------------------------------
-void CGProj::Shader::setVec4(const std::string& name, const glm::vec4& value) const
+void CG::Shader::setVec4(const std::string& name, const glm::vec4& value) const
 {
 	glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
 }
-void CGProj::Shader::setVec4(const std::string& name, float x, float y, float z, float w) const
+void CG::Shader::setVec4(const std::string& name, float x, float y, float z, float w) const
 {
 	glUniform4f(glGetUniformLocation(ID, name.c_str()), x, y, z, w);
 }
 // ------------------------------------------------------------------------
-void CGProj::Shader::setMat2(const std::string& name, const glm::mat2& mat) const
+void CG::Shader::setMat2(const std::string& name, const glm::mat2& mat) const
 {
 	glUniformMatrix2fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 // ------------------------------------------------------------------------
-void CGProj::Shader::setMat3(const std::string& name, const glm::mat3& mat) const
+void CG::Shader::setMat3(const std::string& name, const glm::mat3& mat) const
 {
 	glUniformMatrix3fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 // ------------------------------------------------------------------------
-void CGProj::Shader::setMat4(const std::string& name, const glm::mat4& mat) const
+void CG::Shader::setMat4(const std::string& name, const glm::mat4& mat) const
 {
 	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
-void CGProj::Shader::SetMat4(const char* name, const CGProj::Math::CGMat4<float>& mat) const
+void CG::Shader::SetMat4(const char* name, const CG::CGMat4<float>& mat) const
 {
 	glUniformMatrix4fv(glGetUniformLocation(ID, name), 1, GL_FALSE, mat.data());
 }
 
-bool CGProj::Shader::checkCompileErrors(GLuint shader, std::string type)
+bool CG::Shader::checkCompileErrors(GLuint shader, std::string type)
 {
 	GLint success;
 	GLchar infoLog[1024];

@@ -1,8 +1,10 @@
 #include <CGPrecompiled.h>
 #include "RayTracerDemo.h"
 
-#include <Graphics/GLPrimitiveUtil.h>
 #include <Math/CGMat4.h>
+#include <Geometry/CGCollisionFunction.h>
+#include <Graphics/GLPrimitiveUtil.h>
+
 
 
 /****************************************************************************************/
@@ -21,6 +23,10 @@ void CG::RayTracerDemo::OnInitialize()
 	m_camera.m_near = 0.01f;
 	m_camera.m_far = 500.f;
 	m_camera.m_fov_in_radian = ScalarOp<float>::Radian(45.f);
+
+	m_primitives.resize(1);
+	m_primitives[0].m_sphere.m_pos = CGVec3(0.f, 0.f, -1.f);
+	m_primitives[0].m_sphere.m_radius = 0.1f;
 	
 	RayTrace();
 
@@ -123,7 +129,30 @@ CG::CGVector3<float> CG::RayTracerDemo::ComputeLight(CGVector3<float> pos, CGVec
 
 const CG::Surfel* CG::RayTracerDemo::FindIntersection(CGVector3<float> pos, CGVector3<float> normalizedRay)
 {
-	return nullptr;
+	CGRay ray;
+	ray.m_source = pos;
+	ray.m_target = pos + normalizedRay;
+	ray.m_maxFraction = m_camera.m_far * 2.f;
+
+	bool find_surfel = false;
+	for (size_t i = 0; i < m_primitives.size(); ++i)
+	{
+		if (Intersect(m_primitives[i].m_sphere, ray))
+		{
+			find_surfel = true;
+			Surfel sf;
+			m_surfels.push_back(sf);
+		}
+	}
+
+	if (find_surfel)
+	{
+		return &(m_surfels[0]);
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 /* ### RayTracerDemo Demo ### */

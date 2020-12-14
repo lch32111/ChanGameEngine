@@ -4,6 +4,7 @@
 
 #include <CG_Application.h>
 #include <Math/CGVector3.h>
+#include <Geometry/CGSphere.h>
 #include <Graphics/CGAssetManager.h>
 
 namespace CG
@@ -20,6 +21,12 @@ namespace CG
 		float m_near;
 		float m_far;
 		float m_fov_in_radian;
+	};
+
+	class Primitive
+	{
+	public:
+		CGSphere m_sphere;
 	};
 
 	class Surfel
@@ -57,6 +64,8 @@ namespace CG
 
 		RayTracerCamera m_camera;
 
+		std::vector<Primitive> m_primitives;
+		std::vector<Surfel> m_surfels;
 	private:
 		CGAssetManager m_asset_manager;
 		Shader* m_simple_shader;

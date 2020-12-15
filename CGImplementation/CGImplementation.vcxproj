@@ -216,6 +216,7 @@
     <ClInclude Include="Geometry\CGGeometryConfig.h" />
     <ClInclude Include="Geometry\CGConvex.h" />
     <ClInclude Include="Geometry\CGLineSegment.h" />
+    <ClInclude Include="Geometry\CGPlane.h" />
     <ClInclude Include="Geometry\CGRay.h" />
     <ClInclude Include="Geometry\CGShape.h" />
     <ClInclude Include="Geometry\CGSphere.h" />

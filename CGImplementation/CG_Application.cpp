@@ -11,6 +11,10 @@
 #include <Demo/CollisionTestBedDemo.h>
 #include <Demo/RayTracerDemo.h>
 
+#ifdef _CRTDBG_MAP_ALLOC
+#define new CG_DBG_NEW
+#endif
+
 /* ### Application ### */
 void CG::Application::Initialize(bool shouldBaseInit)
 {
@@ -18,20 +22,30 @@ void CG::Application::Initialize(bool shouldBaseInit)
 
 	if (shouldBaseInit)
 	{
+#ifdef _CRTDBG_MAP_ALLOC
+		_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
+		_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
+		_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
+		_CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDOUT);
+		_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
+		_CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDOUT);
+		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
 		glfwInit();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 		// glfw window creation
-		app_window = glfwCreateWindow(m_width, m_height, "CG Demo", NULL, NULL);
-		if (app_window == NULL)
+		m_app_window = glfwCreateWindow(m_width, m_height, "CG Demo", NULL, NULL);
+		if (m_app_window == NULL)
 		{
 			std::cout << "CJProj::Application::initGraphics::Failed to create GLFW window\n";
 			glfwTerminate();
 		}
 
-		glfwMakeContextCurrent(app_window);
+		glfwMakeContextCurrent(m_app_window);
 
 		// glad : load all OpenGL function pointers
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -44,7 +58,7 @@ void CG::Application::Initialize(bool shouldBaseInit)
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-		ImGui_ImplGlfw_InitForOpenGL(app_window, true);
+		ImGui_ImplGlfw_InitForOpenGL(m_app_window, true);
 		ImGui_ImplOpenGL3_Init("#version 130");
 
 		ImGui::StyleColorsDark();
@@ -59,13 +73,18 @@ void CG::Application::Finalize()
 
 	if (m_isBaseInit)
 	{
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
+
+		glfwDestroyWindow(m_app_window);
 		glfwTerminate();
 	}
 }
 
 void CG::Application::Execute()
 {
-	while (!glfwWindowShouldClose(app_window))
+	while (!glfwWindowShouldClose(m_app_window))
 	{
 		float currentFrame = (float)glfwGetTime();
 		m_deltaTime = currentFrame - m_lastFrame;
@@ -83,7 +102,7 @@ void CG::Application::Execute()
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-		glfwSwapBuffers(app_window);
+		glfwSwapBuffers(m_app_window);
 	}
 }
 
@@ -113,7 +132,7 @@ namespace CG
 
 		virtual void Execute() override
 		{
-			while (!glfwWindowShouldClose(app_window) && m_window_open == true)
+			while (!glfwWindowShouldClose(m_app_window) && m_window_open == true)
 			{
 				float currentFrame = (float)glfwGetTime();
 				m_deltaTime = currentFrame - m_lastFrame;
@@ -130,7 +149,7 @@ namespace CG
 				ImGui::Render();
 				ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-				glfwSwapBuffers(app_window);
+				glfwSwapBuffers(m_app_window);
 			}
 
 		}
@@ -151,7 +170,7 @@ namespace CG
 				auto openApp = [&](Application* app)
 				{
 					m_app_selected = true;
-					m_app->app_window = this->app_window;
+					m_app->m_app_window = this->m_app_window;
 					m_app->Initialize(false);
 					m_app->ResizeWindowCallback(m_width, m_height);
 				};
@@ -213,7 +232,7 @@ namespace CG
 				delete m_app;
 				m_app = nullptr;
 				m_app_selected = false;
-				glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+				glfwSetInputMode(m_app_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 			};
 
 			if (key == GLFW_KEY_B && mods == GLFW_MOD_CONTROL)

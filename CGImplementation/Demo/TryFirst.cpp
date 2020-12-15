@@ -31,7 +31,7 @@ void CG::PhysicsDemo::OnFinalize()
 
 void CG::PhysicsDemo::Update(float deltaTime, float lastFrame)
 {
-	test1->key(app_window, deltaTime);
+	test1->key(m_app_window, deltaTime);
 	test1->updateImgui();
 	test1->updateSimulation(deltaTime, lastFrame);
 }
@@ -48,7 +48,7 @@ void CG::PhysicsDemo::MouseMoveCallback(double xpos, double ypos)
 
 void CG::PhysicsDemo::MouseButtonCallback(int button, int action, int mods)
 {
-	test1->mouseButton(app_window, button, action, mods, m_width, m_height);
+	test1->mouseButton(m_app_window, button, action, mods, m_width, m_height);
 }
 
 

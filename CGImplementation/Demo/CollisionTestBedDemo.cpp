@@ -19,7 +19,7 @@
 void CG::CollisionDemo::OnInitialize()
 {
 	glfwSwapInterval(0);
-	glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(m_app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
@@ -36,7 +36,7 @@ void CG::CollisionDemo::OnFinalize()
 
 void CG::CollisionDemo::Update(float deltaTime, float lastFrame)
 {
-	demo->key(app_window, deltaTime);
+	demo->key(m_app_window, deltaTime);
 	demo->updateImgui();
 	demo->updateSimulation(deltaTime, lastFrame);
 }
@@ -53,7 +53,7 @@ void CG::CollisionDemo::MouseMoveCallback(double xpos, double ypos)
 
 void CG::CollisionDemo::MouseButtonCallback(int button, int action, int mods)
 {
-	demo->mouseButton(app_window, button, action, mods, m_width, m_height);
+	demo->mouseButton(m_app_window, button, action, mods, m_width, m_height);
 }
 
 void CG::CollisionDemo::ScrollCallback(double yoffset)

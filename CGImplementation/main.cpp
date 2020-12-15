@@ -41,11 +41,11 @@ int main()
 {
 	app->Initialize();
 	{
-		glfwSetFramebufferSizeCallback(app->app_window, framebuffer_size_callback);
-		glfwSetCursorPosCallback(app->app_window, cursorPos_callback);
-		glfwSetMouseButtonCallback(app->app_window, mouseButton_callback);
-		glfwSetScrollCallback(app->app_window, scroll_callback);
-		glfwSetKeyCallback(app->app_window, key_callback);
+		glfwSetFramebufferSizeCallback(app->m_app_window, framebuffer_size_callback);
+		glfwSetCursorPosCallback(app->m_app_window, cursorPos_callback);
+		glfwSetMouseButtonCallback(app->m_app_window, mouseButton_callback);
+		glfwSetScrollCallback(app->m_app_window, scroll_callback);
+		glfwSetKeyCallback(app->m_app_window, key_callback);
 	}
 	
 	app->Execute();

@@ -11,7 +11,7 @@
 void CG::CullingDemo::OnInitialize()
 {
 	glfwSwapInterval(0);
-	glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(m_app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
@@ -28,7 +28,7 @@ void CG::CullingDemo::OnFinalize()
 
 void CG::CullingDemo::Update(float deltaTime, float lastFrame)
 {
-	demo->key(app_window, deltaTime);
+	demo->key(m_app_window, deltaTime);
 	demo->updateImgui();
 	demo->updateSimulation(deltaTime, lastFrame);
 }
@@ -45,7 +45,7 @@ void CG::CullingDemo::MouseMoveCallback(double xpos, double ypos)
 
 void CG::CullingDemo::MouseButtonCallback(int button, int action, int mods)
 {
-	demo->mouseButton(app_window, button, action, mods, m_width, m_height);
+	demo->mouseButton(m_app_window, button, action, mods, m_width, m_height);
 }
 
 void CG::CullingDemo::ScrollCallback(double yoffset)

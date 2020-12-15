@@ -48,6 +48,17 @@
 #define CG_DEBUG_BREAK(x)
 #endif
 
+#if defined(CG_DEBUG)
+	#if defined(__WIN32__) && defined(_MSC_VER)
+		#ifndef _CRTDBG_MAP_ALLOC
+			#define _CRTDBG_MAP_ALLOC
+			#include<stdlib.h>
+			#include<crtdbg.h>
+			#define CG_DBG_NEW	new (_NORMAL_BLOCK , __FILE__ , __LINE__ )
+		#endif
+	#endif
+#endif
+
 #include <stdint.h>
 
 #include <cmath>

@@ -12,7 +12,7 @@
 void CG::RayTracerDemo::OnInitialize()
 {
 	glfwSwapInterval(0);
-	glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	// glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 

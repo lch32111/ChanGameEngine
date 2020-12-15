@@ -18,7 +18,7 @@
 void CG::GraphicsDemo::OnInitialize()
 {
 	glfwSwapInterval(0); // Turn off Vsync and measure the FPS
-	glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(m_app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
@@ -35,7 +35,7 @@ void CG::GraphicsDemo::OnFinalize()
 
 void CG::GraphicsDemo::Update(float deltaTime, float lastFrame)
 {
-	test2->key(app_window, deltaTime);
+	test2->key(m_app_window, deltaTime);
 	test2->updateImgui();
 	test2->updateSimulation(deltaTime, lastFrame);
 }
@@ -54,7 +54,7 @@ void CG::GraphicsDemo::MouseButtonCallback(int button, int action, int mods)
 {
 	// Application::mouseButton(button, action, mods);
 
-	test2->mouseButton(app_window, button, action, mods, m_width, m_height);
+	test2->mouseButton(m_app_window, button, action, mods, m_width, m_height);
 }
 
 void CG::GraphicsDemo::ScrollCallback(double yoffset)

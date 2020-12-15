@@ -11,7 +11,7 @@ namespace CG
 	{
 	public:
 		virtual ~Application() {}
-		GLFWwindow* app_window;
+		GLFWwindow* m_app_window;
 
 		void Initialize(bool shouldBaseInit = true);
 		void Finalize();

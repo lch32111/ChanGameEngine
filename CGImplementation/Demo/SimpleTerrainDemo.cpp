@@ -11,7 +11,7 @@
 void CG::TerrainDemo::OnInitialize()
 {
 	glfwSwapInterval(0); // Turn off Vsync and measure the FPS
-	glfwSetInputMode(app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(m_app_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
@@ -28,7 +28,7 @@ void CG::TerrainDemo::OnFinalize()
 
 void CG::TerrainDemo::Update(float deltaTime, float lastFrame)
 {
-	test3->key(app_window, deltaTime);
+	test3->key(m_app_window, deltaTime);
 	test3->updateImgui();
 	test3->updateSimulation(deltaTime, lastFrame);
 }
@@ -45,7 +45,7 @@ void CG::TerrainDemo::MouseMoveCallback(double xpos, double ypos)
 
 void CG::TerrainDemo::MouseButtonCallback(int button, int action, int mods)
 {
-	test3->mouseButton(app_window, button, action, mods, m_width, m_height);
+	test3->mouseButton(m_app_window, button, action, mods, m_width, m_height);
 }
 
 void CG::TerrainDemo::ScrollCallback(double yoffset)

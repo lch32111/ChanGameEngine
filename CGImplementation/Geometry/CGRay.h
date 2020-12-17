@@ -13,7 +13,7 @@ namespace CG
 	public:
 		CGRay() { }
 
-		CGVec3 GetDirection()
+		CGVec3 GetDirection() const
 		{
 			return Normalize(m_target - m_source);
 		}

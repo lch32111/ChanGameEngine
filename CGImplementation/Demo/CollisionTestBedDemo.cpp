@@ -10,6 +10,7 @@
 #include <Graphics/GLPrimitiveUtil.h>
 
 #include <Geometry/CGCollisionFunction.h>
+#include <Geometry/CGRay.h>
 
 #include <GPED/GPED_random.h>
 #include <GPED/CGPhysicsUtil.h>

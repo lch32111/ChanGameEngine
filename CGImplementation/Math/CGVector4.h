@@ -207,7 +207,7 @@ namespace CG
 	template <typename Scalar>
 	inline Scalar Length(const CGVector4<Scalar>& v)
 	{
-		return ScalarOp<Scalar>::sqrt(v.m_value[0] * v.m_value[0] + 
+		return CGScalarOp<Scalar>::sqrt(v.m_value[0] * v.m_value[0] + 
 			v.m_value[1] * v.m_value[1] + 
 			v.m_value[2] * v.m_value[2] + 
 			v.m_value[3] * v.m_value[3]);

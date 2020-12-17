@@ -5,6 +5,7 @@
 #include <CG_Application.h>
 #include <Math/CGVector3.h>
 #include <Geometry/CGSphere.h>
+#include <Geometry/CGPlane.h>
 #include <Graphics/CGAssetManager.h>
 
 namespace CG
@@ -13,7 +14,10 @@ namespace CG
 	class RayTracerCamera
 	{
 	public:
-
+		/* 
+		It's assumed that the camera is located on (0,0,0) in the world, 
+		and then watching the negative z-direction (0, 0, -1) (toward screen).
+		*/
 		void GetPrimaryRay(float x, float y, int width, int height,
 			CGVector3<float>& position,
 			CGVector3<float>& w) const;
@@ -26,7 +30,16 @@ namespace CG
 	class Primitive
 	{
 	public:
+
+		enum ShapeType
+		{
+			SPHERE,
+			PLANE
+		};
+
+		ShapeType m_shape_type;
 		CGSphere m_sphere;
+		CGPlane m_plane;
 	};
 
 	class Surfel
@@ -52,6 +65,7 @@ namespace CG
 		virtual void OnInitialize();
 		virtual void OnFinalize();
 	private:
+		void PrepareScene();
 		void RayTrace();
 		CGVector3<float> ComputeLight(CGVector3<float> pos, CGVector3<float> normalizedRay);
 		const Surfel* FindIntersection(CGVector3<float> pos, CGVector3<float> normalizedRay);

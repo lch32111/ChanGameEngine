@@ -1,8 +1,11 @@
 #include <CGPrecompiled.h>
 #include "RayTracerDemo.h"
 
+#include <Imgui/imgui.h>
+
 #include <Math/CGMat4.h>
 #include <Geometry/CGCollisionFunction.h>
+#include <Geometry/CGRay.h>
 #include <Graphics/GLPrimitiveUtil.h>
 
 
@@ -20,14 +23,7 @@ void CG::RayTracerDemo::OnInitialize()
 	m_image_height = 256;
 	m_image_buffer = new CGVector3<float>[m_image_width * m_image_height];
 
-	m_camera.m_near = 0.01f;
-	m_camera.m_far = 500.f;
-	m_camera.m_fov_in_radian = ScalarOp<float>::Radian(45.f);
-
-	m_primitives.resize(1);
-	m_primitives[0].m_sphere.m_pos = CGVec3(0.f, 0.f, -1.f);
-	m_primitives[0].m_sphere.m_radius = 0.1f;
-	
+	PrepareScene();
 	RayTrace();
 
 	m_asset_manager.assetInit();
@@ -53,6 +49,47 @@ void CG::RayTracerDemo::OnFinalize()
 
 void CG::RayTracerDemo::Update(float deltaTime, float lastFrame)
 {
+	bool change = false;
+
+	if (ImGui::DragFloat("Sphere Radius", &(m_primitives[0].m_sphere.m_radius), 0.001f))
+	{
+		change = true;
+	}
+
+	if (ImGui::DragFloat("Sphere Z", &(m_primitives[0].m_sphere.m_pos[2]), 0.001f))
+	{
+		change = true;
+	}
+
+	if (ImGui::DragFloat("Plane Distance", &(m_primitives[1].m_plane.m_distance), 0.001f))
+	{
+		change = true;
+	}
+
+	if (ImGui::InputFloat("Plane X", &(m_primitives[1].m_plane.m_normal[0]), 0.001f))
+	{
+		m_primitives[1].m_plane.m_normal = SafeNormalize(m_primitives[1].m_plane.m_normal);
+		change = true;
+	}
+
+	if (ImGui::InputFloat("Plane Y", &(m_primitives[1].m_plane.m_normal[1]), 0.001f))
+	{
+		m_primitives[1].m_plane.m_normal = SafeNormalize(m_primitives[1].m_plane.m_normal);
+		change = true;
+	}
+
+	if (ImGui::InputFloat("Plane Z", &(m_primitives[1].m_plane.m_normal[2]), 0.001f))
+	{
+		m_primitives[1].m_plane.m_normal = SafeNormalize(m_primitives[1].m_plane.m_normal);
+		change = true;
+	}
+
+	if (change == true)
+	{
+		RayTrace();
+		glBindTexture(GL_TEXTURE_2D, m_gl_image_tex);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image_width, m_image_height, 0, GL_RGB, GL_FLOAT, m_image_buffer);
+	}
 }
 
 void CG::RayTracerDemo::Display()
@@ -92,6 +129,23 @@ void CG::RayTracerDemo::ResizeWindowCallback(int width, int height)
 	glViewport(0, 0, width, height);
 }
 
+
+void CG::RayTracerDemo::PrepareScene()
+{
+	m_camera.m_near = 0.01f;
+	m_camera.m_far = 500.f;
+	m_camera.m_fov_in_radian = CGScalarOp<float>::Radian(45.f);
+
+	m_primitives.resize(2);
+	m_primitives[0].m_sphere.m_pos = CGVec3(0.f, 0.f, -1.f);
+	m_primitives[0].m_sphere.m_radius = 0.1f;
+	m_primitives[0].m_shape_type = Primitive::SPHERE;
+
+	m_primitives[1].m_plane.m_normal = CGVec3(0.f, 1.f, 0.f);
+	m_primitives[1].m_plane.m_distance = -10.f;
+	m_primitives[1].m_shape_type = Primitive::PLANE;
+}
+
 void CG::RayTracerDemo::RayTrace()
 {
 	for (u32 y = 0; y < m_image_height; ++y)
@@ -100,7 +154,7 @@ void CG::RayTracerDemo::RayTrace()
 		{
 			CGVector3<float> p;
 			CGVector3<float> w;
-			m_camera.GetPrimaryRay((float)x + 0.5f, (float)y + 0.5f, (s32)m_image_width, (s32)m_image_height, p, w);
+			m_camera.GetPrimaryRay((float)x, (float)y, (s32)m_image_width, (s32)m_image_height, p, w);
 			m_image_buffer[y * m_image_width + x] = ComputeLight(p, w);
 		}
 	}
@@ -137,11 +191,27 @@ const CG::Surfel* CG::RayTracerDemo::FindIntersection(CGVector3<float> pos, CGVe
 	bool find_surfel = false;
 	for (size_t i = 0; i < m_primitives.size(); ++i)
 	{
-		if (Intersect(m_primitives[i].m_sphere, ray))
+		switch (m_primitives[i].m_shape_type)
 		{
-			find_surfel = true;
-			Surfel sf;
-			m_surfels.push_back(sf);
+		case Primitive::SPHERE:
+		{
+			if (Intersect(m_primitives[i].m_sphere, ray))
+			{
+				find_surfel = true;
+				Surfel sf;
+				m_surfels.push_back(sf);
+			}
+			break;
+		}
+		case Primitive::PLANE:
+		{
+			if (IntersectTruePlane(m_primitives[i].m_plane, ray))
+			{
+				find_surfel = true;
+				Surfel sf;
+				m_surfels.push_back(sf);
+			}
+		}
 		}
 	}
 
@@ -161,11 +231,11 @@ const CG::Surfel* CG::RayTracerDemo::FindIntersection(CGVector3<float> pos, CGVe
 
 void CG::RayTracerCamera::GetPrimaryRay(float x, float y, int width, int height, CGVector3<float>& position, CGVector3<float>& w) const
 {
-	const float side = -2.f * tan(m_fov_in_radian / 2.f);
+	const float side = 2.f * tan(m_fov_in_radian / 2.f);
 
-	position.m_value[0] = m_near * (x / width - 0.5f) * side * width / height;
-	position.m_value[1] = m_near * -(y / height - 0.5f) * side;
-	position.m_value[2] = m_near;
+	position.m_value[0] = m_near * side * width / height * (x / width - 0.5f);
+	position.m_value[1] = m_near * side * (y / height - 0.5f);
+	position.m_value[2] = -m_near;
 
 	w = Normalize(position);
 }

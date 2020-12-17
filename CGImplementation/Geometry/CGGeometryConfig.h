@@ -19,7 +19,7 @@ namespace CG
 	typedef CG::CGMat2<CGScalar> CGCMat2;
 	typedef CG::CGMat3<CGScalar> CGCMat3;
 	typedef CG::CGMat4<CGScalar> CGCMat4;
-	typedef CG::ScalarOp<CGScalar> CGScalarUtil;
+	typedef CG::CGScalarOp<CGScalar> CGScalarUtil;
 
 	// For specifying float scalar
 	typedef float CGFScalar;
@@ -29,7 +29,7 @@ namespace CG
 	typedef CG::CGMat2<CGFScalar> CGFMat2;
 	typedef CG::CGMat3<CGFScalar> CGFMat3;
 	typedef CG::CGMat4<CGFScalar> CGFMat4;
-	typedef CG::ScalarOp<CGFScalar> CGFScalarUtil;
+	typedef CG::CGScalarOp<CGFScalar> CGFScalarUtil;
 
 	// For specifying double scalar
 	typedef double CGDScalar;
@@ -39,7 +39,12 @@ namespace CG
 	typedef CG::CGMat2<CGDScalar> CGDMat2;
 	typedef CG::CGMat3<CGDScalar> CGDMat3;
 	typedef CG::CGMat4<CGDScalar> CGDMat4;
-	typedef CG::ScalarOp<CGDScalar> CGDScalarUtil;
+	typedef CG::CGScalarOp<CGDScalar> CGDScalarUtil;
+
+	static inline CGScalar GetGeometryEpsilon()
+	{
+		return 0.00001f;
+	}
 
 	// TODO : do more progresses Collision Contact Info
 	struct CGContact

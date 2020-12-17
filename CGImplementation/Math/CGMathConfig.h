@@ -13,10 +13,11 @@
 namespace CG
 {
 	template <typename Scalar>
-	struct ScalarOp {};
+	struct CGScalarOp {};
 
 	template<>
-	struct ScalarOp<float> {
+	struct CGScalarOp<float> 
+	{
 		static float TwoTimesPi() { return 6.283185307179586232f; }
 		static float Epsilon() { return FLT_EPSILON; }
 		static float Max() { return FLT_MAX; }
@@ -42,7 +43,8 @@ namespace CG
 	};
 
 	template<>
-	struct ScalarOp<double> {
+	struct CGScalarOp<double> 
+	{
 		static double TwoTimesPi() { return 6.283185307179586232; }
 		static double Epsilon() { return DBL_EPSILON; }
 		static double Max() { return DBL_MAX; }

@@ -1,6 +1,11 @@
 #include <CGPrecompiled.h>
 #include <Geometry/CGCollisionFunction.h>
 
+#include <Geometry/CGSphere.h>
+#include <Geometry/CGRay.h>
+#include <Geometry/CGLineSegment.h>
+#include <Geometry/CGPlane.h>
+
 using namespace CG;
 
 bool CG::Intersect(const CGSphere& a, const CGSphere& b)
@@ -79,7 +84,79 @@ bool CG::Intersect(const CGSphere& sphere, const CGRay& ray)
 
 bool CG::Intersect(const CGSphere& sphere, const CGLineSegment& segment)
 {
+	// TODO
 	CGVec3 segmentDir = segment.GetDirection();
 
 	return true;
+}
+
+bool CG::Intersect(const CGPlane& p, const CGRay& ray)
+{
+	CGVec3 rayDir = ray.GetDirection();
+	CGVec3 maxTarget = ray.m_source + rayDir * ray.m_maxFraction;
+
+	CGScalar t = (p.m_distance - Dot(p.m_normal, ray.m_source)) / Dot(p.m_normal, maxTarget);
+
+	if (t >= CGScalar(0.f) && t <= CGScalar(1.f))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+// P : Dot(p.m_normal, X) = p.m_distance
+// Ray X = A + t * rayDir
+// t = (p.m_distance - Dot(p.m_normal, A)) / Dot(p.m_normal, rayDir)
+bool CG::IntersectTruePlane(const CGPlane& p, const CGRay& ray)
+{
+	CGVec3 rayDir = ray.GetDirection();
+	CGScalar rate = Dot(p.m_normal, rayDir);
+
+	if (rate >= CGScalar(0.f))
+	{
+		return false;
+	}
+	else
+	{
+		CGScalar t = (p.m_distance - Dot(p.m_normal, ray.m_source)) / rate;
+
+		if (t >= CGScalar(0.f) && t <= ray.m_maxFraction)
+		{
+			return true;
+		}
+
+		return false;
+	}
+}
+
+bool CG::IntersectTruePlane(CGVec3 planeA, CGVec3 planeB, CGVec3 planeC, const CGRay& ray)
+{
+	CGPlane p;
+	p.m_normal = Cross(planeB - planeA, planeC - planeA);
+	p.m_distance = Dot(p.m_normal, planeA);
+	return Intersect(p, ray);
+}
+
+// Real Time Collision Detection Chapter 5.3.1  Intersecting Segment Agains Plane
+bool CG::Intersect(const CGPlane& p, const CGLineSegment& segment)
+{
+	CGScalar t = (p.m_distance - Dot(p.m_normal, segment.m_source)) / Dot(p.m_normal, (segment.m_target - segment.m_source));
+
+	// If t in [0..1] compute and return intersection point
+	if (t >= CGScalar(0.f) && t <= CGScalar(1.f)) 
+	{
+		// A + t * (B - A) is the intersection point
+		return true;
+	}
+	// Else t is +INF, -INF, NaN, or not in[0..1] so no intersection
+	return false;
+}
+
+bool CG::Intersect(CGVec3 planeA, CGVec3 planeB, CGVec3 planeC, const CGLineSegment& segment)
+{
+	CGPlane p;
+	p.m_normal = Cross(planeB - planeA, planeC - planeA);
+	p.m_distance = Dot(p.m_normal, planeA);
+	return Intersect(p, segment);
 }

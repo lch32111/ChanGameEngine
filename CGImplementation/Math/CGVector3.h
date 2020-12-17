@@ -204,7 +204,7 @@ namespace CG
 	template <typename Scalar>
 	inline Scalar Length(const CGVector3<Scalar>& v)
 	{
-		return ScalarOp<Scalar>::Sqrt(v.m_value[0] * v.m_value[0] + v.m_value[1] * v.m_value[1] + v.m_value[2] * v.m_value[2]);
+		return CGScalarOp<Scalar>::Sqrt(v.m_value[0] * v.m_value[0] + v.m_value[1] * v.m_value[1] + v.m_value[2] * v.m_value[2]);
 	}
 
 	template<typename Scalar>
@@ -218,6 +218,18 @@ namespace CG
 	{
 		Scalar length = Length(v);
 		CG_DEBUG_BREAK(length);
+		return v * (static_cast<Scalar>(1.0) / length);
+	}
+
+	template <typename Scalar>
+	inline CGVector3<Scalar> SafeNormalize(const CGVector3<Scalar>& v)
+	{
+		Scalar length = Length(v);
+		if (CGScalarOp<Scalar>::Abs(length) < CGScalarOp<Scalar>::Epsilon())
+		{
+			return CGVector3<Scalar>(Scalar(1.0), Scalar(0.0), Scalar(1.0));
+		}
+		
 		return v * (static_cast<Scalar>(1.0) / length);
 	}
 }

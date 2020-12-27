@@ -5,6 +5,7 @@
 #include <Geometry/CGRay.h>
 #include <Geometry/CGLineSegment.h>
 #include <Geometry/CGPlane.h>
+#include <Geometry/CGTriangle.h>
 
 using namespace CG;
 
@@ -51,16 +52,14 @@ bool CG::Intersect(const CGSphere& a, const CGSphere& b, CGContact& c)
 bool CG::Intersect(const CGSphere& sphere, const CGRay& ray)
 {
 	// Translate Ray into the sphere local space;
-	CGRay tRay;
-	tRay.m_source = ray.m_source - sphere.m_pos;
-	tRay.m_target = ray.m_target - sphere.m_pos;
+	CGRay tRay(ray.GetSource() - sphere.m_pos, ray.GetTarget() - sphere.m_pos, ray.GetMaxFraction());
 
 	// Then Calculate the early exit for ray-sphere intersection
-	CGScalar sourceSqLength = Dot(tRay.m_source, tRay.m_source);
-	CGVec3 r = tRay.m_target - tRay.m_source;	
+	CGScalar sourceSqLength = Dot(tRay.GetSource(), tRay.GetSource());
+	CGVec3 r = tRay.GetTarget() - tRay.GetSource();	
 	CGScalar rSqLength = Dot(r, r);
 
-	CGScalar projectedLength = Dot(tRay.m_source, r);
+	CGScalar projectedLength = Dot(tRay.GetSource(), r);
 
 	CGScalar EarlyExit = projectedLength * projectedLength -
 		rSqLength * (sourceSqLength - sphere.m_radius * sphere.m_radius);
@@ -93,9 +92,9 @@ bool CG::Intersect(const CGSphere& sphere, const CGLineSegment& segment)
 bool CG::Intersect(const CGPlane& p, const CGRay& ray)
 {
 	CGVec3 rayDir = ray.GetDirection();
-	CGVec3 maxTarget = ray.m_source + rayDir * ray.m_maxFraction;
+	CGVec3 maxTarget = ray.GetSource() + rayDir * ray.GetMaxFraction();
 
-	CGScalar t = (p.m_distance - Dot(p.m_normal, ray.m_source)) / Dot(p.m_normal, maxTarget);
+	CGScalar t = (p.m_distance - Dot(p.m_normal, ray.GetSource())) / Dot(p.m_normal, maxTarget);
 
 	if (t >= CGScalar(0.f) && t <= CGScalar(1.f))
 	{
@@ -119,9 +118,9 @@ bool CG::IntersectTruePlane(const CGPlane& p, const CGRay& ray)
 	}
 	else
 	{
-		CGScalar t = (p.m_distance - Dot(p.m_normal, ray.m_source)) / rate;
+		CGScalar t = (p.m_distance - Dot(p.m_normal, ray.GetSource())) / rate;
 
-		if (t >= CGScalar(0.f) && t <= ray.m_maxFraction)
+		if (t >= CGScalar(0.f) && t <= ray.GetMaxFraction())
 		{
 			return true;
 		}
@@ -159,4 +158,38 @@ bool CG::Intersect(CGVec3 planeA, CGVec3 planeB, CGVec3 planeC, const CGLineSegm
 	p.m_normal = Cross(planeB - planeA, planeC - planeA);
 	p.m_distance = Dot(p.m_normal, planeA);
 	return Intersect(p, segment);
+}
+
+// Assume the triangle 0, 1, 2 is counter clockwise
+bool CG::IntersectTruePlane(const CGTriangle& tri, const CGRay& ray)
+{
+	constexpr CGScalar triIntersectEps = CGScalar(1e-6);
+	CGVec3 rayDir = ray.GetDirection();
+
+	CGVec3 e1 = tri[1] - tri[0];
+	CGVec3 e2 = tri[2] - tri[0];
+
+	CGVec3 n = Normalize(Cross(e1, e2));
+
+	CGVec3 q = Cross(rayDir, e2);
+	CGScalar a = Dot(e1, q);
+
+	// left condition : Ray direction from false plane
+	// right condition : Ray is parallel for the plane
+	if ((Dot(n, rayDir) >= 0) || (CGScalarUtil::Abs(a) <= triIntersectEps))
+		return false;
+
+	CGVec3 s = (ray.GetSource() - tri[0]) / a;
+	CGVec3 r = Cross(s, e1);
+
+	CGScalar b[3];
+	b[0] = Dot(s, q);
+	b[1] = Dot(r, rayDir);
+	b[2] = CGScalar(1.0) - b[0] - b[1];
+
+	if ((b[0] < CGScalar(0.0)) || (b[1] < CGScalar(0.0)) || (b[2] < CGScalar(0.0)))
+		return false;
+
+	CGScalar t = Dot(e2, r);
+	return t >= CGScalar(0.0);
 }

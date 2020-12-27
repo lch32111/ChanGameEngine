@@ -9,6 +9,7 @@ namespace CG
 	class CGRay;
 	class CGLineSegment;
 	class CGPlane;
+	class CGTriangle;
 	struct CGContact;
 
 	bool Intersect(const CGSphere& a, const CGSphere& b);
@@ -18,15 +19,12 @@ namespace CG
 
 	// Intersect plane with ray for both of the true/false plane
 	bool Intersect(const CGPlane& p, const CGRay& ray);
-
-	// only for the true plane
+	bool Intersect(const CGPlane& p, const CGLineSegment& segment);
+	bool Intersect(CGVec3 planeA, CGVec3 planeB, CGVec3 planeC, const CGLineSegment& segment); // Intersect LineSegment against plane of triangle ABC.
 	bool IntersectTruePlane(const CGPlane& p, const CGRay& ray);
 	bool IntersectTruePlane(CGVec3 planeA, CGVec3 planeB, CGVec3 planeC, const CGRay& ray);
-
-	bool Intersect(const CGPlane& p, const CGLineSegment& segment);
-
-	// Intersect LineSegment against plane of triangle ABC.
-	bool Intersect(CGVec3 planeA, CGVec3 planeB, CGVec3 planeC, const CGLineSegment& segment);
+	
+	bool IntersectTruePlane(const CGTriangle& t, const CGRay& ray);
 }
 
 #endif

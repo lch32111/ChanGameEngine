@@ -183,10 +183,7 @@ CG::CGVector3<float> CG::RayTracerDemo::ComputeLight(CGVector3<float> pos, CGVec
 
 const CG::Surfel* CG::RayTracerDemo::FindIntersection(CGVector3<float> pos, CGVector3<float> normalizedRay)
 {
-	CGRay ray;
-	ray.m_source = pos;
-	ray.m_target = pos + normalizedRay;
-	ray.m_maxFraction = m_camera.m_far * 2.f;
+	CGRay ray(pos, pos + normalizedRay, m_camera.m_far * 2.f);
 
 	bool find_surfel = false;
 	for (size_t i = 0; i < m_primitives.size(); ++i)

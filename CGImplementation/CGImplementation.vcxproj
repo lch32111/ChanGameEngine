@@ -220,6 +220,7 @@
     <ClInclude Include="Geometry\CGRay.h" />
     <ClInclude Include="Geometry\CGShape.h" />
     <ClInclude Include="Geometry\CGSphere.h" />
+    <ClInclude Include="Geometry\CGTriangle.h" />
     <ClInclude Include="Graphics\CGBloomEffect.h" />
     <ClInclude Include="CGErrorLogger.h" />
     <ClInclude Include="CG_Application.h" />

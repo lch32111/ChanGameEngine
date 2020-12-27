@@ -136,13 +136,13 @@ namespace CG
 	};
 
 	template <typename Scalar>
-	inline CGVector3<Scalar> operator*(const CGVector3<Scalar>& v, const Scalar& scalar)
+	inline CGVector3<Scalar> operator*(const CGVector3<Scalar>& v, const Scalar scalar)
 	{
 		return CGVector3<Scalar>(v.m_value[0] * scalar, v.m_value[1] * scalar, v.m_value[2] * scalar);
 	}
 
 	template <typename Scalar>
-	inline CGVector3<Scalar> operator*(const Scalar& scalar, const CGVector3<Scalar>& v)
+	inline CGVector3<Scalar> operator*(const Scalar scalar, const CGVector3<Scalar>& v)
 	{
 		return CGVector3<Scalar>(scalar * v.m_value[0], scalar * v.m_value[1], scalar * v.m_value[2]);
 	}
@@ -154,9 +154,21 @@ namespace CG
 	}
 
 	template <typename Scalar>
+	inline CGVector3<Scalar> operator+(const CGVector3<Scalar>& a, const Scalar b)
+	{
+		return CGVector3<Scalar>(a.m_value[0] + b, a.m_value[1] + b, a.m_value[2] + b);
+	}
+
+	template <typename Scalar>
 	inline CGVector3<Scalar> operator-(const CGVector3<Scalar>& a, const CGVector3<Scalar>& b)
 	{
 		return CGVector3<Scalar>(a.m_value[0] - b.m_value[0], a.m_value[1] - b.m_value[1], a.m_value[2] - b.m_value[2]);
+	}
+
+	template <typename Scalar>
+	inline CGVector3<Scalar> operator-(const CGVector3<Scalar>& a, const Scalar b)
+	{
+		return CGVector3<Scalar>(a.m_value[0] - b, a.m_value[1] - b, a.m_value[2] - b);
 	}
 
 	template <typename Scalar>
@@ -169,6 +181,12 @@ namespace CG
 	inline CGVector3<Scalar> operator/(const CGVector3<Scalar>& a, const CGVector3<Scalar>& b)
 	{
 		return CGVector3<Scalar>(a.m_value[0] / b.m_value[0], a.m_value[1] / b.m_value[1], a.m_value[2] / b.m_value[2]);
+	}
+
+	template <typename Scalar>
+	inline CGVector3<Scalar> operator/(const CGVector3<Scalar>& a, const Scalar b)
+	{
+		return CGVector3<Scalar>(a.m_value[0] / b, a.m_value[1] / b, a.m_value[2] / b);
 	}
 
 	template <typename Scalar>

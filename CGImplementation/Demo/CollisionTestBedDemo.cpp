@@ -328,9 +328,7 @@ void CG::CollisionTestBed::mouseButton(GLFWwindow * app_window,
 			glm::vec3 rayTo = GetRayTo((int)x, (int)y, &camera, screen_width, screen_height);
 			rayTo /= 10.f;
 
-			CGRay r;
-			r.m_source = CGVec3(rayFrom.x, rayFrom.y, rayFrom.z);
-			r.m_target = CGVec3(rayTo.x, rayTo.y, rayTo.z);
+			CGRay r(CGVec3(rayFrom.x, rayFrom.y, rayFrom.z), CGVec3(rayTo.x, rayTo.y, rayTo.z), 10000.f) ;
 
 			isRaySphereCollided = Intersect(aSphere, r);
 		}

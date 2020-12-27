@@ -223,7 +223,7 @@ namespace CG
 	inline CGVector4<Scalar> Normalize(const CGVector4<Scalar>& v)
 	{
 		Scalar length = Length(v);
-		CG_DEBUG_BREAK(length);
+		CG_DEBUG_ASSERT(length);
 		return v * (static_cast<Scalar>(1.0) / length);
 	}
 }

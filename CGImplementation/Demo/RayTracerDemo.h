@@ -73,6 +73,7 @@ namespace CG
 		template<typename T, bool is_base_of = std::is_base_of<CGConvex, T>::value>
 		T& GetConvex()
 		{
+			CG_DEBUG_ASSERT(m_shape_type != NONE);
 			return *((T*)m_convex);
 		}
 

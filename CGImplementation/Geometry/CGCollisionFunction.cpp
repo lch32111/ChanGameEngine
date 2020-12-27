@@ -160,36 +160,58 @@ bool CG::Intersect(CGVec3 planeA, CGVec3 planeB, CGVec3 planeC, const CGLineSegm
 	return Intersect(p, segment);
 }
 
-// Assume the triangle 0, 1, 2 is counter clockwise
+/* Real Time Collision Detection Chapter 5.3.6 Intersecting Ray or Segment Against Triangle
+   Assume the triangle 0, 1, 2 is counter clockwise
+   T(v,w) = A + v(B - A) + w(C - A)
+   R(t) = P + t(Q - P)
+        = P + kZ. 0 <= k <= max_fraction -> 0 <= k / max_fraction == t <= 1
+
+   A + v(B - A) + w(C - A) = P + kZ
+   [ -Z   (B - A)  (C - A) ] [ k v w]^T = [ (P - A) ]
+
+   n = (B - A) X (C - A)
+   d = dot(-Z, n)
+   e = -Z X (P - A)
+
+   k = dot((P - A), n) / d
+   v = dot((C - A), e) / d
+   w = dot(-(B - A), e) / d
+   u = 1.0 - v - w
+*/		
 bool CG::IntersectTruePlane(const CGTriangle& tri, const CGRay& ray)
 {
-	constexpr CGScalar triIntersectEps = CGScalar(1e-6);
-	CGVec3 rayDir = ray.GetDirection();
+	CGVec3 neg_ray_dir = ray.GetDirection() * CGScalar(-1.0);
 
-	CGVec3 e1 = tri[1] - tri[0];
-	CGVec3 e2 = tri[2] - tri[0];
+	CGVec3 ab = tri[1] - tri[0];
+	CGVec3 ac = tri[2] - tri[0];
 
-	CGVec3 n = Normalize(Cross(e1, e2));
-
-	CGVec3 q = Cross(rayDir, e2);
-	CGScalar a = Dot(e1, q);
-
-	// left condition : Ray direction from false plane
-	// right condition : Ray is parallel for the plane
-	if ((Dot(n, rayDir) >= 0) || (CGScalarUtil::Abs(a) <= triIntersectEps))
+	CGVec3 n = Cross(ab, ac);
+	CGScalar d = Dot(neg_ray_dir, n);
+	// ray from false plane
+	if (d <= 0)
 		return false;
 
-	CGVec3 s = (ray.GetSource() - tri[0]) / a;
-	CGVec3 r = Cross(s, e1);
+	CGVec3 a_to_ray_source = ray.GetSource() - tri[0];
+	
+	CGScalar k = Dot(a_to_ray_source, n);
 
-	CGScalar b[3];
-	b[0] = Dot(s, q);
-	b[1] = Dot(r, rayDir);
-	b[2] = CGScalar(1.0) - b[0] - b[1];
-
-	if ((b[0] < CGScalar(0.0)) || (b[1] < CGScalar(0.0)) || (b[2] < CGScalar(0.0)))
+	if (k < CGScalar(0.0) || k > ray.GetMaxFraction() * d) 
 		return false;
 
-	CGScalar t = Dot(e2, r);
-	return t >= CGScalar(0.0);
+	CGVec3 e = Cross(neg_ray_dir, a_to_ray_source);
+	CGScalar v = Dot(ac, e);
+	if (v < CGScalar(0.0) || v > d) return false;
+
+	CGScalar w = -Dot(ab, e);
+	if (w < CGScalar(0.0) || v + w > d) return false;
+
+	/*
+	* Code for getting solutions
+	CGScalar ood = CGSCalar(1.0) / d;
+	k *= ood;
+	v *= ood;
+	w *= ood;
+	CGScalar u = CGScalar(1.0) - v - w;
+	*/
+	return true;
 }

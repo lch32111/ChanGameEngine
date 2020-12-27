@@ -37,6 +37,12 @@ namespace CG
 		void shadowFirstRender();
 
 		unsigned getMaxInstanceNumb();
+
+		const std::vector<CGModelMesh>& GetMeshes() const
+		{
+			return m_meshes;
+		}
+
 	private:
 		/* Model Data */
 		std::vector<CGModelMesh> m_meshes;

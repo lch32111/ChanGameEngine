@@ -215,3 +215,36 @@ bool CG::IntersectTruePlane(const CGTriangle& tri, const CGRay& ray)
 	*/
 	return true;
 }
+
+bool CG::IntersectTruePlane(const CGTriangle& tri, const CGRay& ray, CGScalar& t)
+{
+	CGVec3 neg_ray_dir = ray.GetDirection() * CGScalar(-1.0);
+
+	CGVec3 ab = tri[1] - tri[0];
+	CGVec3 ac = tri[2] - tri[0];
+
+	CGVec3 n = Cross(ab, ac);
+	CGScalar d = Dot(neg_ray_dir, n);
+	// ray from false plane
+	if (d <= 0)
+		return false;
+
+	CGVec3 a_to_ray_source = ray.GetSource() - tri[0];
+
+	CGScalar k = Dot(a_to_ray_source, n);
+
+	if (k < CGScalar(0.0) || k > ray.GetMaxFraction() * d)
+		return false;
+
+	CGVec3 e = Cross(neg_ray_dir, a_to_ray_source);
+	CGScalar v = Dot(ac, e);
+	if (v < CGScalar(0.0) || v > d) return false;
+
+	CGScalar w = -Dot(ab, e);
+	if (w < CGScalar(0.0) || v + w > d) return false;
+
+	CGScalar ood = CGScalar(1.0) / d;
+	t = k * ood;
+
+	return true;
+}

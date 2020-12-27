@@ -6,7 +6,9 @@
 #include <Math/CGMat4.h>
 #include <Geometry/CGCollisionFunction.h>
 #include <Geometry/CGRay.h>
+
 #include <Graphics/GLPrimitiveUtil.h>
+#include <Graphics/CGModel.h>
 
 
 
@@ -19,14 +21,15 @@ void CG::RayTracerDemo::OnInitialize()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
-	m_image_width = 256;
-	m_image_height = 256;
+	m_asset_manager.assetInit();
+
+	m_image_width = 32;
+	m_image_height = 32;
 	m_image_buffer = new CGVector3<float>[m_image_width * m_image_height];
 
 	InitializeScene();
 	RayTrace();
-
-	m_asset_manager.assetInit();
+	
 	m_simple_shader = m_asset_manager.getShader(SHADER_SIMPLE_RENDER);
 	m_simple_shader->use();
 	m_simple_shader->setInt("texture1", 0);
@@ -54,55 +57,6 @@ void CG::RayTracerDemo::OnFinalize()
 void CG::RayTracerDemo::Update(float deltaTime, float lastFrame)
 {
 	bool change = false;
-
-	if (ImGui::DragFloat("Sphere Radius", &(m_primitives[0].GetConvex<CGSphere>().m_radius), 0.001f))
-	{
-		change = true;
-	}
-
-	if (ImGui::DragFloat("Sphere Z", &(m_primitives[0].GetConvex<CGSphere>().m_pos[2]), 0.001f))
-	{
-		change = true;
-	}
-
-	if (ImGui::DragFloat("Plane Distance", &(m_primitives[1].GetConvex<CGPlane>().m_distance), 0.001f))
-	{
-		change = true;
-	}
-
-	if (ImGui::InputFloat("Plane X", &(m_primitives[1].GetConvex<CGPlane>().m_normal[0]), 0.001f))
-	{
-		m_primitives[1].GetConvex<CGPlane>().m_normal = SafeNormalize(m_primitives[1].GetConvex<CGPlane>().m_normal);
-		change = true;
-	}
-
-	if (ImGui::InputFloat("Plane Y", &(m_primitives[1].GetConvex<CGPlane>().m_normal[1]), 0.001f))
-	{
-		m_primitives[1].GetConvex<CGPlane>().m_normal = SafeNormalize(m_primitives[1].GetConvex<CGPlane>().m_normal);
-		change = true;
-	}
-
-	if (ImGui::InputFloat("Plane Z", &(m_primitives[1].GetConvex<CGPlane>().m_normal[2]), 0.001f))
-	{
-		m_primitives[1].GetConvex<CGPlane>().m_normal = SafeNormalize(m_primitives[1].GetConvex<CGPlane>().m_normal);
-		change = true;
-	}
-
-	if (ImGui::DragFloat3("Triangle 0", &(m_primitives[2].GetConvex<CGTriangle>().m_vertices[0].m_value[0]), 0.01f))
-	{
-		change = true;
-	}
-
-	if (ImGui::DragFloat3("Triangle 1", &(m_primitives[2].GetConvex<CGTriangle>().m_vertices[1].m_value[0]), 0.01f))
-	{
-		change = true;
-	}
-
-	if (ImGui::DragFloat3("Triangle 2", &(m_primitives[2].GetConvex<CGTriangle>().m_vertices[2].m_value[0]), 0.01f))
-	{
-		change = true;
-	}
-
 	if (change == true)
 	{
 		RayTrace();
@@ -151,26 +105,65 @@ void CG::RayTracerDemo::ResizeWindowCallback(int width, int height)
 
 void CG::RayTracerDemo::InitializeScene()
 {
+	double startTime = glfwGetTime();
+
 	m_camera.m_near = 0.01f;
 	m_camera.m_far = 500.f;
 	m_camera.m_fov_in_radian = CGScalarOp<float>::Radian(45.f);
 
-	m_primitives.resize(3);
-	m_primitives[0].Initialize(Primitive::SPHERE);
-	CGSphere& sphere = m_primitives[0].GetConvex<CGSphere>();
-	sphere.m_pos = CGVec3(0.f, 0.f, -1.f);
-	sphere.m_radius = 0.1f;
+	float scale = 0.001f;
 
-	m_primitives[1].Initialize(Primitive::PLANE);
-	CGPlane& p = m_primitives[1].GetConvex<CGPlane>();
-	p.m_normal = CGVec3(0.f, 1.f, 0.f);
-	p.m_distance = -10.f;
+	CGMat4<float> transform(1.f);
+	transform[0][0] = scale;
+	transform[1][1] = scale;
+	transform[2][2] = scale;
+	transform[3][0] = 0.f;
+	transform[3][1] = -0.05f;
+	transform[3][2] = -0.2f;
 
-	m_primitives[2].Initialize(Primitive::TRIANGLE);
-	CGTriangle& t = m_primitives[2].GetConvex<CGTriangle>();
-	t.m_vertices[0] = CGVec3(0.5f, 0.f, -1.f);
-	t.m_vertices[1] = CGVec3(0.25f, 0.5f, -1.f);
-	t.m_vertices[2] = CGVec3(0.f, 0.f, -1.f);
+	CGModel* teapot_model = m_asset_manager.getModelData(MODEL_TEAPOT, 1);
+
+	const std::vector<CGModelMesh>& teapot_meshes = teapot_model->GetMeshes();
+
+	for (size_t i = 0; i < teapot_meshes.size(); ++i)
+	{
+		const CGModelMesh& mesh = teapot_meshes[i];
+
+		CG_DEBUG_ASSERT((mesh.m_indices.size() % 3) == 0);
+
+		m_primitives.reserve(m_primitives.size() + mesh.m_indices.size() / 3);
+
+		for (size_t j = 0; j < mesh.m_indices.size(); j += 3)
+		{
+			unsigned i0 = mesh.m_indices[j];
+			unsigned i1 = mesh.m_indices[j + 1];
+			unsigned i2 = mesh.m_indices[j + 2];
+
+			const Vertex& v0 = mesh.m_vertices[i0];
+			const Vertex& v1 = mesh.m_vertices[i1];
+			const Vertex& v2 = mesh.m_vertices[i2];
+
+			m_primitives.push_back(Primitive());
+			Primitive& p = m_primitives.back();
+			p.Initialize(Primitive::TRIANGLE);
+
+			CGTriangle& t = p.GetConvex<CGTriangle>();
+
+			CGVector4<float> tr = transform * CGVec4(v0.Position[0], v0.Position[1], v0.Position[2], 1.f);
+			t.m_vertices[0] = CGVec3{ tr[0], tr[1], tr[2] };
+
+			tr = transform * CGVec4(v1.Position[0], v1.Position[1], v1.Position[2], 1.f);
+			t.m_vertices[1] = CGVec3{ tr[0], tr[1], tr[2] };
+
+			tr = transform * CGVec4(v2.Position[0], v2.Position[1], v2.Position[2], 1.f);
+			t.m_vertices[2] = CGVec3{ tr[0], tr[1], tr[2] };
+		}
+	}
+
+	double endTime = glfwGetTime();
+
+	double duration = endTime - startTime;
+	printf("Initliaze Scene ms %lf\n", (duration / 1000.0));
 }
 
 void CG::RayTracerDemo::FinalizeScene()
@@ -221,39 +214,34 @@ const CG::Surfel* CG::RayTracerDemo::FindIntersection(CGVector3<float> pos, CGVe
 	CGRay ray(pos, pos + normalizedRay, m_camera.m_far * 2.f);
 
 	bool find_surfel = false;
+	float min_t = FLT_MAX;
 	for (size_t i = 0; i < m_primitives.size(); ++i)
 	{
 		switch (m_primitives[i].m_shape_type)
 		{
-		case Primitive::SPHERE:
-		{
-			if (Intersect(m_primitives[i].GetConvex<CGSphere>(), ray))
-			{
-				find_surfel = true;
-				Surfel sf;
-				m_surfels.push_back(sf);
-			}
-			break;
-		}
-		case Primitive::PLANE:
-		{
-			if (IntersectTruePlane(m_primitives[i].GetConvex<CGPlane>(), ray))
-			{
-				find_surfel = true;
-				Surfel sf;
-				m_surfels.push_back(sf);
-			}
-			break;
-		}
 		case Primitive::TRIANGLE:
 		{
-			if (IntersectTruePlane(m_primitives[i].GetConvex<CGTriangle>(), ray))
+			CGScalar t;
+
+			if (IntersectTruePlane(m_primitives[i].GetConvex<CGTriangle>(), ray, t))
 			{
-				find_surfel = true;
-				Surfel sf;
-				m_surfels.push_back(sf);
+				if (t < min_t)
+				{
+					min_t = t;
+
+					if (find_surfel == false)
+					{
+						Surfel sf;
+						m_surfels.push_back(sf);
+						find_surfel = true;
+					}
+				}
 			}
 			break;
+		}
+		default:
+		{
+			CG_DEBUG_ASSERT(false);
 		}
 		}
 	}

@@ -186,6 +186,7 @@ void CG::CGAssetManager::assetInit()
 	m_models[MODEL_BUNNY] = CGModel("ResourceFolder/ModelFolder/bunny/bunny.obj");
 	m_models[MODEL_HOUSE_OBJ] = CGModel("ResourceFolder/ModelFolder/house_obj/house_obj.obj");
 	m_models[MODEL_OLD_HOUSE] = CGModel("ResourceFolder/ModelFolder/old_house/house_01.obj");
+	m_models[MODEL_TEAPOT] = CGModel("ResourceFolder/ModelFolder/teapot/teapot.obj");
 }
 
 void CG::CGAssetManager::destroy()

@@ -258,6 +258,17 @@ namespace CG
 	}
 
 	template<typename Scalar>
+	inline CGVector4<Scalar> operator*(const CGMat4<Scalar>& m, const CGVector4<Scalar>& v)
+	{
+		CGVector4<Scalar> r;
+		r[0] = m[0][0] * v[0] + m[1][0] * v[1] + m[2][0] * v[2] + m[3][0] * v[3];
+		r[1] = m[0][1] * v[0] + m[1][1] * v[1] + m[2][1] * v[2] + m[3][1] * v[3];
+		r[2] = m[0][2] * v[0] + m[1][2] * v[1] + m[2][2] * v[2] + m[3][2] * v[3];
+		r[3] = m[0][3] * v[0] + m[1][3] * v[1] + m[2][3] * v[2] + m[3][3] * v[3];
+		return r;
+	}
+
+	template<typename Scalar>
 	inline CGMat4<Scalar> operator*(const CGMat4<Scalar>& a, const CGMat4<Scalar>& b)
 	{
 		CGMat4<Scalar> r;

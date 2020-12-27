@@ -9,6 +9,7 @@ namespace CG
 	{
 	public:
 		CGConvex() : CGShape() { }
+		virtual ~CGConvex() {}
 	};
 }
 

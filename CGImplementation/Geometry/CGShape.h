@@ -7,6 +7,8 @@ namespace CG
 	{
 	public:
 		CGShape() { }
+
+		virtual ~CGShape() {}
 	};
 }
 

@@ -23,7 +23,7 @@ void CG::RayTracerDemo::OnInitialize()
 	m_image_height = 256;
 	m_image_buffer = new CGVector3<float>[m_image_width * m_image_height];
 
-	PrepareScene();
+	InitializeScene();
 	RayTrace();
 
 	m_asset_manager.assetInit();
@@ -43,7 +43,11 @@ void CG::RayTracerDemo::OnInitialize()
 void CG::RayTracerDemo::OnFinalize()
 {
 	glDeleteTextures(1, &m_gl_image_tex);
+	
 	m_asset_manager.destroy();
+
+	FinalizeScene();
+
 	delete[] m_image_buffer;
 }
 
@@ -51,50 +55,50 @@ void CG::RayTracerDemo::Update(float deltaTime, float lastFrame)
 {
 	bool change = false;
 
-	if (ImGui::DragFloat("Sphere Radius", &(m_primitives[0].m_sphere.m_radius), 0.001f))
+	if (ImGui::DragFloat("Sphere Radius", &(m_primitives[0].GetConvex<CGSphere>().m_radius), 0.001f))
 	{
 		change = true;
 	}
 
-	if (ImGui::DragFloat("Sphere Z", &(m_primitives[0].m_sphere.m_pos[2]), 0.001f))
+	if (ImGui::DragFloat("Sphere Z", &(m_primitives[0].GetConvex<CGSphere>().m_pos[2]), 0.001f))
 	{
 		change = true;
 	}
 
-	if (ImGui::DragFloat("Plane Distance", &(m_primitives[1].m_plane.m_distance), 0.001f))
+	if (ImGui::DragFloat("Plane Distance", &(m_primitives[1].GetConvex<CGPlane>().m_distance), 0.001f))
 	{
 		change = true;
 	}
 
-	if (ImGui::InputFloat("Plane X", &(m_primitives[1].m_plane.m_normal[0]), 0.001f))
+	if (ImGui::InputFloat("Plane X", &(m_primitives[1].GetConvex<CGPlane>().m_normal[0]), 0.001f))
 	{
-		m_primitives[1].m_plane.m_normal = SafeNormalize(m_primitives[1].m_plane.m_normal);
+		m_primitives[1].GetConvex<CGPlane>().m_normal = SafeNormalize(m_primitives[1].GetConvex<CGPlane>().m_normal);
 		change = true;
 	}
 
-	if (ImGui::InputFloat("Plane Y", &(m_primitives[1].m_plane.m_normal[1]), 0.001f))
+	if (ImGui::InputFloat("Plane Y", &(m_primitives[1].GetConvex<CGPlane>().m_normal[1]), 0.001f))
 	{
-		m_primitives[1].m_plane.m_normal = SafeNormalize(m_primitives[1].m_plane.m_normal);
+		m_primitives[1].GetConvex<CGPlane>().m_normal = SafeNormalize(m_primitives[1].GetConvex<CGPlane>().m_normal);
 		change = true;
 	}
 
-	if (ImGui::InputFloat("Plane Z", &(m_primitives[1].m_plane.m_normal[2]), 0.001f))
+	if (ImGui::InputFloat("Plane Z", &(m_primitives[1].GetConvex<CGPlane>().m_normal[2]), 0.001f))
 	{
-		m_primitives[1].m_plane.m_normal = SafeNormalize(m_primitives[1].m_plane.m_normal);
+		m_primitives[1].GetConvex<CGPlane>().m_normal = SafeNormalize(m_primitives[1].GetConvex<CGPlane>().m_normal);
 		change = true;
 	}
 
-	if (ImGui::DragFloat3("Triangle 0", &(m_primitives[2].m_triangle.m_vertices[0].m_value[0]), 0.01f))
-	{
-		change = true;
-	}
-
-	if (ImGui::DragFloat3("Triangle 1", &(m_primitives[2].m_triangle.m_vertices[1].m_value[0]), 0.01f))
+	if (ImGui::DragFloat3("Triangle 0", &(m_primitives[2].GetConvex<CGTriangle>().m_vertices[0].m_value[0]), 0.01f))
 	{
 		change = true;
 	}
 
-	if (ImGui::DragFloat3("Triangle 2", &(m_primitives[2].m_triangle.m_vertices[2].m_value[0]), 0.01f))
+	if (ImGui::DragFloat3("Triangle 1", &(m_primitives[2].GetConvex<CGTriangle>().m_vertices[1].m_value[0]), 0.01f))
+	{
+		change = true;
+	}
+
+	if (ImGui::DragFloat3("Triangle 2", &(m_primitives[2].GetConvex<CGTriangle>().m_vertices[2].m_value[0]), 0.01f))
 	{
 		change = true;
 	}
@@ -145,25 +149,36 @@ void CG::RayTracerDemo::ResizeWindowCallback(int width, int height)
 }
 
 
-void CG::RayTracerDemo::PrepareScene()
+void CG::RayTracerDemo::InitializeScene()
 {
 	m_camera.m_near = 0.01f;
 	m_camera.m_far = 500.f;
 	m_camera.m_fov_in_radian = CGScalarOp<float>::Radian(45.f);
 
 	m_primitives.resize(3);
-	m_primitives[0].m_sphere.m_pos = CGVec3(0.f, 0.f, -1.f);
-	m_primitives[0].m_sphere.m_radius = 0.1f;
-	m_primitives[0].m_shape_type = Primitive::SPHERE;
+	m_primitives[0].Initialize(Primitive::SPHERE);
+	CGSphere& sphere = m_primitives[0].GetConvex<CGSphere>();
+	sphere.m_pos = CGVec3(0.f, 0.f, -1.f);
+	sphere.m_radius = 0.1f;
 
-	m_primitives[1].m_plane.m_normal = CGVec3(0.f, 1.f, 0.f);
-	m_primitives[1].m_plane.m_distance = -10.f;
-	m_primitives[1].m_shape_type = Primitive::PLANE;
+	m_primitives[1].Initialize(Primitive::PLANE);
+	CGPlane& p = m_primitives[1].GetConvex<CGPlane>();
+	p.m_normal = CGVec3(0.f, 1.f, 0.f);
+	p.m_distance = -10.f;
 
-	m_primitives[2].m_triangle.m_vertices[0] = CGVec3(0.5f, 0.f, -1.f);
-	m_primitives[2].m_triangle.m_vertices[1] = CGVec3(0.25f, 0.5f, -1.f);
-	m_primitives[2].m_triangle.m_vertices[2] = CGVec3(0.f, 0.f, -1.f);
-	m_primitives[2].m_shape_type = Primitive::TRIANGLE;
+	m_primitives[2].Initialize(Primitive::TRIANGLE);
+	CGTriangle& t = m_primitives[2].GetConvex<CGTriangle>();
+	t.m_vertices[0] = CGVec3(0.5f, 0.f, -1.f);
+	t.m_vertices[1] = CGVec3(0.25f, 0.5f, -1.f);
+	t.m_vertices[2] = CGVec3(0.f, 0.f, -1.f);
+}
+
+void CG::RayTracerDemo::FinalizeScene()
+{
+	for (Primitive& p : m_primitives)
+	{
+		p.Finalize();
+	}
 }
 
 void CG::RayTracerDemo::RayTrace()
@@ -212,7 +227,7 @@ const CG::Surfel* CG::RayTracerDemo::FindIntersection(CGVector3<float> pos, CGVe
 		{
 		case Primitive::SPHERE:
 		{
-			if (Intersect(m_primitives[i].m_sphere, ray))
+			if (Intersect(m_primitives[i].GetConvex<CGSphere>(), ray))
 			{
 				find_surfel = true;
 				Surfel sf;
@@ -222,7 +237,7 @@ const CG::Surfel* CG::RayTracerDemo::FindIntersection(CGVector3<float> pos, CGVe
 		}
 		case Primitive::PLANE:
 		{
-			if (IntersectTruePlane(m_primitives[i].m_plane, ray))
+			if (IntersectTruePlane(m_primitives[i].GetConvex<CGPlane>(), ray))
 			{
 				find_surfel = true;
 				Surfel sf;
@@ -232,7 +247,7 @@ const CG::Surfel* CG::RayTracerDemo::FindIntersection(CGVector3<float> pos, CGVe
 		}
 		case Primitive::TRIANGLE:
 		{
-			if (IntersectTruePlane(m_primitives[i].m_triangle, ray))
+			if (IntersectTruePlane(m_primitives[i].GetConvex<CGTriangle>(), ray))
 			{
 				find_surfel = true;
 				Surfel sf;

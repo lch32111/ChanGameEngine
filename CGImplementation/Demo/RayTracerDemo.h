@@ -36,13 +36,48 @@ namespace CG
 		{
 			SPHERE,
 			PLANE,
-			TRIANGLE
+			TRIANGLE,
+			NONE
 		};
 
+		Primitive()
+			: m_shape_type(NONE)
+		{}
+
+		void Initialize(ShapeType type)
+		{
+			m_shape_type = type;
+
+			switch (type)
+			{
+			case SPHERE:
+				m_convex = new CGSphere();
+				break;
+			case PLANE:
+				m_convex = new CGPlane();
+				break;
+			case TRIANGLE:
+				m_convex = new CGTriangle();
+				break;
+			}
+		}
+
+		void Finalize()
+		{
+			if (m_shape_type != NONE)
+			{
+				delete m_convex;
+			}
+		}
+
+		template<typename T, bool is_base_of = std::is_base_of<CGConvex, T>::value>
+		T& GetConvex()
+		{
+			return *((T*)m_convex);
+		}
+
 		ShapeType m_shape_type;
-		CGSphere m_sphere;
-		CGPlane m_plane;
-		CGTriangle m_triangle;
+		CGConvex* m_convex;
 	};
 
 	class Surfel
@@ -68,7 +103,8 @@ namespace CG
 		virtual void OnInitialize();
 		virtual void OnFinalize();
 	private:
-		void PrepareScene();
+		void InitializeScene();
+		void FinalizeScene();
 		void RayTrace();
 		CGVector3<float> ComputeLight(CGVector3<float> pos, CGVector3<float> normalizedRay);
 		const Surfel* FindIntersection(CGVector3<float> pos, CGVector3<float> normalizedRay);

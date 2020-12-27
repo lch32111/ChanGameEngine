@@ -6,6 +6,7 @@
 #include <Math/CGVector3.h>
 #include <Geometry/CGSphere.h>
 #include <Geometry/CGPlane.h>
+#include <Geometry/CGTriangle.h>
 #include <Graphics/CGAssetManager.h>
 
 namespace CG
@@ -34,12 +35,14 @@ namespace CG
 		enum ShapeType
 		{
 			SPHERE,
-			PLANE
+			PLANE,
+			TRIANGLE
 		};
 
 		ShapeType m_shape_type;
 		CGSphere m_sphere;
 		CGPlane m_plane;
+		CGTriangle m_triangle;
 	};
 
 	class Surfel

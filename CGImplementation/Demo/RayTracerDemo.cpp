@@ -84,6 +84,21 @@ void CG::RayTracerDemo::Update(float deltaTime, float lastFrame)
 		change = true;
 	}
 
+	if (ImGui::DragFloat3("Triangle 0", &(m_primitives[2].m_triangle.m_vertices[0].m_value[0]), 0.01f))
+	{
+		change = true;
+	}
+
+	if (ImGui::DragFloat3("Triangle 1", &(m_primitives[2].m_triangle.m_vertices[1].m_value[0]), 0.01f))
+	{
+		change = true;
+	}
+
+	if (ImGui::DragFloat3("Triangle 2", &(m_primitives[2].m_triangle.m_vertices[2].m_value[0]), 0.01f))
+	{
+		change = true;
+	}
+
 	if (change == true)
 	{
 		RayTrace();
@@ -136,7 +151,7 @@ void CG::RayTracerDemo::PrepareScene()
 	m_camera.m_far = 500.f;
 	m_camera.m_fov_in_radian = CGScalarOp<float>::Radian(45.f);
 
-	m_primitives.resize(2);
+	m_primitives.resize(3);
 	m_primitives[0].m_sphere.m_pos = CGVec3(0.f, 0.f, -1.f);
 	m_primitives[0].m_sphere.m_radius = 0.1f;
 	m_primitives[0].m_shape_type = Primitive::SPHERE;
@@ -144,6 +159,11 @@ void CG::RayTracerDemo::PrepareScene()
 	m_primitives[1].m_plane.m_normal = CGVec3(0.f, 1.f, 0.f);
 	m_primitives[1].m_plane.m_distance = -10.f;
 	m_primitives[1].m_shape_type = Primitive::PLANE;
+
+	m_primitives[2].m_triangle.m_vertices[0] = CGVec3(0.5f, 0.f, -1.f);
+	m_primitives[2].m_triangle.m_vertices[1] = CGVec3(0.25f, 0.5f, -1.f);
+	m_primitives[2].m_triangle.m_vertices[2] = CGVec3(0.f, 0.f, -1.f);
+	m_primitives[2].m_shape_type = Primitive::TRIANGLE;
 }
 
 void CG::RayTracerDemo::RayTrace()
@@ -208,6 +228,17 @@ const CG::Surfel* CG::RayTracerDemo::FindIntersection(CGVector3<float> pos, CGVe
 				Surfel sf;
 				m_surfels.push_back(sf);
 			}
+			break;
+		}
+		case Primitive::TRIANGLE:
+		{
+			if (IntersectTruePlane(m_primitives[i].m_triangle, ray))
+			{
+				find_surfel = true;
+				Surfel sf;
+				m_surfels.push_back(sf);
+			}
+			break;
 		}
 		}
 	}

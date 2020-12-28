@@ -28,7 +28,8 @@ namespace CG
 
 
 
-	bool IntersectTruePlane(const CGTriangle& tri, const CGRay& ray, CGScalar& t);
+	bool IntersectTruePlane(const CGTriangle& tri, const CGRay& ray, 
+		CGScalar& t, CGScalar& u, CGScalar& v, CGScalar& w);
 }
 
 #endif

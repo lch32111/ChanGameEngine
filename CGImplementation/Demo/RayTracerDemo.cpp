@@ -157,6 +157,10 @@ void CG::RayTracerDemo::InitializeScene()
 
 			tr = transform * CGVec4(v2.Position[0], v2.Position[1], v2.Position[2], 1.f);
 			t.m_vertices[2] = CGVec3{ tr[0], tr[1], tr[2] };
+
+			p.m_texcoord[0] = CGVector2<float>(v0.TexCoords.x, v0.TexCoords.y);
+			p.m_texcoord[1] = CGVector2<float>(v1.TexCoords.x, v1.TexCoords.y);
+			p.m_texcoord[2] = CGVector2<float>(v2.TexCoords.x, v2.TexCoords.y);
 		}
 	}
 
@@ -176,6 +180,7 @@ void CG::RayTracerDemo::FinalizeScene()
 
 void CG::RayTracerDemo::RayTrace()
 {
+	double startTime = glfwGetTime();
 	for (u32 y = 0; y < m_image_height; ++y)
 	{
 		for (u32 x = 0; x < m_image_width; ++x)
@@ -186,6 +191,10 @@ void CG::RayTracerDemo::RayTrace()
 			m_image_buffer[y * m_image_width + x] = ComputeLight(p, w);
 		}
 	}
+	double endTime = glfwGetTime();
+
+	double duration = endTime - startTime;
+	printf("RayTrace Scene %lf(s)\n", duration);
 }
 
 CG::CGVector3<float> CG::RayTracerDemo::ComputeLight(CGVector3<float> pos, CGVector3<float> normalizedRay)
@@ -195,8 +204,16 @@ CG::CGVector3<float> CG::RayTracerDemo::ComputeLight(CGVector3<float> pos, CGVec
 	CGVector3<float> color;
 	if (surfel != nullptr)
 	{
-		color[0] = 1.f;
-		color[1] = 1.f;
+		Primitive& prim = m_primitives[surfel->primitive_index];
+
+		CGVector2<float> texCoord(0.f);
+		for (int i = 0; i < 3; ++i)
+		{
+			texCoord += prim.m_texcoord[i] * surfel->barycentric[i];
+		}
+
+		color[0] = texCoord[0];
+		color[1] = texCoord[1];
 		color[2] = 1.f;
 	}
 	else
@@ -213,28 +230,25 @@ const CG::Surfel* CG::RayTracerDemo::FindIntersection(CGVector3<float> pos, CGVe
 {
 	CGRay ray(pos, pos + normalizedRay, m_camera.m_far * 2.f);
 
-	bool find_surfel = false;
-	float min_t = FLT_MAX;
+	int primitive_index = -1;
+	CGScalar u, v, w;
+	CGScalar min_t = FLT_MAX;
 	for (size_t i = 0; i < m_primitives.size(); ++i)
 	{
 		switch (m_primitives[i].m_shape_type)
 		{
 		case Primitive::TRIANGLE:
 		{
-			CGScalar t;
-
-			if (IntersectTruePlane(m_primitives[i].GetConvex<CGTriangle>(), ray, t))
+			CGScalar t_u, t_v, t_w, t_t;
+			if (true == IntersectTruePlane(m_primitives[i].GetConvex<CGTriangle>(), ray, t_u, t_v, t_w, t_t))
 			{
-				if (t < min_t)
+				if (t_t < min_t)
 				{
-					min_t = t;
-
-					if (find_surfel == false)
-					{
-						Surfel sf;
-						m_surfels.push_back(sf);
-						find_surfel = true;
-					}
+					min_t = t_t;
+					primitive_index = i;
+					u = t_u;
+					v = t_v;
+					w = t_w;
 				}
 			}
 			break;
@@ -246,9 +260,15 @@ const CG::Surfel* CG::RayTracerDemo::FindIntersection(CGVector3<float> pos, CGVe
 		}
 	}
 
-	if (find_surfel)
+	if (primitive_index != -1)
 	{
-		return &(m_surfels[0]);
+		Surfel sf;
+		sf.primitive_index = primitive_index;
+		sf.barycentric[0] = u;
+		sf.barycentric[1] = v;
+		sf.barycentric[2] = w;
+		m_surfels.push_back(sf);
+		return &(m_surfels.back());
 	}
 	else
 	{

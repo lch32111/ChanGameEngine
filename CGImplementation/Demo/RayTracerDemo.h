@@ -79,13 +79,20 @@ namespace CG
 
 		ShapeType m_shape_type;
 		CGConvex* m_convex;
+
+		// temporary, triangle texcoord
+		CGVector2<float> m_texcoord[3];
 	};
 
 	class Surfel
 	{
 	public:
-		CGVector3<float> m_position;
-		CGVector3<float> m_normal;
+		// CGVector3<float> m_position;
+		// CGVector3<float> m_normal;
+
+		// temporary, for textureing
+		int primitive_index;
+		float barycentric[3];	// barycentric
 	};
 
 	class RayTracerDemo : public Application

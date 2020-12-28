@@ -216,7 +216,8 @@ bool CG::IntersectTruePlane(const CGTriangle& tri, const CGRay& ray)
 	return true;
 }
 
-bool CG::IntersectTruePlane(const CGTriangle& tri, const CGRay& ray, CGScalar& t)
+bool CG::IntersectTruePlane(const CGTriangle& tri, const CGRay& ray, 
+	CGScalar& u, CGScalar& v, CGScalar& w, CGScalar& t)
 {
 	CGVec3 neg_ray_dir = ray.GetDirection() * CGScalar(-1.0);
 
@@ -231,20 +232,23 @@ bool CG::IntersectTruePlane(const CGTriangle& tri, const CGRay& ray, CGScalar& t
 
 	CGVec3 a_to_ray_source = ray.GetSource() - tri[0];
 
-	CGScalar k = Dot(a_to_ray_source, n);
+	t = Dot(a_to_ray_source, n);
 
-	if (k < CGScalar(0.0) || k > ray.GetMaxFraction() * d)
+	if (t < CGScalar(0.0) || t > ray.GetMaxFraction() * d)
 		return false;
 
 	CGVec3 e = Cross(neg_ray_dir, a_to_ray_source);
-	CGScalar v = Dot(ac, e);
+	v = Dot(ac, e);
 	if (v < CGScalar(0.0) || v > d) return false;
 
-	CGScalar w = -Dot(ab, e);
+	w = -Dot(ab, e);
 	if (w < CGScalar(0.0) || v + w > d) return false;
 
 	CGScalar ood = CGScalar(1.0) / d;
-	t = k * ood;
+	t *= ood;
+	v *= ood;
+	w *= ood;
+	u = CGScalar(1.0) - v - w;
 
 	return true;
 }

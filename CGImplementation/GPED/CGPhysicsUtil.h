@@ -4,6 +4,7 @@
 
 #include <GPED/GPED_Precision.h>
 #include <Graphics/chanQuatCamera.h>
+#include <Math/CGVector3.h>
 
 namespace CG
 {
@@ -18,6 +19,42 @@ namespace CG
 		return glm::vec3(1, 0, 0);
 	}
 
+	static CGVector3<float> GetRayTo(int x, int y, int screen_width, int screen_height,
+		float cam_near_plane_in_radian,
+		CGVector3<float> camPos,
+		CGVector3<float> camForward
+	)
+	{
+		CGVector3<float> ray_from = camPos;
+		CGVector3<float> ray_forward = camForward;
+		constexpr float far_plane = 10000.f;
+		ray_forward *= far_plane;
+
+		CGVector3<float> vertical(0, 1, 0);
+		CGVector3<float> hor = Cross(ray_forward, vertical);
+		hor = SafeNormalize(hor);
+		vertical = Cross(hor, ray_forward);
+		vertical = SafeNormalize(vertical);
+
+		float tan_fov = CGScalarOp<float>::Tan(0.5f * cam_near_plane_in_radian);
+
+		hor *= 2.f * far_plane * tan_fov;
+		vertical *= 2.f * far_plane * tan_fov;
+
+		float aspect = (float)screen_width / screen_height;
+		
+		hor *= aspect;
+
+		CGVector3<float> ray_to_center = ray_from + ray_forward;
+		CGVector3<float> d_hor = hor * (1.f / screen_width);
+		CGVector3<float> d_vert = vertical * (1.f / screen_height);
+
+		CGVector3<float> ray_to = ray_to_center + (hor * -0.5f) + (vertical * 0.5f);
+		ray_to += (float)x * d_hor;
+		ray_to -= (float)y * d_vert;
+		return ray_to;
+	}
+
 	// Screen-to-World-Ray From Bullet Physics Library
 	static glm::vec3 GetRayTo(int x, int y, 
 		chanQuatCamera* camera, 
@@ -27,7 +64,7 @@ namespace CG
 
 		glm::vec3 rayFrom = camera->Position;
 		glm::vec3 rayForward = camera->Front;
-		GPED::real farPlane = 10000.f;
+		constexpr GPED::real farPlane = 10000.f;
 		rayForward *= farPlane;
 
 		glm::vec3 vertical(0, 1, 0);

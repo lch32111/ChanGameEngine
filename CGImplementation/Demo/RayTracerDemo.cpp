@@ -10,7 +10,7 @@
 #include <Graphics/GLPrimitiveUtil.h>
 #include <Graphics/CGModel.h>
 
-
+#include <GPED/CGPhysicsUtil.h>
 
 /****************************************************************************************/
 /* ### RayTracerDemo Demo ### */
@@ -89,6 +89,32 @@ void CG::RayTracerDemo::MouseMoveCallback(double xpos, double ypos)
 
 void CG::RayTracerDemo::MouseButtonCallback(int button, int action, int mods)
 {
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	{
+		double x, y;
+		glfwGetCursorPos(m_app_window, &x, &y);
+
+		int xpos = (int)x;
+		int ypos = m_height - (int)y;
+		
+		if (xpos >= 0 && xpos <= m_width && ypos >= 0 && ypos <= m_height)
+		{
+			xpos = (int)((float)xpos * m_image_width / m_width);
+			ypos = (int)((float)ypos * m_image_width / m_height);
+
+#if 0	// color pick ¸ðµå
+			CGVector3<float> p, w;
+			m_camera.GetPrimaryRay((float)xpos, (float)ypos, (s32)m_image_width, (s32)m_image_height, p, w);
+			m_image_buffer[ypos * m_image_width + xpos] = CGVector3<float>(1.f, 0.f, 0.f);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image_width, m_image_height, 0, GL_RGB, GL_FLOAT, m_image_buffer);
+#endif
+
+			CGVector3<float> p, w;
+			m_camera.GetPrimaryRay((float)xpos, (float)ypos, (s32)m_image_width, (s32)m_image_height, p, w);
+			CGVector3<float> c = ComputeLight(p, w);
+			printf("(%d %d) = %f %f %f\n", xpos, ypos, c[0], c[1], c[2]);
+		}
+	}
 }
 
 void CG::RayTracerDemo::ScrollCallback(double yoffset)

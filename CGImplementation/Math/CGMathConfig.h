@@ -19,6 +19,7 @@ namespace CG
 	struct CGScalarOp<float> 
 	{
 		static float TwoTimesPi() { return 6.283185307179586232f; }
+		static float Pi() { return 3.14159265358979323846264338327950288f; }
 		static float Epsilon() { return FLT_EPSILON; }
 		static float Max() { return FLT_MAX; }
 
@@ -46,6 +47,7 @@ namespace CG
 	struct CGScalarOp<double> 
 	{
 		static double TwoTimesPi() { return 6.283185307179586232; }
+		static double Pi() { return 3.14159265358979323846264338327950288; }
 		static double Epsilon() { return DBL_EPSILON; }
 		static double Max() { return DBL_MAX; }
 

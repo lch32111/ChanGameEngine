@@ -22,7 +22,7 @@ namespace CG
 			return *this;
 		}
 
-		CGVector3<Scalar> operator-()
+		CGVector3<Scalar> operator-() const
 		{
 			return CGVector3<Scalar>(-m_value[0], -m_value[1], -m_value[2]);
 		}

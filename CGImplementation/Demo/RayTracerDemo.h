@@ -11,7 +11,7 @@
 
 namespace CG
 {
-	// The whole ray tracer is from https://graphicscodex.com/
+	// The whole ray tracer is from https://graphicscodex.com/ and G3D project.
 	class RayTracerCamera
 	{
 	public:
@@ -91,8 +91,53 @@ namespace CG
 		// CGVector3<float> m_normal;
 
 		// temporary, for textureing
-		int primitive_index;
-		float barycentric[3];	// barycentric
+		int m_primitive_index;
+		float m_barycentric[3];	// barycentric
+		
+		CGVector3<float> m_position;
+		CGVector3<float> m_normal;
+
+		float m_reflectivity = 0.5f;
+
+		CGVector3<float> GetEmittedRadiance(const CGVector3<float>& wo) const
+		{
+			return CGVector3<float>(0.f);
+		}
+
+		CGVector3<float> GetFiniteScatteringDensity(const CGVector3<float>& wi, const CGVector3<float>& wo) const
+		{
+			float wi_n = Dot(wi, m_normal);
+			float wo_n = Dot(wo, m_normal);
+
+			if (wi_n > 0 && wo_n > 0)
+			{
+				return CGVector3<float>(m_reflectivity / CGScalarOp<float>::Pi());
+			}
+			else
+			{
+				return CGVector3<float>(0.f);
+			}
+		}
+	};
+
+	// it's point light currently
+	class Light
+	{
+	public:
+		CGVector3<float> m_position;
+		CGVector3<float> m_color;
+		// CGVector3<float> m_attenuation;
+
+		CGVector3<float> GetBiradiance(const CGVector3<float>& x) const
+		{
+			CGVector3<float> wi = m_position - x;
+			float wi_len = Length(wi);
+			// wi *= (1.f / wi_len);
+			
+			CGVector3<float> bi_radiance = m_color / (4.f * CGScalarOp<float>::Pi() * wi_len);
+
+			return bi_radiance;
+		}
 	};
 
 	class RayTracerDemo : public Application
@@ -114,9 +159,11 @@ namespace CG
 		void InitializeScene();
 		void FinalizeScene();
 		void RayTrace();
-		CGVector3<float> ComputeLight(CGVector3<float> pos, CGVector3<float> normalizedRay);
-		const Surfel* FindIntersection(CGVector3<float> pos, CGVector3<float> normalizedRay);
 
+		int FindIntersection(const CGVector3<float>& x, const CGVector3<float>& wi);
+		CGVector3<float> ComputeLightIn(const CGVector3<float>& x, const CGVector3<float>& wi);
+		CGVector3<float> ComputeLightOut(const int surfel_index, const CGVector3<float>& wo);
+		bool Visible(const CGVector3<float>& x, const CGVector3<float>& y) { return true; }
 
 		u32 m_image_width;
 		u32 m_image_height;
@@ -127,9 +174,14 @@ namespace CG
 
 		std::vector<Primitive> m_primitives;
 		std::vector<Surfel> m_surfels;
+		std::vector<Light> m_lights;
 	private:
 		CGAssetManager m_asset_manager;
 		Shader* m_simple_shader;
+
+	private:
+		bool m_color_paint_mode;
+		CGVector3<float>* m_duplicated_image_buffer;
 	};
 }
 

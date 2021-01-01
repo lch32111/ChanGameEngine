@@ -23,12 +23,18 @@ void CG::RayTracerDemo::OnInitialize()
 
 	m_asset_manager.assetInit();
 
-	m_image_width = 32;
-	m_image_height = 32;
+	m_image_width = 160;
+	m_image_height = 100;
 	m_image_buffer = new CGVector3<float>[m_image_width * m_image_height];
+
+	m_duplicated_image_buffer = new CGVector3<float>[m_image_width * m_image_height];
+	m_color_paint_mode = false;
 
 	InitializeScene();
 	RayTrace();
+
+	memcpy(m_duplicated_image_buffer, m_image_buffer, sizeof(CGVector3<float>) * (m_image_width * m_image_height));
+
 	
 	m_simple_shader = m_asset_manager.getShader(SHADER_SIMPLE_RENDER);
 	m_simple_shader->use();
@@ -51,11 +57,29 @@ void CG::RayTracerDemo::OnFinalize()
 
 	FinalizeScene();
 
+	delete[] m_duplicated_image_buffer;
 	delete[] m_image_buffer;
 }
 
 void CG::RayTracerDemo::Update(float deltaTime, float lastFrame)
 {
+	if (ImGui::Checkbox("Paint Mode", &m_color_paint_mode))
+	{
+		// false -> true
+		if (m_color_paint_mode == true)
+		{
+
+		}
+		// true -> false
+		else
+		{
+			glBindTexture(GL_TEXTURE_2D, m_gl_image_tex);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image_width, m_image_height, 0, GL_RGB, GL_FLOAT, m_image_buffer);
+			
+			memcpy(m_duplicated_image_buffer, m_image_buffer, sizeof(CGVector3<float>) * m_image_width * m_image_height);
+		}
+	}
+	
 	bool change = false;
 	if (change == true)
 	{
@@ -80,7 +104,35 @@ void CG::RayTracerDemo::Display()
 	m_simple_shader->SetMat4("model", identity);
 	m_simple_shader->SetMat4("view", identity);
 	m_simple_shader->SetMat4("projection", identity);
-	renderScreenQuad();
+
+	static unsigned int screenQuadVAO = 0;
+	if (screenQuadVAO == 0)
+	{
+		unsigned int screenQuadVBO;
+
+		float quadYInvertVertices[] = {
+			// positions        //Normal       // texture Coords
+			-1.0f,  1.0f, 0.0f, 0.f, 0.f, 1.f, 0.0f, 0.0f,
+			-1.0f, -1.0f, 0.0f, 0.f, 0.f, 1.f, 0.0f, 1.0f,
+			 1.0f,  1.0f, 0.0f, 0.f, 0.f, 1.f, 1.0f, 0.0f,
+			 1.0f, -1.0f, 0.0f, 0.f, 0.f, 1.f, 1.0f, 1.0f,
+		};
+		// setup plane VAO
+		glGenVertexArrays(1, &screenQuadVAO);
+		glGenBuffers(1, &screenQuadVBO);
+		glBindVertexArray(screenQuadVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, screenQuadVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(quadYInvertVertices), &quadYInvertVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	}
+	glBindVertexArray(screenQuadVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
 }
 
 void CG::RayTracerDemo::MouseMoveCallback(double xpos, double ypos)
@@ -95,24 +147,29 @@ void CG::RayTracerDemo::MouseButtonCallback(int button, int action, int mods)
 		glfwGetCursorPos(m_app_window, &x, &y);
 
 		int xpos = (int)x;
-		int ypos = m_height - (int)y;
+		int ypos = (int)y;
 		
 		if (xpos >= 0 && xpos <= m_width && ypos >= 0 && ypos <= m_height)
 		{
 			xpos = (int)((float)xpos * m_image_width / m_width);
-			ypos = (int)((float)ypos * m_image_width / m_height);
+			ypos = (int)((float)ypos * m_image_height / m_height);
 
-#if 0	// color pick ¸ðµå
-			CGVector3<float> p, w;
-			m_camera.GetPrimaryRay((float)xpos, (float)ypos, (s32)m_image_width, (s32)m_image_height, p, w);
-			m_image_buffer[ypos * m_image_width + xpos] = CGVector3<float>(1.f, 0.f, 0.f);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image_width, m_image_height, 0, GL_RGB, GL_FLOAT, m_image_buffer);
-#endif
+			if (m_color_paint_mode)
+			{
+				CGVector3<float> p, w;
+				m_camera.GetPrimaryRay((float)xpos, (float)ypos, (s32)m_image_width, (s32)m_image_height, p, w);
+				m_duplicated_image_buffer[ypos * m_image_width + xpos] = CGVector3<float>(1.f, 0.f, 0.f);
 
-			CGVector3<float> p, w;
-			m_camera.GetPrimaryRay((float)xpos, (float)ypos, (s32)m_image_width, (s32)m_image_height, p, w);
-			CGVector3<float> c = ComputeLight(p, w);
-			printf("(%d %d) = %f %f %f\n", xpos, ypos, c[0], c[1], c[2]);
+				glBindTexture(GL_TEXTURE_2D, m_gl_image_tex);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image_width, m_image_height, 0, GL_RGB, GL_FLOAT, m_duplicated_image_buffer);
+			}
+			else
+			{
+				CGVector3<float> p, w;
+				m_camera.GetPrimaryRay((float)xpos, (float)ypos, (s32)m_image_width, (s32)m_image_height, p, w);
+				CGVector3<float> c = ComputeLightIn(p, w);
+				printf("(%d %d) = %f %f %f\n", xpos, ypos, c[0], c[1], c[2]);
+			}
 		}
 	}
 }
@@ -139,13 +196,15 @@ void CG::RayTracerDemo::InitializeScene()
 
 	float scale = 0.001f;
 
+	CGVector3<float> teapot_pos(0.f, -0.05f, -0.2f);
+
 	CGMat4<float> transform(1.f);
 	transform[0][0] = scale;
 	transform[1][1] = scale;
 	transform[2][2] = scale;
-	transform[3][0] = 0.f;
-	transform[3][1] = -0.05f;
-	transform[3][2] = -0.2f;
+	transform[3][0] = teapot_pos[0];
+	transform[3][1] = teapot_pos[1];
+	transform[3][2] = teapot_pos[2];
 
 	CGModel* teapot_model = m_asset_manager.getModelData(MODEL_TEAPOT, 1);
 
@@ -190,6 +249,13 @@ void CG::RayTracerDemo::InitializeScene()
 		}
 	}
 
+	Light point_light0;
+	point_light0.m_position = CGVector3<float>(0.0f, 0.1f, 0.f);
+	point_light0.m_color = CGVector3<float>(8.f, 4.f, 4.f);
+	// point_light0.m_attenuation = CGVector3<float>(1.f, 0.0014f, 0.000007f);
+	m_lights.push_back(point_light0);
+
+
 	double endTime = glfwGetTime();
 
 	double duration = endTime - startTime;
@@ -214,7 +280,7 @@ void CG::RayTracerDemo::RayTrace()
 			CGVector3<float> p;
 			CGVector3<float> w;
 			m_camera.GetPrimaryRay((float)x, (float)y, (s32)m_image_width, (s32)m_image_height, p, w);
-			m_image_buffer[y * m_image_width + x] = ComputeLight(p, w);
+			m_image_buffer[y * m_image_width + x] = ComputeLightIn(p, w);
 		}
 	}
 	double endTime = glfwGetTime();
@@ -223,36 +289,7 @@ void CG::RayTracerDemo::RayTrace()
 	printf("RayTrace Scene %lf(s)\n", duration);
 }
 
-CG::CGVector3<float> CG::RayTracerDemo::ComputeLight(CGVector3<float> pos, CGVector3<float> normalizedRay)
-{
-	const CG::Surfel* surfel = FindIntersection(pos, normalizedRay);
-
-	CGVector3<float> color;
-	if (surfel != nullptr)
-	{
-		Primitive& prim = m_primitives[surfel->primitive_index];
-
-		CGVector2<float> texCoord(0.f);
-		for (int i = 0; i < 3; ++i)
-		{
-			texCoord += prim.m_texcoord[i] * surfel->barycentric[i];
-		}
-
-		color[0] = texCoord[0];
-		color[1] = texCoord[1];
-		color[2] = 1.f;
-	}
-	else
-	{
-		color[0] = 0.f;
-		color[1] = 0.f;
-		color[2] = 0.f;
-	}
-	
-	return color;
-}
-
-const CG::Surfel* CG::RayTracerDemo::FindIntersection(CGVector3<float> pos, CGVector3<float> normalizedRay)
+int CG::RayTracerDemo::FindIntersection(const CGVector3<float>& pos, const CGVector3<float>& normalizedRay)
 {
 	CGRay ray(pos, pos + normalizedRay, m_camera.m_far * 2.f);
 
@@ -289,17 +326,69 @@ const CG::Surfel* CG::RayTracerDemo::FindIntersection(CGVector3<float> pos, CGVe
 	if (primitive_index != -1)
 	{
 		Surfel sf;
-		sf.primitive_index = primitive_index;
-		sf.barycentric[0] = u;
-		sf.barycentric[1] = v;
-		sf.barycentric[2] = w;
+		sf.m_primitive_index = primitive_index;
+		sf.m_barycentric[0] = u;
+		sf.m_barycentric[1] = v;
+		sf.m_barycentric[2] = w;
+		sf.m_position = pos + normalizedRay * min_t;
+
+		CGTriangle& tri = m_primitives[primitive_index].GetConvex<CGTriangle>();
+		sf.m_normal = Normalize(Cross(tri[1] - tri[0], tri[2] - tri[0]));
+
 		m_surfels.push_back(sf);
-		return &(m_surfels.back());
+		return m_surfels.size() - 1;
 	}
 	else
 	{
-		return nullptr;
+		return -1;
 	}
+}
+
+CG::CGVector3<float> CG::RayTracerDemo::ComputeLightIn(const CGVector3<float>& x, const CGVector3<float>& wi)
+{
+	int surfel_index = FindIntersection(x, wi);
+
+	CGVector3<float> color;
+	if (surfel_index >= 0)
+	{
+		color = ComputeLightOut(surfel_index, -wi);
+	}
+	else
+	{
+		color[0] = 0.f;
+		color[1] = 0.f;
+		color[2] = 0.f;
+	}
+	
+	return color;
+}
+
+CG::CGVector3<float> CG::RayTracerDemo::ComputeLightOut(const int surfel_index, const CGVector3<float>& wo)
+{
+	CG_DEBUG_ASSERT(surfel_index >= 0);
+
+	const Surfel& surfel = m_surfels[surfel_index];
+
+	CGVector3<float> radiance = surfel.GetEmittedRadiance(wo);
+
+	const CGVector3<float>& x = surfel.m_position;
+	const CGVector3<float>& n = surfel.m_normal;
+	
+	for (const Light& light : m_lights)
+	{
+		const CGVector3<float>& y = light.m_position;
+
+		if (Visible(x, y))
+		{
+			const CGVector3<float> wi = Normalize(y - x);
+			const CGVector3<float> bi_radiance = light.GetBiradiance(x);
+			const CGVector3<float> f = surfel.GetFiniteScatteringDensity(wi, wo);
+
+			radiance += bi_radiance * f * CGScalarOp<float>::Abs(Dot(wi, n));
+		}
+	}
+	
+	return radiance;
 }
 
 /* ### RayTracerDemo Demo ### */
@@ -311,7 +400,7 @@ void CG::RayTracerCamera::GetPrimaryRay(float x, float y, int width, int height,
 	const float side = 2.f * tan(m_fov_in_radian / 2.f);
 
 	position.m_value[0] = m_near * side * width / height * (x / width - 0.5f);
-	position.m_value[1] = m_near * side * (y / height - 0.5f);
+	position.m_value[1] = m_near * side * -(y / height - 0.5f);
 	position.m_value[2] = -m_near;
 
 	w = Normalize(position);

@@ -1,6 +1,12 @@
 #include <CGPrecompiled.h>
 #include "RayTracerDemo.h"
 
+#include <thread>
+#ifdef __WIN32__
+#include <Windows.h>
+#endif
+
+
 #include <Imgui/imgui.h>
 
 #include <Math/CGMat4.h>
@@ -11,6 +17,8 @@
 #include <Graphics/CGModel.h>
 
 #include <GPED/CGPhysicsUtil.h>
+
+
 
 /****************************************************************************************/
 /* ### RayTracerDemo Demo ### */
@@ -144,7 +152,7 @@ void CG::RayTracerDemo::MouseMoveCallback(double x, double y)
 		int xpos = (int)x;
 		int ypos = (int)y;
 
-		if (xpos >= 0 && xpos <= m_width && ypos >= 0 && ypos <= m_height)
+		if (xpos >= 0 && xpos < m_width && ypos >= 0 && ypos < m_height)
 		{
 			xpos = (int)((float)xpos * m_image_width / m_width);
 			ypos = (int)((float)ypos * m_image_height / m_height);
@@ -181,7 +189,7 @@ void CG::RayTracerDemo::MouseButtonCallback(int button, int action, int mods)
 		int xpos = (int)x;
 		int ypos = (int)y;
 		
-		if (xpos >= 0 && xpos <= m_width && ypos >= 0 && ypos <= m_height)
+		if (xpos >= 0 && xpos < m_width && ypos >= 0 && ypos < m_height)
 		{
 			xpos = (int)((float)xpos * m_image_width / m_width);
 			ypos = (int)((float)ypos * m_image_height / m_height);
@@ -336,8 +344,41 @@ void CG::RayTracerDemo::FinalizeScene()
 	}
 }
 
+#ifdef __WIN32__
+// https://docs.microsoft.com/ko-kr/previous-versions/visualstudio/visual-studio-2015/debugger/how-to-set-a-thread-name-in-native-code?view=vs-2015&redirectedfrom=MSDN
+const DWORD MS_VC_EXCEPTION = 0x406D1388;
+#pragma pack(push,8)  
+typedef struct tagTHREADNAME_INFO
+{
+	DWORD dwType; // Must be 0x1000.  
+	LPCSTR szName; // Pointer to name (in user addr space).  
+	DWORD dwThreadID; // Thread ID (-1=caller thread).  
+	DWORD dwFlags; // Reserved for future use, must be zero.  
+} THREADNAME_INFO;
+#pragma pack(pop)  
+void SetThreadName(DWORD dwThreadID, const char* threadName) {
+	THREADNAME_INFO info;
+	info.dwType = 0x1000;
+	info.szName = threadName;
+	info.dwThreadID = dwThreadID;
+	info.dwFlags = 0;
+#pragma warning(push)  
+#pragma warning(disable: 6320 6322)  
+	__try {
+		RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+	}
+#pragma warning(pop)  
+}
+#endif
+
 void CG::RayTracerDemo::RayTrace()
 {
+	printf("buffer width height (%u, %u)\n", m_image_width, m_image_height);
+
+#if 0
+	printf("thread count : %u\n", 1);
 	double startTime = glfwGetTime();
 	for (u32 y = 0; y < m_image_height; ++y)
 	{
@@ -350,12 +391,69 @@ void CG::RayTracerDemo::RayTrace()
 		}
 	}
 	double endTime = glfwGetTime();
-
 	double duration = endTime - startTime;
 	printf("RayTrace Scene %lf(s)\n", duration);
+#else
+
+	const unsigned int thread_count = std::thread::hardware_concurrency() * 2;
+	printf("thread count : %u\n", thread_count);
+
+	char name_buf[256];
+	std::vector<std::string> thread_name(thread_count);
+
+	for (unsigned i = 0; i < thread_count; ++i)
+	{
+		sprintf(name_buf, "RayTraceTask %u", i);
+		thread_name[i] = name_buf;
+	}
+
+	std::vector<std::thread> thread_container(thread_count);
+
+	u32 divider = m_image_height / thread_count;
+
+	double startTime = glfwGetTime();
+
+	for (unsigned i = 0; i < thread_count; ++i)
+	{
+		TracingTask task;
+		task.m_start_height = i * divider;
+		task.m_end_height = (i + 1) * divider;
+
+		std::thread task_thread(&RayTracerDemo::RayTraceTask, this, task);
+
+#ifdef __WIN32__
+		SetThreadName(GetThreadId(static_cast<HANDLE>(task_thread.native_handle())), thread_name[i].c_str());
+#endif
+
+		thread_container[i] = std::move(task_thread);
+	}
+
+	for (unsigned i = 0; i < thread_count; ++i)
+	{
+		thread_container[i].join();
+	}
+
+	double endTime = glfwGetTime();
+	double duration = endTime - startTime;
+	printf("RayTrace Scene %lf(s)\n", duration);
+#endif
 }
 
-int CG::RayTracerDemo::FindIntersection(const CGVector3<float>& pos, const CGVector3<float>& normalizedRay)
+void CG::RayTracerDemo::RayTraceTask(TracingTask task)
+{
+	for (u32 y = task.m_start_height; y < task.m_end_height; ++y)
+	{
+		for (u32 x = 0; x < m_image_width; ++x)
+		{
+			CG::CGVector3<float> p;
+			CG::CGVector3<float> w;
+			m_camera.GetPrimaryRay((float)x, (float)y, (s32)m_image_width, (s32)m_image_height, p, w);
+			m_image_buffer[y * m_image_width + x] = ComputeLightIn(p, w);
+		}
+	}
+}
+
+const std::shared_ptr<CG::Surfel> CG::RayTracerDemo::FindIntersection(const CGVector3<float>& pos, const CGVector3<float>& normalizedRay)
 {
 #if 0
 	CGRay ray(pos, pos + normalizedRay, m_camera.m_far * 2.f);
@@ -422,34 +520,34 @@ int CG::RayTracerDemo::FindIntersection(const CGVector3<float>& pos, const CGVec
 	m_broad_phase.RayCast(&broad_ray_cast, ray_input);
 	if (broad_ray_cast.m_hit_primitive != nullptr)
 	{
-		Surfel sf;
-		sf.m_primitive_index = broad_ray_cast.m_hit_primitive->m_self_index;
-		sf.m_barycentric[0] = broad_ray_cast.hit_u;
-		sf.m_barycentric[1] = broad_ray_cast.hit_v;
-		sf.m_barycentric[2] = broad_ray_cast.hit_w;
-		sf.m_position = pos + normalizedRay * broad_ray_cast.min_t;
+		std::shared_ptr<Surfel> surfel(new Surfel());
+
+		surfel->m_primitive_index = broad_ray_cast.m_hit_primitive->m_self_index;
+		surfel->m_barycentric[0] = broad_ray_cast.hit_u;
+		surfel->m_barycentric[1] = broad_ray_cast.hit_v;
+		surfel->m_barycentric[2] = broad_ray_cast.hit_w;
+		surfel->m_position = pos + normalizedRay * broad_ray_cast.min_t;
 
 		CGTriangle& tri = broad_ray_cast.m_hit_primitive->GetConvex<CGTriangle>();
-		sf.m_normal = Normalize(Cross(tri[1] - tri[0], tri[2] - tri[0]));
+		surfel->m_normal = Normalize(Cross(tri[1] - tri[0], tri[2] - tri[0]));
 
-		m_surfels.push_back(sf);
-		return m_surfels.size() - 1;
+		return surfel;
 	}
 	else
 	{
-		return -1;
+		return nullptr;
 	}
 #endif
 }
 
 CG::CGVector3<float> CG::RayTracerDemo::ComputeLightIn(const CGVector3<float>& x, const CGVector3<float>& wi)
 {
-	int surfel_index = FindIntersection(x, wi);
+	std::shared_ptr<Surfel> surfel = FindIntersection(x, wi);
 
 	CGVector3<float> color;
-	if (surfel_index >= 0)
+	if (surfel != nullptr)
 	{
-		color = ComputeLightOut(surfel_index, -wi);
+		color = ComputeLightOut(surfel, -wi);
 	}
 	else
 	{
@@ -461,16 +559,12 @@ CG::CGVector3<float> CG::RayTracerDemo::ComputeLightIn(const CGVector3<float>& x
 	return color;
 }
 
-CG::CGVector3<float> CG::RayTracerDemo::ComputeLightOut(const int surfel_index, const CGVector3<float>& wo)
+CG::CGVector3<float> CG::RayTracerDemo::ComputeLightOut(const std::shared_ptr<Surfel>& surfel, const CGVector3<float>& wo)
 {
-	CG_DEBUG_ASSERT(surfel_index >= 0);
+	CGVector3<float> radiance = surfel->GetEmittedRadiance(wo);
 
-	const Surfel& surfel = m_surfels[surfel_index];
-
-	CGVector3<float> radiance = surfel.GetEmittedRadiance(wo);
-
-	const CGVector3<float>& x = surfel.m_position;
-	const CGVector3<float>& n = surfel.m_normal;
+	const CGVector3<float>& x = surfel->m_position;
+	const CGVector3<float>& n = surfel->m_normal;
 	
 	for (const Light& light : m_lights)
 	{
@@ -480,7 +574,7 @@ CG::CGVector3<float> CG::RayTracerDemo::ComputeLightOut(const int surfel_index, 
 		{
 			const CGVector3<float> wi = Normalize(y - x);
 			const CGVector3<float> bi_radiance = light.GetBiradiance(x);
-			const CGVector3<float> f = surfel.GetFiniteScatteringDensity(wi, wo);
+			const CGVector3<float> f = surfel->GetFiniteScatteringDensity(wi, wo);
 
 			radiance += bi_radiance * f * CGScalarOp<float>::Abs(Dot(wi, n));
 		}

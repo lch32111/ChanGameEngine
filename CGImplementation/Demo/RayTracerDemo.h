@@ -167,9 +167,18 @@ namespace CG
 		void FinalizeScene();
 		void RayTrace();
 
-		int FindIntersection(const CGVector3<float>& x, const CGVector3<float>& wi);
+		struct TracingTask
+		{
+			// [m_start_height, m_end_height)
+			u32 m_start_height;
+			u32 m_end_height;
+		};
+
+		void RayTraceTask(TracingTask task);
+
+		const std::shared_ptr<Surfel> FindIntersection(const CGVector3<float>& x, const CGVector3<float>& wi);
 		CGVector3<float> ComputeLightIn(const CGVector3<float>& x, const CGVector3<float>& wi);
-		CGVector3<float> ComputeLightOut(const int surfel_index, const CGVector3<float>& wo);
+		CGVector3<float> ComputeLightOut(const std::shared_ptr<Surfel>& surfel, const CGVector3<float>& wo);
 		bool Visible(const CGVector3<float>& x, const CGVector3<float>& y) { return true; }
 
 		u32 m_image_width;
@@ -193,9 +202,7 @@ namespace CG
 			bool RayCastCallback(const GPED::c3RayInput& input, int nodeId);
 		};
 
-
 		std::vector<Primitive> m_primitives;
-		std::vector<Surfel> m_surfels;
 		std::vector<Light> m_lights;
 	private:
 		CGAssetManager m_asset_manager;

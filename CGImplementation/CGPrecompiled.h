@@ -37,6 +37,7 @@
 
 #if defined(CG_DEBUG)
 	#if defined(__WIN32__) && defined(_MSC_VER)
+		#define _CRT_SECURE_NO_WARNINGS
 		#include <iostream>
 		#include <assert.h>
 		#include <intrin.h>

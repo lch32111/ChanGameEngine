@@ -31,8 +31,12 @@ void CG::RayTracerDemo::OnInitialize()
 
 	m_asset_manager.assetInit();
 
-	m_image_width = 160;
-	m_image_height = 100;
+	m_simple_shader = m_asset_manager.getShader(SHADER_SIMPLE_RENDER);
+	m_simple_shader->use();
+	m_simple_shader->setInt("texture1", 0);
+
+	m_image_width = m_width;
+	m_image_height = m_height;
 	m_image_buffer = new CGVector3<float>[m_image_width * m_image_height];
 
 	m_duplicated_image_buffer = new CGVector3<float>[m_image_width * m_image_height];
@@ -45,11 +49,6 @@ void CG::RayTracerDemo::OnInitialize()
 	RayTrace();
 
 	memcpy(m_duplicated_image_buffer, m_image_buffer, sizeof(CGVector3<float>) * (m_image_width * m_image_height));
-
-	
-	m_simple_shader = m_asset_manager.getShader(SHADER_SIMPLE_RENDER);
-	m_simple_shader->use();
-	m_simple_shader->setInt("texture1", 0);
 
 	glGenTextures(1, &m_gl_image_tex);
 	glBindTexture(GL_TEXTURE_2D, m_gl_image_tex);
@@ -64,12 +63,12 @@ void CG::RayTracerDemo::OnFinalize()
 {
 	glDeleteTextures(1, &m_gl_image_tex);
 	
-	m_asset_manager.destroy();
-
 	FinalizeScene();
 
 	delete[] m_duplicated_image_buffer;
 	delete[] m_image_buffer;
+
+	m_asset_manager.destroy();
 }
 
 void CG::RayTracerDemo::Update(float deltaTime, float lastFrame)
@@ -622,7 +621,6 @@ CG::CGVector3<float> CG::RayTracerDemo::ComputeLightOut(const std::shared_ptr<Su
 
 /* ### RayTracerDemo Demo ### */
 /****************************************************************************************/
-
 void CG::RayTracerCamera::GetPrimaryRay(float x, float y, int width, int height, CGVector3<float>& position, CGVector3<float>& w) const
 {
 	const float side = 2.f * tan(m_fov_in_radian / 2.f);

@@ -508,6 +508,43 @@ const std::shared_ptr<CG::Surfel> CG::RayTracerDemo::FindIntersection(const CGVe
 		return -1;
 	}
 #else
+	struct BroadClosesetRayCast : BroadRayCast
+	{
+		float m_camera_near_plane = 0.f;
+		float m_camera_far_plane = 0.f;
+		Primitive* m_hit_primitive = nullptr;
+
+		CGScalar min_t = 1000000.f;
+		CGScalar hit_u, hit_v, hit_w;
+
+		bool RayCastCallback(const GPED::c3RayInput& input, int nodeId)
+		{
+			void* data = broadPhase->GetUserData(nodeId);
+			Primitive* primitive = (Primitive*)data;
+
+			CGVec3 startPoint(input.startPoint[0], input.startPoint[1], input.startPoint[2]);
+			CGVec3 rayDir(input.direction[0], input.direction[1], input.direction[2]);
+
+			CGRay ray(startPoint, startPoint + rayDir * m_camera_near_plane, m_camera_far_plane * 2.f);
+
+			CGScalar u, v, w, t;
+
+			bool hit = IntersectTruePlane(primitive->GetConvex<CGTriangle>(), ray, u, v, w, t);
+
+			if (hit && t < min_t)
+			{
+				min_t = t;
+				hit_u = u;
+				hit_v = v;
+				hit_w = w;
+				m_hit_primitive = primitive;
+			}
+
+			return true;
+		}
+
+	};
+
 	BroadClosesetRayCast broad_ray_cast;
 	broad_ray_cast.broadPhase = &m_broad_phase;
 	broad_ray_cast.m_camera_near_plane = m_camera.m_near;
@@ -586,7 +623,6 @@ CG::CGVector3<float> CG::RayTracerDemo::ComputeLightOut(const std::shared_ptr<Su
 /* ### RayTracerDemo Demo ### */
 /****************************************************************************************/
 
-
 void CG::RayTracerCamera::GetPrimaryRay(float x, float y, int width, int height, CGVector3<float>& position, CGVector3<float>& w) const
 {
 	const float side = 2.f * tan(m_fov_in_radian / 2.f);
@@ -596,30 +632,4 @@ void CG::RayTracerCamera::GetPrimaryRay(float x, float y, int width, int height,
 	position.m_value[2] = -m_near;
 
 	w = Normalize(position);
-}
-
-bool CG::RayTracerDemo::BroadClosesetRayCast::RayCastCallback(const GPED::c3RayInput& input, int nodeId)
-{
-	void* data = broadPhase->GetUserData(nodeId);
-	Primitive* primitive = (Primitive*)data;
-
-	CGVec3 startPoint(input.startPoint[0], input.startPoint[1], input.startPoint[2]);
-	CGVec3 rayDir(input.direction[0], input.direction[1], input.direction[2]);
-
-	CGRay ray(startPoint, startPoint + rayDir * m_camera_near_plane, m_camera_far_plane * 2.f);
-
-	CGScalar u, v, w, t;
-
-	bool hit = IntersectTruePlane(primitive->GetConvex<CGTriangle>(), ray, u, v, w, t);
-
-	if (hit && t < min_t)
-	{
-		min_t = t;
-		hit_u = u;
-		hit_v = v;
-		hit_w = w;
-		m_hit_primitive = primitive;
-	}
-
-	return true;
 }

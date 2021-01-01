@@ -190,18 +190,6 @@ namespace CG
 
 		CGBroadPhase m_broad_phase;
 
-		struct BroadClosesetRayCast : BroadRayCast
-		{
-			float m_camera_near_plane = 0.f;
-			float m_camera_far_plane = 0.f;
-			Primitive* m_hit_primitive = nullptr;
-			
-			CGScalar min_t = 1000000.f;
-			CGScalar hit_u, hit_v, hit_w;
-
-			bool RayCastCallback(const GPED::c3RayInput& input, int nodeId);
-		};
-
 		std::vector<Primitive> m_primitives;
 		std::vector<Light> m_lights;
 	private:

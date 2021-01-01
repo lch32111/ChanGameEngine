@@ -324,7 +324,7 @@ void CG::DynamicAABBTree::InsertLeaf(int leaf)
 	index = m_nodes[leaf].parent;
 	while (index != Node_Null)
 	{
-		// index = Balance(index);
+		index = Balance(index);
 
 		int left = m_nodes[index].left;
 		int right = m_nodes[index].right;
@@ -373,7 +373,7 @@ void CG::DynamicAABBTree::RemoveLeaf(int leaf)
 		int index = grandParent;
 		while (index != Node_Null)
 		{
-			// index = Balance(index);
+			index = Balance(index);
 			
 			int left = m_nodes[index].left;
 			int right = m_nodes[index].right;
@@ -395,9 +395,147 @@ void CG::DynamicAABBTree::RemoveLeaf(int leaf)
 	// Validate();
 }
 
-int CG::DynamicAABBTree::Balance(int index)
+s32 CG::DynamicAABBTree::Balance(s32 iA)
 {
-	return 0;
+	CG_DEBUG_ASSERT(iA != Node_Null);
+
+	TreeNode* A = m_nodes + iA;
+	if (A->isLeaf() || A->height < 2)
+	{
+		return iA;
+	}
+
+	s32 iB = A->left;
+	s32 iC = A->right;
+	CG_DEBUG_ASSERT(0 <= iB && iB < m_nodeCapacity);
+	CG_DEBUG_ASSERT(0 <= iC && iC < m_nodeCapacity);
+
+	TreeNode* B = m_nodes + iB;
+	TreeNode* C = m_nodes + iC;
+
+	s32 balance = C->height - B->height;
+
+	// Rotate C up
+	if (balance > 1)
+	{
+		s32 iF = C->left;
+		s32 iG = C->right;
+		TreeNode* F = m_nodes + iF;
+		TreeNode* G = m_nodes + iG;
+		CG_DEBUG_ASSERT(0 <= iF && iF < m_nodeCapacity);
+		CG_DEBUG_ASSERT(0 <= iG && iG < m_nodeCapacity);
+
+		// Swap A and C
+		C->left = iA;
+		C->parent = A->parent;
+		A->parent = iC;
+
+		// A's old parent should point to C
+		if (C->parent != Node_Null)
+		{
+			if (m_nodes[C->parent].left == iA)
+			{
+				m_nodes[C->parent].left = iC;
+			}
+			else
+			{
+				CG_DEBUG_ASSERT(m_nodes[C->parent].right == iA);
+				m_nodes[C->parent].right = iC;
+			}
+		}
+		else
+		{
+			m_root = iC;
+		}
+
+		// Rotate
+		if (F->height > G->height)
+		{
+			C->right = iF;
+			A->right = iG;
+			G->parent = iA;
+			A->aabb.Combine(B->aabb, G->aabb);
+			C->aabb.Combine(A->aabb, F->aabb);
+
+			A->height = 1 + CG::Max(B->height, G->height);
+			C->height = 1 + CG::Max(A->height, F->height);
+		}
+		else
+		{
+			C->right = iG;
+			A->right = iF;
+			F->parent = iA;
+			A->aabb.Combine(B->aabb, F->aabb);
+			C->aabb.Combine(A->aabb, G->aabb);
+
+			A->height = 1 + CG::Max(B->height, F->height);
+			C->height = 1 + CG::Max(A->height, G->height);
+		}
+
+		return iC;
+	}
+
+	// Rotate B up
+	if (balance < -1)
+	{
+		s32 iD = B->left;
+		s32 iE = B->right;
+		TreeNode* D = m_nodes + iD;
+		TreeNode* E = m_nodes + iE;
+		CG_DEBUG_ASSERT(0 <= iD && iD < m_nodeCapacity);
+		CG_DEBUG_ASSERT(0 <= iE && iE < m_nodeCapacity);
+
+		// Swap A and B
+		B->left = iA;
+		B->parent = A->parent;
+		A->parent = iB;
+
+		// A's old parent should point to B
+		if (B->parent != Node_Null)
+		{
+			if (m_nodes[B->parent].left == iA)
+			{
+				m_nodes[B->parent].left = iB;
+			}
+			else
+			{
+				CG_DEBUG_ASSERT(m_nodes[B->parent].right == iA);
+				m_nodes[B->parent].right = iB;
+			}
+		}
+		else
+		{
+			m_root = iB;
+		}
+
+		// Rotate
+		if (D->height > E->height)
+		{
+			B->right = iD;
+			A->left = iE;
+			E->parent = iA;
+			A->aabb.Combine(C->aabb, E->aabb);
+			B->aabb.Combine(A->aabb, D->aabb);
+
+			A->height = 1 + CG::Max(C->height, E->height);
+			B->height = 1 + CG::Max(A->height, D->height);
+		}
+		else
+		{
+			B->right = iE;
+			A->left = iD;
+			D->parent = iA;
+			A->aabb.Combine(C->aabb, D->aabb);
+			B->aabb.Combine(A->aabb, E->aabb);
+
+			A->height = 1 + CG::Max(C->height, D->height);
+			B->height = 1 + CG::Max(A->height, E->height);
+		}
+
+		return iB;
+	}
+
+	return iA;
 }
 
 void CG::DynamicAABBTree::Validate()

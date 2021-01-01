@@ -73,7 +73,10 @@ namespace CG
 		void InsertLeaf(int leaf);
 		void RemoveLeaf(int leaf);
 
-		int Balance(int index);
+		s32 Balance(s32 index);
+
+		s32 ComputeHeight(int nodeId) const;
+		s32 ComputeHeight() const;
 
 		int m_root;
 		
@@ -90,9 +93,6 @@ namespace CG
 		void Validate();
 		void ValidateStructure(int index) const;
 		void ValidateMetrics(int index) const;
-		
-		s32 ComputeHeight(int nodeId) const;
-		s32 ComputeHeight() const;
 	};
 
 	template<typename T>
@@ -134,8 +134,8 @@ namespace CG
 	template<typename T>
 	inline void DynamicAABBTree::RayCast(T * callback, const GPED::c3RayInput & input) const
 	{
-		const int stackCapacity = 256;
-		int stack[stackCapacity];
+		const int stackCapacity = m_nodeCount;
+		int* stack = (int*)malloc(sizeof(int) * m_nodeCount);
 		stack[0] = m_root;
 
 		int count = 1;
@@ -165,6 +165,8 @@ namespace CG
 				}
 			}
 		}
+
+		free(stack);
 	}
 }
 

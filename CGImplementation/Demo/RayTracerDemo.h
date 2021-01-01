@@ -3,10 +3,15 @@
 #define __RAY_TRACER_DEMO_H__
 
 #include <CG_Application.h>
+
 #include <Math/CGVector3.h>
+
 #include <Geometry/CGSphere.h>
 #include <Geometry/CGPlane.h>
 #include <Geometry/CGTriangle.h>
+
+#include <GPED/CGBroadPhase.h>
+
 #include <Graphics/CGAssetManager.h>
 
 namespace CG
@@ -76,6 +81,8 @@ namespace CG
 			CG_DEBUG_ASSERT(m_shape_type != NONE);
 			return *((T*)m_convex);
 		}
+
+		int m_self_index;
 
 		ShapeType m_shape_type;
 		CGConvex* m_convex;
@@ -172,6 +179,21 @@ namespace CG
 
 		RayTracerCamera m_camera;
 
+		CGBroadPhase m_broad_phase;
+
+		struct BroadClosesetRayCast : BroadRayCast
+		{
+			float m_camera_near_plane = 0.f;
+			float m_camera_far_plane = 0.f;
+			Primitive* m_hit_primitive = nullptr;
+			
+			CGScalar min_t = 1000000.f;
+			CGScalar hit_u, hit_v, hit_w;
+
+			bool RayCastCallback(const GPED::c3RayInput& input, int nodeId);
+		};
+
+
 		std::vector<Primitive> m_primitives;
 		std::vector<Surfel> m_surfels;
 		std::vector<Light> m_lights;
@@ -180,6 +202,7 @@ namespace CG
 		Shader* m_simple_shader;
 
 	private:
+		bool m_left_mouse_clicked;
 		bool m_color_paint_mode;
 		CGVector3<float>* m_duplicated_image_buffer;
 	};

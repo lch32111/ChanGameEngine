@@ -28,7 +28,10 @@ void CG::RayTracerDemo::OnInitialize()
 	m_image_buffer = new CGVector3<float>[m_image_width * m_image_height];
 
 	m_duplicated_image_buffer = new CGVector3<float>[m_image_width * m_image_height];
+
+	m_left_mouse_clicked = false;
 	m_color_paint_mode = false;
+	
 
 	InitializeScene();
 	RayTrace();
@@ -68,7 +71,6 @@ void CG::RayTracerDemo::Update(float deltaTime, float lastFrame)
 		// false -> true
 		if (m_color_paint_mode == true)
 		{
-
 		}
 		// true -> false
 		else
@@ -135,14 +137,44 @@ void CG::RayTracerDemo::Display()
 	glBindVertexArray(0);
 }
 
-void CG::RayTracerDemo::MouseMoveCallback(double xpos, double ypos)
+void CG::RayTracerDemo::MouseMoveCallback(double x, double y)
 {
+	if (m_left_mouse_clicked)
+	{
+		int xpos = (int)x;
+		int ypos = (int)y;
+
+		if (xpos >= 0 && xpos <= m_width && ypos >= 0 && ypos <= m_height)
+		{
+			xpos = (int)((float)xpos * m_image_width / m_width);
+			ypos = (int)((float)ypos * m_image_height / m_height);
+
+			if (m_color_paint_mode)
+			{
+				CGVector3<float> p, w;
+				m_camera.GetPrimaryRay((float)xpos, (float)ypos, (s32)m_image_width, (s32)m_image_height, p, w);
+				m_duplicated_image_buffer[ypos * m_image_width + xpos] = CGVector3<float>(1.f, 0.f, 0.f);
+
+				glBindTexture(GL_TEXTURE_2D, m_gl_image_tex);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image_width, m_image_height, 0, GL_RGB, GL_FLOAT, m_duplicated_image_buffer);
+			}
+			else
+			{
+				CGVector3<float> p, w;
+				m_camera.GetPrimaryRay((float)xpos, (float)ypos, (s32)m_image_width, (s32)m_image_height, p, w);
+				CGVector3<float> c = ComputeLightIn(p, w);
+				printf("(%d %d) = %f %f %f\n", xpos, ypos, c[0], c[1], c[2]);
+			}
+		}
+	}
 }
 
 void CG::RayTracerDemo::MouseButtonCallback(int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
+		m_left_mouse_clicked = true;
+
 		double x, y;
 		glfwGetCursorPos(m_app_window, &x, &y);
 
@@ -172,6 +204,11 @@ void CG::RayTracerDemo::MouseButtonCallback(int button, int action, int mods)
 			}
 		}
 	}
+
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+	{
+		m_left_mouse_clicked = false;
+	}
 }
 
 void CG::RayTracerDemo::ScrollCallback(double yoffset)
@@ -185,6 +222,9 @@ void CG::RayTracerDemo::ResizeWindowCallback(int width, int height)
 	glViewport(0, 0, width, height);
 }
 
+
+template<typename T> T get_min(T a, T b) { return a < b ? a : b; }
+template<typename T> T get_max(T a, T b) { return a < b ? b : a; }
 
 void CG::RayTracerDemo::InitializeScene()
 {
@@ -210,13 +250,26 @@ void CG::RayTracerDemo::InitializeScene()
 
 	const std::vector<CGModelMesh>& teapot_meshes = teapot_model->GetMeshes();
 
+
+	int primitive_size = 0;
 	for (size_t i = 0; i < teapot_meshes.size(); ++i)
 	{
 		const CGModelMesh& mesh = teapot_meshes[i];
 
 		CG_DEBUG_ASSERT((mesh.m_indices.size() % 3) == 0);
 
-		m_primitives.reserve(m_primitives.size() + mesh.m_indices.size() / 3);
+		primitive_size += mesh.m_indices.size() / 3;
+	}
+
+	m_primitives.resize(primitive_size);
+
+
+	int primitive_index = 0;
+	for (size_t i = 0; i < teapot_meshes.size(); ++i)
+	{
+		const CGModelMesh& mesh = teapot_meshes[i];
+
+		CG_DEBUG_ASSERT((mesh.m_indices.size() % 3) == 0);
 
 		for (size_t j = 0; j < mesh.m_indices.size(); j += 3)
 		{
@@ -228,9 +281,9 @@ void CG::RayTracerDemo::InitializeScene()
 			const Vertex& v1 = mesh.m_vertices[i1];
 			const Vertex& v2 = mesh.m_vertices[i2];
 
-			m_primitives.push_back(Primitive());
-			Primitive& p = m_primitives.back();
+			Primitive& p = m_primitives[primitive_index];
 			p.Initialize(Primitive::TRIANGLE);
+			p.m_self_index = primitive_index;
 
 			CGTriangle& t = p.GetConvex<CGTriangle>();
 
@@ -246,8 +299,21 @@ void CG::RayTracerDemo::InitializeScene()
 			p.m_texcoord[0] = CGVector2<float>(v0.TexCoords.x, v0.TexCoords.y);
 			p.m_texcoord[1] = CGVector2<float>(v1.TexCoords.x, v1.TexCoords.y);
 			p.m_texcoord[2] = CGVector2<float>(v2.TexCoords.x, v2.TexCoords.y);
+
+
+			GPED::c3AABB triangle_aabb;
+			for (int i = 0; i < 3; ++i)
+			{
+				triangle_aabb.min[i] = get_min(t.m_vertices[0][i], get_min(t.m_vertices[1][i], t.m_vertices[2][i]));
+				triangle_aabb.max[i] = get_max(t.m_vertices[0][i], get_max(t.m_vertices[1][i], t.m_vertices[2][i]));
+			}
+
+			m_broad_phase.CreateProxy(triangle_aabb, &p);
+
+			++primitive_index;
 		}
 	}
+
 
 	Light point_light0;
 	point_light0.m_position = CGVector3<float>(0.0f, 0.1f, 0.f);
@@ -259,7 +325,7 @@ void CG::RayTracerDemo::InitializeScene()
 	double endTime = glfwGetTime();
 
 	double duration = endTime - startTime;
-	printf("Initliaze Scene ms %lf\n", (duration / 1000.0));
+	printf("Initliaze Scene %lf(ms)\n", (duration * 1000.0));
 }
 
 void CG::RayTracerDemo::FinalizeScene()
@@ -291,6 +357,7 @@ void CG::RayTracerDemo::RayTrace()
 
 int CG::RayTracerDemo::FindIntersection(const CGVector3<float>& pos, const CGVector3<float>& normalizedRay)
 {
+#if 0
 	CGRay ray(pos, pos + normalizedRay, m_camera.m_far * 2.f);
 
 	int primitive_index = -1;
@@ -342,6 +409,37 @@ int CG::RayTracerDemo::FindIntersection(const CGVector3<float>& pos, const CGVec
 	{
 		return -1;
 	}
+#else
+	BroadClosesetRayCast broad_ray_cast;
+	broad_ray_cast.broadPhase = &m_broad_phase;
+	broad_ray_cast.m_camera_near_plane = m_camera.m_near;
+	broad_ray_cast.m_camera_far_plane = m_camera.m_far;
+
+	glm::vec3 ray_from(pos[0], pos[1], pos[2]);
+	glm::vec3 ray_to(pos[0] + normalizedRay[0], pos[1] + normalizedRay[1], pos[2] + normalizedRay[2]);
+	GPED::c3RayInput ray_input(ray_from, ray_to);
+
+	m_broad_phase.RayCast(&broad_ray_cast, ray_input);
+	if (broad_ray_cast.m_hit_primitive != nullptr)
+	{
+		Surfel sf;
+		sf.m_primitive_index = broad_ray_cast.m_hit_primitive->m_self_index;
+		sf.m_barycentric[0] = broad_ray_cast.hit_u;
+		sf.m_barycentric[1] = broad_ray_cast.hit_v;
+		sf.m_barycentric[2] = broad_ray_cast.hit_w;
+		sf.m_position = pos + normalizedRay * broad_ray_cast.min_t;
+
+		CGTriangle& tri = broad_ray_cast.m_hit_primitive->GetConvex<CGTriangle>();
+		sf.m_normal = Normalize(Cross(tri[1] - tri[0], tri[2] - tri[0]));
+
+		m_surfels.push_back(sf);
+		return m_surfels.size() - 1;
+	}
+	else
+	{
+		return -1;
+	}
+#endif
 }
 
 CG::CGVector3<float> CG::RayTracerDemo::ComputeLightIn(const CGVector3<float>& x, const CGVector3<float>& wi)
@@ -406,3 +504,28 @@ void CG::RayTracerCamera::GetPrimaryRay(float x, float y, int width, int height,
 	w = Normalize(position);
 }
 
+bool CG::RayTracerDemo::BroadClosesetRayCast::RayCastCallback(const GPED::c3RayInput& input, int nodeId)
+{
+	void* data = broadPhase->GetUserData(nodeId);
+	Primitive* primitive = (Primitive*)data;
+
+	CGVec3 startPoint(input.startPoint[0], input.startPoint[1], input.startPoint[2]);
+	CGVec3 rayDir(input.direction[0], input.direction[1], input.direction[2]);
+
+	CGRay ray(startPoint, startPoint + rayDir * m_camera_near_plane, m_camera_far_plane * 2.f);
+
+	CGScalar u, v, w, t;
+
+	bool hit = IntersectTruePlane(primitive->GetConvex<CGTriangle>(), ray, u, v, w, t);
+
+	if (hit && t < min_t)
+	{
+		min_t = t;
+		hit_u = u;
+		hit_v = v;
+		hit_w = w;
+		m_hit_primitive = primitive;
+	}
+
+	return true;
+}

@@ -77,6 +77,9 @@
     <IncludePath>$(ProjectDir);$(ProjectDir)CGbasic\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)CGbasic\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir)CGbasic\include;$(ProjectDir);$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>

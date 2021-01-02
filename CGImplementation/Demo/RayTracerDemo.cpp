@@ -35,8 +35,13 @@ void CG::RayTracerDemo::OnInitialize()
 	m_simple_shader->use();
 	m_simple_shader->setInt("texture1", 0);
 
+#if _DEBUG
+	m_image_width = 160;
+	m_image_height = 100;
+#else
 	m_image_width = m_width;
 	m_image_height = m_height;
+#endif
 	m_image_buffer = new CGVector3<float>[m_image_width * m_image_height];
 
 	m_duplicated_image_buffer = new CGVector3<float>[m_image_width * m_image_height];
@@ -227,6 +232,23 @@ void CG::RayTracerDemo::ResizeWindowCallback(int width, int height)
 	Application::m_width = width;
 	Application::m_height = height;
 	glViewport(0, 0, width, height);
+
+#if !_DEBUG
+	m_image_width = width;
+	m_image_height = height;
+
+	delete[] m_image_buffer;
+	delete[] m_duplicated_image_buffer;
+
+	m_image_buffer = new CGVector3<float>[width * height];
+	m_duplicated_image_buffer = new CGVector3<float>[width * height];
+	RayTrace();
+
+	memcpy(m_duplicated_image_buffer, m_image_buffer, sizeof(CGVector3<float>) * (m_image_width * m_image_height));
+
+	glBindTexture(GL_TEXTURE_2D, m_gl_image_tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image_width, m_image_height, 0, GL_RGB, GL_FLOAT, m_image_buffer);
+#endif
 }
 
 
@@ -244,7 +266,7 @@ void CG::RayTracerDemo::InitializeScene()
 	float scale = 0.001f;
 
 	CGVector3<float> teapot_pos(0.f, -0.05f, -0.2f);
-
+	
 	CGMat4<float> transform(1.f);
 	transform[0][0] = scale;
 	transform[1][1] = scale;
@@ -257,7 +279,6 @@ void CG::RayTracerDemo::InitializeScene()
 
 	const std::vector<CGModelMesh>& teapot_meshes = teapot_model->GetMeshes();
 
-
 	int primitive_size = 0;
 	for (size_t i = 0; i < teapot_meshes.size(); ++i)
 	{
@@ -268,7 +289,9 @@ void CG::RayTracerDemo::InitializeScene()
 		primitive_size += mesh.m_indices.size() / 3;
 	}
 
-	m_primitives.resize(primitive_size);
+	constexpr int additional_primitive = 1;
+
+	m_primitives.resize(primitive_size + additional_primitive);
 
 
 	int primitive_index = 0;
@@ -321,12 +344,21 @@ void CG::RayTracerDemo::InitializeScene()
 		}
 	}
 
+	m_primitives[primitive_index].Initialize(Primitive::SPHERE);
+	CGSphere& sphere = m_primitives[primitive_index].GetConvex<CGSphere>();
+	sphere.m_pos = CGVector3<float>(-0.2f, 0.f, -0.5f);
+	sphere.m_radius = 0.1f;
+
+	GPED::c3AABB sphere_aabb = makeAABB(glm::vec3(sphere.m_pos[0], sphere.m_pos[1], sphere.m_pos[2]), 
+		glm::vec3(sphere.m_radius));
+	m_broad_phase.CreateProxy(sphere_aabb, &m_primitives[primitive_index]);
 
 	Light point_light0;
 	point_light0.m_position = CGVector3<float>(0.0f, 0.1f, 0.f);
 	point_light0.m_color = CGVector3<float>(8.f, 4.f, 4.f);
 	// point_light0.m_attenuation = CGVector3<float>(1.f, 0.0014f, 0.000007f);
 	m_lights.push_back(point_light0);
+
 
 
 	double endTime = glfwGetTime();
@@ -394,7 +426,7 @@ void CG::RayTracerDemo::RayTrace()
 	printf("RayTrace Scene %lf(s)\n", duration);
 #else
 
-	const unsigned int thread_count = std::thread::hardware_concurrency() * 2;
+	const unsigned int thread_count = std::thread::hardware_concurrency();
 	printf("thread count : %u\n", thread_count);
 
 	char name_buf[256];
@@ -526,9 +558,22 @@ const std::shared_ptr<CG::Surfel> CG::RayTracerDemo::FindIntersection(const CGVe
 
 			CGRay ray(startPoint, startPoint + rayDir * m_camera_near_plane, m_camera_far_plane * 2.f);
 
-			CGScalar u, v, w, t;
-
-			bool hit = IntersectTruePlane(primitive->GetConvex<CGTriangle>(), ray, u, v, w, t);
+			CGScalar u = 0.f, v = 0.f, w = 0.f, t;
+			bool hit = false;
+			switch (primitive->m_shape_type)
+			{
+			case Primitive::SPHERE:
+			{
+				hit = Intersect(primitive->GetConvex<CGSphere>(), ray, t);
+				break;
+			}
+			case Primitive::PLANE:
+				hit = IntersectTruePlane(primitive->GetConvex<CGPlane>(), ray, t);
+				break;
+			case Primitive::TRIANGLE:
+				hit = IntersectTruePlane(primitive->GetConvex<CGTriangle>(), ray, u, v, w, t);
+				break;
+			}
 
 			if (hit && t < min_t)
 			{
@@ -564,8 +609,26 @@ const std::shared_ptr<CG::Surfel> CG::RayTracerDemo::FindIntersection(const CGVe
 		surfel->m_barycentric[2] = broad_ray_cast.hit_w;
 		surfel->m_position = pos + normalizedRay * broad_ray_cast.min_t;
 
-		CGTriangle& tri = broad_ray_cast.m_hit_primitive->GetConvex<CGTriangle>();
-		surfel->m_normal = Normalize(Cross(tri[1] - tri[0], tri[2] - tri[0]));
+		switch(broad_ray_cast.m_hit_primitive->m_shape_type)
+		{
+		case Primitive::SPHERE:
+		{
+			// TODO : use partial derivative to calculate the precise normal of sphere
+			CGSphere& sphere = broad_ray_cast.m_hit_primitive->GetConvex<CGSphere>();
+			surfel->m_normal = Normalize(surfel->m_position - sphere.m_pos);
+			break;
+		}
+		case Primitive::PLANE:
+		{
+			break;
+		}
+		case Primitive::TRIANGLE:
+		{
+			CGTriangle& tri = broad_ray_cast.m_hit_primitive->GetConvex<CGTriangle>();
+			surfel->m_normal = Normalize(Cross(tri[1] - tri[0], tri[2] - tri[0]));
+		}
+		}
+		
 
 		return surfel;
 	}

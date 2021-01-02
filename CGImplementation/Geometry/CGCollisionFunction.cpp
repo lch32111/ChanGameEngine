@@ -47,38 +47,67 @@ bool CG::Intersect(const CGSphere& a, const CGSphere& b, CGContact& c)
 	return true;
 }
 
-// Collision Detection in Interactive 3D Environments by Gino van den Bergen
-// From Section 3.1.2
+// Real Time Collision Detection 178p
+// From Section 5.3.2 Intersecting Ray or Sgment Agains Sphere
 bool CG::Intersect(const CGSphere& sphere, const CGRay& ray)
 {
-	// Translate Ray into the sphere local space;
-	CGRay tRay(ray.GetSource() - sphere.m_pos, ray.GetTarget() - sphere.m_pos, ray.GetMaxFraction());
+	CGVec3 m = ray.GetSource() - sphere.m_pos;
+	CGScalar b = Dot(m, ray.GetDirection());
+	CGScalar c = Dot(m, m) - sphere.m_radius * sphere.m_radius;
 
-	// Then Calculate the early exit for ray-sphere intersection
-	CGScalar sourceSqLength = Dot(tRay.GetSource(), tRay.GetSource());
-	CGVec3 r = tRay.GetTarget() - tRay.GetSource();	
-	CGScalar rSqLength = Dot(r, r);
+	if (c > CGScalar(0.0) && b > CGScalar(0.0)) 
+		return false;
 
-	CGScalar projectedLength = Dot(tRay.GetSource(), r);
+	CGScalar discr = b * b - c;
+	if (discr < CGScalar(0.0))
+		return false;
 
-	CGScalar EarlyExit = projectedLength * projectedLength -
-		rSqLength * (sourceSqLength - sphere.m_radius * sphere.m_radius);
+	return true;
+}
 
-	if (EarlyExit >= 0)
-		return true;
+bool CG::Intersect(const CGSphere& sphere, const CGRay& ray, CGScalar& enter)
+{
+	CGVec3 m = ray.GetSource() - sphere.m_pos;
+	CGScalar b = Dot(m, ray.GetDirection());
+	CGScalar c = Dot(m, m) - sphere.m_radius * sphere.m_radius;
 
-	// entry point is max(lambdaEnter, 0)
-	CGScalar lambdaEnter = (-projectedLength - CGScalarUtil::Sqrt(EarlyExit)) / (rSqLength * rSqLength);
+	if (c > CGScalar(0.0) && b > CGScalar(0.0))
+		return false;
+
+	CGScalar discr = b * b - c;
+	if (discr < CGScalar(0.0))
+		return false;
+
+	enter = -b - CGScalarUtil::Sqrt(discr);
+	if (enter < CGScalar(0.0))
+		enter = CGScalar(0.0);
+
+	return true;
+}
+
+bool CG::Intersect(const CGSphere& sphere, const CGRay& ray, CGScalar& enter, CGScalar& exit)
+{
+	CGVec3 m = ray.GetSource() - sphere.m_pos;
+	CGScalar b = Dot(m, ray.GetDirection());
+	CGScalar c = Dot(m, m) - sphere.m_radius * sphere.m_radius;
+
+	if (c > CGScalar(0.0) && b > CGScalar(0.0))
+		return false;
+
+	CGScalar discr = b * b - c;
+	if (discr < CGScalar(0.0))
+		return false;
 	
-	// exit point is min(lambdaExit, 1)
-	CGScalar lambdaExit = (-projectedLength + CGScalarUtil::Sqrt(EarlyExit)) / (rSqLength * rSqLength);
+	discr = CGScalarUtil::Sqrt(discr);
+	enter = -b - discr;
+	if (enter < CGScalar(0.0))
+		enter = CGScalar(0.0);
 
-	if (lambdaEnter <= CGScalar(1.0) && lambdaExit >= CGScalar(0.0))
-	{
-		return true;
-	}
+	exit = -b + discr;
+	if (exit > ray.GetMaxFraction())
+		exit = ray.GetMaxFraction();
 
-	return false;
+	return true;
 }
 
 bool CG::Intersect(const CGSphere& sphere, const CGLineSegment& segment)
@@ -96,7 +125,7 @@ bool CG::Intersect(const CGPlane& p, const CGRay& ray)
 
 	CGScalar t = (p.m_distance - Dot(p.m_normal, ray.GetSource())) / Dot(p.m_normal, maxTarget);
 
-	if (t >= CGScalar(0.f) && t <= CGScalar(1.f))
+	if (t >= CGScalar(0.0) && t <= CGScalar(1.0))
 	{
 		return true;
 	}
@@ -214,6 +243,21 @@ bool CG::IntersectTruePlane(const CGTriangle& tri, const CGRay& ray)
 	CGScalar u = CGScalar(1.0) - v - w;
 	*/
 	return true;
+}
+
+bool CG::IntersectTruePlane(const CGPlane& p, const CGRay& ray, CGScalar& t)
+{
+	CGVec3 rayDir = ray.GetDirection();
+	CGVec3 maxTarget = ray.GetSource() + rayDir * ray.GetMaxFraction();
+	CGScalar s = (p.m_distance - Dot(p.m_normal, ray.GetSource())) / Dot(p.m_normal, maxTarget);
+
+	if (s >= CGScalar(0.0) && s <= CGScalar(1.0))
+	{
+		t = s;
+		return true;
+	}
+
+	return false;
 }
 
 bool CG::IntersectTruePlane(const CGTriangle& tri, const CGRay& ray, 

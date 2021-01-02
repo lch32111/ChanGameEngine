@@ -79,4 +79,18 @@ typedef uint64_t u64;
 
 typedef double float64;
 
+namespace CG
+{
+	template<typename T> T GetMax(T a, T b)
+	{
+		return a < b ? b : a;
+	}
+
+	template<typename T> T GetMin(T a, T b)
+	{
+		return a < b ? a : b;
+	}
+}
+
+
 #endif

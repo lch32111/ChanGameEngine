@@ -179,7 +179,7 @@ namespace CG
 		const std::shared_ptr<Surfel> FindIntersection(const CGVector3<float>& x, const CGVector3<float>& wi);
 		CGVector3<float> ComputeLightIn(const CGVector3<float>& x, const CGVector3<float>& wi);
 		CGVector3<float> ComputeLightOut(const std::shared_ptr<Surfel>& surfel, const CGVector3<float>& wo);
-		bool Visible(const CGVector3<float>& x, const CGVector3<float>& y) { return true; }
+		bool Visible(const CGVector3<float>& y, const CGVector3<float>& x);
 
 		u32 m_image_width;
 		u32 m_image_height;

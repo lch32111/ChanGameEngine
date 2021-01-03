@@ -4,6 +4,10 @@
 
 #include <GPED/GPED_Precision.h>
 
+#include <Geometry/CGLineSegment.h>
+#include <Geometry/CGAABB.h>
+#include <Geometry/CGCollisionFunction.h>
+
 namespace CG
 {
 #define Node_Null -1
@@ -61,6 +65,9 @@ namespace CG
 
 		template<typename T>
 		void RayCast(T* callback, const GPED::c3RayInput& input) const;
+
+		template<typename T>
+		void LineSegmentCast(T* callback, const CGLineSegment& input) const;
 
 		int GetHeight() const;
 
@@ -156,7 +163,52 @@ namespace CG
 				{
 					bool proceed = callback->RayCastCallback(input, nodeId);
 					if (proceed == false)
-						return;
+						break;
+				}
+				else
+				{
+					stack[count++] = node->left;
+					stack[count++] = node->right;
+				}
+			}
+		}
+
+		free(stack);
+	}
+
+	template<typename T>
+	inline void DynamicAABBTree::LineSegmentCast(T* callback, const CGLineSegment& input) const
+	{
+		const int stackCapacity = m_nodeCount;
+		int* stack = (int*)malloc(sizeof(int) * m_nodeCount);
+		stack[0] = m_root;
+
+		int count = 1;
+		while (count)
+		{
+			assert(count < stackCapacity);
+			// Pop from the stack
+			int nodeId = stack[--count];
+
+			if (nodeId == Node_Null)
+				continue;
+
+			const TreeNode* node = m_nodes + nodeId;
+
+			// TODO : remove GPED from DynamicAABBTree
+			// c3AABB and CGAABB have same data layout
+			// So we can use like this temporarily
+			CGAABB cg_aabb;
+			cg_aabb.m_min = CGVec3(node->aabb.min[0], node->aabb.min[1], node->aabb.min[2]);
+			cg_aabb.m_max = CGVec3(node->aabb.max[0], node->aabb.max[1], node->aabb.max[2]);
+			
+			if (Intersect(cg_aabb, input))
+			{
+				if (node->isLeaf())
+				{
+					bool proceed = callback->LineSegmentCastCallback(input, nodeId);
+					if (proceed == false)
+						break;
 				}
 				else
 				{

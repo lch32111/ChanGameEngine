@@ -234,20 +234,23 @@ void CG::RayTracerDemo::ResizeWindowCallback(int width, int height)
 	glViewport(0, 0, width, height);
 
 #if !_DEBUG
-	m_image_width = width;
-	m_image_height = height;
+	if (m_image_width != width || m_image_height != height)
+	{
+		m_image_width = width;
+		m_image_height = height;
 
-	delete[] m_image_buffer;
-	delete[] m_duplicated_image_buffer;
+		delete[] m_image_buffer;
+		delete[] m_duplicated_image_buffer;
 
-	m_image_buffer = new CGVector3<float>[width * height];
-	m_duplicated_image_buffer = new CGVector3<float>[width * height];
-	RayTrace();
+		m_image_buffer = new CGVector3<float>[width * height];
+		m_duplicated_image_buffer = new CGVector3<float>[width * height];
+		RayTrace();
 
-	memcpy(m_duplicated_image_buffer, m_image_buffer, sizeof(CGVector3<float>) * (m_image_width * m_image_height));
+		memcpy(m_duplicated_image_buffer, m_image_buffer, sizeof(CGVector3<float>) * (m_image_width * m_image_height));
 
-	glBindTexture(GL_TEXTURE_2D, m_gl_image_tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image_width, m_image_height, 0, GL_RGB, GL_FLOAT, m_image_buffer);
+		glBindTexture(GL_TEXTURE_2D, m_gl_image_tex);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image_width, m_image_height, 0, GL_RGB, GL_FLOAT, m_image_buffer);
+	}
 #endif
 }
 
@@ -289,7 +292,7 @@ void CG::RayTracerDemo::InitializeScene()
 		primitive_size += mesh.m_indices.size() / 3;
 	}
 
-	constexpr int additional_primitive = 1;
+	constexpr int additional_primitive = 2;	// sphere and plane
 
 	m_primitives.resize(primitive_size + additional_primitive);
 
@@ -344,14 +347,36 @@ void CG::RayTracerDemo::InitializeScene()
 		}
 	}
 
-	m_primitives[primitive_index].Initialize(Primitive::SPHERE);
-	CGSphere& sphere = m_primitives[primitive_index].GetConvex<CGSphere>();
-	sphere.m_pos = CGVector3<float>(-0.2f, 0.f, -0.5f);
-	sphere.m_radius = 0.1f;
+	{
+		m_primitives[primitive_index].Initialize(Primitive::SPHERE);
+		CGSphere& sphere = m_primitives[primitive_index].GetConvex<CGSphere>();
+		sphere.m_pos = CGVector3<float>(-0.2f, 0.f, -0.5f);
+		sphere.m_radius = 0.1f;
 
-	GPED::c3AABB sphere_aabb = makeAABB(glm::vec3(sphere.m_pos[0], sphere.m_pos[1], sphere.m_pos[2]), 
-		glm::vec3(sphere.m_radius));
-	m_broad_phase.CreateProxy(sphere_aabb, &m_primitives[primitive_index]);
+		GPED::c3AABB sphere_aabb = makeAABB(glm::vec3(sphere.m_pos[0], sphere.m_pos[1], sphere.m_pos[2]),
+			glm::vec3(sphere.m_radius));
+		m_broad_phase.CreateProxy(sphere_aabb, &m_primitives[primitive_index]);
+
+		++primitive_index;
+	}
+	
+	{
+		m_primitives[primitive_index].Initialize(Primitive::PLANE);
+		CGPlane& plane = m_primitives[primitive_index].GetConvex<CGPlane>();
+
+		constexpr float plane_neg_y_distance = -100.f;
+		plane.m_distance = plane_neg_y_distance;
+		plane.m_normal = CGVector3<float>(0.f, 1.f, 0.f);
+
+		// make enough big plane
+		GPED::c3AABB plane_aabb;
+		plane_aabb.min = glm::vec3(-1000.f, plane_neg_y_distance, -1000.f);
+		plane_aabb.max = glm::vec3(1000.f, plane_neg_y_distance + 0.1f, 1000.f);
+		m_broad_phase.CreateProxy(plane_aabb, &m_primitives[primitive_index]);
+
+		++primitive_index;
+	}
+
 
 	Light point_light0;
 	point_light0.m_position = CGVector3<float>(0.0f, 0.1f, 0.f);
@@ -359,7 +384,17 @@ void CG::RayTracerDemo::InitializeScene()
 	// point_light0.m_attenuation = CGVector3<float>(1.f, 0.0014f, 0.000007f);
 	m_lights.push_back(point_light0);
 
+	Light point_light1;
+	point_light1.m_position = CGVector3<float>(-0.2f, 0.2f, -0.4f);
+	point_light1.m_color = CGVector3<float>(4.f, 4.f, 8.f);
+	// point_light0.m_attenuation = CGVector3<float>(1.f, 0.0014f, 0.000007f);
+	m_lights.push_back(point_light1);
 
+	Light point_light2;
+	point_light2.m_position = CGVector3<float>(-0.2f, -0.2f, -0.2f);
+	point_light2.m_color = CGVector3<float>(8.f, 7.f, 0.f);
+	// point_light0.m_attenuation = CGVector3<float>(1.f, 0.0014f, 0.000007f);
+	m_lights.push_back(point_light2);
 
 	double endTime = glfwGetTime();
 
@@ -539,6 +574,7 @@ const std::shared_ptr<CG::Surfel> CG::RayTracerDemo::FindIntersection(const CGVe
 		return -1;
 	}
 #else
+
 	struct BroadClosesetRayCast : BroadRayCast
 	{
 		float m_camera_near_plane = 0.f;
@@ -586,7 +622,6 @@ const std::shared_ptr<CG::Surfel> CG::RayTracerDemo::FindIntersection(const CGVe
 
 			return true;
 		}
-
 	};
 
 	BroadClosesetRayCast broad_ray_cast;
@@ -620,6 +655,8 @@ const std::shared_ptr<CG::Surfel> CG::RayTracerDemo::FindIntersection(const CGVe
 		}
 		case Primitive::PLANE:
 		{
+			CGPlane& plane = broad_ray_cast.m_hit_primitive->GetConvex<CGPlane>();
+			surfel->m_normal = plane.m_normal;
 			break;
 		}
 		case Primitive::TRIANGLE:
@@ -669,7 +706,7 @@ CG::CGVector3<float> CG::RayTracerDemo::ComputeLightOut(const std::shared_ptr<Su
 	{
 		const CGVector3<float>& y = light.m_position;
 
-		if (Visible(x, y))
+		if (Visible(y, x))
 		{
 			const CGVector3<float> wi = Normalize(y - x);
 			const CGVector3<float> bi_radiance = light.GetBiradiance(x);
@@ -680,6 +717,74 @@ CG::CGVector3<float> CG::RayTracerDemo::ComputeLightOut(const std::shared_ptr<Su
 	}
 	
 	return radiance;
+}
+
+bool CG::RayTracerDemo::Visible(const CGVector3<float>& y, const CGVector3<float>& x)
+{
+	// TODO : bump the ray with epsilon value for shadow
+	// Line Segment Work needed!!!!!!!
+	CGLineSegment line_seg;
+	line_seg.m_source = y;
+	line_seg.m_target = x;
+
+	struct BroadLineSegmentCast : BroadLineCast
+	{
+		Primitive* m_hit_primitive = nullptr;
+
+		bool LineSegmentCastCallback(const CGLineSegment& input, int nodeId)
+		{
+			void* data = m_broad_phase->GetUserData(nodeId);
+			Primitive* primitive = (Primitive*)data;
+
+			CGScalar t = 0.f;
+			bool hit = false;
+			switch (primitive->m_shape_type)
+			{
+			case Primitive::SPHERE:
+			{
+				hit = Intersect(primitive->GetConvex<CGSphere>(), input, t);
+				break;
+			}
+			case Primitive::PLANE:
+			{
+				hit = Intersect(primitive->GetConvex<CGPlane>(), input, t);
+				break;
+			}
+			case Primitive::TRIANGLE:
+			{
+				hit = Intersect(primitive->GetConvex<CGTriangle>(), input, t);
+				break;
+			}
+			}
+			
+			if (hit == true) 
+			{
+				if(CGScalarOp<float>::Abs(t - 1.f) > 0.001f)
+				{
+					m_hit_primitive = primitive;
+
+					// we don't need to find other primitives because it's now intersecting other
+					// it indicates we should give it a shadow
+					return false;
+				}
+			}
+
+			// if there is no overlapped primitive, we should keep finding other primitives
+			return true;
+		}
+	};
+
+	BroadLineSegmentCast broad_line_seg_cast;
+	broad_line_seg_cast.m_broad_phase = &m_broad_phase;
+	m_broad_phase.LineSegmentCast(&broad_line_seg_cast, line_seg);
+	if (broad_line_seg_cast.m_hit_primitive != nullptr)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 /* ### RayTracerDemo Demo ### */

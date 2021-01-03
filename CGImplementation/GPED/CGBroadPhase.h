@@ -51,6 +51,9 @@ namespace CG
 		template<typename T>
 		void RayCast(T* callback, const GPED::c3RayInput& input) const;
 
+		template<typename T>
+		void LineSegmentCast(T* callback, const CGLineSegment& input) const;
+
 		const DynamicAABBTree* getTree() const
 		{
 			return &m_tree;
@@ -151,6 +154,12 @@ namespace CG
 		m_tree.RayCast(callback, input);
 	}
 
+	template<typename T>
+	inline void CGBroadPhase::LineSegmentCast(T* callback, const CGLineSegment& input) const
+	{
+		m_tree.LineSegmentCast(callback, input);
+	}
+
 	/* 181116 Chanhaneg Lee
 	   Wrapper Class to get pairs of potential collisions from the BroadPhase
 	   You should pass this class to the parameter of the UpdatePairs method of BroadPhase
@@ -248,6 +257,13 @@ namespace CG
 
 		const CGBroadPhase* broadPhase;
 		CGRayCastCallback* callback;
+	};
+
+	struct BroadLineCast
+	{
+	public:
+		virtual bool LineSegmentCastCallback(const CGLineSegment& input, int nodeId) = 0;
+		const CGBroadPhase* m_broad_phase;
 	};
 
 	struct BroadRayCastWrapper : BroadRayCast

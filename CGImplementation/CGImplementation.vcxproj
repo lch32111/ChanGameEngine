@@ -215,6 +215,7 @@
     <ClInclude Include="Demo\CollisionTestBedDemo.h" />
     <ClInclude Include="Demo\CullingDemo.h" />
     <ClInclude Include="Demo\RayTracerDemo.h" />
+    <ClInclude Include="Geometry\CGAABB.h" />
     <ClInclude Include="Geometry\CGCollisionFunction.h" />
     <ClInclude Include="Geometry\CGGeometryConfig.h" />
     <ClInclude Include="Geometry\CGConvex.h" />

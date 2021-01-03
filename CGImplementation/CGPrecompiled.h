@@ -90,6 +90,13 @@ namespace CG
 	{
 		return a < b ? a : b;
 	}
+
+	template<typename T> void Swap(T& a, T& b)
+	{
+		T t = a;
+		a = b;
+		b = t;
+	}
 }
 
 

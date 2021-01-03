@@ -629,6 +629,9 @@
     <ClInclude Include="Geometry\CGTriangle.h">
       <Filter>Geometry\Header</Filter>
     </ClInclude>
+    <ClInclude Include="Geometry\CGAABB.h">
+      <Filter>Geometry\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderFolder\DeferredFirst.fs">

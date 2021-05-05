@@ -40,6 +40,24 @@ While I was doing this project, I implemented these list:
 **Physics**
 
 * Most of physics theories and implementations are based on the "Game Physics Engine Development" Book.
-* And other codes such as broadphase, dynamicAABBtree, rayPick are based on Box2D and BulletPhysics Library.
+* And other codes such as Broad Phase, DynamicAABBtree, Ray Picking are based on Box2D and BulletPhysics Library.
 * Terrain Physics between terrain triangles and spheres.
+
+
+
+## 2020.12 ~ 2021.01
+
+I had stopped this project after I got the job as a game engine programmer. But I have an interest in the high quality rendering, especially using ray tracing. So, I got enough time at this period to study a little of the ray tracing. This is the simple scene I made with the ray tracing :
+
+![ray_trace_simple_trial](img/raytracing_try.png)
+
+I Implemented these for this ray-traced scene :
+
+* **Rendering Equation** : I'm using [the Graphics Codex](http://graphicscodex.com/index.php) to learn the rendering equation. And I also refer to the sample code provided with the Graphics Codex in [G3D Innovation Engine](https://casual-effects.com/g3d/www/index.html).
+* **Primitive Intersection** : Sphere, Plane, Ray, Line Segment, Triangle. I referred to the [RTCD](https://realtimecollisiondetection.net/) to implement all of the intersections.
+* **Bounding Volume Hierarchy** : In order to accelerate the ray intersection, I used the Dynamic AABB Tree, which I implemented by referring to the [box2D](https://github.com/erincatto/box2d) code.
+
+In addition to the above, I used the threads to accelerate the ray tracing by separating the pixels with some threads.
+
+Because I'm using the Graphics Codex to improve my graphics ability, I am going to study BSDF, Path Tracing, Photon Mapping, and so on. Before going deeper on this, I realized that I don't have enough base knowledge on statistics. So I've decided to study it. After that, I can restart this ray tracing work.
 

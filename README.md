@@ -1,6 +1,6 @@
 # ChanGameEngine
 
-This is the my personal game engine, which is a kind of experiment lab for me. I've started this project as the game engine project, but it's just becoming my experiment. However, I still have the goal to make my own game engine. 
+This is my personal game engine, which is a kind of experiment lab for me. I've started this project as the game engine project, but it's just becoming my experiment. However, I still have the goal to make my own game engine. 
 
 the program structure and the build system of this project is not good because I didn't know anything about those topics when I started this project. But I've experienced the game engine development in the company. Now, I am ready to change this project. Before doing that, I can show what I did with this project.
 
@@ -20,7 +20,7 @@ you can see the video of this [here](https://youtu.be/KSpS1TO2YgM).
 
 
 
-While I was doing this project, I implemented these list:
+While I was doing this project, I implemented these things:
 
 **Graphics**
 
@@ -28,14 +28,14 @@ While I was doing this project, I implemented these list:
 * PostProcessing : HDR, Bloom, SSAO.
 * Terrain Rendering with Perlin noise and height map (you can see the terrain rendering and physics [here](https://www.youtube.com/watch?v=gEwG9HVjTYk))
 
-**Light** (you can see the light editing video [here]([Implemented Shadow of Dir, Point, Spot Light - YouTube](https://www.youtube.com/watch?v=0eW7ttd--IM)))
+**Light** (you can see the video editing lights [here]([Implemented Shadow of Dir, Point, Spot Light - YouTube](https://www.youtube.com/watch?v=0eW7ttd--IM)))
 
 * The types of light : Directional, Point, and Spot light.
 
-* Editing light : Position, Direction, Ambient/Diffuse/Specular Color, Attenunation factors, light radius.
+* Light Interactions : Position, Direction, Ambient/Diffuse/Specular Color, Attenuation factors, light radius.
 * Range Visualizer for each light type
-* shadow cast for each light type
-* editing the shadow frustum for each light type
+* Shadow cast for each light type
+* Editing the shadow frustum for each light type
 
 **Physics**
 

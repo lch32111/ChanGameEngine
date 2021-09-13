@@ -26,22 +26,21 @@ While I was doing this project, I implemented these things:
 
 * The graphics engine is based on the deferred shading. All of objects in game world will be drawn by the technique.
 * PostProcessing : HDR, Bloom, SSAO.
-* Terrain Rendering with Perlin noise and height map (you can see the terrain rendering and physics [here](https://www.youtube.com/watch?v=gEwG9HVjTYk))
+* [Terrain Rendering](https://www.youtube.com/watch?v=gEwG9HVjTYk) with Perlin noise and height map (you can see the terrain rendering and physics
 
-**Light** (you can see the video editing lights [here]([Implemented Shadow of Dir, Point, Spot Light - YouTube](https://www.youtube.com/watch?v=0eW7ttd--IM)))
+**Light**
 
+* [Editing light properties](https://www.youtube.com/watch?v=0eW7ttd--IM) : Position, Direction, Ambient/Diffuse/Specular Color, Attenuation factors, light radius.
 * The types of light : Directional, Point, and Spot light.
-
-* Light Interactions : Position, Direction, Ambient/Diffuse/Specular Color, Attenuation factors, light radius.
 * Range Visualizer for each light type
 * Shadow cast for each light type
 * Editing the shadow frustum for each light type
 
 **Physics**
 
-* Most of physics theories and implementations are based on the "Game Physics Engine Development" Book.
+* Most of physics theories and implementations are based on the "Game Physics Engine Development" Book. This book does not solve a jitter problem caused by its implementation. So it changed my research direction toward Box2D and BulletPhysics Library to learn a valid physics engine implementation. So, I studied the Erin Catto's GDC presentation for Sequential Impulse Constraint Solver and his implementation in [my other repository](https://github.com/lch32111/ChPhysicsEngine/tree/master/ChanPhysicsPlayGround). And the video about it is [here](https://www.youtube.com/watch?v=c333rQkeskM).
 * And other codes such as Broad Phase, DynamicAABBtree, Ray Picking are based on Box2D and BulletPhysics Library.
-* Terrain Physics between terrain triangles and spheres.
+* [Terrain Physics](https://www.youtube.com/watch?v=gEwG9HVjTYk) between terrain triangles and spheres.
 
 
 

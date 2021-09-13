@@ -237,7 +237,7 @@ void CG::DynamicAABBTree::InsertLeaf(int leaf)
 		// Cost of creating a new parent for this node and the new leaf
 		GPED::real cost = GPED::real(2.0) * combinedArea;
 
-		// Minimum cost of pushing the leaf further down the three
+		// Minimum cost of pushing the leaf further down the tree
 		GPED::real inheritanceCost = GPED::real(2.0) * (combinedArea - area);
 
 		// Cost of descending into left child

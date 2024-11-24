@@ -1,8 +1,8 @@
 # ChanGameEngine
 
-This is my personal game engine, which is a kind of experiment lab for me. I've started this project as the game engine project, but it's just becoming my experiment. However, I still have the goal to make my own game engine. 
+I started this project as my game engine project, but it became just my experiment. I don't update codes here anymore, because I start to work on my second library.
 
-the program structure and the build system of this project is not good because I didn't know anything about those topics when I started this project. But I've experienced the game engine development in the company. Now, I am ready to change this project. Before doing that, I can show what I did with this project.
+
 
 
 
